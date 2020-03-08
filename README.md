@@ -1,10 +1,23 @@
-# f5-fast README
+# vscode-f5-fast README
 
-This is the README for the F5 Automation Services Templates, "vscode-f5-fast". 
+This is the README for the F5 Automation Services Templates(FAST), "vscode-f5-fast". 
 
-This extension is intented to help interface with FAST to manage templates and deploy applications.
+This extension is intented to help interface with the FAST servoce to manage templates and deploy applications.
 
-## Features
+
+## Features and workflows
+
+* Connect to FAST service/engine (via API)
+  * Manage multiple FAST services
+    * select which one to work with
+  * Authenticate
+  * List templates
+  * Upload template
+  * Clone template?
+  * Create template
+  * Deploy template
+
+[Detailed work flow ideas] (./workflows.md)
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
@@ -14,9 +27,33 @@ For example if there is an image subfolder under your extension project workspac
 
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
+## History
+
+WikiPedia: Visual Studio Code
+    [https://en.wikipedia.org/wiki/Visual_Studio_Code]
+
+What is the difference between an IDE and an editor?
+    [https://discuss.atom.io/t/what-is-the-difference-between-an-ide-and-an-editor/32629]
+
+StackOverFlow: Developer Survey Results
+    [https://insights.stackoverflow.com/survey/2019#development-environments-and-tools]
+
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Currently utilizing built in node modules, no external dependencies yet...
+
+### Imports:
+
+* http/https
+
+### Future dependency predictions:
+* some sort of json/yaml linter(intellisense) (what is the difference?)
+* json parser?
+* authentication
+  * basic
+  * auth token
+* timestamp/uuid generator
+* CodeLens to provide inline links to do things like post highlighted json...[https://github.com/microsoft/vscode-extension-samples/tree/master/codelens-sample]
 
 ## Extension Settings
 

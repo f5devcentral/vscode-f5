@@ -1,6 +1,6 @@
 {
-	"name": "f5-fast",
-	"displayName": "f5-fast",
+	"name": "vscode-f5-fast",
+	"displayName": "vscode-f5-fast",
 	"description": "",
 	"version": "0.0.1",
 	"engines": {
