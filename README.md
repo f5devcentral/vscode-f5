@@ -11,11 +11,29 @@ This extension is intented to help interface with the FAST servoce to manage tem
   * Manage multiple FAST services
     * select which one to work with
   * Authenticate
+    * Basic Auth
+    * Token Auth
   * List templates
+  * Modify template
   * Upload template
   * Clone template?
   * Create template
   * Deploy template
+* Highlight suggested variable placement
+  * take a raw as3 declaration with no variables, just unique names like posting directly to as3, with a hot-key-combo, highlight all the typical areas that would need to be replaced with variables to make the declaration a template
+* Intelligent posting:
+  * utilize async functions
+  * key off 202 of original post till job completes
+  * Settings like job check delay 3 or 5 seconds
+* Autocomplete
+  * Provide suggestions for autocomplete of words
+* CodeSnippets
+  * Provide code snippets to complete parts of the declaration
+  * start typing a class object name, it can provide the remaining brackets/commas to comlete the object, including required class definition
+  * Once class definition is complete provide options for snippits/autocomplete of options only available to that class
+* Provide easy links to public github repos, schemas, and documentation
+
+
 
 [Detailed work flow ideas] (./workflows.md)
 
@@ -29,14 +47,9 @@ For example if there is an image subfolder under your extension project workspac
 
 ## History
 
-WikiPedia: Visual Studio Code
-    [https://en.wikipedia.org/wiki/Visual_Studio_Code]
-
-What is the difference between an IDE and an editor?
-    [https://discuss.atom.io/t/what-is-the-difference-between-an-ide-and-an-editor/32629]
-
-StackOverFlow: Developer Survey Results
-    [https://insights.stackoverflow.com/survey/2019#development-environments-and-tools]
+* [WikiPedia: Visual Studio Code](https://en.wikipedia.org/wiki/Visual_Studio_Code)
+* [What is the difference between an IDE and an editor?](https://discuss.atom.io/t/what-is-the-difference-between-an-ide-and-an-editor/32629)
+* [StackOverFlow: Developer Survey Results](https://insights.stackoverflow.com/survey/2019#development-environments-and-tools)
 
 ## Requirements
 

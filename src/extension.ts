@@ -29,16 +29,19 @@ export function activate(context: vscode.ExtensionContext) {
 				  chunks.push(chunk);
 				});
 				response.on('end', () => {
-				  const result = Buffer.concat(chunks).toString();
+				  const result = JSON.parse(Buffer.concat(chunks).toString());
 				  console.log(result);
-				  console.log(result);
-				  //vscode.window.showTextDocument(document:)
+				  console.log(result.value);
+				  vscode.window.openTextDocument(result.id);
+				  let doc = vscode.workspace.openTextDocument(result.value);
+				  vscode.window.showTextDocument(doc, { preview: false });
+				  //vscode.window
 				});
 				var setting: vscode.Uri = vscode.Uri.parse("untitled:" + "C:\summary.txt");
 				vscode.workspace.openTextDocument(setting).then((a: vscode.TextDocument) => {
 					vscode.window.showTextDocument(a, 1, false).then(e => {
 						e.edit(edit => {
-							edit.insert(new vscode.Position(0, 0), "Your advertisement here");
+							edit.insert(new vscode.Position(0, 0), 'insert text here!');
 						});
 					});
 				}, (error: any) => {
@@ -52,9 +55,9 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('Hello World!');
 	});
 
-
 	context.subscriptions.push(disposable);
 }
+
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
