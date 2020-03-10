@@ -4,6 +4,9 @@ This is the README for the F5 Automation Services Templates(FAST), "vscode-f5-fa
 
 This extension is intented to help interface with the FAST servoce to manage templates and deploy applications.
 
+## Index
+
+* [Detailed work flow ideas](./workflows.md)
 
 ## Features and workflows
 
@@ -35,7 +38,6 @@ This extension is intented to help interface with the FAST servoce to manage tem
 
 
 
-[Detailed work flow ideas] (./workflows.md)
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
