@@ -9,6 +9,7 @@ This extension is intented to help interface with the FAST servoce to manage tem
 ## Index
 
 * [Project Ideas](./project_details.md)
+* [Extension Interface](./extensionInterface.md)
 * [Detailed work flow ideas](./workflows.md)
 * [Research](./research.md)
 
