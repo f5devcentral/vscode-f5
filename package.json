@@ -16,12 +16,8 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "cowsay.say",
-				"title": "cowsay"
-			},
-			{
 				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"title": "f5-fast"
 			}
 		]
 	},
