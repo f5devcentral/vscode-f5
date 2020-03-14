@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "f5-fast" is now active!');
+	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
 				method: 'GET',
 			},
 			response => {
-				const chunks = [];
+				const chunks = "";
 				response.on('data', (chunk) => {
 				  chunks.push(chunk);
 				});
@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 				  const result = JSON.parse(Buffer.concat(chunks).toString());
 				  console.log(result);
 				  console.log(result.value);
-				  vscode.window.openTextDocument(result.id);
+				  vscode.window.showTextDocument(result.id);
 				  let doc = vscode.workspace.openTextDocument(result.value);
 				  vscode.window.showTextDocument(doc, { preview: false });
 				  //vscode.window
