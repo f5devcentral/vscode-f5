@@ -1,67 +1,57 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { request } from 'https';
 
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		const req = request(
-			{
-				host: 'api.chucknorris.io',
-				path: '/jokes/random',
-				method: 'GET',
-			},
-			response => {
-				const chunks = "";
+	// functionality: configure tree view
+	//	-- https://medium.com/@sanaajani/creating-your-first-vs-code-extension-8dbdef2d6ad9
+	//	-- https://github.com/Microsoft/vscode-extension-samples/tree/master/tree-view-sample
+	//	-- https://stackoverflow.com/search?q=%5Bvisual-studio-code%5D+TreeDataProvider
+	//	-- https://stackoverflow.com/questions/56534723/simple-example-to-implement-vs-code-treedataprovider-with-json-data
+
+	
+	// command: execute bash/tmsh on device
+	//	-- use device details from tree view, post api to bash endpoint, show response
+
+
+
+	let disposable = vscode.commands.registerCommand('extension.chuckJoke', async () => {
+		//  https://api.chucknorris.io/jokes/random
+		const chuckApiCall = {
+			host: 'api.chucknorris.io',
+			path: '/jokes/random',
+			method: 'GET',
+		}
+		const req = request(chuckApiCall, response => {
+				const chunks: any[] = [];
 				response.on('data', (chunk) => {
-				  chunks.push(chunk);
+					chunks.push(chunk);
 				});
 				response.on('end', () => {
-				  const result = JSON.parse(Buffer.concat(chunks).toString());
-				  console.log(result);
-				  console.log(result.value);
-				  vscode.window.showTextDocument(result.id);
-				  let doc = vscode.workspace.openTextDocument(result.value);
-				  vscode.window.showTextDocument(doc, { preview: false });
-				  //vscode.window
-				});
-				var setting: vscode.Uri = vscode.Uri.parse("untitled:" + "C:\summary.txt");
-				vscode.workspace.openTextDocument(setting).then((a: vscode.TextDocument) => {
-					vscode.window.showTextDocument(a, 1, false).then(e => {
-						e.edit(edit => {
-							edit.insert(new vscode.Position(0, 0), 'insert text here!');
-						});
-					});
-				}, (error: any) => {
-					console.error(error);
-					debugger;
+					const result = JSON.parse(Buffer.concat(chunks).toString());
+					console.log('chuck joke: ', result.value);
+					vscode.window.showInformationMessage(`Getting Joke from https://api.chucknorris.io/jokes/random`);
+
+
+					if (result) {
+						vscode.workspace.openTextDocument({ content: `Chuck Joke: \r\n\r\n${ result.value }`).then(
+							doc => vscode.window.showTextDocument(doc, { preview: false })
+						), (error: any) => {
+							console.error(error)
+							debugger
+						}
+					}
 				});
 			}
 		);
 		req.end();
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
 	});
-
 	context.subscriptions.push(disposable);
 }
 
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
-
-
-
-//  https://api.chucknorris.io/jokes/random

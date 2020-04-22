@@ -10,14 +10,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.chuckJoke"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "f5-fast"
+				"command": "extension.chuckJoke",
+				"title": "f5-fast: Chuck Joke"
 			}
 		]
 	},
