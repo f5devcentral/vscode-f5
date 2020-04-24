@@ -8,10 +8,12 @@ This extension is intented to help interface with the FAST servoce to manage tem
 
 ## Index
 
-* [Project Ideas](./project_details.md)
-* [Extension Interface](./extensionInterface.md)
-* [Detailed work flow ideas](./workflows.md)
-* [Research](./research.md)
+* [CHANGELOG](CHANGELOG.md)
+* [VS Code Exension Dev Quickstart](./README_docs/vsc-extension-quickstart.md)
+* [Project Ideas](./README_docs/project_details.md)
+* [Extension Interface](./README_docs/extensionInterface.md)
+* [Detailed work flow ideas](./README_docs/workflows.md)
+* [Research](./README_docs/research.md)
 
 ---
 

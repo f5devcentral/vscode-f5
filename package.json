@@ -10,14 +10,43 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.chuckJoke"
+		"onCommand:chuckJoke",
+		"onCommand:extension.remoteCommand",
+		"onCommand:f5-fast.openSettings"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": [
+			{
+				"title": "f5-fast",
+				"properties": {
+					"f5-fast.hosts": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "BIG-IP/Fast Host",
+							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
+						},
+						"default": [
+							"admin@192.168.1.245"
+						],
+						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format"
+					}
+				}
+			}
+		],
 		"commands": [
 			{
-				"command": "extension.chuckJoke",
+				"command": "chuckJoke",
 				"title": "f5-fast: Chuck Joke"
+			},
+			{
+				"command": "extension.remoteCommand",
+				"title": "f5-fast: Remote Command Execute"
+			},
+			{
+				"command": "f5-fast.openSettings",
+				"title": "f5-fast: settings"
 			}
 		]
 	},

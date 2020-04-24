@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { chuckJoke } from './chuckJoke';
 import { request } from 'https';
 
 
@@ -12,43 +13,50 @@ export function activate(context: vscode.ExtensionContext) {
 	//	-- https://stackoverflow.com/search?q=%5Bvisual-studio-code%5D+TreeDataProvider
 	//	-- https://stackoverflow.com/questions/56534723/simple-example-to-implement-vs-code-treedataprovider-with-json-data
 
+	//	-- Example tree view for devices and details 
+	// 		https://github.com/microsoft/vscode-cosmosdb
+	// 		https://github.com/formulahendry/vscode-docker-explorer
+
 	
 	// command: execute bash/tmsh on device
 	//	-- use device details from tree view, post api to bash endpoint, show response
 
+	//	1.	move chuck joke to function in other file - DONE
+	// 	2.	configure extension config to manage device list 
+	//		2a.	settings structure to host devices - DONE
+	//		2b.	command to quickly bring up settings - DONE
+	//		2c.	quickPick list of hosts - just log what was selected
+	//	3.	inputBox for passwords, keyring to store them
+	//	4.	tree view in F5 container
+	//		4a.	F5 tree view contianer with f5 logo
+	//		4b.	display hosts from config file in tree view
+	//		4c. add/edit/delete device from tree view
+	//	5.	configure tests?  mocha?
+	//	6.	list fast templates under device in tree view
+	//		6a.	when selected in tree view, display template in editor
+	//	7.	list deployed applications in tree view
+	//		7a.	when selected in tree view, display template in editor
+	//	8.	configure JSON output highlighting like RestClient
 
 
-	let disposable = vscode.commands.registerCommand('extension.chuckJoke', async () => {
-		//  https://api.chucknorris.io/jokes/random
-		const chuckApiCall = {
-			host: 'api.chucknorris.io',
-			path: '/jokes/random',
-			method: 'GET',
-		}
-		const req = request(chuckApiCall, response => {
-				const chunks: any[] = [];
-				response.on('data', (chunk) => {
-					chunks.push(chunk);
-				});
-				response.on('end', () => {
-					const result = JSON.parse(Buffer.concat(chunks).toString());
-					console.log('chuck joke: ', result.value);
-					vscode.window.showInformationMessage(`Getting Joke from https://api.chucknorris.io/jokes/random`);
+	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', () => {
+		// console.log('befor Chuck func call');
+		chuckJoke();
+	}));
 
 
-					if (result) {
-						vscode.workspace.openTextDocument({ content: `Chuck Joke: \r\n\r\n${ result.value }`).then(
-							doc => vscode.window.showTextDocument(doc, { preview: false })
-						), (error: any) => {
-							console.error(error)
-							debugger
-						}
-					}
-				});
-			}
-		);
-		req.end();
-	});
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.openSettings', () => {
+		// console.log('befor Chuck func call');
+		//chuckJoke();
+		return vscode.commands.executeCommand("workbench.action.openSettings", "f5-fast");
+	}));
+
+
+	
+//original way the example extension structured the command
+	let disposable = vscode.commands.registerCommand('extension.remoteCommand', async () => {
+		vscode.window.showInformationMessage('placeholder to execute command on bigip...')
+	});	
 	context.subscriptions.push(disposable);
 }
 
