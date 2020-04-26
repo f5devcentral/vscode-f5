@@ -1,21 +1,76 @@
 {
 	"name": "vscode-f5-fast",
-	"displayName": "vscode-f5-fast",
-	"description": "",
+	"displayName": "F5 Networks FAST",
+	"description": "(F)5 Networks (A)utomation (S)ervices (T)emplate engine extension",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.42.0"
 	},
+	"bugs": {
+		"url": "https://github.com/DumpySquare/vscode-f5-fast/issues"
+	},
+	"license": "SEE LICENSE IN LICENSE.txt",
+	"icon": "images/f5.png",
+	"galleryBanner": {
+		"color": "#DCDCDC",
+		"theme": "light"
+	},
+	"homepage": "https://github.com/DumpySquare/vscode-f5-fast/blob/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DumpySquare/vscode-f5-fast.git"
+	},
 	"categories": [
-		"Other"
+		"Formatters",
+		"Other",
+		"Programming Languages",
+		"Snippets"
 	],
 	"activationEvents": [
 		"onCommand:chuckJoke",
 		"onCommand:extension.remoteCommand",
-		"onCommand:f5-fast.openSettings"
+		"onCommand:f5-fast.openSettings",
+		"onCommand:f5-fast.connectDevice",
+		"onCommand:f5-fast.connectDevice2",
+		"onView:f5Hosts"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "f5-fast-view-container",
+					"title": "BIG-IPs",
+					"icon": "images/f5_white_24x24.svg"
+				}
+			]
+		},
+		"views": {
+			"f5-fast-view-container": [
+				{
+					"id": "f5Hosts",
+					"name": "f5 Hosts"
+				},
+				{
+					"id": "localFastTemplates",
+					"name": "local FAST Templates"
+				},
+				{
+					"id": "nodeDependencies",
+					"name": "node Dependencies"
+				},
+				{
+					"id": "carTree",
+					"name": "Car Tree"
+				}
+			],
+      "explorer": [
+        {
+          "id": "f5Fast",
+          "name": "f5 faster"
+        }
+      ]
+    },
 		"configuration": [
 			{
 				"title": "f5-fast",
@@ -37,6 +92,14 @@
 		],
 		"commands": [
 			{
+				"command": "f5-fast.connectDevice",
+				"title": "f5-fast: Connect to Device"
+			},
+			{
+				"command": "f5-fast.connectDevice2",
+				"title": "f5-fast: Connect to Device-2"
+			},
+			{
 				"command": "chuckJoke",
 				"title": "f5-fast: Chuck Joke"
 			},
@@ -47,8 +110,79 @@
 			{
 				"command": "f5-fast.openSettings",
 				"title": "f5-fast: settings"
+			},
+			{
+				"command": "f5-fast.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5-fast.addEntry",
+				"title": "Addd"
+			},
+			{
+				"command": "nodeDependencies.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "nodeDependencies.addEntry",
+				"title": "Addd"
+			},
+			{
+				"command": "nodeDependencies.editEntry",
+				"title": "Edit",
+				"icon": {
+					"light": "resources/light/edit.svg",
+					"dark": "resources/dark/edit.svg"
+				}
+			},
+			{
+				"command": "nodeDependencies.deleteEntry",
+				"title": "Delete"
 			}
-		]
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "f5-fast.refreshEntry",
+					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5-fast.addEntry",
+					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "nodeDependencies.refreshEntry",
+					"when": "view == nodeDependencies",
+					"group": "navigation"
+				},
+				{
+					"command": "nodeDependencies.addEntry",
+					"when": "view == nodeDependencies",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "nodeDependencies.editEntry",
+					"when": "view == nodeDependencies && viewItem == dependency",
+					"group": "inline"
+				},
+				{
+					"command": "nodeDependencies.deleteEntry",
+					"when": "view == nodeDependencies && viewItem == dependency"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

@@ -1,0 +1,41 @@
+[
+  {
+    "collapsibleState": 0,
+    "label": "device1",
+    "version": "^0.4.2",
+    "command": {
+      "command": "extension.openPackageOnNpm",
+      "title": "",
+      "arguments": [
+        "jsonc-parser"
+      ]
+    },
+    "contextValue": "dependency"
+  },
+  {
+    "collapsibleState": 0,
+    "label": "device2",
+    "version": "^0.3.10",
+    "command": {
+      "command": "extension.openPackageOnNpm",
+      "title": "",
+      "arguments": [
+        "ftp"
+      ]
+    },
+    "contextValue": "dependency"
+  },
+  {
+    "collapsibleState": 0,
+    "label": "device3",
+    "version": "^0.5.1",
+    "command": {
+      "command": "extension.openPackageOnNpm",
+      "title": "",
+      "arguments": [
+        "mkdirp"
+      ]
+    },
+    "contextValue": "dependency"
+  }
+]
