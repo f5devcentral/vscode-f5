@@ -10,6 +10,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
 
+	let runDevices = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	runDevices.command = 'extension.disconnect';
+	// runDevices.color = '#42b883';
+	runDevices.text = "yay F5!!!";
+	runDevices.tooltip = 'Disconnect';
+	runDevices.show();
+
 	// functionality: configure tree view
 	//	-- https://medium.com/@sanaajani/creating-your-first-vs-code-extension-8dbdef2d6ad9
 	//	-- https://github.com/Microsoft/vscode-extension-samples/tree/master/tree-view-sample
