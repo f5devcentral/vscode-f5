@@ -16,6 +16,9 @@ Node.JS native https.get module [https://nodejs.org/api/https.html#https_https_g
 
 ## Ideas!!!
 
+### creating gifs for repo documenation
+[https://gifs-as-documentation.readthedocs.io/en/latest/]
+
 ### Use extension custom data types to assist with declaration building (AS3/DO/TS/FAST):
 [https://github.com/microsoft/vscode-custom-data]
 

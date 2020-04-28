@@ -4,6 +4,11 @@ This is the README for the F5 Automation Services Templates(FAST), "vscode-f5-fa
 
 This extension is intented to help interface with the FAST servoce to manage templates and deploy applications.
 
+## Demo of early stages..
+![demo1](./README_docs/f5-demo-1_4.27.2020.gif)
+
+![demo2](./README_docs/vscode-fast_demo_01.png)
+
 ---
 
 ## Index

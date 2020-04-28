@@ -41,9 +41,9 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
         const toDep = (name: string): f5Host => {
             // const createHost = 
             const newDep = new f5Host(name, vscode.TreeItemCollapsibleState.None, {
-                command: 'f5-fast.connectDevice',
-                title: '',
-                arguments: [element]
+                command: 'f5-fast.connectDevice2',
+                title: 'DepTitle',
+                arguments: [name]
             });
             console.log(`newDep host1: ${JSON.stringify(newDep)}`);
             return newDep;
@@ -138,9 +138,9 @@ export class f5Host extends vscode.TreeItem {
 		super(label, collapsibleState);
 	}
 
-	// get tooltip(): string {
-	// 	return `tooltip-version`;
-	// }
+	get tooltip(): string {
+		return `Connect`;
+	}
 
 	// get description(): string {
 	// 	return 'descLoc';

@@ -64,13 +64,13 @@
 					"name": "Car Tree"
 				}
 			],
-      "explorer": [
-        {
-          "id": "f5Fast",
-          "name": "f5 faster"
-        }
-      ]
-    },
+			"explorer": [
+				{
+					"id": "f5Fast",
+					"name": "f5 faster"
+				}
+			]
+		},
 		"configuration": [
 			{
 				"title": "f5-fast",
@@ -102,6 +102,10 @@
 			{
 				"command": "chuckJoke",
 				"title": "f5-fast: Chuck Joke"
+			},
+			{
+				"command": "testCommand1",
+				"title": "f5-fast: testCommand1"
 			},
 			{
 				"command": "extension.remoteCommand",
@@ -204,5 +208,8 @@
 		"mocha": "^7.0.1",
 		"typescript": "^3.7.5",
 		"vscode-test": "^1.3.0"
+	},
+	"dependencies": {
+		"node-fetch": "^2.6.0"
 	}
 }
