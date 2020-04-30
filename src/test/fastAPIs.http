@@ -8,7 +8,7 @@
 
 ###   # get bigip auth token
 # @name loginA
-POST https://{{bigip}}/mgmt/shared/authn/login
+POST https://{{host}}/mgmt/shared/authn/login
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ###   # get as3 declaration
-GET https://{{bigip}}/mgmt/shared/appsvcs/declare
+GET https://{{host}}/mgmt/shared/fast/info
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 

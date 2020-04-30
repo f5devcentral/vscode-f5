@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { request } from 'https';
 
+
 export function chuckJoke() {
     // console.log('beginnning chuck func call')
     const chuckApiCall = {
@@ -30,7 +31,7 @@ export function chuckJoke() {
                     doc => vscode.window.showTextDocument(doc, { preview: false })
                 ), (error: any) => {
                     console.error(error)
-                    debugger
+                    // debugger
                 }
             }
         });

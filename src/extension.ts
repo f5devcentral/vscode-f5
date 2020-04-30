@@ -8,8 +8,11 @@ import { F5TreeProvider } from './treeProvider';
 import { f5Api } from './f5Api'
 import { stringify } from 'querystring';
 import { setHostStatusBar } from './utils';
+import { test } from 'mocha';
 
-
+//	// status bar global definition
+//	// looking to use this for what device we are working with
+//	//		and access needed credentials from there
 // let hostStatusBar: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -29,44 +32,13 @@ export function activate(context: vscode.ExtensionContext) {
 		f5API.low();
 		// console.log(`-----1-----  ${gets}`)
 		
-		const gets2 = f5API.funcSole('funk');
+		const gets2 = f5API.funcSole(testTable);
 		console.log(`-----2-----  ${gets2}`)
 
 	}));
 
 
-	// functionality: configure tree view
-	//	-- https://medium.com/@sanaajani/creating-your-first-vs-code-extension-8dbdef2d6ad9
-	//	-- https://github.com/Microsoft/vscode-extension-samples/tree/master/tree-view-sample
-	//	-- https://stackoverflow.com/search?q=%5Bvisual-studio-code%5D+TreeDataProvider
-	//	-- https://stackoverflow.com/questions/56534723/simple-example-to-implement-vs-code-treedataprovider-with-json-data
-
-	//	-- Example tree view for devices and details 
-	// 		https://github.com/microsoft/vscode-cosmosdb
-	// 		https://github.com/formulahendry/vscode-docker-explorer
-
 	
-	// command: execute bash/tmsh on device
-	//	-- use device details from tree view, post api to bash endpoint, show response
-
-	//	1.	move chuck joke to function in other file - DONE
-	// 	2.	configure extension config to manage device list 
-	//		2a.	settings structure to host devices - DONE
-	//		2b.	command to quickly bring up settings - DONE
-	//		2c.	quickPick list of hosts - just log what was selected - DONE
-	//	3.	inputBox for passwords - DONE
-	//	4.	keyring to store passwords
-	//			- node-keytar - https://github.com/atom/node-keytar
-	//	5.	tree view in F5 container
-	//		4a.	F5 tree view contianer with f5 logo - DONE
-	//		4b.	display hosts from config file in tree view - DONE
-	//		4c. add/edit/delete device from tree view
-	//	6.	configure tests?  mocha?
-	//	7.	list fast templates under device in tree view
-	//		6a.	when selected in tree view, display template in editor
-	//	8.	list deployed applications in tree view
-	//		7a.	when selected in tree view, display template in editor
-	//	9.	configure JSON output highlighting like RestClient
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async () => {
@@ -126,6 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// thinking about how I want to handle device/username/password creds
 		//	either in it's own object, or in the host status bar...
 		//		if status bar, can easily clear text(host)/password on disconnect
+		// need to figure out how to access status bar contents in other contexts.  
 
 		//  will cache passwords with keytar in the future
 		
@@ -143,6 +116,8 @@ export function activate(context: vscode.ExtensionContext) {
 		} else {
 			bigip.host = hostFromTree;
 		}
+
+		// clean up bigipHosts var, no longer needed...
 		
 		bigip.password = await vscode.window.showInputBox({password: true});
 		// console.log(`Password: ${password}`);
@@ -150,17 +125,27 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`bigip-obj: ${JSON.stringify(bigip)}`);
 		console.log(`Selected device/host/bigip: ${bigip.host}, password: ${bigip.password}`);
 
-		var statusBar = await setHostStatusBar(bigip.host, bigip.password);
+		var statusBar = setHostStatusBar(bigip.host, bigip.password);
 
-		console.log(`prefastTemp: ${JSON.stringify(statusBar)}`);
+		// testTable[bigip.host] = bigip;
+		// const myBigip = testTable['admin@192.168.2.2'];
+
+		console.log(`prefastTemp-statusBar: ${JSON.stringify(statusBar)}`);
+
+		// cont newHost: []
 		const fastTemplates = f5API.getFastTemplates(bigip.host, bigip.password);
+		// const token = getChuckAuth();
+		// console.log('token in main extension: ' + token)
 
 		console.log(`fastTemplates: ${fastTemplates}`);
 		// return hostStatusBar;
+		// debugger;
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.disconnect', (hostStatusBar) => {
 		console.log('inside disconnect call');
+		// trying to access hostStatusBar to clear host information
+		//  need to find a way to define/access in a global way
 		console.log(`hostStatusBar: ${hostStatusBar}`);
 		return vscode.window.showInformationMessage('will disconnect from bigip and clear status bar')
 
