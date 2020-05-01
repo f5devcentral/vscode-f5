@@ -10,17 +10,19 @@ import { stringify } from 'querystring';
 import { setHostStatusBar } from './utils';
 import { test } from 'mocha';
 
-//	// status bar global definition
-//	// looking to use this for what device we are working with
-//	//		and access needed credentials from there
-// let hostStatusBar: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
 
+	// Create a status bar item
+	const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	context.subscriptions.push(statusBar);
+
+
 	// exploring classes to group all f5 api calls
 	const f5API = new f5Api();
+
 
 	context.subscriptions.push(vscode.commands.registerCommand('testCommand1', () => {
 		console.log('befor Chuck func call');
@@ -32,66 +34,14 @@ export function activate(context: vscode.ExtensionContext) {
 		f5API.low();
 		// console.log(`-----1-----  ${gets}`)
 		
-		const gets2 = f5API.funcSole(testTable);
+		const gets2 = f5API.funcSole('func');
 		console.log(`-----2-----  ${gets2}`)
 
 	}));
 
 
 	
-
-
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async () => {
-		console.log('executing f5-fast.connectDevice');
-
-		// // get config and map bigip hosts to items list for quickPick
-		// const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts', ['']).map(label => ({ label }));
-		// // fire quickPick, assign selection
-		// const bigipHost1 = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'select device'}).then(
-		// 	host => {
-		// 		console.log(`Selected host: ${JSON.stringify(host)}`);
-
-		// 		let hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-		// 		hostStatusBar.command = 'extension.disconnect';
-		// 		// runDevices.color = '#42b883';
-		// 		hostStatusBar.text = host;
-		// 		hostStatusBar.tooltip = 'Disconnect';
-		// 		hostStatusBar.show();
-
-		// 	});
-		// 	console.log(`Selected bigipHost1: ${bigipHost1}`);
-			
-
-		// another way to do this
-		const bigipHostsNew = vscode.workspace.getConfiguration().get('f5-fast.hosts');
-		const selectedHost = await vscode.window.showQuickPick(bigipHostsNew, {placeHolder: 'Select Device'}).then(host => {
-			console.log(`inside picked: ${host}`);
-
-			// const psswrd = await vscode.window.showInputBox({password: true});
-			// console.log(`Password: ${psswrd}`);
-
-			
-			
-			return host;
-		});
-		let hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-		hostStatusBar.command = 'extension.disconnect';
-		// runDevices.color = '#42b883';
-		hostStatusBar.text = selectedHost;
-		hostStatusBar.tooltip = 'Disconnect';
-		hostStatusBar.show();
-		console.log(`Selected host: ${selectedHost}`)
-
-			// let bigipHost = JSON.stringify(bigipHost1.label);
-		// bigipHost = bigipHost.label;
-		// vscode.window.showInformationMessage(`Selected device: ${bigipHost}`);
-
-
-		
-		// debugger;
-	}));
-	
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice2', async (hostFromTree, hostStatusBar) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (hostFromTree, hostStatusBar) => {
 		console.log('executing f5-fast.connectDevice2');
 		console.log(`Host from tree select: ${hostFromTree}`);
 
@@ -125,52 +75,42 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`bigip-obj: ${JSON.stringify(bigip)}`);
 		console.log(`Selected device/host/bigip: ${bigip.host}, password: ${bigip.password}`);
 
-		var statusBar = setHostStatusBar(bigip.host, bigip.password);
 
-		// testTable[bigip.host] = bigip;
-		// const myBigip = testTable['admin@192.168.2.2'];
+		const fastTemplates = f5API.getFastTemplates(statusBar, bigip.host, bigip.password);
 
-		console.log(`prefastTemp-statusBar: ${JSON.stringify(statusBar)}`);
-
-		// cont newHost: []
-		const fastTemplates = f5API.getFastTemplates(bigip.host, bigip.password);
-		// const token = getChuckAuth();
-		// console.log('token in main extension: ' + token)
 
 		console.log(`fastTemplates: ${fastTemplates}`);
-		// return hostStatusBar;
-		// debugger;
+
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.disconnect', (hostStatusBar) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.disconnect', () => {
 		console.log('inside disconnect call');
-		// trying to access hostStatusBar to clear host information
-		//  need to find a way to define/access in a global way
-		console.log(`hostStatusBar: ${hostStatusBar}`);
-		return vscode.window.showInformationMessage('will disconnect from bigip and clear status bar')
 
-		// hostStatusBar.dispose();
+		// clear status bar 
+		// feed it the statusBar object created at top, blank host, blank password)
+		setHostStatusBar(statusBar, '', '');
+
+		
+		return vscode.window.showInformationMessage('clearing selected bigip and status bar details')
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', () => {
-		// console.log('befor Chuck func call');
 		chuckJoke();
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.openSettings', () => {
-		// console.log('befor Chuck func call');
-		//chuckJoke();
 		return vscode.commands.executeCommand("workbench.action.openSettings", "f5-fast");
 	}));
 
 
 	
-//original way the example extension structured the command
+	//original way the example extension structured the command
 	let disposable = vscode.commands.registerCommand('extension.remoteCommand', async () => {
 		return vscode.window.showInformationMessage('placeholder to execute command on bigip...')
 	});	
 	context.subscriptions.push(disposable);
+
 
 	// trying to setup tree provider to list f5 hosts from config file
 	// const hostsTreeProvider = new F5TreeProvider(vscode.workspace.getConfiguration().get('f5-fast.hosts'));
@@ -194,7 +134,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider());
 
-
 }
+
+
 // this method is called when your extension is deactivated
 export function deactivate() {}

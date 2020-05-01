@@ -26,9 +26,11 @@ export function chuckJoke() {
             console.log('chuck joke: ', result.value);
             vscode.window.showInformationMessage(`Getting Joke from https://api.chucknorris.io/jokes/random`);
 
+            // const content = `Chuck Joke: \r\n\r\n${ result.value }`
+            // const content = `Chuck Joke: \r\n\r\n${ result }`
             if (result) {
-                vscode.workspace.openTextDocument({ content: `Chuck Joke: \r\n\r\n${ result.value }` ).then(
-                    doc => vscode.window.showTextDocument(doc, { preview: false })
+                vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(result , undefined, 4) })
+                .then( doc => vscode.window.showTextDocument(doc, { preview: false })
                 ), (error: any) => {
                     console.error(error)
                     // debugger

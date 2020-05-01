@@ -11,7 +11,8 @@ Desc:
 https://github.com/Microsoft/vscode/issues/53697
 > Yeah, use a formatter (as library) when creating the file. The most simple would be using JSON.stringify(stats, undefined, 4)
 - Want it formated like the vscode-rest-client
-
+- more information about formating data in editor window
+https://stackoverflow.com/questions/29973357/how-do-you-format-code-in-visual-studio-code-vscode
 
 ## functionality:  capture logs of remote device
 - pretty sure this only works over Remote SSH
@@ -58,6 +59,8 @@ I was also able to append the password to the status bar object, so, this could 
 
 ### example status bar repos
 
+ - best status bar example seems to be the basic-multi-root-sample in the vscode-extension-samples
+
  - seems to be a git like extension that shows file status
 https://github.com/vsls-contrib/gitdoc/blob/fbadc302bf94d64b2e448b22ee366259d760c6e7/src/watcher.ts
 
@@ -73,3 +76,9 @@ https://github.com/lkytal/quickTask/blob/ad5efc17bb414e759126065fe885de93c1de771
  - another simple example of using the status bar to show the total number of lines in current editor
 https://github.com/praveenp30/total-lines/blob/eeb5a93707b1ec89c4f423ff6833c13000120275/extension.js
 
+
+
+
+## unit testing
+- need to setup testing/unit/mock/mocha...
+https://stackoverflow.com/questions/47906194/unit-test-functions-that-use-vscode-extension-api-functions/58827442#58827442

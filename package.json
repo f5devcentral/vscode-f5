@@ -31,7 +31,6 @@
 		"onCommand:extension.remoteCommand",
 		"onCommand:f5-fast.openSettings",
 		"onCommand:f5-fast.connectDevice",
-		"onCommand:f5-fast.connectDevice2",
 		"onView:f5Hosts"
 	],
 	"main": "./out/extension.js",
@@ -94,10 +93,6 @@
 			{
 				"command": "f5-fast.connectDevice",
 				"title": "f5-fast: Connect to Device"
-			},
-			{
-				"command": "f5-fast.connectDevice2",
-				"title": "f5-fast: Connect to Device-2"
 			},
 			{
 				"command": "chuckJoke",

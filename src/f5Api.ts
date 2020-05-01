@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
+import { setHostStatusBar } from './utils'
 
 export class f5Api {
     hi() {
@@ -18,7 +19,7 @@ export class f5Api {
         return func + '-sole-brother';
     }
 
-    getFastTemplates(host: string, password: string) {
+    getFastTemplates(statusBar: vscode.StatusBarItem, host: string, password: string) {
         console.log('beginnning NEW chuck func call');
         console.log(`Serial: ${host} - ${password}`);
         
@@ -32,6 +33,8 @@ export class f5Api {
                 listFastTemplates(host, val.body.token.token)
                     .then( fastInfo => vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(fastInfo.body, undefined, 4) }))
                     .then( doc => vscode.window.showTextDocument(doc, { preview: false }))
+
+                setHostStatusBar(statusBar, host, password)
             });
 
         // trying a sync way
