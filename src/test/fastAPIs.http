@@ -1,6 +1,7 @@
 
 
 @host = 192.168.200.131
+#@host = 10.200.244.5
 
 @user = admin
 @upass = benrocks
@@ -17,99 +18,31 @@ Content-Type: application/json
     "logonProviderName": "provider"
 }
 
-###   # get as3 declaration
+###   # get fast info
 GET https://{{host}}/mgmt/shared/fast/info
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
 
-###   # DELETE!!! as3 declaration - not working
-POST https://{{bigip}}/mgmt/shared/appsvcs/declare
-  ?async=true
+###   # get f5 host info
+GET https://{{host}}/mgmt/shared/identified-devices/config/device-info
+  #?$select=hostname,managementAddress,version,product,platformMarketingName
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
-{
-  "$schema": "./as3-schema-3.12.0-5.json",
-  "class": "AS3",
-  "declaration": {
-    "class": "ADC",
-    "schemaVersion": "3.12.0",
-    "updateMode": "complete",
-    "id": "id1",
-    "label": "Task1",
-    "remark": "benlab ntp lb",
-    "target": {
-      "hostname": {{target}}
-    },
-    "infra": {
-      "class": "Tenant"
-    }
-  }
-}
 
-
-
-###   # send as3 declaration
-POST https://{{bigip}}/mgmt/shared/appsvcs/declare
-  ?async=true
+###   # get fast info
+GET https://{{host}}/mgmt/shared/
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
-{
-  "$schema": "./as3-schema-3.12.0-5.json",
-  "class":"AS3",
-  "action": "deploy",
-  "persist": true,
-  "declaration": {
-    "class": "ADC",
-    "schemaVersion": "3.12.0",
-    "updateMode": "complete",
-    "id": {{$guid}},
-    "label": "Task1",
-    "remark": "benlab ntp lb",
-    "target": {
-      "hostname": {{target}}
-    },
-    "infra": {
-      "class": "Tenant",
-      "ntp": {
-        "class": "Application",
-        "template": "generic",
-        "ntp_u123_vs": {
-          "class": "Service_L4",
-          "virtualPort": 123,
-          "virtualAddresses": [
-              {{vip}}
-          ],
-          "layer4": "udp",
-          "pool": "esxi_hosts_u123_pool"
-        },
-        "esxi_hosts_u123_pool": {
-          "class": "Pool",
-          "label": "esxi_hosts",
-          "monitors": [
-            "icmp"
-          ],
-          "members": [
-            {
-              "servicePort": 123,
-              "serverAddresses": [
-                "10.200.210.21"
-                ]
-            },
-            {
-              "servicePort": 123,
-              "serverAddresses": [
-                "10.200.210.22"
-              ]
-            }
-          ]
-        }
-      }
-    }
-  }
-}
+###   # get fast templates
+GET https://{{host}}/mgmt/shared/fast/templates
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+#
 
 
 

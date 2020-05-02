@@ -16,8 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
 
 	// Create a status bar item
-	const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-	context.subscriptions.push(statusBar);
+	const hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	context.subscriptions.push(hostStatusBar);
 
 
 	// exploring classes to group all f5 api calls
@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (hostFromTree, hostStatusBar) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (hostFromTree) => {
 		console.log('executing f5-fast.connectDevice2');
 		console.log(`Host from tree select: ${hostFromTree}`);
 
@@ -76,10 +76,10 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`Selected device/host/bigip: ${bigip.host}, password: ${bigip.password}`);
 
 
-		const fastTemplates = f5API.getFastTemplates(statusBar, bigip.host, bigip.password);
+		f5API.getFastInfo(hostStatusBar, bigip.host, bigip.password);
 
-
-		console.log(`fastTemplates: ${fastTemplates}`);
+		// const fastTemplates = f5API.getFastTemplates(hostStatusBar, bigip.host, bigip.password);
+		// console.log(`fastTemplates: ${fastTemplates}`);
 
 	}));
 
@@ -88,7 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// clear status bar 
 		// feed it the statusBar object created at top, blank host, blank password)
-		setHostStatusBar(statusBar, '', '');
+		setHostStatusBar(hostStatusBar, '', '');
 
 		
 		return vscode.window.showInformationMessage('clearing selected bigip and status bar details')
