@@ -76,7 +76,15 @@ https://github.com/lkytal/quickTask/blob/ad5efc17bb414e759126065fe885de93c1de771
  - another simple example of using the status bar to show the total number of lines in current editor
 https://github.com/praveenp30/total-lines/blob/eeb5a93707b1ec89c4f423ff6833c13000120275/extension.js
 
+ - simple status bar implementation passing context to a call for complete mgmt
+ https://github.com/chenzejiang/vscode-link-status-bar/blob/7764f9d2f693abc7fa0f4246d4f38ab0c0649d97/src/app.js
 
+
+#### status bar color
+
+https://stackoverflow.com/questions/42780975/visual-studio-code-status-bar-color
+
+![one](./vscode_statusBar_colors.png)
 
 
 ## unit testing

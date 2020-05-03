@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`Selected device/host/bigip: ${bigip.host}, password: ${bigip.password}`);
 
 
-		f5API.getFastInfo(hostStatusBar, bigip.host, bigip.password);
+		f5API.getF5FastInfo(hostStatusBar, bigip.host, bigip.password);
 
 		// const fastTemplates = f5API.getFastTemplates(hostStatusBar, bigip.host, bigip.password);
 		// console.log(`fastTemplates: ${fastTemplates}`);

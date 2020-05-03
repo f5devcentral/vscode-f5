@@ -18,7 +18,7 @@ export class f5Api {
         return func + '-sole-brother';
     }
 
-    getFastInfo(hostStatusBar: vscode.StatusBarItem, device: string, password: string) {
+    getF5FastInfo(hostStatusBar: vscode.StatusBarItem, device: string, password: string) {
         console.log(`getFastInfo: ${device} - ${password}`);
         
        // start promise
@@ -44,10 +44,43 @@ export class f5Api {
         
             var [username, host] = device.split('@');
 
-            getAuthToken(host, {username, password})
-                .then( token => {
-                    console.log(`inside-getAuth-token: ${JSON.stringify(token)}`)
+            setHostStatusBar(hostStatusBar, host, password)
 
+            getAuthToken(host, {username, password})
+                .then( hostToken => {
+                    // why is this still showing if auth failed and no token returned?
+                    console.log(`inside-getAuth-hostToken: ${JSON.stringify(hostToken)}`);
+                    
+                    // interface hostToken {
+                    //     host: string,
+                    //     token: string
+                    // }
+
+                    // var [host, token] = hostToken;
+                    const host = hostToken.host;
+                    const token = hostToken.token;
+
+                    console.log(`inside-getAuth-host_token: ${host} - ${token}`);
+                    
+                    getF5Info(host, token)
+                    .then( f5Info => {
+                        console.log(`inside-getAuth-fastInfo: ${f5Info}`);
+                        vscode.workspace.openTextDocument({ 
+                            language: 'json', 
+                            content: JSON.stringify(f5Info, undefined, 4) 
+                        })
+                        .then( doc => vscode.window.showTextDocument(doc, { preview: false })
+                    )};
+
+                    getFastInfo(host, token)
+                    .then( fastInfo => {
+                        console.log(`inside-getAuth-fastInfo: ${fastInfo}`);
+                        vscode.workspace.openTextDocument({ 
+                            language: 'json', 
+                            content: JSON.stringify(fastInfo, undefined, 4) 
+                        })
+                        .then( doc => vscode.window.showTextDocument(doc, { preview: false })
+                    )};
                 })
 
             // const benRequest: object = {
@@ -71,7 +104,7 @@ export class f5Api {
         // const authToken2 = getAuthTokenSync(host, password);
         // console.log(`authToken: ${JSON.stringify(authToken)}`)
         // debugger;
-        return 'fast information!!!';
+        // return 'fast information!!!';
         
     }
 
@@ -105,6 +138,8 @@ export class f5Api {
         
     // }
 };
+
+
 
 // function listFastInfo(host: string, token: string): Promise<any> {
 //     const newHost:string[] = host.split('@');
@@ -284,7 +319,7 @@ export class f5Api {
 //     });
 // };
 
-function makeRequest(opts: object, payload: object): Promise<any> {
+function makeRequest(opts: object, payload: object = {}): Promise<any> {
     // var host = 
     // const newHost:string[] = host.split('@');
     // console.log(`newHost: ${JSON.stringify(newHost)}`);
@@ -306,14 +341,14 @@ function makeRequest(opts: object, payload: object): Promise<any> {
         }
     }
 
-    // console.log('makeRequest---opts: ' + JSON.stringify(opts));
+    console.log('makeRequest---opts: ' + JSON.stringify(opts));
     
     // combine defaults with passed in options
     const combOpts = Object.assign({}, defaultOpts, opts);
 
-    // console.log('makeRequest---combOpts: ' + JSON.stringify(combOpts));
-    // console.log('makeRequest---defaultOpts: ' + JSON.stringify(defaultOpts));
-    // console.log('makeRequest---payload: ' + JSON.stringify(payload));
+    console.log('makeRequest---combOpts: ' + JSON.stringify(combOpts));
+    console.log('makeRequest---defaultOpts: ' + JSON.stringify(defaultOpts));
+    console.log('makeRequest---payload: ' + JSON.stringify(payload));
     
     // console.log('Bout to call API token request')
     return new Promise((resolve, reject) => {
@@ -334,12 +369,15 @@ function makeRequest(opts: object, payload: object): Promise<any> {
                     return reject(new Error(`Invalid response object ${combOpts}`));
                 };
                 
-
-                console.log('makeRequest******STATUS: ' + res.statusCode);
-                console.log('makeRequest******HEADERS: ' + JSON.stringify(res.headers));
-                console.log('makeRequest******TOKEN: ' + JSON.stringify(body.token.token));
-
-
+                 // configure global logging parameters
+                console.log('makeRequest***STATUS: ' + res.statusCode);
+                console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
+                console.log('makeRequest***BODY: ' + JSON.stringify(body));
+                
+                if (res.statusCode != 200) {
+                    // console.error(`AuthToken FAILURE: ${res.statusCode} - ${res.statusMessage}`);
+                    return reject(new Error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`));
+                }
 
                 return resolve({
                     status: res.statusCode,
@@ -375,19 +413,39 @@ const getAuthToken = (host: string, payload: object) => makeRequest({
 }, payload)
 .then( response => {
     // console.log('value in getAuth: ' + JSON.stringify(response));
-    // Promise.resolve(value.body.token);
-    return response.body.token.token;
+    return {host: host, token: response.body.token.token};
+}, reason => {
+    vscode.window.showInformationMessage(`${reason}`);
 });
 
-const getF5Info = (host: string, payload: object) => makeRequest({
+const getF5Info = (host: string, token: string) => makeRequest({
     host,
     path: '/mgmt/shared/identified-devices/config/device-info',
     method: 'GET',
-}, payload)
+    headers: {
+        'Content-Type': 'application/json',
+        'X-F5-Auth-Token': token
+    }
+})
 .then( response => {
-    // console.log('value in getAuth: ' + JSON.stringify(response));
+    console.log('value in getF5Info: ' + JSON.stringify(response));
     // Promise.resolve(value.body.token);
-    return response.body.token.token;
+    return response.body;
+});
+
+
+const getFastInfo = (host: string, token: string) => makeRequest({
+    host,
+    path: '/mgmt/shared/fast/info',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-F5-Auth-Token': token
+    }
+})
+.then( response => {
+    console.log('value in getFastInfo: ' + JSON.stringify(response));
+    // Promise.resolve(value.body.token);
+    return response.body;
 });
 
 // const makePatch = (path: string, payload: object) => makeRequest({
