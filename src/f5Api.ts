@@ -5,331 +5,76 @@ import { request } from 'https';
 import { setHostStatusBar } from './utils'
 
 export class f5Api {
-    hi() {
-        return 'hi';
-    }
 
-    low() {
-        console.log('inside LOW')
-    }
-    
-    funcSole(func: string) {
-        console.log(`inside funcSole: ${func}`)
-        return func + '-sole-brother';
+    connectF5(hostStatusBar: vscode.StatusBarItem, device: string, password: string) {
+        console.log(`connectF5: ${device} - ${password}`);
+
+        var [username, host] = device.split('@');
+
+        getAuthToken(host, {username, password})
+            .then( hostToken => {
+                // why is this still showing if auth failed and no token returned?
+                console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
+                
+                setHostStatusBar(hostStatusBar, device, password)
+                vscode.window.showInformationMessage(`Successfully connected to ${host}`);
+                
+            }, reason => {
+                vscode.window.showInformationMessage(`inside getAuthToken${reason}`);
+            })
+
     }
 
     getF5FastInfo(hostStatusBar: vscode.StatusBarItem, device: string, password: string) {
         console.log(`getFastInfo: ${device} - ${password}`);
         
-       // start promise
-        // let authToken = getAuthToken(host, password);
-        
-        // // when promise is resolved (successful)
-        // authToken.then(
-        //     function(val) {
-        //         // console.log(`authToken-full: ${JSON.stringify(val)}`)
-        //         console.log(`authToken: ${JSON.stringify(val.body.token.token)}`)
+        var [username, host] = device.split('@');
 
-        //         // now we have an auth token, get fast templates
-        //         listFastInfo(host, val.body.token.token)
-        //             .then( fastInfo => vscode.workspace.openTextDocument({ 
-        //                 language: 'json', 
-        //                 content: JSON.stringify(fastInfo.body, undefined, 4) 
-        //             }))
-        //             .then( doc => vscode.window.showTextDocument(doc, { preview: false }))
+        setHostStatusBar(hostStatusBar, host, password)
 
-        //         setHostStatusBar(hostStatusBar, host, password)
-        //         // return val.body.token.token;
-        //     });
-        
-            var [username, host] = device.split('@');
+        getAuthToken(host, {username, password})
+            .then( hostToken => {
+                // why is this still showing if auth failed and no token returned?
+                console.log(`inside-getAuth-hostToken: ${JSON.stringify(hostToken)}`);
+                
+                // interface hostToken {
+                //     host: string,
+                //     token: string
+                // }
 
-            setHostStatusBar(hostStatusBar, host, password)
+                // var [host, token] = hostToken;
+                const host = hostToken.host;
+                const token = hostToken.token;
 
-            getAuthToken(host, {username, password})
-                .then( hostToken => {
-                    // why is this still showing if auth failed and no token returned?
-                    console.log(`inside-getAuth-hostToken: ${JSON.stringify(hostToken)}`);
-                    
-                    // interface hostToken {
-                    //     host: string,
-                    //     token: string
-                    // }
+                console.log(`inside-getAuth-host_token: ${host} - ${token}`);
+                
+                getF5Info(host, token)
+                .then( f5Info => {
+                    console.log(`inside-getAuth-fastInfo: ${f5Info}`);
+                    vscode.workspace.openTextDocument({ 
+                        language: 'json', 
+                        content: JSON.stringify(f5Info, undefined, 4) 
+                    })
+                    .then( doc => vscode.window.showTextDocument(doc, { preview: false })
+                )};
 
-                    // var [host, token] = hostToken;
-                    const host = hostToken.host;
-                    const token = hostToken.token;
-
-                    console.log(`inside-getAuth-host_token: ${host} - ${token}`);
-                    
-                    getF5Info(host, token)
-                    .then( f5Info => {
-                        console.log(`inside-getAuth-fastInfo: ${f5Info}`);
-                        vscode.workspace.openTextDocument({ 
-                            language: 'json', 
-                            content: JSON.stringify(f5Info, undefined, 4) 
-                        })
-                        .then( doc => vscode.window.showTextDocument(doc, { preview: false })
-                    )};
-
-                    getFastInfo(host, token)
-                    .then( fastInfo => {
-                        console.log(`inside-getAuth-fastInfo: ${fastInfo}`);
-                        vscode.workspace.openTextDocument({ 
-                            language: 'json', 
-                            content: JSON.stringify(fastInfo, undefined, 4) 
-                        })
-                        .then( doc => vscode.window.showTextDocument(doc, { preview: false })
-                    )};
-                })
-
-            // const benRequest: object = {
-            //     host,
-            //     path: '/mgmt/shared/authn/login',
-            //     method: 'POST'
-            // }
-
-            // let benAuthToken = makeRequest(benRequest, { username, password });
-
-            // console.log(`benAuthToken: ${benAuthToken}`)
-            
-            // const tokenToken = benAuthToken.then(value => {
-            //     console.log(`inside-tokenToken-value: ${JSON.stringify(value)}`)
-            //     Promise.resolve(value);
-            // });
-            
-            // console.log(`tokenToken: ${tokenToken}`)
-
-        // trying a sync way
-        // const authToken2 = getAuthTokenSync(host, password);
-        // console.log(`authToken: ${JSON.stringify(authToken)}`)
-        // debugger;
-        // return 'fast information!!!';
-        
+                getFastInfo(host, token)
+                .then( fastInfo => {
+                    console.log(`inside-getAuth-fastInfo: ${fastInfo}`);
+                    vscode.workspace.openTextDocument({ 
+                        language: 'json', 
+                        content: JSON.stringify(fastInfo, undefined, 4) 
+                    })
+                    .then( doc => vscode.window.showTextDocument(doc, { preview: false })
+            )};
+        })
     }
-
-    // getFastTemplates(hostStatusBar: vscode.StatusBarItem, host: string, password: string) {
-    //     console.log(`getFastTemplates: ${host} - ${password}`);
-        
-    //    // start promise
-    //     let authToken = getAuthToken(host, password);
-        
-    //     // when promise is resolved (successful)
-    //     authToken.then(
-    //         function(val) {
-    //             // console.log(`authToken-full: ${JSON.stringify(val)}`)
-    //             console.log(`authToken: ${JSON.stringify(val.body.token.token)}`)
-
-    //             // now we have an auth token, get fast templates
-    //             listFastTemplates(host, val.body.token.token)
-    //                 .then( fastInfo => vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(fastInfo.body, undefined, 4) }))
-    //                 .then( doc => vscode.window.showTextDocument(doc, { preview: false }))
-
-    //             setHostStatusBar(hostStatusBar, host, password)
-    //             return val.body.token.token;
-    //         });
-
-    //     // trying a sync way
-    //     // const authToken2 = getAuthTokenSync(host, password);
-    //     // console.log(`authToken2: ${JSON.stringify(authToken2)}`)
-    //     // console.log(`authToken: ${JSON.stringify(authToken)}`)
-    //     debugger;
-    //     return 'fast template!!!';
-        
-    // }
 };
 
 
 
-// function listFastInfo(host: string, token: string): Promise<any> {
-//     const newHost:string[] = host.split('@');
-//     // console.log(`newHost: ${JSON.stringify(newHost)}`);
-//     // console.log(`getAuthToken details expanded: ${newHost[0]}, ${newHost[1]}, ${password}`);
-
-//     const getTemplates = {
-//         host: newHost[1],
-//         path: '/mgmt/shared/fast/info',
-//         method: 'GET',
-//         rejectUnauthorized: false,
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-F5-Auth-Token': token
-//         }
-//     }
-
-    
-//     // console.log('Bout to call API token request')
-//     return new Promise((resolve, reject) => {
-//         const req = request(getTemplates, (res) => {
-//             const buffer: any = [];
-//             res.setEncoding('utf8');
-//             // console.log('Sending::: ' )
-//             res.on('data', (data) => {
-//                 buffer.push(data);
-//             });
-//             res.on('end', () => {
-//                 let body = buffer.join('');
-//                 body = body || '{}';
-
-//                 try {
-//                     body = JSON.parse(body);
-//                 } catch (e) {
-//                     return reject(new Error(`Invalid response object from ${getTemplates.method} to ${getTemplates.path}`));
-//                 };
-                
-//                 console.log('templates-STATUS: ' + res.statusCode);
-//                 console.log('templates-HEADERS: ' + JSON.stringify(res.headers));
-//                 console.log('templates-INFO-BODY: ' + JSON.stringify(body));
-
-//                 return resolve({
-//                     status: res.statusCode,
-//                     headers: res.headers,
-//                     body
-//                 });
-//             });
-//         });
-
-//         req.on('error', (e) => {
-//             reject(new Error(`${getTemplates.host}:${e.message}`));
-//         });
-
-//         // if (postData) req.write(postData);
-//         req.end();
-//     });
-// }
-
-// function listFastTemplates(host: string, token: string): Promise<any> {
-//     const newHost:string[] = host.split('@');
-//     // console.log(`newHost: ${JSON.stringify(newHost)}`);
-//     // console.log(`getAuthToken details expanded: ${newHost[0]}, ${newHost[1]}, ${password}`);
-
-//     const getTemplates = {
-//         host: newHost[1],
-//         path: '/mgmt/shared/fast/templates',
-//         method: 'GET',
-//         rejectUnauthorized: false,
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-F5-Auth-Token': token
-//         }
-//     }
-
-    
-//     // console.log('Bout to call API token request')
-//     return new Promise((resolve, reject) => {
-//         const req = request(getTemplates, (res) => {
-//             const buffer: any = [];
-//             res.setEncoding('utf8');
-//             // console.log('Sending::: ' )
-//             res.on('data', (data) => {
-//                 buffer.push(data);
-//             });
-//             res.on('end', () => {
-//                 let body = buffer.join('');
-//                 body = body || '{}';
-
-//                 try {
-//                     body = JSON.parse(body);
-//                 } catch (e) {
-//                     return reject(new Error(`Invalid response object from ${getTemplates.method} to ${getTemplates.path}`));
-//                 };
-                
-//                 console.log('templates-STATUS: ' + res.statusCode);
-//                 console.log('templates-HEADERS: ' + JSON.stringify(res.headers));
-//                 console.log('templates-INFO-BODY: ' + JSON.stringify(body));
-
-//                 return resolve({
-//                     status: res.statusCode,
-//                     headers: res.headers,
-//                     body
-//                 });
-//             });
-//         });
-
-//         req.on('error', (e) => {
-//             reject(new Error(`${getTemplates.host}:${e.message}`));
-//         });
-
-//         // if (postData) req.write(postData);
-//         req.end();
-//     });
-// }
-
-// function getAuthToken(host: string, password: string): Promise<any> {
-//     // var host = 
-//     const newHost:string[] = host.split('@');
-//     // console.log(`newHost: ${JSON.stringify(newHost)}`);
-//     // console.log(`getAuthToken details expanded: ${newHost[0]}, ${newHost[1]}, ${password}`);
-
-//     const postData = JSON.stringify({
-//         username: newHost[0],
-//         password: password,
-//         logonProviderName: "provider"
-//     });
-
-//     const getToken = {
-//         host: newHost[1],
-//         path: '/mgmt/shared/authn/login',
-//         method: 'POST',
-//         rejectUnauthorized: false,
-//         headers: {
-//             'Content-Type': 'application/json'
-//         }
-//     }
-
-//     console.log('getAuthToken---getToken: ' + JSON.stringify(getToken));
-    
-//     // console.log('Bout to call API token request')
-//     return new Promise((resolve, reject) => {
-//         const req = request(getToken, (res) => {
-//             const buffer: any = [];
-//             res.setEncoding('utf8');
-//             // console.log('Sending::: ' )
-//             res.on('data', (data) => {
-//                 buffer.push(data);
-//             });
-//             res.on('end', () => {
-//                 let body = buffer.join('');
-//                 body = body || '{}';
-
-//                 try {
-//                     body = JSON.parse(body);
-//                 } catch (e) {
-//                     return reject(new Error(`Invalid response object from ${getToken.method} to ${getToken.path}`));
-//                 };
-                
-//                 // console.log('STATUS: ' + res.statusCode);
-//                 // console.log('HEADERS: ' + JSON.stringify(res.headers));
-//                 // console.log('TOKEN: ' + JSON.stringify(body.token.token));
-
-//                 return resolve({
-//                     status: res.statusCode,
-//                     headers: res.headers,
-//                     body
-//                 });
-//             });
-//         });
-
-//         req.on('error', (e) => {
-//             reject(new Error(`${getToken.host}:${e.message}`));
-//         });
-
-//         if (postData) req.write(postData);
-//         req.end();
-//     });
-// };
 
 function makeRequest(opts: object, payload: object = {}): Promise<any> {
-    // var host = 
-    // const newHost:string[] = host.split('@');
-    // console.log(`newHost: ${JSON.stringify(newHost)}`);
-    // console.log(`getAuthToken details expanded: ${newHost[0]}, ${newHost[1]}, ${password}`);
-
-    // const postData = JSON.stringify({
-    //     username: newHost[0],
-    //     password: password,
-    //     logonProviderName: "provider"
-    // });
 
     const defaultOpts = {
         // host: '',
@@ -376,7 +121,7 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                 
                 if (res.statusCode != 200) {
                     // console.error(`AuthToken FAILURE: ${res.statusCode} - ${res.statusMessage}`);
-                    return reject(new Error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`));
+                    return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
                 }
 
                 return resolve({
@@ -398,13 +143,7 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
     });
 };
 
-// const makeGet = (options: object) => makeRequest({
-//     method: 'GET'
-// });
 
-// const makePost = (path: object, payload: object) => makeRequest({
-//     method: 'POST'
-// }, payload);
 
 const getAuthToken = (host: string, payload: object) => makeRequest({
     host,
@@ -413,10 +152,15 @@ const getAuthToken = (host: string, payload: object) => makeRequest({
 }, payload)
 .then( response => {
     // console.log('value in getAuth: ' + JSON.stringify(response));
+    if (response.status != 200) {
+        return new Error(`error from getAuthToken: ${response}`);
+    }
     return {host: host, token: response.body.token.token};
 }, reason => {
-    vscode.window.showInformationMessage(`${reason}`);
+    vscode.window.showInformationMessage(`failed getAuthToken: ${reason}`);
 });
+
+
 
 const getF5Info = (host: string, token: string) => makeRequest({
     host,
@@ -434,6 +178,7 @@ const getF5Info = (host: string, token: string) => makeRequest({
 });
 
 
+
 const getFastInfo = (host: string, token: string) => makeRequest({
     host,
     path: '/mgmt/shared/fast/info',
@@ -447,8 +192,3 @@ const getFastInfo = (host: string, token: string) => makeRequest({
     // Promise.resolve(value.body.token);
     return response.body;
 });
-
-// const makePatch = (path: string, payload: object) => makeRequest({
-//     path,
-//     method: 'PATCH'
-// }, payload);

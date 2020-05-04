@@ -10,6 +10,10 @@ export class carTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
     data: TreeItem[];
 
+    // const cars = { 
+    //     vehicles: 'cars'
+    // }
+
     constructor() {
         this.data = [new TreeItem('cars', [
         new TreeItem(
@@ -20,16 +24,17 @@ export class carTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
     }
 
     getTreeItem(element: TreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
-        // console.log(`CARS element in getTreeItem ${JSON.stringify(element)}`);
+        // console.log(`CARS element in getTreeItem ~~~~~ ${JSON.stringify(element)}`);
         return element;
     };
 
     getChildren(element?: TreeItem|undefined): vscode.ProviderResult<TreeItem[]> {
+        
         if (element === undefined) {
-            // console.log(`CARS this.data in getChildren ${JSON.stringify(this.data)}`);
+            // console.log(`CARS this.data in getChildren ----- ${JSON.stringify(this.data)}`);
             return this.data;
         }
-        // console.log(`CARS element.children in getChildren ${JSON.stringify(element.children)}`);
+        // console.log(`CARS element.children in getChildren ***** ${JSON.stringify(element.children)}`);
         return element.children;
     }
 };

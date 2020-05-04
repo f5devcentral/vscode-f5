@@ -51,8 +51,8 @@
 					"name": "f5 Hosts"
 				},
 				{
-					"id": "localFastTemplates",
-					"name": "local FAST Templates"
+					"id": "fastTemplates",
+					"name": "FAST Templates"
 				},
 				{
 					"id": "nodeDependencies",
@@ -103,6 +103,18 @@
 				"title": "f5-fast: testCommand1"
 			},
 			{
+				"command": "f5-fast.addHost",
+				"title": "f5-fast: Add Host"
+			},
+			{
+				"command": "f5-fast.editHost",
+				"title": "f5-fast: Edit Host"
+			},
+			{
+				"command": "f5-fast.removeHost",
+				"title": "f5-fast: Remove Host"
+			},
+			{
 				"command": "extension.remoteCommand",
 				"title": "f5-fast: Remote Command Execute"
 			},
@@ -111,7 +123,7 @@
 				"title": "f5-fast: settings"
 			},
 			{
-				"command": "f5-fast.refreshEntry",
+				"command": "f5-fast.refreshHostsTree",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -119,8 +131,28 @@
 				}
 			},
 			{
-				"command": "f5-fast.addEntry",
-				"title": "Addd"
+				"command": "f5-fast.refreshTemplates",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5-fast.addHost",
+				"title": "Add"
+			},
+			{
+				"command": "f5-fast.editHost",
+				"title": "Edit",
+				"icon": {
+					"light": "resources/light/edit.svg",
+					"dark": "resources/dark/edit.svg"
+				}
+			},
+			{
+				"command": "f5-fast.removeHost",
+				"title": "Delete"
 			},
 			{
 				"command": "nodeDependencies.refreshEntry",
@@ -150,12 +182,17 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "f5-fast.refreshEntry",
+					"command": "f5-fast.refreshHostsTree",
 					"when": "view == f5Hosts",
 					"group": "navigation"
 				},
 				{
-					"command": "f5-fast.addEntry",
+					"command": "f5-fast.refreshTemplates",
+					"when": "view == fastTemplates",
+					"group": "navigation"
+				},
+				{
+					"command": "f5-fast.addHost",
 					"when": "view == f5Hosts",
 					"group": "navigation"
 				},
@@ -179,6 +216,15 @@
 				{
 					"command": "nodeDependencies.deleteEntry",
 					"when": "view == nodeDependencies && viewItem == dependency"
+				},
+				{
+					"command": "f5-fast.editHost",
+					"when": "view == f5Hosts",
+					"group": "inline"
+				},
+				{
+					"command": "f5-fast.removeHost",
+					"when": "view == f5Hosts"
 				}
 			]
 		}

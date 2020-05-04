@@ -6,6 +6,15 @@ Name: f5-Fast
 Desc:  
 
 
+## functionality: virtual file store (memFS)
+ - used to store files in memory, like ftp browser or remote files stores
+ -- should be used to store connected device information, templates, deployed app details, etc...
+
+ https://github.com/Microsoft/vscode-extension-samples/tree/master/fsprovider-sample/src
+ https://code.visualstudio.com/api/references/vscode-api#FileSystemProvider
+ https://stackoverflow.com/questions/50198150/how-to-work-with-filesystemprovider-file-systems-in-visual-studio-code
+
+
 ## functionality: display pretty json with colors
 - this got it somewhat formatted
 https://github.com/Microsoft/vscode/issues/53697
@@ -43,6 +52,9 @@ https://github.com/moll/node-mitm
 		https://github.com/microsoft/vscode-cosmosdb
 		https://github.com/formulahendry/vscode-docker-explorer
 
+
+ - really good use of trees - Docker Explorer
+ -- https://github.com/formulahendry/vscode-docker-explorer
 
 
 

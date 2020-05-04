@@ -1,10 +1,14 @@
+'use strict';
+
 import * as vscode from 'vscode';
 
 import { request } from 'https';
 import { chuckJoke } from './chuckJoke';
 import { carTreeDataProvider } from './carTreeView';
 import { DepNodeProvider, Dependency } from './nodeDependencies';
-import { F5TreeProvider } from './treeProvider';
+import { MemFS } from './fileSystemProvider';
+import { F5TreeProvider, f5Host } from './hostsTreeProvider';
+import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
 import { f5Api } from './f5Api'
 import { stringify } from 'querystring';
 import { setHostStatusBar } from './utils';
@@ -19,23 +23,18 @@ export function activate(context: vscode.ExtensionContext) {
 	const hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 	context.subscriptions.push(hostStatusBar);
 
+	const memFs = new MemFS();
+    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', memFs, { isCaseSensitive: true }));
+    let initialized = false;
+
 
 	// exploring classes to group all f5 api calls
 	const f5API = new f5Api();
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('testCommand1', () => {
-		console.log('befor Chuck func call');
-		// chuckJoke();
+		console.log('placeholder for testing commands');
 
-		const gets = f5API.hi();
-		console.log(`-----1-----  ${gets}`)
-		
-		f5API.low();
-		// console.log(`-----1-----  ${gets}`)
-		
-		const gets2 = f5API.funcSole('func');
-		console.log(`-----2-----  ${gets2}`)
 
 	}));
 
@@ -70,16 +69,8 @@ export function activate(context: vscode.ExtensionContext) {
 		// clean up bigipHosts var, no longer needed...
 		
 		bigip.password = await vscode.window.showInputBox({password: true});
-		// console.log(`Password: ${password}`);
-		
-		console.log(`bigip-obj: ${JSON.stringify(bigip)}`);
-		console.log(`Selected device/host/bigip: ${bigip.host}, password: ${bigip.password}`);
 
-
-		f5API.getF5FastInfo(hostStatusBar, bigip.host, bigip.password);
-
-		// const fastTemplates = f5API.getFastTemplates(hostStatusBar, bigip.host, bigip.password);
-		// console.log(`fastTemplates: ${fastTemplates}`);
+		f5API.connectF5(hostStatusBar, bigip.host, bigip.password);
 
 	}));
 
@@ -90,9 +81,14 @@ export function activate(context: vscode.ExtensionContext) {
 		// feed it the statusBar object created at top, blank host, blank password)
 		setHostStatusBar(hostStatusBar, '', '');
 
-		
+		for (const [name] of memFs.readDirectory(vscode.Uri.parse('memfs:/'))) {
+            memFs.delete(vscode.Uri.parse(`memfs:/${name}`));
+        }
+        initialized = false;
+
 		return vscode.window.showInformationMessage('clearing selected bigip and status bar details')
 	}));
+
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', () => {
 		chuckJoke();
@@ -104,6 +100,96 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.addHost', () => {
+
+		vscode.window.showInputBox({prompt: 'Device/BIG-IP/Host      ', placeHolder: '<user>@<host/ip>'})
+		.then(newHost => {
+			const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+
+			if (newHost === undefined) {
+				throw new Error('Add device inputBox cancelled');
+			}
+
+			// const deviceRex = /^[a-zA-Z]+\d*@\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/		// matches only if host is IP
+			const deviceRex = /^[\w-.]+@[\w-.]+$/		// matches any username combo an F5 will accept and host/ip
+			// console.log(`Match RegEx? ${deviceRex.test(newHost)}`)	// does it match regex pattern?
+			// console.log(`Existing? ${bigipHosts?.includes(newHost)}`)	// it it already in the list?
+
+			if (!bigipHosts?.includes(newHost) && deviceRex.test(newHost)){
+				bigipHosts?.push(newHost);
+				vscode.workspace.getConfiguration().update('f5-fast.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
+				vscode.window.showInformationMessage(`Adding ${newHost} to list!`);
+				hostsTreeProvider.refresh();
+			} else {
+				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
+			}
+		});
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.removeHost', async (hostID) => {
+		console.log(`Remove Host command: ${JSON.stringify(hostID)}`)
+		
+		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
+		
+		const newBigipHosts = bigipHosts?.filter( item => item != hostID.label)
+		console.log(`less bigipHosts: ${JSON.stringify(newBigipHosts)}`)
+		
+		vscode.window.showInformationMessage(`${JSON.stringify(hostID.label)} removed!!!`);
+		await vscode.workspace.getConfiguration().update('f5-fast.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
+		hostsTreeProvider.refresh();
+	}));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.editHost', async (hostID) => {
+		
+		// TODO: if hostID === undefined => quickSelect device list
+		
+		console.log(`Edit Host command: ${JSON.stringify(hostID)}`)
+		vscode.window.showInformationMessage(`Editing ${JSON.stringify(hostID.label)} host!!!`);
+		
+		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
+		
+		//find item position in array, then modify		**** ditching in favor of filter method
+		// const location = bigipHosts?.indexOf(hostID)
+		// const newHosts: Array<string> = bigipHosts[location]
+
+		vscode.window.showInputBox({prompt: 'Update Device/BIG-IP/Host      ', placeHolder: hostID.label})
+		.then( input => {
+
+			if (input === undefined) {
+				throw new Error('Update device inputBox cancelled');
+			}
+
+			const deviceRex = /^[\w-.]+@[\w-.]+$/
+			if (!bigipHosts?.includes(input) && deviceRex.test(input)) {
+
+				const newBigipHosts = bigipHosts?.map( item => {
+					if (item === hostID.label) {
+						return input;
+					} else {
+						return item;
+					}
+				})				
+				
+				// console.log(`bigipHosts: ${JSON.stringify(bigipHosts)}`)
+				// console.log(`newbigipHosts: ${JSON.stringify(newBigipHosts)}`)
+				vscode.workspace.getConfiguration().update('f5-fast.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
+				vscode.window.showInformationMessage(`Updating ${input} device name.`);
+
+				// need to give the configuration a chance to save before refresh
+				setTimeout( () => {
+					hostsTreeProvider.refresh();
+				}, 500);
+			} else {
+				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
+			}
+		})
+		
+	}));
+
+
 	
 	//original way the example extension structured the command
 	let disposable = vscode.commands.registerCommand('extension.remoteCommand', async () => {
@@ -112,14 +198,21 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 
+	// setting up templates tree
+	const templatesTreeProvider = new F5TreeProvider('');
+	vscode.window.registerTreeDataProvider('fastTemplates', templatesTreeProvider, hostStatusBar);
+	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => templatesTreeProvider.refresh());
+
+
+
 	// trying to setup tree provider to list f5 hosts from config file
 	// const hostsTreeProvider = new F5TreeProvider(vscode.workspace.getConfiguration().get('f5-fast.hosts'));
 	const hostsTreeProvider = new F5TreeProvider('');
 	vscode.window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
-	vscode.commands.registerCommand('f5-fast.refreshEntry', () => hostsTreeProvider.refresh());
-	vscode.commands.registerCommand('f5-fast.addEntry', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
-	vscode.commands.registerCommand('f5-fast.editEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called edit entry on ${node.label}.`));
-	vscode.commands.registerCommand('f5-fast.deleteEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
+	vscode.commands.registerCommand('f5-fast.refreshHostsTree', () => hostsTreeProvider.refresh());
+	// vscode.commands.registerCommand('f5-fast.addEntry', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
+	// vscode.commands.registerCommand('f5-fast.editEntry', (host: f5Host) => vscode.window.showInformationMessage(`Successfully called edit entry on ${host.label}.`));
+	// vscode.commands.registerCommand('f5-fast.deleteEntry', (host: f5Host) => vscode.window.showInformationMessage(`Successfully called delete entry on ${host.label}.`));
 
 	// Samples of `window.registerTreeDataProvider`
 	// all entries for nodeDependeny tree view
@@ -132,7 +225,14 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('nodeDependencies.deleteEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
 
 
-	vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider());
+	const carTreeData = {
+		"cars1": [
+			{ "name":"Ford2", "models":[ "Fiesta3", "Focus3", "Mustang3" ] },
+			{ "name":"BMW2", "models":[ "3203", "X33", "X53" ] }
+		  ]
+	}
+
+	vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider(carTreeData));
 
 }
 
