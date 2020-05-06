@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { request } from 'https';
 import { setHostStatusBar } from './utils'
+import { ext } from './extVariables';
 
 export class f5Api {
 
@@ -51,6 +52,15 @@ export class f5Api {
                 getF5Info(host, token)
                 .then( f5Info => {
                     console.log(`inside-getAuth-fastInfo: ${f5Info}`);
+
+                    // memFs.writeFile(vscode.Uri.parse(`memfs:/info.json`), Buffer.from(f5Info), { create: true, overwrite: true });
+
+                    
+
+
+
+                    // ext.context.globalState.update()
+
                     vscode.workspace.openTextDocument({ 
                         language: 'json', 
                         content: JSON.stringify(f5Info, undefined, 4) 

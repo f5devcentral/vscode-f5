@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import { request } from 'https';
+// import { request } from 'https';
 import { chuckJoke } from './chuckJoke';
 import { carTreeDataProvider } from './carTreeView';
 import { DepNodeProvider, Dependency } from './nodeDependencies';
@@ -10,22 +10,26 @@ import { MemFS } from './fileSystemProvider';
 import { F5TreeProvider, f5Host } from './hostsTreeProvider';
 import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
 import { f5Api } from './f5Api'
-import { stringify } from 'querystring';
-import { setHostStatusBar } from './utils';
+// import { stringify } from 'querystring';
+import { setHostStatusBar, setMemento, getMemento, setMementoW, getMementoW } from './utils';
 import { test } from 'mocha';
+import { ext } from './extVariables';
 
 
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
 
+	ext.context = context;
+
 	// Create a status bar item
 	const hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 	context.subscriptions.push(hostStatusBar);
 
-	const memFs = new MemFS();
-    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', memFs, { isCaseSensitive: true }));
-    let initialized = false;
+	// create virtual file store
+	// const memFs = new MemFS();
+    // context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', memFs, { isCaseSensitive: true }));
+    // let initialized = false;
 
 
 	// exploring classes to group all f5 api calls
@@ -34,8 +38,32 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('testCommand1', () => {
 		console.log('placeholder for testing commands');
+		
+		vscode.window.showInputBox({
+			prompt: 'give me something to store!', 
+			// placeHolder: hostID.label,
+		})
+		.then( value => {
 
+			if (value === undefined) {
+				throw new Error('testCommand1 inputBox cancelled');
+			}
+			setMementoW('key1', value);
+			// ext.context.globalState.update('key1', value);
+		})
 
+		// const benG = getMemento('key1', value);
+		// const benG = ext.context.globalState.get('key1');
+		// console.log(benG);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('testCommand2', () => {
+		console.log('placeholder for testing commands - 2');
+		
+		const benG = getMementoW('key1');
+		// const benG = ext.context.globalState.get('key1');
+		// console.log(benG);
+		vscode.window.showInformationMessage(`Memento! ${benG}`)
 	}));
 
 
@@ -52,6 +80,9 @@ export function activate(context: vscode.ExtensionContext) {
 		//  will cache passwords with keytar in the future
 		
 		const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+
+		// initialize virtual file store: memfs
+		initialized = true;
 
 		var bigip = {
 			host: <string> '',
@@ -81,10 +112,10 @@ export function activate(context: vscode.ExtensionContext) {
 		// feed it the statusBar object created at top, blank host, blank password)
 		setHostStatusBar(hostStatusBar, '', '');
 
-		for (const [name] of memFs.readDirectory(vscode.Uri.parse('memfs:/'))) {
-            memFs.delete(vscode.Uri.parse(`memfs:/${name}`));
-        }
-        initialized = false;
+		// for (const [name] of memFs.readDirectory(vscode.Uri.parse('memfs:/'))) {
+        //     memFs.delete(vscode.Uri.parse(`memfs:/${name}`));
+        // }
+        // initialized = false;
 
 		return vscode.window.showInformationMessage('clearing selected bigip and status bar details')
 	}));
@@ -155,7 +186,11 @@ export function activate(context: vscode.ExtensionContext) {
 		// const location = bigipHosts?.indexOf(hostID)
 		// const newHosts: Array<string> = bigipHosts[location]
 
-		vscode.window.showInputBox({prompt: 'Update Device/BIG-IP/Host      ', placeHolder: hostID.label})
+		vscode.window.showInputBox({
+			prompt: 'Update Device/BIG-IP/Host      ', 
+			// placeHolder: hostID.label,
+			value: hostID.label
+		})
 		.then( input => {
 
 			if (input === undefined) {

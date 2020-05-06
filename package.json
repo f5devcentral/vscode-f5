@@ -2,7 +2,7 @@
 	"name": "vscode-f5-fast",
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)utomation (S)ervices (T)emplate engine extension",
-	"version": "0.0.1",
+	"version": "0.0.4",
 	"engines": {
 		"vscode": "^1.42.0"
 	},
@@ -101,6 +101,10 @@
 			{
 				"command": "testCommand1",
 				"title": "f5-fast: testCommand1"
+			},
+			{
+				"command": "testCommand2",
+				"title": "f5-fast: testCommand2"
 			},
 			{
 				"command": "f5-fast.addHost",
@@ -251,6 +255,7 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
-		"https": "^1.0.0"
+		"https": "^1.0.0",
+		"keytar": "^5.6.0"
 	}
 }
