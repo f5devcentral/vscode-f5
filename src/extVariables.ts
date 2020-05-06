@@ -5,6 +5,7 @@
 
 import { ExtensionContext, TreeView } from "vscode";
 import { KeyTar } from "./utils/keytar";
+import { MemFS } from './fileSystemProvider'
 
 /**
  * Namespace for common variables used throughout the extension. They must be initialized in the activate() method of extension.ts
@@ -12,4 +13,5 @@ import { KeyTar } from "./utils/keytar";
 export namespace ext {
     export let context: ExtensionContext;
     export let keytar: KeyTar | undefined;
+    export let memFs: MemFS;
 }

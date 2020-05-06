@@ -27,9 +27,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(hostStatusBar);
 
 	// create virtual file store
-	// const memFs = new MemFS();
-    // context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', memFs, { isCaseSensitive: true }));
-    // let initialized = false;
+	ext.memFs = new MemFS();
+    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', ext.memFs, { isCaseSensitive: true }));
+    let initialized = false;
 
 
 	// exploring classes to group all f5 api calls

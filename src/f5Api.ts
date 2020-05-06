@@ -38,44 +38,40 @@ export class f5Api {
                 // why is this still showing if auth failed and no token returned?
                 console.log(`inside-getAuth-hostToken: ${JSON.stringify(hostToken)}`);
                 
-                // interface hostToken {
-                //     host: string,
-                //     token: string
-                // }
+                interface hostToken {
+                    host: string,
+                    token: string
+                }
 
                 // var [host, token] = hostToken;
-                const host = hostToken.host;
-                const token = hostToken.token;
+                // const host = hostToken.host;
+                // const token = hostToken.token;
 
-                console.log(`inside-getAuth-host_token: ${host} - ${token}`);
+                console.log(`inside-getAuth-host_token: ${hostToken.host} - ${hostToken.token}`);
                 
-                getF5Info(host, token)
+                getF5Info(hostToken.host, hostToken.token)
                 .then( f5Info => {
                     console.log(`inside-getAuth-fastInfo: ${f5Info}`);
 
-                    // memFs.writeFile(vscode.Uri.parse(`memfs:/info.json`), Buffer.from(f5Info), { create: true, overwrite: true });
-
-                    
-
-
+                    ext.memFs.writeFile(vscode.Uri.parse(`memfs:/info.json`), Buffer.from(f5Info), { create: true, overwrite: true });
 
                     // ext.context.globalState.update()
 
-                    vscode.workspace.openTextDocument({ 
-                        language: 'json', 
-                        content: JSON.stringify(f5Info, undefined, 4) 
-                    })
-                    .then( doc => vscode.window.showTextDocument(doc, { preview: false })
-                )};
+                    // vscode.workspace.openTextDocument({ 
+                    //     language: 'json', 
+                    //     content: JSON.stringify(f5Info, undefined, 4) 
+                    // })
+                    // .then( doc => vscode.window.showTextDocument(doc, { preview: false })
+                )}
 
-                getFastInfo(host, token)
-                .then( fastInfo => {
-                    console.log(`inside-getAuth-fastInfo: ${fastInfo}`);
-                    vscode.workspace.openTextDocument({ 
-                        language: 'json', 
-                        content: JSON.stringify(fastInfo, undefined, 4) 
-                    })
-                    .then( doc => vscode.window.showTextDocument(doc, { preview: false })
+                // getFastInfo(host, token)
+                // .then( fastInfo => {
+                //     console.log(`inside-getAuth-fastInfo: ${fastInfo}`);
+                //     vscode.workspace.openTextDocument({ 
+                //         language: 'json', 
+                //         content: JSON.stringify(fastInfo, undefined, 4) 
+                //     })
+                //     .then( doc => vscode.window.showTextDocument(doc, { preview: false })
             )};
         })
     }
