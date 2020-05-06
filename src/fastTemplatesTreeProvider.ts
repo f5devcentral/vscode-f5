@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { ext } from './extensionVariables'
 
 export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTemplate> {
 
@@ -20,7 +21,9 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
         // console.log(`statusBar: ${JSON.stringify(stat)}`);
         
         const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts');
-        console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+		
+		console.log(`hostStatusBar in fastTree: ${ext.hostStatusBar}`)
    
         // takes individual host item and creates a tree item
         const treeHosts = (name: string): fastTemplate => {

@@ -8,12 +8,13 @@ import { carTreeDataProvider } from './carTreeView';
 import { DepNodeProvider, Dependency } from './nodeDependencies';
 import { MemFS } from './fileSystemProvider';
 import { F5TreeProvider, f5Host } from './hostsTreeProvider';
+import { as3TreeProvider } from './as3TreeProvider';
 import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
 import { f5Api } from './f5Api'
 // import { stringify } from 'querystring';
 import { setHostStatusBar, setMemento, getMemento, setMementoW, getMementoW } from './utils';
 import { test } from 'mocha';
-import { ext } from './extVariables';
+import { ext } from './extensionVariables';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -23,8 +24,8 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.context = context;
 
 	// Create a status bar item
-	const hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-	context.subscriptions.push(hostStatusBar);
+	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	context.subscriptions.push(ext.hostStatusBar);
 
 	// create virtual file store
 	ext.memFs = new MemFS();
@@ -36,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const f5API = new f5Api();
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('testCommand1', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('writeMemento', () => {
 		console.log('placeholder for testing commands');
 		
 		vscode.window.showInputBox({
@@ -57,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// console.log(benG);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('testCommand2', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('readMemento', () => {
 		console.log('placeholder for testing commands - 2');
 		
 		const benG = getMementoW('key1');
@@ -68,9 +69,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (hostFromTree) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (host) => {
 		console.log('executing f5-fast.connectDevice2');
-		console.log(`Host from tree select: ${hostFromTree}`);
+		console.log(`Host from tree select: ${host}`);
 
 		// thinking about how I want to handle device/username/password creds
 		//	either in it's own object, or in the host status bar...
@@ -79,29 +80,35 @@ export function activate(context: vscode.ExtensionContext) {
 
 		//  will cache passwords with keytar in the future
 		
-		const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts');
-
+		const bigipHosts: vscode.QuickPickItem[] = await vscode.workspace.getConfiguration().get('f5-fast.hosts');
+		
+		if (bigipHosts === undefined) {
+			throw new Error('no hosts in configuration')
+		}
 		// initialize virtual file store: memfs
 		initialized = true;
 
-		var bigip = {
-			host: <string> '',
-			password: <string> ''
-		};
-
-		if (!hostFromTree) {
-			bigip.host = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
+		if (!host) {
+			host = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
 			// console.log(`Selected device/host/bigip: ${bigip}`);
-			vscode.window.showInformationMessage(`Selected device/host/bigip = ${bigip.host}`)
-		} else {
-			bigip.host = hostFromTree;
+			vscode.window.showInformationMessage(`Selected device/host/bigip = ${host}`)
 		}
 
 		// clean up bigipHosts var, no longer needed...
 		
-		bigip.password = await vscode.window.showInputBox({password: true});
+		// const password: string = await vscode.window.showInputBox({password: true});
 
-		f5API.connectF5(hostStatusBar, bigip.host, bigip.password);
+		vscode.window.showInputBox({ password: true})
+		.then( password => {
+			if (!password) {
+				throw new Error('User cancelled password input')
+			}
+			f5API.connectF5(host, password);
+			// console.log(`connection token: ${connect}`)
+		})
+
+		// var connection = await f5API.connectF5(hostStatusBar, bigip.host, bigip.password);
+		//here
 
 	}));
 
@@ -110,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// clear status bar 
 		// feed it the statusBar object created at top, blank host, blank password)
-		setHostStatusBar(hostStatusBar, '', '');
+		setHostStatusBar();
 
 		// for (const [name] of memFs.readDirectory(vscode.Uri.parse('memfs:/'))) {
         //     memFs.delete(vscode.Uri.parse(`memfs:/${name}`));
@@ -118,6 +125,12 @@ export function activate(context: vscode.ExtensionContext) {
         // initialized = false;
 
 		return vscode.window.showInformationMessage('clearing selected bigip and status bar details')
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('getF5Info', () => {
+		// f5API.getF5HostInfo();
+		f5API.listAS3Tasks();
 	}));
 
 
@@ -235,8 +248,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// setting up templates tree
 	const templatesTreeProvider = new F5TreeProvider('');
-	vscode.window.registerTreeDataProvider('fastTemplates', templatesTreeProvider, hostStatusBar);
+	vscode.window.registerTreeDataProvider('fastTemplates', templatesTreeProvider);
 	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => templatesTreeProvider.refresh());
+
+
+	// setting up as3 tree
+	const as3Tree = new as3TreeProvider('');
+	vscode.window.registerTreeDataProvider('as3', as3Tree);
+	vscode.commands.registerCommand('refreshAS3Tree', () => as3Tree.refresh());
 
 
 
@@ -260,14 +279,14 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('nodeDependencies.deleteEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
 
 
-	const carTreeData = {
+	ext.carTreeData = {
 		"cars1": [
 			{ "name":"Ford2", "models":[ "Fiesta3", "Focus3", "Mustang3" ] },
 			{ "name":"BMW2", "models":[ "3203", "X33", "X53" ] }
 		  ]
 	}
 
-	vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider(carTreeData));
+	vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider());
 
 }
 

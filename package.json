@@ -55,6 +55,10 @@
 					"name": "FAST Templates"
 				},
 				{
+					"id": "as3",
+					"name": "AS3"
+				},
+				{
 					"id": "nodeDependencies",
 					"name": "node Dependencies"
 				},
@@ -99,12 +103,16 @@
 				"title": "f5-fast: Chuck Joke"
 			},
 			{
-				"command": "testCommand1",
-				"title": "f5-fast: testCommand1"
+				"command": "getF5Info",
+				"title": "f5-fast: Show F5 Device Info"
 			},
 			{
-				"command": "testCommand2",
-				"title": "f5-fast: testCommand2"
+				"command": "writeMemento",
+				"title": "f5-fast: writeMemento"
+			},
+			{
+				"command": "getMenento",
+				"title": "f5-fast: getMemento"
 			},
 			{
 				"command": "f5-fast.addHost",
@@ -128,6 +136,14 @@
 			},
 			{
 				"command": "f5-fast.refreshHostsTree",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "refreshAS3Tree",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -228,6 +244,10 @@
 				},
 				{
 					"command": "f5-fast.removeHost",
+					"when": "view == f5Hosts"
+				},
+				{
+					"command": "getF5Info",
 					"when": "view == f5Hosts"
 				}
 			]

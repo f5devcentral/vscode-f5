@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { carTreeData, ext } from './extensionVariables'
 
 
 // setting up tree view stuff
@@ -14,6 +15,9 @@ export class carTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
     //     vehicles: 'cars'
     // }
 
+    // constructor(private workspaceRoot: string) {
+    // }
+
     constructor() {
         this.data = [new TreeItem('cars', [
         new TreeItem(
@@ -23,18 +27,21 @@ export class carTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
         ])];
     }
 
+
     getTreeItem(element: TreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
-        // console.log(`CARS element in getTreeItem ~~~~~ ${JSON.stringify(element)}`);
+        console.log(`CARS element in getTreeItem ~~~~~ ${JSON.stringify(element)}`);
         return element;
     };
 
     getChildren(element?: TreeItem|undefined): vscode.ProviderResult<TreeItem[]> {
         
+        const data = ext.carTreeData;
+
         if (element === undefined) {
-            // console.log(`CARS this.data in getChildren ----- ${JSON.stringify(this.data)}`);
+            console.log(`CARS this.data in getChildren ----- ${JSON.stringify(this.data)}`);
             return this.data;
         }
-        // console.log(`CARS element.children in getChildren ***** ${JSON.stringify(element.children)}`);
+        console.log(`CARS element.children in getChildren ***** ${JSON.stringify(element.children)}`);
         return element.children;
     }
 };

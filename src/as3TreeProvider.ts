@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
+// import { f5API } from './f5Api'
+import { ext } from './extensionVariables';
 
-export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
+export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<f5Host | undefined> = new vscode.EventEmitter<f5Host | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<f5Host | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<as3Item | undefined> = new vscode.EventEmitter<as3Item | undefined>();
+	readonly onDidChangeTreeData: vscode.Event<as3Item | undefined> = this._onDidChangeTreeData.event;
 
 	constructor(private workspaceRoot: string) {
 	}
@@ -12,23 +14,33 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: f5Host): vscode.TreeItem {
+	getTreeItem(element: as3Item): vscode.TreeItem {
 		return element;
 	}
 
-	getChildren(element?: f5Host): Thenable<f5Host[]> {
-        
+	getChildren(element?: as3Item): Thenable<as3Item[]> {
+		
+		// list of tasks in tree by 'id'
+		// command to produce as3 example snip-it
+		// command to post declaration to connected device
+
+		if ( ext.hostStatusBar.text && ext.hostStatusBar.password ) {
+			// const as3Tasks = f5API.listAS3Tasks();
+			// console.log(`AS3 Tasks: ${JSON.stringify(as3Tasks)}`);
+		}
+
+
         const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts');
-        // console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+        console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
    
         // takes individual host item and creates a tree item
-        const treeHosts = (name: string): f5Host => {
-            const treeItem = new f5Host(name, vscode.TreeItemCollapsibleState.None, {
+        const treeHosts = (name: string): as3Item => {
+            const treeItem = new as3Item(name, vscode.TreeItemCollapsibleState.None, {
                 command: 'f5-fast.connectDevice',
                 title: 'hostTitle',
                 arguments: [name]
             });
-            // console.log(`treeItem: ${JSON.stringify(treeItem)}`);
+            console.log(`treeItem: ${JSON.stringify(treeItem)}`);
             return treeItem;
         }
 
@@ -38,7 +50,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
 		// basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
         const treeItems = bigipHosts.map(host => treeHosts(host));
 
-        // console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
+        console.log(`as3 Tree Full: ${JSON.stringify(treeItems)}`);
 
         return Promise.resolve(treeItems);
 	}
@@ -46,7 +58,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
 
 }
 
-export class f5Host extends vscode.TreeItem {
+export class as3Item extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		// private version: string,
@@ -56,9 +68,9 @@ export class f5Host extends vscode.TreeItem {
 		super(label, collapsibleState);
 	}
 
-	get tooltip(): string {
-		return `Connect`;
-	}
+	// get tooltip(): string {
+	// 	return `Connect`;
+	// }
 
 	// get description(): string {
 	// 	return 'descLoc';

@@ -2,6 +2,29 @@
 
 [BACK TO MAIN README](../README.md)
 
+
+1.  device connect
+    - get auth token
+    - if not sucessful - fail message - exit all processing
+    - if successful
+        - store user/pass in statusBar
+        - get device info - store in memFs
+        - get installed ILX services
+          - if fast, refresh tree
+            tree should have:
+                - templates
+                - deployed apps
+                - tasks
+          - if as3, refresh tree
+                - 
+        - refresh templates tree
+            - templates tree should use user/pass from statusBar, to populate templates list
+
+
+
+
+
+
 ## Connectivity Mgmt
 
 List of BIGIP targets like VS Code Remote SSH plugin
