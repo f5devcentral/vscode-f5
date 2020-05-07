@@ -7,11 +7,12 @@ All notable changes to the "f5-fast" extension will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
-## [0.0.5] - (5-X-2020)
+## [0.1.0] - (5-7-2020)
 
 ### Added
-### Changed
-### Removed
+- load sample as3 declaration
+- post as3 declaration to connected F5
+
 
 ## [0.0.4] - (5-4-2020)
 

@@ -145,8 +145,8 @@ export class f5Api {
         var host: string = ext.hostStatusBar.text;
         const password: string = ext.hostStatusBar.password;
 
-        console.log(`text in postAS3: ${JSON.stringify(dec)}`)
-
+        console.log(`declartion to postAS3: ${JSON.stringify(dec)}`)
+        
         if (host || password) {
             var [username, host] = host.split('@');
             getAuthToken(host, {username, password})
@@ -154,22 +154,46 @@ export class f5Api {
                 if (hostToken === undefined) {
                     throw new Error('hostToken blank, auth failed');
                 }
-
-                callHTTP('POST', hostToken.host, '/mgmt/shared/appsvcs/declare?async=true', hostToken.token, dec)
+                
+                callHTTP('POST', hostToken.host, '/mgmt/shared/appsvcs/declare/', hostToken.token, dec)
                 .then( postInfo => {
+                    
+                    console.log(`postAS3 response: ${JSON.stringify(postInfo)}`)
+                    
+                    // if postInfo resposecode == 202
+                    //      capture 'id'
+                    //      GET on id will http/200
 
                     vscode.workspace.openTextDocument({ 
                         language: 'json', 
                         content: JSON.stringify(postInfo, undefined, 4) 
                     })
-                    .then( doc => 
-                        vscode.window.showTextDocument(
-                            doc, 
-                            { 
-                                preview: false 
-                            }
-                        )
-                    )
+                    .then( doc => {
+                        vscode.window.showTextDocument( doc, { preview: false })
+
+                        // if (postInfo.status == 202) {
+                        //     // postInfo.body.id
+                        //     console.log(`post STATUS: ${JSON.stringify(postInfo.body.id)}`)
+                        
+                        //     vscode.window.showQuickPick(['yes', 'no'], {placeHolder: 'follow post async?'})
+                        //     .then( selection => {
+                        //         if (selection == 'yes'){
+                        //             console.log(`WINDOW SELECTION:  ${selection}`)
+                        //             // callHTTP('GET', hostToken.host, `/mgmt/shared/appsvcs/tasks/${postInfo.body.id}`, hostToken.token)
+                        //             // .then( newPostInfo => {
+                        //             //     // var lastLine = vscode.TextEdit.document.lineAt(textEditor.document.lineCount - 1);
+                        //             //     vscode.TextEdit.insert(-1, newPostInfo)
+                        //             // });
+                        //         } 
+                        //         // else {
+                        //         //     throw new Error('User Cancelled AS3 post follow-up')
+                        //         // }
+                        //     });
+                        // }
+                        
+                    })
+
+
                 });
             });
         } else {
@@ -232,16 +256,20 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                     console.log(`GOT 401!!!!!`)
                 }
                 
-                if (res.statusCode != 200) {
+                const goodResp: Array<number> = [200, 201, 202]
+                // was trying to check against array above with arr.includes or arr.indexOf
+                if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 ) {
+                    return resolve({
+                        status: res.statusCode,
+                        headers: res.headers,
+                        body
+                    });
+                } else {
+
                     console.error(`AuthToken FAILURE: ${res.statusCode} - ${res.statusMessage}`);
                     return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
                 }
 
-                return resolve({
-                    status: res.statusCode,
-                    headers: res.headers,
-                    body
-                });
             });
         });
 
@@ -309,20 +337,22 @@ const getAS3Tasks = (host: string, token: string) => makeRequest({
 
 
 
-const callHTTP = (method: string, host: string, path: string, token: string, payload: object = {}) => makeRequest({
-    method,
-    host,
-    path,
-    headers: {
-        'Content-Type': 'application/json',
-        'X-F5-Auth-Token': token
+const callHTTP = (method: string, host: string, path: string, token: string, payload: object = {}) => makeRequest(
+    {
+        method,
+        host,
+        path,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-F5-Auth-Token': token
+        }
     },
     payload
-})
+)
 .then( response => {
-    console.log('value in getFastInfo: ' + JSON.stringify(response));
+    console.log('response from callHTTP: ' + JSON.stringify(response));
     // Promise.resolve(value.body.token);
-    return response.body;
+    return response;
 });
 
 

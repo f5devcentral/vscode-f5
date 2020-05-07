@@ -29,6 +29,15 @@ export function getHostStatusBar() {
 
 };
 
+export function isValidJson(json: string) {
+    try {
+        JSON.parse(json);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 export function setMemento(key:string, value: string) {
     ext.context.globalState.update(key, value)
 }

@@ -2,7 +2,7 @@
 	"name": "vscode-f5-fast",
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)utomation (S)ervices (T)emplate engine extension",
-	"version": "0.0.4",
+	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.42.0"
 	},
@@ -293,6 +293,7 @@
 	"dependencies": {
 		"fs": "0.0.1-security",
 		"https": "^1.0.0",
-		"keytar": "^5.6.0"
+		"keytar": "^5.6.0",
+		"vsce": "^1.75.0"
 	}
 }

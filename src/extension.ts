@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 
 import * as sample_as3Dec from './test/sample_as3Dec.json';
 
@@ -15,7 +15,7 @@ import { as3TreeProvider } from './as3TreeProvider';
 import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
 import { f5Api } from './f5Api'
 // import { stringify } from 'querystring';
-import { setHostStatusBar, setMemento, getMemento, setMementoW, getMementoW } from './utils/utils';
+import { setHostStatusBar, setMemento, getMemento, setMementoW, getMementoW, isValidJson } from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
 
@@ -94,7 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!host) {
 			host = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
 			// console.log(`Selected device/host/bigip: ${bigip}`);
-			vscode.window.showInformationMessage(`Selected device/host/bigip = ${host}`)
+			// vscode.window.showInformationMessage(`Selected device/host/bigip = ${host}`)
 		}
 
 		// clean up bigipHosts var, no longer needed...
@@ -152,7 +152,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('loadAS3Sample1', () => {
 		// can probably set this up to read files from a directory and provide a pick list
 		//		or enable it as a tree on the left
-		//	setup a command to download a git with all the sample declarations, then enable a tree to show them???
+		//	setup a command to download a git with all the sample declarations, 
+		//		then enable a tree to show them???
 		vscode.workspace.openTextDocument({ 
 			language: 'json', 
 			content: JSON.stringify(JSON.parse(JSON.stringify(sample_as3Dec)), undefined, 4) 
@@ -184,15 +185,23 @@ export function activate(context: vscode.ExtensionContext) {
 			const text = editor.document.getText();
 			console.log(`ENTIRE DOC: ${text}`)
 
-			
+			if (!isValidJson(text)) {
+				return vscode.window.showErrorMessage('Not valid JSON');
+			}
+
+
 			f5API.postAS3(JSON.parse(text));
 		} else {
 			// post selected text/declaration
 			// var selection = editor.selection;
 			const text = editor.document.getText(editor.selection);
+			if (!isValidJson(text)) {
+				return vscode.window.showErrorMessage('Not valid JSON');
+			}
 			
+			console.log(`SELECTED TEXT: ${text}`)
+			f5API.postAS3(JSON.parse(text));
 		} 
-		console.log(`SELECTED TEXT: ${text}`)
 		
 	}));
 

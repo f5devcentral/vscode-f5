@@ -5,6 +5,14 @@ This is the README for the F5 Automation Services Templates(FAST), "vscode-f5-fa
 This extension is intented to help interface with the FAST servoce to manage templates and deploy applications.
 
 ## Demo of early stages..
+
+### Demo showing device mgmt (add, modify, delete, connect, show F5 host info)
+![demo1](./README_docs/f5-demo-hostMgmt_5.7.2020.gif)
+
+### Demo showing connect to device, load sample AS3 from local, post AS3 to connected F5, see response
+![demo1](./README_docs/f5-demo-postAS3_5.7.2020.gif)
+
+
 ![demo1](./README_docs/f5-demo-1_4.27.2020.gif)
 
 ![demo2](./README_docs/vscode-fast_demo_01.png)
