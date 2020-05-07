@@ -129,13 +129,34 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('getF5Info', () => {
-		// f5API.getF5HostInfo();
+		f5API.getF5HostInfo();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('listAS3Tasks', () => {
 		f5API.listAS3Tasks();
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', () => {
 		chuckJoke();
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('loadAS3Sample1', () => {
+		const jsonDec = require('./test/sample_as3Dec.json');
+		console.log(`sampleJSON: ${jsonDec}`)
+		// vscode.workspace.openTextDocument({ 
+		// 	language: 'json', 
+		// 	content: JSON.stringify(JSON.parse(jsonDec), undefined, 4) 
+		// })
+		// .then( doc => 
+		// 	vscode.window.showTextDocument(
+		// 		doc, 
+		// 		{ 
+		// 			preview: false 
+		// 		}
+		// 	)
+		// )
 	}));
 
 

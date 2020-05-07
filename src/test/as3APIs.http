@@ -26,12 +26,14 @@ X-F5-Auth-Token: {{authToken}}
 
 ###   # get as3 tasks
 GET https://{{host}}/mgmt/shared/appsvcs/task/
+  ?$select=id,results
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
 
 ###   # get as3 declarations
 GET https://{{host}}/mgmt/shared/appsvcs/declare/
+  # ?$select=id
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 

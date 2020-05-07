@@ -41,11 +41,14 @@ export class f5Api {
                 if (hostToken === undefined) {
                     throw new Error('hostToken blank, auth failed');
                 }
-                getAS3Tasks(hostToken.host, hostToken.token)
-                .then( f5Info => {
+                callHTTP('GET', hostToken.host, '/mgmt/shared/appsvcs/task/', hostToken.token)
+                .then( response => {
+
+                    // response = JSON.parse(response)
+                    debugger;
                     vscode.workspace.openTextDocument({ 
                         language: 'json', 
-                        content: JSON.stringify(f5Info, undefined, 4) 
+                        content: JSON.stringify(response, undefined, 4) 
                     })
                     .then( doc => 
                         vscode.window.showTextDocument(
@@ -277,6 +280,22 @@ const getAS3Tasks = (host: string, token: string) => makeRequest({
     return response.body;
 });
 
+
+
+const callHTTP = (method: string, host: string, path: string, token: string) => makeRequest({
+    method,
+    host,
+    path,
+    headers: {
+        'Content-Type': 'application/json',
+        'X-F5-Auth-Token': token
+    }
+})
+.then( response => {
+    console.log('value in getFastInfo: ' + JSON.stringify(response));
+    // Promise.resolve(value.body.token);
+    return response.body;
+});
 
 
 const getFastInfo = (host: string, token: string) => makeRequest({

@@ -107,6 +107,14 @@
 				"title": "f5-fast: Show F5 Device Info"
 			},
 			{
+				"command": "listAS3Tasks",
+				"title": "f5-fast: List AS3 Tasks"
+			},
+			{
+				"command": "loadAS3Sample1",
+				"title": "f5-fast: load AS3 Sample 1"
+			},
+			{
 				"command": "writeMemento",
 				"title": "f5-fast: writeMemento"
 			},
