@@ -103,8 +103,12 @@
 				"title": "f5-fast: Chuck Joke"
 			},
 			{
-				"command": "getF5Info",
+				"command": "getF5HostInfo",
 				"title": "f5-fast: Show F5 Device Info"
+			},
+			{
+				"command": "getF5FastInfo",
+				"title": "f5-fast: Show F5 Fast Info"
 			},
 			{
 				"command": "listAS3Tasks",
@@ -113,6 +117,10 @@
 			{
 				"command": "loadAS3Sample1",
 				"title": "f5-fast: load AS3 Sample 1"
+			},
+			{
+				"command": "postAS3Dec",
+				"title": "f5-fast: post AS3 declaration"
 			},
 			{
 				"command": "writeMemento",
@@ -255,7 +263,7 @@
 					"when": "view == f5Hosts"
 				},
 				{
-					"command": "getF5Info",
+					"command": "getF5HostInfo",
 					"when": "view == f5Hosts"
 				}
 			]
@@ -283,6 +291,7 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
+		"fs": "0.0.1-security",
 		"https": "^1.0.0",
 		"keytar": "^5.6.0"
 	}

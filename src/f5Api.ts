@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
-import { setHostStatusBar, getHostStatusBar } from './utils'
+import { setHostStatusBar, getHostStatusBar } from './utils/utils'
 import { ext } from './extensionVariables';
 import { rejects } from 'assert';
 
@@ -57,14 +57,15 @@ export class f5Api {
                                 preview: false 
                             }
                         )
-                )};
+                    )
+                });
             });
         } else {
             console.error(`getF5HostInfo - NO host or password details: ${host} - ${password}`);
             vscode.window.showInformationMessage(`Connect to device first!!!`);
-            //instead of errors, just call the connect command
+            // //instead of errors, just call the connect command
         }
-    }
+    };
 
     getF5HostInfo() {
 
@@ -93,7 +94,8 @@ export class f5Api {
                                 preview: false 
                             }
                         )
-                )};
+                    )
+                });
             });
         } else {
             console.error(`getF5HostInfo - NO host or password details: ${host} - ${password}`);
@@ -102,54 +104,79 @@ export class f5Api {
         }
     }
 
-    getF5FastInfo(hostStatusBar: vscode.StatusBarItem, device: string, password: string) {
-        console.log(`getFastInfo: ${device} - ${password}`);
+    getF5FastInfo() {
         
-        var [username, host] = device.split('@');
+        var host: string = ext.hostStatusBar.text;
+        const password: string = ext.hostStatusBar.password;
 
-        setHostStatusBar(host, password)
-
-        return getAuthToken(host, {username, password})
+        if (host || password) {
+            var [username, host] = host.split('@');
+            getAuthToken(host, {username, password})
             .then( hostToken => {
-                // why is this still showing if auth failed and no token returned?
-                console.log(`inside-getAuth-hostToken: ${JSON.stringify(hostToken)}`);
-                
-                interface hostToken {
-                    host: string,
-                    token: string
+                if (hostToken === undefined) {
+                    throw new Error('hostToken blank, auth failed');
                 }
 
-                // var [host, token] = hostToken;
-                // const host = hostToken.host;
-                // const token = hostToken.token;
-
-                console.log(`inside-getAuth-host_token: ${hostToken.host} - ${hostToken.token}`);
-                
-                getF5Info(hostToken.host, hostToken.token)
+                callHTTP('GET', hostToken.host, '/mgmt/shared/fast/info', hostToken.token)
                 .then( f5Info => {
-                    console.log(`inside-getAuth-fastInfo: ${f5Info}`);
 
-                    ext.memFs.writeFile(vscode.Uri.parse(`memfs:/info.json`), Buffer.from(f5Info), { create: true, overwrite: true });
+                    vscode.workspace.openTextDocument({ 
+                        language: 'json', 
+                        content: JSON.stringify(f5Info, undefined, 4) 
+                    })
+                    .then( doc => 
+                        vscode.window.showTextDocument(
+                            doc, 
+                            { 
+                                preview: false 
+                            }
+                        )
+                    )
+                });
+            });
+        } else {
+            console.error(`getF5FastInfo - NO host or password details: ${host} - ${password}`);
+            vscode.window.showInformationMessage(`Connect to device first!!!`);
+            //instead of errors, just call the connect command
+        }
+    }
 
-                    // ext.context.globalState.update()
+    postAS3(dec: object) {
+        var host: string = ext.hostStatusBar.text;
+        const password: string = ext.hostStatusBar.password;
 
-                    // vscode.workspace.openTextDocument({ 
-                    //     language: 'json', 
-                    //     content: JSON.stringify(f5Info, undefined, 4) 
-                    // })
-                    // .then( doc => vscode.window.showTextDocument(doc, { preview: false })
-                )}
+        console.log(`text in postAS3: ${JSON.stringify(dec)}`)
 
-                // getFastInfo(host, token)
-                // .then( fastInfo => {
-                //     console.log(`inside-getAuth-fastInfo: ${fastInfo}`);
-                //     vscode.workspace.openTextDocument({ 
-                //         language: 'json', 
-                //         content: JSON.stringify(fastInfo, undefined, 4) 
-                //     })
-                //     .then( doc => vscode.window.showTextDocument(doc, { preview: false })
-            )};
-        })
+        if (host || password) {
+            var [username, host] = host.split('@');
+            getAuthToken(host, {username, password})
+            .then( hostToken => {
+                if (hostToken === undefined) {
+                    throw new Error('hostToken blank, auth failed');
+                }
+
+                callHTTP('POST', hostToken.host, '/mgmt/shared/appsvcs/declare?async=true', hostToken.token, dec)
+                .then( postInfo => {
+
+                    vscode.workspace.openTextDocument({ 
+                        language: 'json', 
+                        content: JSON.stringify(postInfo, undefined, 4) 
+                    })
+                    .then( doc => 
+                        vscode.window.showTextDocument(
+                            doc, 
+                            { 
+                                preview: false 
+                            }
+                        )
+                    )
+                });
+            });
+        } else {
+            console.error(`postInfo - NO host or password details: ${host} - ${password}`);
+            vscode.window.showInformationMessage(`Connect to device first!!!`);
+            //instead of errors, just call the connect command
+        }
     }
 };
 
@@ -282,14 +309,15 @@ const getAS3Tasks = (host: string, token: string) => makeRequest({
 
 
 
-const callHTTP = (method: string, host: string, path: string, token: string) => makeRequest({
+const callHTTP = (method: string, host: string, path: string, token: string, payload: object = {}) => makeRequest({
     method,
     host,
     path,
     headers: {
         'Content-Type': 'application/json',
         'X-F5-Auth-Token': token
-    }
+    },
+    payload
 })
 .then( response => {
     console.log('value in getFastInfo: ' + JSON.stringify(response));

@@ -1,6 +1,9 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+
+import * as sample_as3Dec from './test/sample_as3Dec.json';
 
 // import { request } from 'https';
 import { chuckJoke } from './chuckJoke';
@@ -12,7 +15,7 @@ import { as3TreeProvider } from './as3TreeProvider';
 import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
 import { f5Api } from './f5Api'
 // import { stringify } from 'querystring';
-import { setHostStatusBar, setMemento, getMemento, setMementoW, getMementoW } from './utils';
+import { setHostStatusBar, setMemento, getMemento, setMementoW, getMementoW } from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
 
@@ -70,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (host) => {
-		console.log('executing f5-fast.connectDevice2');
+		console.log('executing f5-fast.connectDevice');
 		console.log(`Host from tree select: ${host}`);
 
 		// thinking about how I want to handle device/username/password creds
@@ -128,8 +131,12 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('getF5Info', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('getF5HostInfo', () => {
 		f5API.getF5HostInfo();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('getF5FastInfo', () => {
+		f5API.getF5FastInfo();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('listAS3Tasks', () => {
@@ -143,24 +150,55 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('loadAS3Sample1', () => {
-		const jsonDec = require('./test/sample_as3Dec.json');
-		console.log(`sampleJSON: ${jsonDec}`)
-		// vscode.workspace.openTextDocument({ 
-		// 	language: 'json', 
-		// 	content: JSON.stringify(JSON.parse(jsonDec), undefined, 4) 
-		// })
-		// .then( doc => 
-		// 	vscode.window.showTextDocument(
-		// 		doc, 
-		// 		{ 
-		// 			preview: false 
-		// 		}
-		// 	)
-		// )
+		// can probably set this up to read files from a directory and provide a pick list
+		//		or enable it as a tree on the left
+		//	setup a command to download a git with all the sample declarations, then enable a tree to show them???
+		vscode.workspace.openTextDocument({ 
+			language: 'json', 
+			content: JSON.stringify(JSON.parse(JSON.stringify(sample_as3Dec)), undefined, 4) 
+		})
+		.then( doc => 
+			vscode.window.showTextDocument(
+				doc, 
+				{ 
+					preview: false 
+				}
+			)
+		)
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('postAS3Dec', () => {
+
+		// if selected text, capture that, if not, capture entire document
+
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			return; // No open text editor
+		}
+
+		// if text is selected in editor
+		if (editor.selection.isEmpty) {
+			// post entire page
+			// validate json structure before send?  something like: try => JSON.parse?
+
+			const text = editor.document.getText();
+			console.log(`ENTIRE DOC: ${text}`)
+
+			
+			f5API.postAS3(JSON.parse(text));
+		} else {
+			// post selected text/declaration
+			// var selection = editor.selection;
+			const text = editor.document.getText(editor.selection);
+			
+		} 
+		console.log(`SELECTED TEXT: ${text}`)
+		
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.openSettings', () => {
+		// not sure where this would return anything to...
 		return vscode.commands.executeCommand("workbench.action.openSettings", "f5-fast");
 	}));
 

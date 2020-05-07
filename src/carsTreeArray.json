@@ -1,7 +1,4 @@
-
-
-
-export let carTreeData = {
+{
   "cars1": [
     { "name":"Ford2", "models":[ "Fiesta3", "Focus3", "Mustang3" ] },
     { "name":"BMW2", "models":[ "3203", "X33", "X53" ] }

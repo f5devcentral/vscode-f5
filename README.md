@@ -124,3 +124,16 @@ Added features X, Y, and Z.
 **Enjoy!**
 
 
+## Running the extension for dev
+
+- Clone git https://github.com/DumpySquare/vscode-f5-fast
+- Change to git directory: `cd vscode-f5-fast/`
+- Install node and dependencies: `npm install`
+- Start VS Code: `code .`
+- To start debugging: `F5`
+- Navigate to view container by clicking on the f5 icon in the Activity bar (typically on the left)
+- Update device list in tree view on the left with a device in your environment
+  - "ADD" in the "F5 Hosts" view
+  - or `click` the pencil icon on an item and modify the item
+- Connect to device
+  - (`click` device in host tree or `Cntrl+shift+P` or `F1`)

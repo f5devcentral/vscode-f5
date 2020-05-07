@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ext } from './extensionVariables';
+import { ext } from '../extensionVariables';
 
 
 export function setHostStatusBar(host: string = '', password: string = '', tip: string = '') {
