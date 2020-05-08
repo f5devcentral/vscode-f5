@@ -24,14 +24,18 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 		// command to produce as3 example snip-it
 		// command to post declaration to connected device
 
-		if ( ext.hostStatusBar.text && ext.hostStatusBar.password ) {
-			// const as3Tasks = f5API.listAS3Tasks();
-			// console.log(`AS3 Tasks: ${JSON.stringify(as3Tasks)}`);
+		// if ( ext.hostStatusBar.text && ext.hostStatusBar.password ) {
+		// 	// const as3Tasks = f5API.listAS3Tasks();
+		// 	// console.log(`AS3 Tasks: ${JSON.stringify(as3Tasks)}`);
+		// }
+
+
+        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+		
+		if ( bigipHosts === undefined) {
+			throw new Error('No configured hosts - from as3TreeProvider');
 		}
-
-
-        const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts');
-        console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
    
         // takes individual host item and creates a tree item
         const treeHosts = (name: string): as3Item => {

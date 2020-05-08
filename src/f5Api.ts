@@ -2,16 +2,23 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
-import { setHostStatusBar, getHostStatusBar } from './utils/utils'
+import { setHostStatusBar, getPassword } from './utils/utils'
 import { ext } from './extensionVariables';
 import { rejects } from 'assert';
+// import { KeyTar, tryGetKeyTar } from './utils/keytar';
 
 export class f5Api {
+
+    // private _keytar: KeyTar | undefined;
+
+    // constructor() {
+    //     this._keytar = tryGetKeyTar();
+    // }
 
     connectF5(device: string, password: string) {
         console.log(`connectF5: ${device} - ${password}`);
         var [username, host] = device.split('@');
-        const auth = getAuthToken(host, {username, password})
+        getAuthToken(host, username, password)
             .then( hostToken => {
                 if (hostToken === undefined) {
                     throw new Error('hostToken blank, auth failed');
@@ -19,6 +26,12 @@ export class f5Api {
                 // why is this still showing if auth failed and no token returned?
                 console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
                 // if hostToken
+
+
+                console.log(`inside-connectF5-hostToken keytar details:${device} - ${password} - ${JSON.stringify(hostToken)}`);
+                ext.keyTar.setPassword('f5Hosts', device, password)
+                
+        
                 setHostStatusBar(device, password)
                 // const now = getHostStatusBar();
                 // console.log(`getHostStatusBar from connectF5: ${JSON.stringify(now)}`)
@@ -31,16 +44,20 @@ export class f5Api {
     }
 
 
-    listAS3Tasks() {
+    async listAS3Tasks() {
         var host: string = ext.hostStatusBar.text;
-        const password: string = ext.hostStatusBar.password;
+        // const password: string = ext.hostStatusBar.password;
+        // const password = await ext.keyTar.getPassword('f5Hosts', host).then( passwd => passwd )
+        const password: string = await getPassword(host)
         if (host || password) {
             var [username, host] = host.split('@');
-            getAuthToken(host, {username, password})
+            getAuthToken(host, username, password)
             .then( hostToken => {
+                
                 if (hostToken === undefined) {
                     throw new Error('hostToken blank, auth failed');
                 }
+
                 callHTTP('GET', hostToken.host, '/mgmt/shared/appsvcs/task/', hostToken.token)
                 .then( response => {
 
@@ -61,20 +78,28 @@ export class f5Api {
                 });
             });
         } else {
-            console.error(`getF5HostInfo - NO host or password details: ${host} - ${password}`);
+            console.error(`listAS3Tasks - NO host or password details: ${host} - ${password}`);
             vscode.window.showInformationMessage(`Connect to device first!!!`);
             // //instead of errors, just call the connect command
         }
     };
 
-    getF5HostInfo() {
+    async getF5HostInfo() {
 
         var host: string = ext.hostStatusBar.text;
-        const password: string = ext.hostStatusBar.password;
+        // const password: string = ext.hostStatusBar.password;
+        const password: string = await getPassword(host)
+        
+
+
+        // const pswd = ext.keytar.getPassword('f5Hosts', host);
+        console.log(`getF5HostInfo - host: ${host} - password: ${password}`);
+        // console.log(`getF5HostInfo - pswd: ${pswd}`);
+        // console.error(`getF5HostInfo - NO host or password details: ${host} - ${pswd}`);
 
         if (host || password) {
             var [username, host] = host.split('@');
-            getAuthToken(host, {username, password})
+            getAuthToken(host, username, password)
             .then( hostToken => {
                 if (hostToken === undefined) {
                     throw new Error('hostToken blank, auth failed');
@@ -104,14 +129,15 @@ export class f5Api {
         }
     }
 
-    getF5FastInfo() {
+    async getF5FastInfo() {
         
         var host: string = ext.hostStatusBar.text;
-        const password: string = ext.hostStatusBar.password;
+        // const password: string = ext.hostStatusBar.password;
+        const password: string = await getPassword(host)
 
         if (host || password) {
             var [username, host] = host.split('@');
-            getAuthToken(host, {username, password})
+            getAuthToken(host, username, password)
             .then( hostToken => {
                 if (hostToken === undefined) {
                     throw new Error('hostToken blank, auth failed');
@@ -141,15 +167,16 @@ export class f5Api {
         }
     }
 
-    postAS3(dec: object) {
+    async postAS3(dec: object) {
         var host: string = ext.hostStatusBar.text;
-        const password: string = ext.hostStatusBar.password;
+        // const password: string = ext.hostStatusBar.password;
+        const password: string = await getPassword(host)
 
         console.log(`declartion to postAS3: ${JSON.stringify(dec)}`)
         
         if (host || password) {
             var [username, host] = host.split('@');
-            getAuthToken(host, {username, password})
+            getAuthToken(host, username, password)
             .then( hostToken => {
                 if (hostToken === undefined) {
                     throw new Error('hostToken blank, auth failed');
@@ -286,15 +313,22 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
 
 
 
-const getAuthToken = async (host: string, payload: object) => makeRequest({
+const getAuthToken = async (host: string, username: string, password: string) => makeRequest({
     host,
     path: '/mgmt/shared/authn/login',
     method: 'POST',
-}, payload)
+// }, { opt1: 'betsy', opt2: 'johnny' })
+}, 
+{ 
+    username,
+    password
+})
 .then( response => {
     // console.log('value in getAuth: ' + JSON.stringify(response));
     if (response.status != 200) {
-        return new Error(`error from getAuthTokenNOT200: ${response}`);
+        // clear cached password for this device
+        ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`)
+        throw new Error(`error from getAuthTokenNOT200: ${response}`);
     }
     return { host: host, token: response.body.token.token };
 }, reason => {

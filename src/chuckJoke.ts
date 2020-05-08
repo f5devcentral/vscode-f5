@@ -23,13 +23,16 @@ export function chuckJoke() {
         response.on('end', () => {
             const result = JSON.parse(Buffer.concat(chunks).toString());
             
-            console.log('chuck joke: ', result.value);
+            console.log('ALL CHUCK JOKE DETAILS: ', JSON.stringify(result));
             vscode.window.showInformationMessage(`Getting Joke from https://api.chucknorris.io/jokes/random`);
 
             // const content = `Chuck Joke: \r\n\r\n${ result.value }`
             // const content = `Chuck Joke: \r\n\r\n${ result }`
+            
+            const content = { chuckJoke: result.value }
+
             if (result) {
-                vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(result , undefined, 4) })
+                vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(content , undefined, 4) })
                 .then( doc => vscode.window.showTextDocument(doc, { preview: false })
                 ), (error: any) => {
                     console.error(error)

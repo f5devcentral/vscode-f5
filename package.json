@@ -2,7 +2,18 @@
 	"name": "vscode-f5-fast",
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)utomation (S)ervices (T)emplate engine extension",
-	"version": "0.1.0",
+	"publisher": "DumpySquare",
+	"version": "0.1.1",
+	"keywords": [
+		"f5",
+		"f5networks",
+		"AS3",
+		"fast",
+		"DO",
+		"TS",
+		"bigip",
+		"big-ip"
+	],
 	"engines": {
 		"vscode": "^1.42.0"
 	},
@@ -99,6 +110,14 @@
 				"title": "f5-fast: Connect to Device"
 			},
 			{
+				"command": "f5-fast.disconnect",
+				"title": "f5-fast: Disconnect from Device"
+			},
+			{
+				"command": "f5-fast.clearPasswords",
+				"title": "f5-fast: Disconnect and Clear all Passwords"
+			},
+			{
 				"command": "chuckJoke",
 				"title": "f5-fast: Chuck Joke"
 			},
@@ -127,8 +146,8 @@
 				"title": "f5-fast: writeMemento"
 			},
 			{
-				"command": "getMenento",
-				"title": "f5-fast: getMemento"
+				"command": "readMemento",
+				"title": "f5-fast: readMemento"
 			},
 			{
 				"command": "f5-fast.addHost",

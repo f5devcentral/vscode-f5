@@ -18,8 +18,12 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
 
 	getChildren(element?: f5Host): Thenable<f5Host[]> {
         
-        const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts');
-        // console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+		
+		if ( bigipHosts === undefined) {
+			throw new Error('No configured hosts - from as3TreeProvider');
+		}
    
         // takes individual host item and creates a tree item
         const treeHosts = (name: string): f5Host => {

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { carTreeData, ext } from './extensionVariables'
+import { ext } from './extensionVariables'
 
 
 // setting up tree view stuff

@@ -20,8 +20,12 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
 	getChildren(element?: fastTemplate): Thenable<fastTemplate[]> {
         // console.log(`statusBar: ${JSON.stringify(stat)}`);
         
-        const bigipHosts = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
 		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+
+		if ( bigipHosts === undefined) {
+			throw new Error('No configured hosts - from as3TreeProvider');
+		}
 		
 		console.log(`hostStatusBar in fastTree: ${ext.hostStatusBar}`)
    
@@ -47,9 +51,9 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
         return Promise.resolve(treeItems);
 	}
 
-	private getTemplateList(): string[] {
+	// private getTemplateList(): string[] {
 
-	}
+	// }
     
 
 }
