@@ -43,6 +43,33 @@ export class f5Api {
         // return auth;
     }
 
+    
+    /*
+    * Used to issue bash commands to device over API
+    */
+    async issueBash(device: string, password: string, cmd: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                if (hostToken === undefined) {
+                    throw new Error('hostToken blank, auth failed');
+                }
+                // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
+
+                return callHTTP(
+                    'POST', 
+                    hostToken.host, 
+                    '/mgmt/tm/util/bash', 
+                    hostToken.token,
+                    {
+                        command: 'run',
+                        utilCmdArgs: `-c '${cmd}'`
+                    }
+                )
+            });
+    }
+
 
     async listAS3Tasks() {
         var host: string = ext.hostStatusBar.text;
@@ -87,15 +114,10 @@ export class f5Api {
     async getF5HostInfo() {
 
         var host: string = ext.hostStatusBar.text;
-        // const password: string = ext.hostStatusBar.password;
         const password: string = await getPassword(host)
-        
-
 
         // const pswd = ext.keytar.getPassword('f5Hosts', host);
         console.log(`getF5HostInfo - host: ${host} - password: ${password}`);
-        // console.log(`getF5HostInfo - pswd: ${pswd}`);
-        // console.error(`getF5HostInfo - NO host or password details: ${host} - ${pswd}`);
 
         if (host || password) {
             var [username, host] = host.split('@');
@@ -317,20 +339,24 @@ const getAuthToken = async (host: string, username: string, password: string) =>
     host,
     path: '/mgmt/shared/authn/login',
     method: 'POST',
-// }, { opt1: 'betsy', opt2: 'johnny' })
 }, 
 { 
     username,
     password
 })
 .then( response => {
-    // console.log('value in getAuth: ' + JSON.stringify(response));
     if (response.status != 200) {
         // clear cached password for this device
-        ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`)
+        ext.keyTar.deletePassword(
+            'f5Hosts',
+            `${username}@${host}`
+            )
         throw new Error(`error from getAuthTokenNOT200: ${response}`);
     }
-    return { host: host, token: response.body.token.token };
+    return { 
+        host: host, 
+        token: response.body.token.token 
+    };
 }, reason => {
     vscode.window.showInformationMessage(`failed getAuthToken: ${reason}`);
     // return new Error(`error from getAuthToken: ${reason}`);

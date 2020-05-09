@@ -33,10 +33,10 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 	context.subscriptions.push(ext.hostStatusBar);
 
-	// create virtual file store
-	ext.memFs = new MemFS();
-    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', ext.memFs, { isCaseSensitive: true }));
-    let initialized = false;
+	// // create virtual file store
+	// ext.memFs = new MemFS();
+    // context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', ext.memFs, { isCaseSensitive: true }));
+    // let initialized = false;
 
 
 	// exploring classes to group all f5 api calls
@@ -46,6 +46,8 @@ export function activate(context: vscode.ExtensionContext) {
 	type KeyTar = typeof keyTarType;
 	ext.keyTar = keyTarType;
 
+	// keep an eye on this for different user install scenarios, like slim docker containers that don't have the supporting librarys
+	// if this error happens, need to find a fallback method of password caching or disable caching without breaking everything
 	if (ext.keyTar === undefined) {
 		throw new Error('keytar undefined in initiation')
 	}
@@ -84,8 +86,8 @@ export function activate(context: vscode.ExtensionContext) {
 		if (bigipHosts === undefined) {
 			throw new Error('no hosts in configuration')
 		}
-		// initialize virtual file store: memfs
-		initialized = true;
+		// // initialize virtual file store: memfs
+		// initialized = true;
 		
 		if (!host) {
 			const host: vscode.QuickPickItem | undefined = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
@@ -309,7 +311,39 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	//original way the example extension structured the command
 	let disposable = vscode.commands.registerCommand('extension.remoteCommand', async () => {
-		return vscode.window.showInformationMessage('placeholder to execute command on bigip...')
+		
+		if (ext.hostStatusBar.text) {
+			const password = await getPassword(ext.hostStatusBar.text);
+			const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' })
+			// const cmd = await vscode.window.showInputBox({ content: 'Bash Command to Execute?' })
+			
+			if ( cmd === undefined ) {
+				// maybe just showInformationMessage and exit instead of error?
+				throw new Error('Remote Command inputBox cancelled');
+			}
+
+			// const bashResp = await f5API.issueBash(ext.hostStatusBar.text, password, cmd);
+			const bashResp = await f5API.issueBash(ext.hostStatusBar.text, password, cmd)
+			// .then( resp => resp )
+			
+			// console.log(`~~~ FINAL BASH RESPONSE: ${JSON.stringify(bashResp)}`)
+
+			vscode.workspace.openTextDocument({ 
+				language: 'text', 
+				content: JSON.stringify(bashResp.body.commandResult) 
+			})
+			.then( doc => 
+				vscode.window.showTextDocument(
+					doc, 
+					{ 
+						preview: false 
+					}
+				)
+			)
+
+		}
+		
+		// return vscode.window.showInformationMessage('placeholder to execute command on bigip...')
 	});	
 	context.subscriptions.push(disposable);
 
