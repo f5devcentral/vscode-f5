@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 // import * as fs from 'fs';
 
-import * as sample_as3Dec from './test/sample_as3Dec.json';
+// import * as sample_as3Dec from './test/sample_as3Dec.json';
 
 // import { request } from 'https';
 import { chuckJoke } from './chuckJoke';
@@ -154,24 +154,24 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('loadAS3Sample1', () => {
-		// can probably set this up to read files from a directory and provide a pick list
-		//		or enable it as a tree on the left
-		//	setup a command to download a git with all the sample declarations, 
-		//		then enable a tree to show them???
-		vscode.workspace.openTextDocument({ 
-			language: 'json', 
-			content: JSON.stringify(JSON.parse(JSON.stringify(sample_as3Dec)), undefined, 4) 
-		})
-		.then( doc => 
-			vscode.window.showTextDocument(
-				doc, 
-				{ 
-					preview: false 
-				}
-			)
-		)
-	}));
+	// context.subscriptions.push(vscode.commands.registerCommand('loadAS3Sample1', () => {
+	// 	// can probably set this up to read files from a directory and provide a pick list
+	// 	//		or enable it as a tree on the left
+	// 	//	setup a command to download a git with all the sample declarations, 
+	// 	//		then enable a tree to show them???
+	// 	vscode.workspace.openTextDocument({ 
+	// 		language: 'json', 
+	// 		content: JSON.stringify(JSON.parse(JSON.stringify(sample_as3Dec)), undefined, 4) 
+	// 	})
+	// 	.then( doc => 
+	// 		vscode.window.showTextDocument(
+	// 			doc, 
+	// 			{ 
+	// 				preview: false 
+	// 			}
+	// 		)
+	// 	)
+	// }));
 
 	context.subscriptions.push(vscode.commands.registerCommand('postAS3Dec', () => {
 

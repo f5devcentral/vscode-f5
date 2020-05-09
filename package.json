@@ -138,10 +138,6 @@
 				"title": "f5-fast: List AS3 Tasks"
 			},
 			{
-				"command": "loadAS3Sample1",
-				"title": "f5-fast: load AS3 Sample 1"
-			},
-			{
 				"command": "postAS3Dec",
 				"title": "f5-fast: post AS3 declaration"
 			},
