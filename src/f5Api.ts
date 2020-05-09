@@ -71,6 +71,29 @@ export class f5Api {
     }
 
 
+    /*
+    * Used to issue bash commands to device over API
+    */
+    async getTsInfo(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                if (hostToken === undefined) {
+                    throw new Error('hostToken blank, auth failed');
+                }
+                // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
+
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/telemetry/info', 
+                    hostToken.token
+                )
+            });
+    }
+
+
     async listAS3Tasks() {
         var host: string = ext.hostStatusBar.text;
         // const password: string = ext.hostStatusBar.password;

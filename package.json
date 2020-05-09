@@ -130,6 +130,10 @@
 				"title": "f5-fast: Show F5 Fast Info"
 			},
 			{
+				"command": "f5-ts.tsInfo",
+				"title": "f5-fast: Show F5 TS Info"
+			},
+			{
 				"command": "listAS3Tasks",
 				"title": "f5-fast: List AS3 Tasks"
 			},

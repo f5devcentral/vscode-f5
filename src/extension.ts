@@ -307,13 +307,42 @@ export function activate(context: vscode.ExtensionContext) {
 		
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.tsInfo', async () => {
+		
+		const host = ext.hostStatusBar.text
 
+		if (host) {
+			const password = await getPassword(host);
+			const tsInfo = await f5API.getTsInfo(host, password);
+
+			if ( tsInfo === undefined ) {
+				throw new Error('getTsInfo failed')
+			}
+
+			vscode.workspace.openTextDocument({ 
+				language: 'json', 
+				content: JSON.stringify(tsInfo, undefined, 4) 
+			})
+			.then( doc => 
+				vscode.window.showTextDocument(
+					doc, 
+					{ 
+						preview: false 
+					}
+				)
+			)
+
+		}
+
+	}));
 	
 	//original way the example extension structured the command
 	let disposable = vscode.commands.registerCommand('extension.remoteCommand', async () => {
 		
-		if (ext.hostStatusBar.text) {
-			const password = await getPassword(ext.hostStatusBar.text);
+		const host = ext.hostStatusBar.text
+
+		if (host) {
+			const password = await getPassword(host);
 			const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' })
 			// const cmd = await vscode.window.showInputBox({ content: 'Bash Command to Execute?' })
 			
@@ -322,11 +351,7 @@ export function activate(context: vscode.ExtensionContext) {
 				throw new Error('Remote Command inputBox cancelled');
 			}
 
-			// const bashResp = await f5API.issueBash(ext.hostStatusBar.text, password, cmd);
 			const bashResp = await f5API.issueBash(ext.hostStatusBar.text, password, cmd)
-			// .then( resp => resp )
-			
-			// console.log(`~~~ FINAL BASH RESPONSE: ${JSON.stringify(bashResp)}`)
 
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
