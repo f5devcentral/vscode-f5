@@ -7,6 +7,13 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
+## [0.1.2] - (5-10-2020)
+
+### Added
+- AS3/DO/TS service checking - display in tool bar with version if installed
+- GET/POST TS declaration
+- Execute BASH command on device
+
 ## [0.1.1] - (5-8-2020)
 
 ### Added
