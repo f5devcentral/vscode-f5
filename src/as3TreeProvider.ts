@@ -30,7 +30,7 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 		// }
 
 
-        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
 		
 		if ( bigipHosts === undefined) {

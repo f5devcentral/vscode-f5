@@ -89,7 +89,7 @@
 			{
 				"title": "f5-fast",
 				"properties": {
-					"f5-fast.hosts": {
+					"f5.hosts": {
 						"type": "array",
 						"items": {
 							"type": "string",
@@ -122,6 +122,10 @@
 				"title": "f5-fast: Chuck Joke"
 			},
 			{
+				"command": "getDODec",
+				"title": "f5-fast: Get DO Dec"
+			},
+			{
 				"command": "getF5HostInfo",
 				"title": "f5-fast: Show F5 Device Info"
 			},
@@ -130,8 +134,16 @@
 				"title": "f5-fast: Show F5 Fast Info"
 			},
 			{
-				"command": "f5-ts.tsInfo",
+				"command": "f5-ts.info",
 				"title": "f5-fast: Show F5 TS Info"
+			},
+			{
+				"command": "f5-ts.getDec",
+				"title": "f5-fast: Get Current TS Declaration"
+			},
+			{
+				"command": "f5-ts.postDec",
+				"title": "f5-fast: Post as TS Declaration"
 			},
 			{
 				"command": "listAS3Tasks",

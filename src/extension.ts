@@ -15,7 +15,20 @@ import { as3TreeProvider } from './as3TreeProvider';
 import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
 import { f5Api } from './f5Api'
 // import { stringify } from 'querystring';
-import { setHostStatusBar, setMemento, getMemento, setMementoW, getMementoW, isValidJson, getPassword } from './utils/utils';
+import { 
+	setHostStatusBar, 
+	setMemento, 
+	getMemento, 
+	setMementoW, 
+	getMementoW, 
+	isValidJson, 
+	getPassword, 
+	setAS3Bar, 
+	setDOBar, 
+	setTSBar, 
+	getDevice,
+	displayJsonInEditor
+} from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
 // import { tryGetKeyTar } from './utils/keytar';
@@ -30,8 +43,14 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.context = context;
 
 	// Create a status bar item
-	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
 	context.subscriptions.push(ext.hostStatusBar);
+	ext.as3Bar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 40);
+	context.subscriptions.push(ext.as3Bar);
+	ext.doBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 30);
+	context.subscriptions.push(ext.doBar);
+	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 20);
+	context.subscriptions.push(ext.tsBar);
 
 	// // create virtual file store
 	// ext.memFs = new MemFS();
@@ -41,9 +60,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// exploring classes to group all f5 api calls
 	const f5API = new f5Api();
+	// ext.f5API = f5API;
 
 	// Setup keyTar global var
-	type KeyTar = typeof keyTarType;
+	// type KeyTar = typeof keyTarType;
 	ext.keyTar = keyTarType;
 
 	// keep an eye on this for different user install scenarios, like slim docker containers that don't have the supporting librarys
@@ -77,11 +97,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (host) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (device) => {
 		console.log('executing f5-fast.connectDevice');
-		console.log(`Host from tree select: ${host}`);
+		console.log(`Host from tree select: ${device}`);
 		
-		const bigipHosts: vscode.QuickPickItem[] | undefined = await vscode.workspace.getConfiguration().get('f5-fast.hosts');
+
+		const bigipHosts: vscode.QuickPickItem[] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
 		
 		if (bigipHosts === undefined) {
 			throw new Error('no hosts in configuration')
@@ -89,23 +110,32 @@ export function activate(context: vscode.ExtensionContext) {
 		// // initialize virtual file store: memfs
 		// initialized = true;
 		
-		if (!host) {
-			const host: vscode.QuickPickItem | undefined = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
-			if (!host) {
+		if (!device) {
+			device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
+			if (!device) {
 				throw new Error('user exited device input')
 			}
+			console.log(`connectDevice, device quick pick answer: ${device}`);
 		}
+		console.log(`connectDevice, pre-password device: ${device}`);
 		
-		const password: string = await getPassword(host)
-		// console.log(`connectDevice, host/password: ${host}/${password}`);
-		f5API.connectF5(host, password);
+		const password: string = await getPassword(device)
+		// console.log(`connectDevice, device/password: ${device}/${password}`);
+		f5API.connectF5(device, password);
+
+		return device;
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.disconnect', () => {
 		console.log('inside disconnect call');
 
-		// clear status bar 
+		// clear status bars 
 		setHostStatusBar();
+		setAS3Bar();
+		setDOBar();
+		setTSBar();
+
+		
 
 		// for (const [name] of memFs.readDirectory(vscode.Uri.parse('memfs:/'))) {
         //     memFs.delete(vscode.Uri.parse(`memfs:/${name}`));
@@ -120,6 +150,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// clear status bar 
 		setHostStatusBar();
+		setAS3Bar();
+		setDOBar();
+		setTSBar();
 
 		// get list of items in keytar for the 'f5Hosts' service
 		await ext.keyTar.findCredentials('f5Hosts').then( list => {
@@ -135,6 +168,126 @@ export function activate(context: vscode.ExtensionContext) {
 		return vscode.window.showInformationMessage('Disconnecting BIG-IP and clearing password cache')
 	}));
 
+
+	context.subscriptions.push(vscode.commands.registerCommand('getDODec', async () => {
+		// get device
+		const device = await getDevice();
+		// get password
+		const password = await getPassword(device)
+		// get DO declaration
+		const dec = f5API.getDODec(device, password);
+
+		console.log(`DO DECLARATION: ${dec}`)
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
+		
+		const host = ext.hostStatusBar.text
+
+		if (host) {
+			const password = await getPassword(host);
+			const tsInfo = await f5API.getTsInfo(host, password);
+
+			if ( tsInfo === undefined ) {
+				throw new Error('getTsInfo failed')
+			}
+
+			vscode.workspace.openTextDocument({ 
+				language: 'json', 
+				content: JSON.stringify(tsInfo, undefined, 4) 
+			})
+			.then( doc => 
+				vscode.window.showTextDocument(
+					doc, 
+					{ 
+						preview: false 
+					}
+				)
+			)
+
+		}
+
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getDec', async () => {
+		
+		var device: string | undefined = ext.hostStatusBar.text
+		// console.log(`TS device from hostStatusBar: ${JSON.stringify(device)}`);
+		
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5-fast.connectDevice');
+			// return bigip;
+			// console.log(`TS GET	bigip: ${JSON.stringify(device)}`);
+		}
+		
+		if (device === undefined) {
+			throw new Error('no hosts in configuration')
+		}
+		// // get device
+		// const device = await getDevice();
+		// console.log(`TS GET	device: ${device}`);
+		
+		// get password
+		const password = await getPassword(device)
+		// console.log(`TS GET	password: ${password}`);
+
+		// get TS declaration
+		const dec = await f5API.getTSDec(device, password);
+
+		displayJsonInEditor(dec);
+
+		// console.log(`TS DECLARATION: ${JSON.stringify(dec)}`)
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.postDec', async () => {
+
+		const device = ext.hostStatusBar.text
+		var tsDecResponse = {};
+
+		if (!device) {
+			throw new Error('Connect to device first')
+		}
+
+		const password = await getPassword(device);
+
+		// if selected text, capture that, if not, capture entire document
+
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			return; // No open text editor
+		}
+
+		// if text is selected in editor
+		if (editor.selection.isEmpty) {
+			// post entire page
+			// validate json structure before send?  something like: try => JSON.parse?
+
+			const text = editor.document.getText();
+			console.log(`ENTIRE DOC: ${text}`)
+
+			if (!isValidJson(text)) {
+				return vscode.window.showErrorMessage('Not valid JSON');
+			}
+
+			tsDecResponse = await f5API.postTSDec(device, password, JSON.parse(text));
+			displayJsonInEditor(tsDecResponse);
+		} else {
+			// post selected text/declaration
+			// var selection = editor.selection;
+			const text = editor.document.getText(editor.selection);
+			if (!isValidJson(text)) {
+				return vscode.window.showErrorMessage('Not valid JSON');
+			}
+			
+			console.log(`SELECTED TEXT: ${text}`)
+			tsDecResponse = await f5API.postTSDec(device, password, JSON.parse(text));
+			displayJsonInEditor(tsDecResponse);
+		} 
+
+	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('getF5HostInfo', () => {
 		f5API.getF5HostInfo();
@@ -221,7 +374,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		vscode.window.showInputBox({prompt: 'Device/BIG-IP/Host      ', placeHolder: '<user>@<host/ip>'})
 		.then(newHost => {
-			const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+			const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 
 			if (newHost === undefined || bigipHosts === undefined) {
 				throw new Error('Add device inputBox cancelled');
@@ -234,7 +387,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if (!bigipHosts.includes(newHost) && deviceRex.test(newHost)){
 				bigipHosts.push(newHost);
-				vscode.workspace.getConfiguration().update('f5-fast.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
+				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
 				vscode.window.showInformationMessage(`Adding ${newHost} to list!`);
 				hostsTreeProvider.refresh();
 			} else {
@@ -248,7 +401,7 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`Remove Host command: ${JSON.stringify(hostID)}`)
 
 		
-		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
 		
 		if ( bigipHosts === undefined ) {
@@ -258,7 +411,7 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`less bigipHosts: ${JSON.stringify(newBigipHosts)}`)
 		
 		vscode.window.showInformationMessage(`${JSON.stringify(hostID.label)} removed!!!`);
-		await vscode.workspace.getConfiguration().update('f5-fast.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
+		await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
 		hostsTreeProvider.refresh();
 	}));
 	
@@ -269,7 +422,7 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`Edit Host command: ${JSON.stringify(hostID)}`)
 		vscode.window.showInformationMessage(`Editing ${JSON.stringify(hostID.label)} host!!!`);
 		
-		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5-fast.hosts');
+		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
 		
 		vscode.window.showInputBox({
@@ -293,7 +446,7 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				})				
 				
-				vscode.workspace.getConfiguration().update('f5-fast.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
+				vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
 				vscode.window.showInformationMessage(`Updating ${input} device name.`);
 
 				// need to give the configuration a chance to save before refresh
@@ -307,34 +460,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.tsInfo', async () => {
-		
-		const host = ext.hostStatusBar.text
 
-		if (host) {
-			const password = await getPassword(host);
-			const tsInfo = await f5API.getTsInfo(host, password);
-
-			if ( tsInfo === undefined ) {
-				throw new Error('getTsInfo failed')
-			}
-
-			vscode.workspace.openTextDocument({ 
-				language: 'json', 
-				content: JSON.stringify(tsInfo, undefined, 4) 
-			})
-			.then( doc => 
-				vscode.window.showTextDocument(
-					doc, 
-					{ 
-						preview: false 
-					}
-				)
-			)
-
-		}
-
-	}));
 	
 	//original way the example extension structured the command
 	let disposable = vscode.commands.registerCommand('extension.remoteCommand', async () => {
@@ -353,6 +479,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const bashResp = await f5API.issueBash(ext.hostStatusBar.text, password, cmd)
 
+			//	I think need to setup a formatter to change all the \n to actual line returns
+			//			https://code.visualstudio.com/blogs/2016/11/15/formatters-best-practices
+			// 	or possibly regex the doc and replace with unicode characters?
+			//		https://docs.microsoft.com/en-us/visualstudio/ide/encodings-and-line-breaks?view=vs-2019
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
 				content: JSON.stringify(bashResp.body.commandResult) 
@@ -387,7 +517,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	// trying to setup tree provider to list f5 hosts from config file
-	// const hostsTreeProvider = new F5TreeProvider(vscode.workspace.getConfiguration().get('f5-fast.hosts'));
+	// const hostsTreeProvider = new F5TreeProvider(vscode.workspace.getConfiguration().get('f5.hosts'));
 	const hostsTreeProvider = new F5TreeProvider('');
 	vscode.window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
 	vscode.commands.registerCommand('f5-fast.refreshHostsTree', () => hostsTreeProvider.refresh());

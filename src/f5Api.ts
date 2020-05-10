@@ -2,51 +2,85 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
-import { setHostStatusBar, getPassword } from './utils/utils'
+import { setHostStatusBar, setAS3Bar, setDOBar, setTSBar, getPassword } from './utils/utils'
 import { ext } from './extensionVariables';
 import { rejects } from 'assert';
 // import { KeyTar, tryGetKeyTar } from './utils/keytar';
 
+/**
+ * F5 API commands
+ */
 export class f5Api {
 
-    // private _keytar: KeyTar | undefined;
 
-    // constructor() {
-    //     this._keytar = tryGetKeyTar();
-    // }
-
-    connectF5(device: string, password: string) {
+    async connectF5(device: string, password: string) {
         console.log(`connectF5: ${device} - ${password}`);
         var [username, host] = device.split('@');
         getAuthToken(host, username, password)
-            .then( hostToken => {
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
-                // why is this still showing if auth failed and no token returned?
-                console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
-                // if hostToken
+            .then( async hostToken => {
 
-
-                console.log(`inside-connectF5-hostToken keytar details:${device} - ${password} - ${JSON.stringify(hostToken)}`);
+                // cache password in keytar
                 ext.keyTar.setPassword('f5Hosts', device, password)
                 
-        
-                setHostStatusBar(device, password)
+                setHostStatusBar(device);
                 // const now = getHostStatusBar();
                 // console.log(`getHostStatusBar from connectF5: ${JSON.stringify(now)}`)
                 vscode.window.showInformationMessage(`Successfully connected to ${host}`);
                 // return hostToken;
-            }, reason => {
-                vscode.window.showInformationMessage(`inside getAuthToken${reason}`);
+
+                const tsInfo = await callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/telemetry/info', 
+                    hostToken.token
+                )
+
+                if (tsInfo.status === 200) {
+                    console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
+                    const text = `TS(${tsInfo.body.version})`
+                    const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `
+                    setTSBar(text, tip);
+                }
+
+                const as3Info = await callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/appsvcs/info', 
+                    hostToken.token
+                )
+
+                if (as3Info.status === 200) {
+                    console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
+                    const text = `AS3(${as3Info.body.version})`
+                    const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `
+                    setAS3Bar(text, tip);
+                }
+
+                const doInfo = await callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/declarative-onboarding/info', 
+                    hostToken.token
+                )
+
+                if (doInfo.status === 200) {
+                    console.log(`DO INFO: ${JSON.stringify(doInfo.body)}`)
+                    const text = `DO(${doInfo.body.version})`
+                    const tip = `schemaCurrent: ${doInfo.body.schemaCurrent} `
+                    setDOBar(text, tip);
+                }
             })
         // return auth;
     }
 
-    
-    /*
-    * Used to issue bash commands to device over API
-    */
+
+
+    /**
+     * Used to issue bash commands to device over API
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     * @param cmd Bash command to execute, or tmsh + <tmsh command>
+     */
     async issueBash(device: string, password: string, cmd: string) {
         // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
@@ -79,16 +113,94 @@ export class f5Api {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
-                // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
-
                 return callHTTP(
                     'GET', 
                     hostToken.host, 
                     '/mgmt/shared/telemetry/info', 
                     hostToken.token
+                )
+            });
+    }
+
+
+
+    /**
+     * Get current Telemetry Streaming Declaration
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async getTSDec(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/telemetry/declare', 
+                    hostToken.token
+                )
+            });
+    }
+
+
+    /**
+     * Get current Telemetry Streaming Declaration
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async postTSDec(device: string, password: string, dec: object) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'POST', 
+                    hostToken.host, 
+                    '/mgmt/shared/telemetry/declare', 
+                    hostToken.token,
+                    dec
+                )
+            });
+    }
+
+
+    /**
+     * Get current Declarative Onboarding Declaration
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async getDODec(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/declartive-onboarding', 
+                    hostToken.token
+                )
+            });
+    }
+
+
+    /**
+     * POST Declarative Onboarding Declaration
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async postDODec(device: string, password: string, dec: object) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'POST', 
+                    hostToken.host, 
+                    '/mgmt/shared/declartive-onboarding', 
+                    hostToken.token,
+                    dec
                 )
             });
     }
@@ -296,9 +408,9 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
     // combine defaults with passed in options
     const combOpts = Object.assign({}, defaultOpts, opts);
 
-    console.log('makeRequest---combOpts: ' + JSON.stringify(combOpts));
-    console.log('makeRequest---defaultOpts: ' + JSON.stringify(defaultOpts));
-    console.log('makeRequest---payload: ' + JSON.stringify(payload));
+    // console.log('makeRequest---combOpts: ' + JSON.stringify(combOpts));
+    // console.log('makeRequest---defaultOpts: ' + JSON.stringify(defaultOpts));
+    // console.log('makeRequest---payload: ' + JSON.stringify(payload));
     
     // console.log('Bout to call API token request')
     return new Promise((resolve, reject) => {
@@ -320,9 +432,9 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                 };
                 
                  // configure global logging parameters
-                console.log('makeRequest***STATUS: ' + res.statusCode);
-                console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
-                console.log('makeRequest***BODY: ' + JSON.stringify(body));
+                // console.log('makeRequest***STATUS: ' + res.statusCode);
+                // console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
+                // console.log('makeRequest***BODY: ' + JSON.stringify(body));
 
                 if (res.statusCode == 401) {
                     console.log(`GOT 401!!!!!`)
@@ -330,7 +442,7 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                 
                 const goodResp: Array<number> = [200, 201, 202]
                 // was trying to check against array above with arr.includes or arr.indexOf
-                if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 ) {
+                if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404) {
                     return resolve({
                         status: res.statusCode,
                         headers: res.headers,
@@ -338,7 +450,7 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                     });
                 } else {
 
-                    console.error(`AuthToken FAILURE: ${res.statusCode} - ${res.statusMessage}`);
+                    console.error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
                     return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
                 }
 
@@ -368,21 +480,32 @@ const getAuthToken = async (host: string, username: string, password: string) =>
     password
 })
 .then( response => {
-    if (response.status != 200) {
+    if (response.status === 200) {
+        return { 
+            host: host, 
+            token: response.body.token.token 
+        }
+    } else {
         // clear cached password for this device
         ext.keyTar.deletePassword(
             'f5Hosts',
             `${username}@${host}`
             )
-        throw new Error(`error from getAuthTokenNOT200: ${response}`);
+            throw new Error(`error from getAuthTokenNOT200: ${response}`);
     }
-    return { 
-        host: host, 
-        token: response.body.token.token 
-    };
-}, reason => {
-    vscode.window.showInformationMessage(`failed getAuthToken: ${reason}`);
-    // return new Error(`error from getAuthToken: ${reason}`);
+    
+    // if (response.status != 200) {
+    //     // clear cached password for this device
+    //     ext.keyTar.deletePassword(
+    //         'f5Hosts',
+    //         `${username}@${host}`
+    //         )
+    //     throw new Error(`error from getAuthTokenNOT200: ${response}`);
+    // }
+    // return { 
+    //     host: host, 
+    //     token: response.body.token.token 
+    // };
 });
 
 
