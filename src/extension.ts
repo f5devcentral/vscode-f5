@@ -485,7 +485,7 @@ export function activate(context: vscode.ExtensionContext) {
 			//		https://docs.microsoft.com/en-us/visualstudio/ide/encodings-and-line-breaks?view=vs-2019
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
-				content: JSON.stringify(bashResp.body.commandResult) 
+				content: bashResp.body.commandResult 
 			})
 			.then( doc => 
 				vscode.window.showTextDocument(
