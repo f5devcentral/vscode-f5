@@ -482,7 +482,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
+<<<<<<< HEAD
 				content: bashResp.body.commandResult
+=======
+				content: bashResp.body.commandResult 
+>>>>>>> d7ce688a1f5904123bdee7c672ef7aded303a64b
 			})
 			.then( doc => 
 				vscode.window.showTextDocument(
