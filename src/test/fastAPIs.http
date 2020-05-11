@@ -1,7 +1,7 @@
 
 
 @host = 192.168.200.131
-#@host = 10.200.244.5
+@bigiq = 10.200.244.5
 
 @user = admin
 @upass = benrocks
@@ -49,7 +49,32 @@ X-F5-Auth-Token: {{authToken}}
 
 ###   # get bigip device list
 @authToken = {{loginA.response.body.token.token}}
-GET https://{{bigip}}/mgmt/shared/resolver/device-groups/cm-bigip-allDevices/devices
+GET https://{{bigiq}}/mgmt/shared/resolver/device-groups/cm-bigip-allDevices/devices
   ?$select=hostname,managementAddress,uuid
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
+
+
+
+
+###   get list of files/directories in directory
+GET https://api.github.com/repos/F5Networks/f5-telemetry-streaming/contents/examples/
+
+
+
+###   get list of files in directory
+GET https://api.github.com/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations
+  ?$select=name,url
+
+
+###   get details of github file
+GET https://api.github.com/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations/action_matching.json
+
+
+
+###  Get raw content of github file
+GET https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/examples/declarations/action_matching.json
+
+
+
+

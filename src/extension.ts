@@ -12,6 +12,7 @@ import { DepNodeProvider, Dependency } from './nodeDependencies';
 import { MemFS } from './fileSystemProvider';
 import { F5TreeProvider, f5Host } from './hostsTreeProvider';
 import { as3TreeProvider } from './as3TreeProvider';
+// import { exampleTsDecsProvider, exampleTsDec } from './treeViews/githubTsExamples';
 import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
 import { f5Api } from './f5Api'
 // import { stringify } from 'querystring';
@@ -236,7 +237,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// get TS declaration
 		const dec = await f5API.getTSDec(device, password);
 
-		displayJsonInEditor(dec);
+		displayJsonInEditor(dec.body.declaration);
 
 		// console.log(`TS DECLARATION: ${JSON.stringify(dec)}`)
 
@@ -477,15 +478,11 @@ export function activate(context: vscode.ExtensionContext) {
 				throw new Error('Remote Command inputBox cancelled');
 			}
 
-			const bashResp = await f5API.issueBash(ext.hostStatusBar.text, password, cmd)
+			const bashResp = await f5API.issueBash(host, password, cmd)
 
-			//	I think need to setup a formatter to change all the \n to actual line returns
-			//			https://code.visualstudio.com/blogs/2016/11/15/formatters-best-practices
-			// 	or possibly regex the doc and replace with unicode characters?
-			//		https://docs.microsoft.com/en-us/visualstudio/ide/encodings-and-line-breaks?view=vs-2019
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
-				content: JSON.stringify(bashResp.body.commandResult) 
+				content: bashResp.body.commandResult
 			})
 			.then( doc => 
 				vscode.window.showTextDocument(
@@ -513,8 +510,12 @@ export function activate(context: vscode.ExtensionContext) {
 	const as3Tree = new as3TreeProvider('');
 	vscode.window.registerTreeDataProvider('as3', as3Tree);
 	vscode.commands.registerCommand('refreshAS3Tree', () => as3Tree.refresh());
-
-
+	
+	
+	// // setting up example TS tree
+	// const tsDecTree = new exampleTsDecsProvider('');
+	// vscode.window.registerTreeDataProvider('tsExamples', tsDecTree);
+	// vscode.commands.registerCommand('refreshTsExamleTree', () => tsDecTree.refresh());
 
 	// trying to setup tree provider to list f5 hosts from config file
 	// const hostsTreeProvider = new F5TreeProvider(vscode.workspace.getConfiguration().get('f5.hosts'));
@@ -543,7 +544,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// }
 
 	// vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider(ext.carTreeData));
-	vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider());
+	// vscode.window.registerTreeDataProvider('carTree', new carTreeDataProvider());
 
 }
 

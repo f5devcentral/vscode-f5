@@ -69,7 +69,7 @@ export function setDOBar(text: string = '', tip: string = '') {
  */
 export function setTSBar(text: string = '', tip: string = '') {
 
-    ext.tsBar.command = 'f5-fast.getTSdec';
+    ext.tsBar.command = 'f5-ts.getDec';
     ext.tsBar.text = text ? text || '' : '';
     ext.tsBar.tooltip = tip ? tip || '' : '';
 
