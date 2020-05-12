@@ -40,9 +40,9 @@
 	],
 	"activationEvents": [
 		"onCommand:chuckJoke",
-		"onCommand:extension.remoteCommand",
-		"onCommand:f5-fast.openSettings",
-		"onCommand:f5-fast.connectDevice",
+		"onCommand:f5.remoteCommand",
+		"onCommand:f5.openSettings",
+		"onCommand:f5.connectDevice",
 		"onView:f5Hosts"
 	],
 	"main": "./out/extension.js",
@@ -117,32 +117,80 @@
 		],
 		"commands": [
 			{
-				"command": "f5-fast.connectDevice",
-				"title": "f5-fast: Connect to Device"
+				"command": "f5.connectDevice",
+				"title": "f5: Connect to Device"
 			},
 			{
-				"command": "f5-fast.disconnect",
-				"title": "f5-fast: Disconnect from Device"
+				"command": "f5.disconnect",
+				"title": "f5: Disconnect from Device"
 			},
 			{
-				"command": "f5-fast.clearPasswords",
-				"title": "f5-fast: Disconnect and Clear all Passwords"
-			},
-			{
-				"command": "chuckJoke",
-				"title": "f5-fast: Chuck Joke"
-			},
-			{
-				"command": "getDODec",
-				"title": "f5-fast: Get DO Dec"
+				"command": "f5.clearPasswords",
+				"title": "f5: Disconnect and Clear all Passwords"
 			},
 			{
 				"command": "f5.getF5HostInfo",
-				"title": "f5-fast: Show F5 Device Info"
+				"title": "f5: Show F5 Device Info"
 			},
 			{
-				"command": "getF5FastInfo",
+				"command": "f5.addHost",
+				"title": "f5: Add Host"
+			},
+			{
+				"command": "f5.editHost",
+				"title": "f5: Edit Host"
+			},
+			{
+				"command": "f5.removeHost",
+				"title": "f5: Remove Host"
+			},
+			{
+				"command": "f5.remoteCommand",
+				"title": "f5: Remote Command Execute"
+			},
+			{
+				"command": "f5.openSettings",
+				"title": "f5: settings"
+			},
+			{
+				"command": "f5.refreshHostsTree",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5-fast.getFastInfo",
 				"title": "f5-fast: Show F5 Fast Info"
+			},
+			{
+				"command": "f5-fast.refreshTemplates",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5-as3.listTasks",
+				"title": "f5-fast: List AS3 Tasks"
+			},
+			{
+				"command": "f5-as3.postDec",
+				"title": "f5-fast: post AS3 declaration"
+			},
+			{
+				"command": "refreshAS3Tree",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5-do.getDec",
+				"title": "f5-fast: Get DO Dec"
 			},
 			{
 				"command": "f5-ts.info",
@@ -161,68 +209,12 @@
 				"title": "f5-fast: Enable TS examples Tree"
 			},
 			{
-				"command": "listAS3Tasks",
-				"title": "f5-fast: List AS3 Tasks"
-			},
-			{
-				"command": "postAS3Dec",
-				"title": "f5-fast: post AS3 declaration"
-			},
-			{
 				"command": "writeMemento",
 				"title": "f5-fast: writeMemento"
 			},
 			{
 				"command": "readMemento",
 				"title": "f5-fast: readMemento"
-			},
-			{
-				"command": "f5-fast.addHost",
-				"title": "f5-fast: Add Host"
-			},
-			{
-				"command": "f5-fast.editHost",
-				"title": "f5-fast: Edit Host"
-			},
-			{
-				"command": "f5-fast.removeHost",
-				"title": "f5-fast: Remove Host"
-			},
-			{
-				"command": "extension.remoteCommand",
-				"title": "f5-fast: Remote Command Execute"
-			},
-			{
-				"command": "f5-fast.openSettings",
-				"title": "f5-fast: settings"
-			},
-			{
-				"command": "f5-fast.refreshHostsTree",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "refreshAS3Tree",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "f5-fast.refreshTemplates",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "f5-fast.addHost",
-				"title": "Add"
 			},
 			{
 				"command": "f5-ts.enableTsExamples",
@@ -233,7 +225,7 @@
 				"title": "Disable"
 			},
 			{
-				"command": "f5-fast.editHost",
+				"command": "f5.editHost",
 				"title": "Edit",
 				"icon": {
 					"light": "resources/light/edit.svg",
@@ -241,7 +233,7 @@
 				}
 			},
 			{
-				"command": "f5-fast.removeHost",
+				"command": "f5.removeHost",
 				"title": "Delete"
 			},
 			{
@@ -265,6 +257,10 @@
 				}
 			},
 			{
+				"command": "chuckJoke",
+				"title": "f5-fast: Chuck Joke"
+			},
+			{
 				"command": "nodeDependencies.deleteEntry",
 				"title": "Delete"
 			}
@@ -272,7 +268,12 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "f5-fast.refreshHostsTree",
+					"command": "f5.addHost",
+					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.refreshHostsTree",
 					"when": "view == f5Hosts",
 					"group": "navigation"
 				},
@@ -281,11 +282,7 @@
 					"when": "view == fastTemplates",
 					"group": "navigation"
 				},
-				{
-					"command": "f5-fast.addHost",
-					"when": "view == f5Hosts",
-					"group": "navigation"
-				},
+
 				{
 					"command": "f5-ts.enableTsExamples",
 					"when": "view == tsExamples",
@@ -318,12 +315,12 @@
 					"when": "view == nodeDependencies && viewItem == dependency"
 				},
 				{
-					"command": "f5-fast.editHost",
+					"command": "f5.editHost",
 					"when": "view == f5Hosts",
 					"group": "inline"
 				},
 				{
-					"command": "f5-fast.removeHost",
+					"command": "f5.removeHost",
 					"when": "view == f5Hosts"
 				},
 				{

@@ -32,7 +32,7 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
         // takes individual host item and creates a tree item
         const treeHosts = (name: string): fastTemplate => {
             const treeItem = new fastTemplate(name, vscode.TreeItemCollapsibleState.None, {
-                command: 'f5-fast.connectDevice',
+                command: 'f5.connectDevice',
                 title: 'hostTitle',
                 arguments: [name]
             });

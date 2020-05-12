@@ -27,7 +27,7 @@ suite('Utils tests...', () => {
 		// setHostStatusBar('admin@192.168.1.1');
 		// assert.deepStrictEqual(ext.hostStatusBar.text, 'admin@192.168.1.1')
 		// assert.deepStrictEqual(ext.hostStatusBar.tooltip, '')
-		// assert.deepStrictEqual(ext.hostStatusBar.command, 'f5-fast.disconnect')
+		// assert.deepStrictEqual(ext.hostStatusBar.command, 'f5.disconnect')
 
 	});
 	test('simulate successful connect -> enable status bar', () => {

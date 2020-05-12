@@ -66,7 +66,7 @@ export class exampleTsDecsProvider implements vscode.TreeDataProvider<exampleTsD
         // // takes individual host item and creates a tree item
         // const treeHosts = (name: string): exampleTsDec => {
         //     const treeItem = new exampleTsDec(name, vscode.TreeItemCollapsibleState.None, {
-        //         command: 'f5-fast.connectDevice',
+        //         command: 'f5.connectDevice',
         //         title: 'hostTitle',
         //         arguments: [name]
         //     });

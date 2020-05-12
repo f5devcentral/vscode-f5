@@ -28,7 +28,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
         // takes individual host item and creates a tree item
         const treeHosts = (name: string): f5Host => {
             const treeItem = new f5Host(name, vscode.TreeItemCollapsibleState.None, {
-                command: 'f5-fast.connectDevice',
+                command: 'f5.connectDevice',
                 title: 'hostTitle',
                 arguments: [name]
             });

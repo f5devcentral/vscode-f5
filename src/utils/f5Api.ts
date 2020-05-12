@@ -79,8 +79,9 @@ export class f5Api {
 
                 if (doInfo.status === 200) {
                     // console.log(`DO INFO: ${JSON.stringify(doInfo.body)}`)
-                    const text = `DO(${doInfo.body.version})`
-                    const tip = `schemaCurrent: ${doInfo.body.schemaCurrent} `
+                    // for some reason DO responds with a list for version info...
+                    const text = `DO(${doInfo.body[0].version})`
+                    const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `
                     setDOBar(text, tip);
                 }
             })

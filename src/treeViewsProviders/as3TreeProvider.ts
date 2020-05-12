@@ -40,7 +40,7 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
         // takes individual host item and creates a tree item
         const treeHosts = (name: string): as3Item => {
             const treeItem = new as3Item(name, vscode.TreeItemCollapsibleState.None, {
-                command: 'f5-fast.connectDevice',
+                command: 'f5.connectDevice',
                 title: 'hostTitle',
                 arguments: [name]
             });
