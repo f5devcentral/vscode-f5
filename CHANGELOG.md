@@ -8,6 +8,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 
 
+## [0.1.3] - (5-12-2020)
+
+### Added
+- Tree view to display TS examples from github
+- hostname/tmos version status bar
 
 ## [0.1.2] - (5-10-2020)
 

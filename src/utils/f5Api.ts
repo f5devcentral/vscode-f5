@@ -2,8 +2,8 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
-import { setHostStatusBar, setAS3Bar, setDOBar, setTSBar, getPassword } from './utils/utils'
-import { ext } from './extensionVariables';
+import { setHostStatusBar, setAS3Bar, setDOBar, setTSBar, getPassword, setHostnameBar } from './utils'
+import { ext } from '../extensionVariables';
 import { rejects } from 'assert';
 // import { KeyTar, tryGetKeyTar } from './utils/keytar';
 
@@ -14,7 +14,7 @@ export class f5Api {
 
 
     async connectF5(device: string, password: string) {
-        console.log(`connectF5: ${device} - ${password}`);
+        // console.log(`connectF5: ${device} - ${password}`);
         var [username, host] = device.split('@');
         getAuthToken(host, username, password)
             .then( async hostToken => {
@@ -28,6 +28,20 @@ export class f5Api {
                 vscode.window.showInformationMessage(`Successfully connected to ${host}`);
                 // return hostToken;
 
+                const hostInfo = await callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/identified-devices/config/device-info', 
+                    hostToken.token
+                )
+
+                if (hostInfo.status === 200) {
+                    // console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
+                    const text = `${hostInfo.body.hostname}`
+                    const tip = `TMOS: ${hostInfo.body.version}`
+                    setHostnameBar(text, tip);
+                }
+
                 const tsInfo = await callHTTP(
                     'GET', 
                     hostToken.host, 
@@ -36,7 +50,7 @@ export class f5Api {
                 )
 
                 if (tsInfo.status === 200) {
-                    console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
+                    // console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
                     const text = `TS(${tsInfo.body.version})`
                     const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `
                     setTSBar(text, tip);
@@ -50,7 +64,7 @@ export class f5Api {
                 )
 
                 if (as3Info.status === 200) {
-                    console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
+                    // console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
                     const text = `AS3(${as3Info.body.version})`
                     const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `
                     setAS3Bar(text, tip);
@@ -64,7 +78,7 @@ export class f5Api {
                 )
 
                 if (doInfo.status === 200) {
-                    console.log(`DO INFO: ${JSON.stringify(doInfo.body)}`)
+                    // console.log(`DO INFO: ${JSON.stringify(doInfo.body)}`)
                     const text = `DO(${doInfo.body.version})`
                     const tip = `schemaCurrent: ${doInfo.body.schemaCurrent} `
                     setDOBar(text, tip);
@@ -252,7 +266,7 @@ export class f5Api {
         const password: string = await getPassword(host)
 
         // const pswd = ext.keytar.getPassword('f5Hosts', host);
-        console.log(`getF5HostInfo - host: ${host} - password: ${password}`);
+        // console.log(`getF5HostInfo - host: ${host} - password: ${password}`);
 
         if (host || password) {
             var [username, host] = host.split('@');
@@ -436,9 +450,9 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                 // console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
                 // console.log('makeRequest***BODY: ' + JSON.stringify(body));
 
-                if (res.statusCode == 401) {
-                    console.log(`GOT 401!!!!!`)
-                }
+                // if (res.statusCode == 401) {
+                //     console.log(`GOT 401!!!!!`)
+                // }
                 
                 const goodResp: Array<number> = [200, 201, 202]
                 // was trying to check against array above with arr.includes or arr.indexOf

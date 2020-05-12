@@ -137,7 +137,7 @@
 				"title": "f5-fast: Get DO Dec"
 			},
 			{
-				"command": "getF5HostInfo",
+				"command": "f5.getF5HostInfo",
 				"title": "f5-fast: Show F5 Device Info"
 			},
 			{
@@ -155,6 +155,10 @@
 			{
 				"command": "f5-ts.postDec",
 				"title": "f5-fast: Post as TS Declaration"
+			},
+			{
+				"command": "f5-ts.enableTsExamples",
+				"title": "f5-fast: Enable TS examples Tree"
 			},
 			{
 				"command": "listAS3Tasks",
@@ -221,6 +225,14 @@
 				"title": "Add"
 			},
 			{
+				"command": "f5-ts.enableTsExamples",
+				"title": "Enable"
+			},
+			{
+				"command": "f5-ts.disableTsExamples",
+				"title": "Disable"
+			},
+			{
 				"command": "f5-fast.editHost",
 				"title": "Edit",
 				"icon": {
@@ -275,6 +287,16 @@
 					"group": "navigation"
 				},
 				{
+					"command": "f5-ts.enableTsExamples",
+					"when": "view == tsExamples",
+					"group": "navigation"
+				},
+				{
+					"command": "f5-ts.disableTsExamples",
+					"when": "view == tsExamples",
+					"group": "navigation"
+				},
+				{
 					"command": "nodeDependencies.refreshEntry",
 					"when": "view == nodeDependencies",
 					"group": "navigation"
@@ -305,7 +327,7 @@
 					"when": "view == f5Hosts"
 				},
 				{
-					"command": "getF5HostInfo",
+					"command": "f5.getF5HostInfo",
 					"when": "view == f5Hosts"
 				}
 			]

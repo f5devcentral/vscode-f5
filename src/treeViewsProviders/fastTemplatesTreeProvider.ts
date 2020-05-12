@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ext } from './extensionVariables'
+import { ext } from '../extensionVariables'
 
 export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTemplate> {
 
@@ -21,13 +21,13 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
         // console.log(`statusBar: ${JSON.stringify(stat)}`);
 		
         const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
 
 		if ( bigipHosts === undefined) {
 			throw new Error('No configured hosts - from as3TreeProvider');
 		}
 		
-		console.log(`hostStatusBar in fastTree: ${ext.hostStatusBar}`)
+		// console.log(`hostStatusBar in fastTree: ${ext.hostStatusBar}`)
    
         // takes individual host item and creates a tree item
         const treeHosts = (name: string): fastTemplate => {
@@ -36,7 +36,7 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
                 title: 'hostTitle',
                 arguments: [name]
             });
-            console.log(`treeItem: ${JSON.stringify(treeItem)}`);
+            // console.log(`treeItem: ${JSON.stringify(treeItem)}`);
             return treeItem;
         }
 
@@ -46,7 +46,7 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
 		// basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
         const treeItems = bigipHosts.map(host => treeHosts(host));
 
-        console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
+        // console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
 
         return Promise.resolve(treeItems);
 	}

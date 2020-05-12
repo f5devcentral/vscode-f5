@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { f5Api } from '../f5Api'
+import { f5Api } from './f5Api'
 
 // const f5API = new f5Api();
 
@@ -8,15 +8,36 @@ export function setHostStatusBar(host: string = '') {
 
     ext.hostStatusBar.command = 'f5-fast.disconnect';
     ext.hostStatusBar.text = host ? host || '' : '';
-    ext.hostStatusBar.tooltip = 'Click to disconnect';
+    ext.hostStatusBar.tooltip = 'Disconnect';
 
     if (host) {
         ext.hostStatusBar.show();
     } else {
         ext.hostStatusBar.hide();
     }
+};
+
+/**
+ * HostName status bar mgmt.
+ * Feed it text, it will show up
+ * Feed it nothing, it will disappear!
+ * @param text text to display in status bar
+ * @param tip text to display when hover
+ */
+export function setHostnameBar(text: string = '', tip: string = '') {
+
+    ext.hostNameBar.command = 'f5.getF5HostInfo';
+    ext.hostNameBar.text = text ? text || '' : '';
+    ext.hostNameBar.tooltip = tip ? tip || '' : '';
+
+    if (text) {
+        ext.hostNameBar.show();
+    } else {
+        ext.hostNameBar.hide();
+    }
 
 };
+
 
 /**
  * AS3 status bar mgmt.
@@ -81,7 +102,10 @@ export function setTSBar(text: string = '', tip: string = '') {
 
 };
 
-
+/**
+ * display json in new editor window
+ * @param item json object to display in new editor
+ */
 export async function displayJsonInEditor(item: object): Promise<any> {
     vscode.workspace.openTextDocument({ 
         language: 'json', 
@@ -113,7 +137,7 @@ export async function getDevice(): Promise<any> {
 
     // if device in statusBar, return that
     const device: string = ext.hostStatusBar.text
-    console.log(`getDevice from hostStatusBar: ${device}`);
+    // console.log(`getDevice from hostStatusBar: ${device}`);
     
     // if not, get device list from config and prompt to select device
     //  select device and connect
@@ -124,7 +148,7 @@ export async function getDevice(): Promise<any> {
             // should kick off "add device"
             throw new Error('no hosts in configuration')
         }
-        console.log(`getDevice devices from config: ${JSON.stringify(bigipHosts)}`);
+        // console.log(`getDevice devices from config: ${JSON.stringify(bigipHosts)}`);
 
         const device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
 
@@ -133,7 +157,7 @@ export async function getDevice(): Promise<any> {
                 throw new Error('no hosts in configuration')
             }
 
-        console.log(`getDevice from quickPick: ${device}`);
+        // console.log(`getDevice from quickPick: ${device}`);
 
         if (!device) {
             throw new Error('user exited device input')
@@ -145,7 +169,7 @@ export async function getDevice(): Promise<any> {
         // f5API.connectF5(host, password);
         return device;
     }
-    console.log(`getDevice returning: ${device}`);
+    // console.log(`getDevice returning: ${device}`);
     return device;
 }
 

@@ -6,7 +6,36 @@ Name: f5-Fast
 Desc:  
 
 
+## apply custom json schema to an editor
+Right now, we just set the file type to json and inject the "$schema": "(https://)./file.schema", which works for now, but can cause problems with some declarations
+- as an interim, we could just remove that line from the json object before sending, but this is kinda hackey
+
+I think we can detect what kind of declaration it is from the base json object "class" and "version", if needed.  The followign git issue talks about associating a custom schema to particular files:
+https://github.com/microsoft/vscode/issues/77433
+This is doable, but not idea.  I'm thinking the different file sub-extension types to catch, but I don't think this is robust enough since it requires special file naming and doesn't cover different schema versions:
+- dec1.as3.json
+- baseInstall.do.json  
+- loggingDec.ts.json
+
+That article and some other reading leads me to beleive that we can find a better way to match then apply the appropriate schema
+
+I guess, if we really need, we can just read the declaration when we get it.  Figure out the base class and schema version, then inject the right schema URL to the delcaration and remove it when posting...
+
+Another similar git issue for further reading: https://github.com/microsoft/vscode/issues/79363, https://github.com/microsoft/vscode/issues/81078
+
+Another route was a language server, but that might be overkill
+- https://code.visualstudio.com/api/language-extensions/language-server-extension-guide
+- https://code.visualstudio.com/docs/languages/overview
+- 
+
+Maybe through a Custom Editor? https://code.visualstudio.com/api/extension-guides/custom-editors#custom-editor-api-basics
+
+Virtual documents (I think relates to git issues referenced above): https://code.visualstudio.com/api/extension-guides/virtual-documents
+
+
+
 ## functionality: virtual file store (memFS)
+***** tabling idea in favor of just making api calls and populating tree views and editors directly  *****
  - used to store files in memory, like ftp browser or remote files stores
  -- should be used to store connected device information, templates, deployed app details, etc...
 
@@ -20,6 +49,7 @@ Desc:
 https://github.com/Microsoft/vscode/issues/53697
 > Yeah, use a formatter (as library) when creating the file. The most simple would be using JSON.stringify(stats, undefined, 4)
 - Want it formated like the vscode-rest-client
+-- found out that the real pretty view from this extension is actually a web view to apply fonts and color
 - more information about formating data in editor window
 https://stackoverflow.com/questions/29973357/how-do-you-format-code-in-visual-studio-code-vscode
 

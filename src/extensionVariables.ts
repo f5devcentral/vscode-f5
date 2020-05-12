@@ -22,11 +22,13 @@ export namespace ext {
     export let keyTar: KeyTar;
     export let memFs: MemFS;
     export let hostStatusBar: StatusBarItem;
+    export let hostNameBar: StatusBarItem;
     export let tsBar: StatusBarItem;
     export let as3Bar: StatusBarItem;
     export let doBar: StatusBarItem;
     // export let f5Api: f5ApiClass;
     export let carTreeData: object | undefined;
+    export let tsExampleView: object | undefined;
 }
 
 

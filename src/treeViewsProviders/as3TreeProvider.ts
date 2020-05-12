@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 // import { f5API } from './f5Api'
-import { ext } from './extensionVariables';
+import { ext } from '../extensionVariables';
 
 export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 

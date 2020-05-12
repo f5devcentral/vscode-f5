@@ -8,16 +8,18 @@ import * as vscode from 'vscode';
 // import { request } from 'https';
 import { chuckJoke } from './chuckJoke';
 import { carTreeDataProvider } from './carTreeView';
-import { DepNodeProvider, Dependency } from './nodeDependencies';
+import { DepNodeProvider, Dependency } from './treeViewsProviders/nodeDependencies';
 import { MemFS } from './fileSystemProvider';
-import { F5TreeProvider, f5Host } from './hostsTreeProvider';
-import { as3TreeProvider } from './as3TreeProvider';
-// import { exampleTsDecsProvider, exampleTsDec } from './treeViews/githubTsExamples';
-import { fastTemplatesTreeProvider } from './fastTemplatesTreeProvider';
-import { f5Api } from './f5Api'
-// import { stringify } from 'querystring';
+import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
+import { as3TreeProvider } from './treeViewsProviders/as3TreeProvider';
+import { exampleTsDecsProvider, exampleTsDec } from './treeViewsProviders/githubTsExamples';
+import { fastTemplatesTreeProvider } from './treeViewsProviders/fastTemplatesTreeProvider';
+import { f5Api } from './utils/f5Api'
+import { Url } from 'url'
+import { callHTTPS } from './utils/externalAPIs';
 import { 
-	setHostStatusBar, 
+	setHostStatusBar,
+	setHostnameBar, 
 	setMemento, 
 	getMemento, 
 	setMementoW, 
@@ -32,8 +34,6 @@ import {
 } from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
-// import { tryGetKeyTar } from './utils/keytar';
-// import * as keyTar from 'keytar';
 import * as keyTarType from 'keytar';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -44,13 +44,15 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.context = context;
 
 	// Create a status bar item
-	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
+	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 20);
 	context.subscriptions.push(ext.hostStatusBar);
-	ext.as3Bar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 40);
+	ext.hostNameBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 19);
+	context.subscriptions.push(ext.hostNameBar);
+	ext.as3Bar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 18);
 	context.subscriptions.push(ext.as3Bar);
-	ext.doBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 30);
+	ext.doBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 17);
 	context.subscriptions.push(ext.doBar);
-	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 20);
+	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 16);
 	context.subscriptions.push(ext.tsBar);
 
 	// // create virtual file store
@@ -75,7 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('writeMemento', () => {
-		console.log('placeholder for testing commands');
+		// console.log('placeholder for testing commands');
 		
 		vscode.window.showInputBox({
 			prompt: 'give me something to store!', 
@@ -90,7 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('readMemento', async () => {
-		console.log('placeholder for testing commands - 2');
+		// console.log('placeholder for testing commands - 2');
 		
 		const mento1 = getMementoW('key1');
 		vscode.window.showInformationMessage(`Memento! ${mento1}`)
@@ -99,8 +101,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.connectDevice', async (device) => {
-		console.log('executing f5-fast.connectDevice');
-		console.log(`Host from tree select: ${device}`);
+		// console.log('executing f5-fast.connectDevice');
+		// console.log(`Host from tree select: ${device}`);
 		
 
 		const bigipHosts: vscode.QuickPickItem[] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
@@ -116,9 +118,9 @@ export function activate(context: vscode.ExtensionContext) {
 			if (!device) {
 				throw new Error('user exited device input')
 			}
-			console.log(`connectDevice, device quick pick answer: ${device}`);
+			// console.log(`connectDevice, device quick pick answer: ${device}`);
 		}
-		console.log(`connectDevice, pre-password device: ${device}`);
+		// console.log(`connectDevice, pre-password device: ${device}`);
 		
 		const password: string = await getPassword(device)
 		// console.log(`connectDevice, device/password: ${device}/${password}`);
@@ -128,7 +130,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.disconnect', () => {
-		console.log('inside disconnect call');
+		// console.log('inside disconnect call');
 
 		// clear status bars 
 		setHostStatusBar();
@@ -178,7 +180,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// get DO declaration
 		const dec = f5API.getDODec(device, password);
 
-		console.log(`DO DECLARATION: ${dec}`)
+		// console.log(`DO DECLARATION: ${dec}`)
 
 	}));
 
@@ -209,6 +211,30 @@ export function activate(context: vscode.ExtensionContext) {
 
 		}
 
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getGitHubExampleTs', async (decUrl) => {
+
+		// console.log(`decUrl from tree:  ${decUrl}`);
+		
+		decUrl = vscode.Uri.parse(decUrl)
+		
+		// console.log(`decoded decUrl from tree:  ${decUrl}`);
+
+		const decCall = await callHTTPS({
+		    method: 'GET',
+		    host: decUrl.authority,
+		    path: decUrl.path,
+		    headers: {
+		        'Content-Type': 'application/json',
+		        'User-Agent': 'nodejs native HTTPS'
+		    }
+		}).then( resp => {
+			return resp
+		})
+
+		displayJsonInEditor(decCall.body)
 	}));
 
 
@@ -267,7 +293,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// validate json structure before send?  something like: try => JSON.parse?
 
 			const text = editor.document.getText();
-			console.log(`ENTIRE DOC: ${text}`)
+			// console.log(`CAPTURING ENTIRE EDITOR DOC: ${text}`)
 
 			if (!isValidJson(text)) {
 				return vscode.window.showErrorMessage('Not valid JSON');
@@ -283,14 +309,14 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 			
-			console.log(`SELECTED TEXT: ${text}`)
+			// console.log(`SELECTED TEXT: ${text}`)
 			tsDecResponse = await f5API.postTSDec(device, password, JSON.parse(text));
 			displayJsonInEditor(tsDecResponse);
 		} 
 
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('getF5HostInfo', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', () => {
 		f5API.getF5HostInfo();
 	}));
 
@@ -308,25 +334,6 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	// context.subscriptions.push(vscode.commands.registerCommand('loadAS3Sample1', () => {
-	// 	// can probably set this up to read files from a directory and provide a pick list
-	// 	//		or enable it as a tree on the left
-	// 	//	setup a command to download a git with all the sample declarations, 
-	// 	//		then enable a tree to show them???
-	// 	vscode.workspace.openTextDocument({ 
-	// 		language: 'json', 
-	// 		content: JSON.stringify(JSON.parse(JSON.stringify(sample_as3Dec)), undefined, 4) 
-	// 	})
-	// 	.then( doc => 
-	// 		vscode.window.showTextDocument(
-	// 			doc, 
-	// 			{ 
-	// 				preview: false 
-	// 			}
-	// 		)
-	// 	)
-	// }));
-
 	context.subscriptions.push(vscode.commands.registerCommand('postAS3Dec', () => {
 
 		// if selected text, capture that, if not, capture entire document
@@ -342,7 +349,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// validate json structure before send?  something like: try => JSON.parse?
 
 			const text = editor.document.getText();
-			console.log(`ENTIRE DOC: ${text}`)
+			// console.log(`ENTIRE DOC: ${text}`)
 
 			if (!isValidJson(text)) {
 				return vscode.window.showErrorMessage('Not valid JSON');
@@ -358,7 +365,7 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 			
-			console.log(`SELECTED TEXT: ${text}`)
+			// console.log(`SELECTED TEXT: ${text}`)
 			f5API.postAS3(JSON.parse(text));
 		} 
 		
@@ -403,13 +410,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 		
 		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
+		// console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
 		
 		if ( bigipHosts === undefined ) {
 			throw new Error('Add device inputBox cancelled');
 		}
 		const newBigipHosts = bigipHosts.filter( item => item != hostID.label)
-		console.log(`less bigipHosts: ${JSON.stringify(newBigipHosts)}`)
+		// console.log(`less bigipHosts: ${JSON.stringify(newBigipHosts)}`)
 		
 		vscode.window.showInformationMessage(`${JSON.stringify(hostID.label)} removed!!!`);
 		await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
@@ -420,11 +427,11 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		// TODO: if hostID === undefined => quickSelect device list
 		
-		console.log(`Edit Host command: ${JSON.stringify(hostID)}`)
+		// console.log(`Edit Host command: ${JSON.stringify(hostID)}`)
 		vscode.window.showInformationMessage(`Editing ${JSON.stringify(hostID.label)} host!!!`);
 		
 		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
+		// console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
 		
 		vscode.window.showInputBox({
 			prompt: 'Update Device/BIG-IP/Host      ', 
@@ -450,7 +457,7 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
 				vscode.window.showInformationMessage(`Updating ${input} device name.`);
 
-				// need to give the configuration a chance to save before refresh
+				// need to give the configuration a chance to save before refresing tree
 				setTimeout( () => {
 					hostsTreeProvider.refresh();
 				}, 300);
@@ -482,11 +489,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
-<<<<<<< HEAD
 				content: bashResp.body.commandResult
-=======
-				content: bashResp.body.commandResult 
->>>>>>> d7ce688a1f5904123bdee7c672ef7aded303a64b
 			})
 			.then( doc => 
 				vscode.window.showTextDocument(
@@ -515,11 +518,22 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('as3', as3Tree);
 	vscode.commands.registerCommand('refreshAS3Tree', () => as3Tree.refresh());
 	
-	
-	// // setting up example TS tree
-	// const tsDecTree = new exampleTsDecsProvider('');
-	// vscode.window.registerTreeDataProvider('tsExamples', tsDecTree);
-	// vscode.commands.registerCommand('refreshTsExamleTree', () => tsDecTree.refresh());
+	const tsDecTree = new exampleTsDecsProvider('testDataInput');
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.enableTsExamples', () => {
+		// chuckJoke();
+		// setting up example TS dec tree
+		vscode.window.registerTreeDataProvider('tsExamples', new exampleTsDecsProvider('testDataInput'));
+		// no need for refresh since we get a fresh tree every "enable" or window/workspace reload
+		vscode.commands.registerCommand('refreshTsExamleTree', () => tsDecTree.refresh());		// never wired up to get called...
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.disableTsExamples', () => {
+		vscode.window.showInformationMessage(`Wire up clearing ts example view!`);
+		// I was thinking the following dispose would dispose of the registration and clear the tree, but that doesn't work
+		// I figure just leave it for now, at least it only loads when user "enables" it, 
+		tsDecTree.dispose();
+	}));
+
 
 	// trying to setup tree provider to list f5 hosts from config file
 	// const hostsTreeProvider = new F5TreeProvider(vscode.workspace.getConfiguration().get('f5.hosts'));
