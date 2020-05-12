@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { request } from 'https';
 import { setHostStatusBar, setAS3Bar, setDOBar, setTSBar, getPassword, setHostnameBar } from './utils'
 import { ext } from '../extensionVariables';
-import { rejects } from 'assert';
+// import { rejects } from 'assert';
 // import { KeyTar, tryGetKeyTar } from './utils/keytar';
 
 /**
@@ -247,7 +247,7 @@ export class f5Api {
 
 
     /**
-     * DO tasks - returns executed DO tasks
+     * DO tasks - returns executed tasks
      * @param device BIG-IP/Host/Device in <user>@<host/ip> format
      * @param password User Password
      */
@@ -266,45 +266,27 @@ export class f5Api {
     }
 
 
-    async listAS3Tasks() {
-        var host: string = ext.hostStatusBar.text;
-        // const password: string = ext.hostStatusBar.password;
-        // const password = await ext.keyTar.getPassword('f5Hosts', host).then( passwd => passwd )
-        const password: string = await getPassword(host)
-        if (host || password) {
-            var [username, host] = host.split('@');
-            getAuthToken(host, username, password)
+
+    /**
+     * AS3 tasks - returns executed tasks
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async as3Tasks(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
             .then( hostToken => {
-                
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
-
-                callHTTP('GET', hostToken.host, '/mgmt/shared/appsvcs/task/', hostToken.token)
-                .then( response => {
-
-                    // response = JSON.parse(response)
-                    debugger;
-                    vscode.workspace.openTextDocument({ 
-                        language: 'json', 
-                        content: JSON.stringify(response, undefined, 4) 
-                    })
-                    .then( doc => 
-                        vscode.window.showTextDocument(
-                            doc, 
-                            { 
-                                preview: false 
-                            }
-                        )
-                    )
-                });
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/appsvcs/task/', 
+                    hostToken.token,
+                )
             });
-        } else {
-            console.error(`listAS3Tasks - NO host or password details: ${host} - ${password}`);
-            vscode.window.showInformationMessage(`Connect to device first!!!`);
-            // //instead of errors, just call the connect command
-        }
-    };
+    }
+
+
 
     async getF5HostInfo() {
 

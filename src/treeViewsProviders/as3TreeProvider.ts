@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-// import { f5API } from './f5Api'
+import { getPassword } from '../utils/utils'
 import { ext } from '../extensionVariables';
+// import { callHTTPS } from '../utils/externalAPIs'
 
 export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 
@@ -18,43 +19,48 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 		return element;
 	}
 
-	getChildren(element?: as3Item): Thenable<as3Item[]> {
+	async getChildren(element?: as3Item): Promise<as3Item[]> {
 		
-		// list of tasks in tree by 'id'
-		// command to produce as3 example snip-it
-		// command to post declaration to connected device
 
-		// if ( ext.hostStatusBar.text && ext.hostStatusBar.password ) {
-		// 	// const as3Tasks = f5API.listAS3Tasks();
-		// 	// console.log(`AS3 Tasks: ${JSON.stringify(as3Tasks)}`);
-		// }
+		// const decCall = await callHTTPS({
+		//     method: 'GET',
+		//     host: 'api.github.com',
+		//     path: '/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations',
+		//     headers: {
+		//         'Content-Type': 'application/json',
+		//         'User-Agent': 'nodejs native HTTPS'
+		//     }
+		// }).then( resp => {
+		// 	return resp
+		// })
 
+		var device = ext.hostStatusBar.text
 
-        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
-		
-		if ( bigipHosts === undefined) {
-			throw new Error('No configured hosts - from as3TreeProvider');
+		if (!device) {
+			return Promise.reject(' no device to get as3 task info');
 		}
-   
-        // takes individual host item and creates a tree item
-        const treeHosts = (name: string): as3Item => {
-            const treeItem = new as3Item(name, vscode.TreeItemCollapsibleState.None, {
-                command: 'f5.connectDevice',
-                title: 'hostTitle',
-                arguments: [name]
-            });
-            console.log(`treeItem: ${JSON.stringify(treeItem)}`);
-            return treeItem;
-        }
 
-		// takes list of bigip hosts from the workspace config file, in the variable "bigipHosts"
-		//		for each item in list assign item to "host", feed "host" to the function treeHosts
-		//		treeHosts return a treeItem, that gets returned as a list of treeItems in the promise.resolve
-		// basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
-        const treeItems = bigipHosts.map(host => treeHosts(host));
+		// const device = await vscode.commands.executeCommand('f5.connectDevice');
+		console.log(`as3TreeProvider device: ${device}`);
+		
 
-        console.log(`as3 Tree Full: ${JSON.stringify(treeItems)}`);
+		const password = await getPassword(device);
+
+		const decCall = await ext.f5Api.as3Tasks(device, password);
+		// const decCall = [ "task1", "task2", "task3"]
+
+		console.log(`as3Tree decCall: ${JSON.stringify(decCall.body.items)}`);
+		
+		const treeItems = decCall.body.map((item:any): as3Item => {
+			return (new as3Item(
+				item.name, 
+				vscode.TreeItemCollapsibleState.None, 
+				{
+					command: 'f5-ts.getAs3item',
+					title: 'hostTitle',
+					arguments: [item.download_url]
+			}))
+		});
 
         return Promise.resolve(treeItems);
 	}

@@ -62,8 +62,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	// exploring classes to group all f5 api calls
-	const f5API = new f5Api();
-	// ext.f5API = f5API;
+	// const f5API = new f5Api();
+	ext.f5Api = new f5Api;
 
 	// Setup keyTar global var
 	// type KeyTar = typeof keyTarType;
@@ -115,12 +115,12 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const password: string = await getPassword(device)
 		// console.log(`connectDevice, device/password: ${device}/${password}`);
-		f5API.connectF5(device, password);
+		ext.f5Api.connectF5(device, password);
 		return device;
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', () => {
-		f5API.getF5HostInfo();
+		ext.f5Api.getF5HostInfo();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
@@ -268,7 +268,7 @@ export function activate(context: vscode.ExtensionContext) {
 				throw new Error('Remote Command inputBox cancelled');
 			}
 
-			const bashResp = await f5API.issueBash(host, password, cmd)
+			const bashResp = await ext.f5Api.issueBash(host, password, cmd)
 
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
@@ -311,7 +311,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => templatesTreeProvider.refresh());
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getFastInfo', () => {
-		f5API.getF5FastInfo();
+		ext.f5Api.getF5FastInfo();
 	}));
 
 
@@ -338,11 +338,11 @@ export function activate(context: vscode.ExtensionContext) {
 	// setting up as3 tree
 	const as3Tree = new as3TreeProvider('');
 	vscode.window.registerTreeDataProvider('as3', as3Tree);
-	vscode.commands.registerCommand('refreshAS3Tree', () => as3Tree.refresh());
+	vscode.commands.registerCommand('f5-as3.refreshTree', () => as3Tree.refresh());
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.listTasks', () => {
-		f5API.listAS3Tasks();
-	}));
+	// context.subscriptions.push(vscode.commands.registerCommand('f5-as3.listTasks', () => {
+	// 	f5API.listAS3Tasks();
+	// }));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', () => {
 
@@ -366,7 +366,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 
-			f5API.postAS3(JSON.parse(text));
+			ext.f5Api.postAS3(JSON.parse(text));
 		} else {
 			// post selected text/declaration
 			// var selection = editor.selection;
@@ -376,7 +376,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			
 			// console.log(`SELECTED TEXT: ${text}`)
-			f5API.postAS3(JSON.parse(text));
+			ext.f5Api.postAS3(JSON.parse(text));
 		} 
 		
 	}));
@@ -421,7 +421,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const host = ext.hostStatusBar.text
 		if (host) {
 			const password = await getPassword(host);
-			const tsInfo = await f5API.getTsInfo(host, password);
+			const tsInfo = await ext.f5Api.getTsInfo(host, password);
 
 			if ( tsInfo === undefined ) {
 				throw new Error('getTsInfo failed')
@@ -455,7 +455,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// console.log(`TS GET	password: ${password}`);
 
 		// get TS declaration
-		const dec = await f5API.getTSDec(device, password);
+		const dec = await ext.f5Api.getTSDec(device, password);
 
 		displayJsonInEditor(dec.body.declaration);
 
@@ -493,7 +493,7 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 
-			tsDecResponse = await f5API.postTSDec(device, password, JSON.parse(text));
+			tsDecResponse = await ext.f5Api.postTSDec(device, password, JSON.parse(text));
 			displayJsonInEditor(tsDecResponse);
 		} else {
 			// post selected text/declaration
@@ -504,7 +504,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			
 			// console.log(`SELECTED TEXT: ${text}`)
-			tsDecResponse = await f5API.postTSDec(device, password, JSON.parse(text));
+			tsDecResponse = await ext.f5Api.postTSDec(device, password, JSON.parse(text));
 			displayJsonInEditor(tsDecResponse);
 		} 
 
@@ -555,7 +555,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 		const password = await getPassword(device)
-		const resp = await f5API.getDoDec(device, password);
+		const resp = await ext.f5Api.getDoDec(device, password);
 
 		if (resp.body === []) {
 			// console.log(`f5.getDec resp: ${JSON.stringify(resp)}`);
@@ -597,7 +597,7 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 
-			doDecResponse = await f5API.postDoDec(device, password, JSON.parse(text));
+			doDecResponse = await ext.f5Api.postDoDec(device, password, JSON.parse(text));
 			displayJsonInEditor(doDecResponse);
 		} else {
 			// post selected text/declaration
@@ -608,7 +608,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			
 			// console.log(`SELECTED TEXT: ${text}`)
-			doDecResponse = await f5API.postTSDec(device, password, JSON.parse(text));
+			doDecResponse = await ext.f5Api.postTSDec(device, password, JSON.parse(text));
 			displayJsonInEditor(doDecResponse);
 		} 
 
@@ -627,7 +627,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 		const password = await getPassword(device)
-		const resp = await f5API.doInspect(device, password);
+		const resp = await ext.f5Api.doInspect(device, password);
 
 		displayJsonInEditor(resp.body);
 	}));
@@ -646,7 +646,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 		const password = await getPassword(device)
-		const resp = await f5API.doTasks(device, password);
+		const resp = await ext.f5Api.doTasks(device, password);
 
 		displayJsonInEditor(resp.body);
 	}));

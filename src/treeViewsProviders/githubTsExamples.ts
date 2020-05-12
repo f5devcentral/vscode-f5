@@ -1,13 +1,6 @@
 import * as vscode from 'vscode';
 import { callHTTPS } from '../utils/externalAPIs'
 
-/**
- * The idea here is to provide a command to get and list all the examples for a given ILX repo
- *      this list would be in a tree view that would only appear if/when the user executes the command
- * the tree view will just list all the different declarations - select will open in editor
- *      - for now, can add the "schema" reference directly into the declaration to provide validation
- * 
- */
 
 export class exampleTsDecsProvider implements vscode.TreeDataProvider<exampleTsDec> {
 	dispose() {
@@ -30,10 +23,6 @@ export class exampleTsDecsProvider implements vscode.TreeDataProvider<exampleTsD
 
 	async getChildren(element?: exampleTsDec): Promise<exampleTsDec[]> {
         
-        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
-		
-
 		const decCall = await callHTTPS({
 		    method: 'GET',
 		    host: 'api.github.com',

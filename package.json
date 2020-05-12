@@ -181,7 +181,7 @@
 				"title": "f5-fast: post AS3 declaration"
 			},
 			{
-				"command": "refreshAS3Tree",
+				"command": "f5-as3.refreshTree",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -287,6 +287,11 @@
 				{
 					"command": "f5.refreshHostsTree",
 					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5-as3.refreshTree",
+					"when": "view == as3",
 					"group": "navigation"
 				},
 				{

@@ -7,7 +7,7 @@ import { ExtensionContext, TreeView, StatusBarItem } from "vscode";
 // import { KeyTar } from "./utils/keytar";
 import * as keyTarType from "keytar";
 import { MemFS } from './fileSystemProvider'
-// import { f5Api } from './f5Api'
+import { f5Api } from './utils/f5Api'
 // import * as f5Api from './f5Api'
 // import { } from './carTreeView'
 
@@ -26,7 +26,8 @@ export namespace ext {
     export let tsBar: StatusBarItem;
     export let as3Bar: StatusBarItem;
     export let doBar: StatusBarItem;
-    // export let f5Api: f5ApiClass;
+    // export class f5Api { };
+    export let f5Api: f5Api;
     export let carTreeData: object | undefined;
     export let tsExampleView: object | undefined;
 }
