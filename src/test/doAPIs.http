@@ -1,0 +1,43 @@
+
+@host = 10.200.244.100
+#@host = 10.200.244.5
+
+@user = admin
+@upass = benrocks
+@authToken = {{loginA.response.body.token.token}}
+
+###   # get auth token
+# @name loginA
+POST https://{{host}}/mgmt/shared/authn/login
+Content-Type: application/json
+
+{
+    "username": "{{user}}",
+    "password": "{{upass}}",
+    "logonProviderName": "provider"
+}
+
+###   # get do service info
+GET https://{{host}}/mgmt/shared/declarative-onboarding/info
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+###   # get do inspect
+GET https://{{host}}/mgmt/shared/declarative-onboarding/inspect
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+###   # get current do dec
+GET https://{{host}}/mgmt/shared/declarative-onboarding/
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+###   # get executed do tasks
+GET https://{{host}}/mgmt/shared/declarative-onboarding/task
+    # &$select=id
+    # &$top=1
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}

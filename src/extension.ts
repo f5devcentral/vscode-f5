@@ -432,24 +432,6 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getGitHubExampleTs', async (decUrl) => {
-		decUrl = vscode.Uri.parse(decUrl)
-		const decCall = await callHTTPS({
-		    method: 'GET',
-		    host: decUrl.authority,
-		    path: decUrl.path,
-		    headers: {
-		        'Content-Type': 'application/json',
-		        'User-Agent': 'nodejs native HTTPS'
-		    }
-		}).then( resp => {
-			return resp
-		})
-
-		displayJsonInEditor(decCall.body)
-	}));
-
-
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getDec', async () => {
 		
 		var device: string | undefined = ext.hostStatusBar.text
@@ -528,9 +510,26 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getGitHubExampleTs', async (decUrl) => {
+		decUrl = vscode.Uri.parse(decUrl)
+		const decCall = await callHTTPS({
+		    method: 'GET',
+		    host: decUrl.authority,
+		    path: decUrl.path,
+		    headers: {
+		        'Content-Type': 'application/json',
+		        'User-Agent': 'nodejs native HTTPS'
+		    }
+		}).then( resp => {
+			return resp
+		})
+
+		displayJsonInEditor(decCall.body)
+	}));
 
 
-	
+
+
 
 /**
  * #########################################################################
@@ -545,20 +544,112 @@ export function activate(context: vscode.ExtensionContext) {
  */
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.getDec', async () => {
-		// get device
-		const device = await getDevice();
-		// get password
-		const password = await getPassword(device)
-		// get DO declaration
-		const dec = f5API.getDODec(device, password);
+		var device: string | undefined = ext.hostStatusBar.text
 
-		// console.log(`DO DECLARATION: ${dec}`)
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5.connectDevice');
+		}
+		
+		if (device === undefined) {
+			throw new Error('no hosts in configuration')
+		}
+		
+		const password = await getPassword(device)
+		const resp = await f5API.getDoDec(device, password);
+
+		if (resp.body === []) {
+			// console.log(`f5.getDec resp: ${JSON.stringify(resp)}`);
+			vscode.window.showInformationMessage(`No declaration detected on device`);
+			return;
+		} else {
+			return displayJsonInEditor(resp.body.declaration);
+		}
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-do.postDec', async () => {
+
+		const device = ext.hostStatusBar.text
+		var doDecResponse = {};
+
+		if (!device) {
+			throw new Error('Connect to device first')
+		}
+
+		const password = await getPassword(device);
+
+		// if selected text, capture that, if not, capture entire document
+
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			return; // No open text editor
+		}
+
+		// if text is selected in editor
+		if (editor.selection.isEmpty) {
+			// post entire page
+			// validate json structure before send?  something like: try => JSON.parse?
+
+			const text = editor.document.getText();
+			// console.log(`CAPTURING ENTIRE EDITOR DOC: ${text}`)
+
+			if (!isValidJson(text)) {
+				return vscode.window.showErrorMessage('Not valid JSON');
+			}
+
+			doDecResponse = await f5API.postDoDec(device, password, JSON.parse(text));
+			displayJsonInEditor(doDecResponse);
+		} else {
+			// post selected text/declaration
+			// var selection = editor.selection;
+			const text = editor.document.getText(editor.selection);
+			if (!isValidJson(text)) {
+				return vscode.window.showErrorMessage('Not valid JSON');
+			}
+			
+			// console.log(`SELECTED TEXT: ${text}`)
+			doDecResponse = await f5API.postTSDec(device, password, JSON.parse(text));
+			displayJsonInEditor(doDecResponse);
+		} 
 
 	}));
 
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5-do.inspect', async () => {
+		var device: string | undefined = ext.hostStatusBar.text
+
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5.connectDevice');
+		}
+		
+		if (device === undefined) {
+			throw new Error('no hosts in configuration')
+		}
+		
+		const password = await getPassword(device)
+		const resp = await f5API.doInspect(device, password);
+
+		displayJsonInEditor(resp.body);
+	}));
 
 
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-do.getTasks', async () => {
+		var device: string | undefined = ext.hostStatusBar.text
+
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5.connectDevice');
+		}
+		
+		if (device === undefined) {
+			throw new Error('no hosts in configuration')
+		}
+		
+		const password = await getPassword(device)
+		const resp = await f5API.doTasks(device, password);
+
+		displayJsonInEditor(resp.body);
+	}));
 
 
 

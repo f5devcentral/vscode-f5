@@ -69,7 +69,7 @@ export function setAS3Bar(text: string = '', tip: string = '') {
  */
 export function setDOBar(text: string = '', tip: string = '') {
 
-    ext.doBar.command = 'f5-fast.f5-do.getDec';
+    ext.doBar.command = 'f5-do.getDec';
     ext.doBar.text = text ? text || '' : '';
     ext.doBar.tooltip = tip ? tip || '' : '';
 

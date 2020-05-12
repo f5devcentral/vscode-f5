@@ -189,32 +189,44 @@
 				}
 			},
 			{
+				"command": "f5-do.inspect",
+				"title": "f5-do: DO Inspect"
+			},
+			{
 				"command": "f5-do.getDec",
-				"title": "f5-fast: Get DO Dec"
+				"title": "f5-do: Get DO Dec"
+			},
+			{
+				"command": "f5-do.getTasks",
+				"title": "f5-do: Get DO tasks"
+			},
+			{
+				"command": "f5-do.postDec",
+				"title": "f5-do: Post DO Dec"
 			},
 			{
 				"command": "f5-ts.info",
-				"title": "f5-fast: Show F5 TS Info"
+				"title": "f5-ts: Show F5 TS Info"
 			},
 			{
 				"command": "f5-ts.getDec",
-				"title": "f5-fast: Get Current TS Declaration"
+				"title": "f5-ts: Get Current TS Declaration"
 			},
 			{
 				"command": "f5-ts.postDec",
-				"title": "f5-fast: Post as TS Declaration"
+				"title": "f5-ts: Post TS Declaration"
 			},
 			{
 				"command": "f5-ts.enableTsExamples",
-				"title": "f5-fast: Enable TS examples Tree"
+				"title": "f5-ts: Enable TS examples Tree"
 			},
 			{
 				"command": "writeMemento",
-				"title": "f5-fast: writeMemento"
+				"title": "f5: writeMemento"
 			},
 			{
 				"command": "readMemento",
-				"title": "f5-fast: readMemento"
+				"title": "f5: readMemento"
 			},
 			{
 				"command": "f5-ts.enableTsExamples",
@@ -258,7 +270,7 @@
 			},
 			{
 				"command": "chuckJoke",
-				"title": "f5-fast: Chuck Joke"
+				"title": "f5: Chuck Joke"
 			},
 			{
 				"command": "nodeDependencies.deleteEntry",

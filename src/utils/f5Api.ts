@@ -54,6 +54,8 @@ export class f5Api {
                     const text = `TS(${tsInfo.body.version})`
                     const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `
                     setTSBar(text, tip);
+                } else {
+                    setTSBar();
                 }
 
                 const as3Info = await callHTTP(
@@ -172,7 +174,7 @@ export class f5Api {
                 return callHTTP(
                     'POST', 
                     hostToken.host, 
-                    '/mgmt/shared/telemetry/declare', 
+                    '/mgmt/shared/declarative-onboarding/', 
                     hostToken.token,
                     dec
                 )
@@ -185,7 +187,7 @@ export class f5Api {
      * @param device BIG-IP/Host/Device in <user>@<host/ip> format
      * @param password User Password
      */
-    async getDODec(device: string, password: string) {
+    async getDoDec(device: string, password: string) {
         // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
@@ -193,10 +195,11 @@ export class f5Api {
                 return callHTTP(
                     'GET', 
                     hostToken.host, 
-                    '/mgmt/shared/declartive-onboarding', 
+                    '/mgmt/shared/declarative-onboarding/', 
                     hostToken.token
                 )
-            });
+            }
+        )
     }
 
 
@@ -205,7 +208,7 @@ export class f5Api {
      * @param device BIG-IP/Host/Device in <user>@<host/ip> format
      * @param password User Password
      */
-    async postDODec(device: string, password: string, dec: object) {
+    async postDoDec(device: string, password: string, dec: object) {
         // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
@@ -213,9 +216,51 @@ export class f5Api {
                 return callHTTP(
                     'POST', 
                     hostToken.host, 
-                    '/mgmt/shared/declartive-onboarding', 
+                    '/mgmt/shared/declarative-onboarding/', 
                     hostToken.token,
                     dec
+                )
+            });
+    }
+
+
+
+    /**
+     * DO Inspect - returns potential DO configuration items
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async doInspect(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/declarative-onboarding/inspect', 
+                    hostToken.token,
+                )
+            });
+    }
+
+
+
+    /**
+     * DO tasks - returns executed DO tasks
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async doTasks(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/declarative-onboarding/task', 
+                    hostToken.token,
                 )
             });
     }
