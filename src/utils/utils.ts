@@ -40,6 +40,29 @@ export function setHostnameBar(text: string = '', tip: string = '') {
 
 
 /**
+ * Fast status bar mgmt.
+ * Feed it text, it will show up
+ * Feed it nothing, it will disappear!
+ * @param text text to display in status bar
+ * @param tip text to display when hover
+ */
+export function setFastBar(text: string = '', tip: string = '') {
+
+    // ext.fastBar.command = 'f5-fast.something';
+    ext.fastBar.text = text ? text || '' : '';
+    ext.fastBar.tooltip = tip ? tip || '' : '';
+
+    if (text) {
+        ext.fastBar.show();
+    } else {
+        ext.fastBar.hide();
+    }
+
+};
+
+
+
+/**
  * AS3 status bar mgmt.
  * Feed it text, it will show up
  * Feed it nothing, it will disappear!

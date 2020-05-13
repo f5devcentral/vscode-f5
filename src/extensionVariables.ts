@@ -23,9 +23,10 @@ export namespace ext {
     export let memFs: MemFS;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;
-    export let tsBar: StatusBarItem;
     export let as3Bar: StatusBarItem;
+    export let fastBar: StatusBarItem;
     export let doBar: StatusBarItem;
+    export let tsBar: StatusBarItem;
     // export class f5Api { };
     export let f5Api: f5Api;
     export let carTreeData: object | undefined;

@@ -3,10 +3,10 @@ import { getPassword } from '../utils/utils'
 import { ext } from '../extensionVariables';
 // import { callHTTPS } from '../utils/externalAPIs'
 
-export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
+export class as3TenantTreeProvider implements vscode.TreeDataProvider<as3TenantItem> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<as3Item | undefined> = new vscode.EventEmitter<as3Item | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<as3Item | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<as3TenantItem | undefined> = new vscode.EventEmitter<as3TenantItem | undefined>();
+	readonly onDidChangeTreeData: vscode.Event<as3TenantItem | undefined> = this._onDidChangeTreeData.event;
 
 	constructor(private workspaceRoot: string) {
 	}
@@ -15,68 +15,57 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: as3Item): vscode.TreeItem {
+	getTreeItem(element: as3TenantItem): vscode.TreeItem {
 		return element;
 	}
 
-	async getChildren(element?: as3Item): Promise<as3Item[]> {
-
+	async getChildren(element?: as3TenantItem): Promise<as3TenantItem[]> {
+		
 		var device = ext.hostStatusBar.text
 
 		if (!device) {
-			return Promise.reject('Select device to get as3 task info');
-			// return Promise.resolve('');
+			return Promise.reject('Select device to get as3 tenant info');
 		}
-
+		
 		const password = await getPassword(device);
-		const decCall = await ext.f5Api.as3Tasks(device, password);
-		// const taskHeader: as3Item = new as3Item(
-		// 	'AS3 Tasks',
-		// 	'',
-		// 	'',
-		// 	vscode.TreeItemCollapsibleState.Collapsed,
-		// 	{
-		// 		command: '',
-		// 		title: '',
-		// 		arguments: ['none']
-		// 	}
-		// );
+
+		const tenants = await ext.f5Api.as3Tenants(device, password);
+		// const decCall = [ "task1", "task2", "task3"]
+
+		// console.log(`as3Tree tenantCall: ${JSON.stringify(tenants.body.items)}`);
+
+		const taskHeader: as3TenantItem = new as3TenantItem(
+			'AS3 Tasks',
+			'',
+			'',
+			vscode.TreeItemCollapsibleState.Collapsed,
+			{
+				command: '',
+				title: '',
+				arguments: ['none']
+			}
+		);
 		
-		// if (decCall.)
-		
-		
-		const taskItems = decCall.body.items.map((item:any) => {
+		const taskItems = tenants.body.items.map((item:any) => {
 
 			const taskId = item.id
 			const shortId = taskId.split('-').pop();
-			var timeStamp
-
-			// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there
-			if (item.declaration.hasOwnProperty('controls')){
-				timeStamp = item.declaration.controls.archiveTimestamp
-			} else {
-				timeStamp = ''
-			}
-
-			// var timeStamp = item.declaration.controls.archiveTimestamp ?
-			// 	item.declaration.controls.archiveTimestamp || '' : '';
-
-
+			const timeStamp = item.declaration.controls.archiveTimestamp
 			// TODO: loop through entire dec, add all tenant names, if there are multiple
 			const decTenant = item.results[0].tenant
 
-			return new as3Item(
+			return new as3TenantItem(
 				shortId,
 				timeStamp,
 				decTenant,
 				vscode.TreeItemCollapsibleState.None, 
 				{
-					command: 'f5-as3.getTask',
+					command: 'f5-as3.getTenant',
 					title: 'hostTitle',
 					arguments: [taskId]
 				}
 			)
-		})
+		});
 
 		// var treeItems =  [taskHeader: [taskItems]]
 		var treeItems =  taskItems
@@ -87,7 +76,7 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 
 }
 
-export class as3Item extends vscode.TreeItem {
+export class as3TenantItem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		private version: string,

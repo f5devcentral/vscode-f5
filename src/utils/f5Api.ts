@@ -2,7 +2,15 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
-import { setHostStatusBar, setAS3Bar, setDOBar, setTSBar, getPassword, setHostnameBar } from './utils'
+import { 
+    setHostStatusBar, 
+    setHostnameBar,
+    setAS3Bar, 
+    setFastBar,
+    setDOBar, 
+    setTSBar,
+    getPassword
+ } from './utils'
 import { ext } from '../extensionVariables';
 // import { rejects } from 'assert';
 // import { KeyTar, tryGetKeyTar } from './utils/keytar';
@@ -54,10 +62,24 @@ export class f5Api {
                     const text = `TS(${tsInfo.body.version})`
                     const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `
                     setTSBar(text, tip);
-                } else {
-                    setTSBar();
                 }
 
+                //********** FAST info **********/
+                const fastInfo = await callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/fast/info', 
+                    hostToken.token
+                )
+                    
+                if (fastInfo.status === 200) {
+                    // console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
+                    const text = `FAST(${fastInfo.body.version})`
+                    // const tip = `schemaCurrent: ${fastInfo.body.schemaCurrent} `
+                    setFastBar(text);
+                }
+                    
+                //********** AS3 info **********/
                 const as3Info = await callHTTP(
                     'GET', 
                     hostToken.host, 
@@ -86,8 +108,36 @@ export class f5Api {
                     const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `
                     setDOBar(text, tip);
                 }
-            })
+            }
+        )
         // return auth;
+    }
+
+
+
+    /**
+     * Used to get F5 Host info
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async getF5HostInfo(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                if (hostToken === undefined) {
+                    throw new Error('hostToken blank, auth failed');
+                }
+                // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
+
+                return callHTTP(
+                    'POST', 
+                    hostToken.host, 
+                    '/mgmt/tm/util/bash', 
+                    hostToken.token
+                )
+            }
+        )
     }
 
 
@@ -118,7 +168,8 @@ export class f5Api {
                         utilCmdArgs: `-c '${cmd}'`
                     }
                 )
-            });
+            }
+        )
     }
 
 
@@ -136,7 +187,8 @@ export class f5Api {
                     '/mgmt/shared/telemetry/info', 
                     hostToken.token
                 )
-            });
+            }
+        );
     }
 
 
@@ -157,7 +209,8 @@ export class f5Api {
                     '/mgmt/shared/telemetry/declare', 
                     hostToken.token
                 )
-            });
+            }
+        );
     }
 
 
@@ -174,11 +227,12 @@ export class f5Api {
                 return callHTTP(
                     'POST', 
                     hostToken.host, 
-                    '/mgmt/shared/declarative-onboarding/', 
+                    '/mgmt/shared/telemetry/declare', 
                     hostToken.token,
                     dec
                 )
-            });
+            }
+        );
     }
 
 
@@ -220,7 +274,8 @@ export class f5Api {
                     hostToken.token,
                     dec
                 )
-            });
+            }
+        );
     }
 
 
@@ -241,7 +296,8 @@ export class f5Api {
                     '/mgmt/shared/declarative-onboarding/inspect', 
                     hostToken.token,
                 )
-            });
+            }
+        );
     }
 
 
@@ -262,7 +318,30 @@ export class f5Api {
                     '/mgmt/shared/declarative-onboarding/task', 
                     hostToken.token,
                 )
-            });
+            }
+        )
+    }
+
+
+
+    /**
+     * AS3 Tenants - returns configured tenants
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async as3Tenants(device: string, password: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    '/mgmt/shared/appsvcs/declare/', 
+                    hostToken.token,
+                )
+            }
+        )
     }
 
 
@@ -283,50 +362,30 @@ export class f5Api {
                     '/mgmt/shared/appsvcs/task/', 
                     hostToken.token,
                 )
-            });
+            }
+        )
     }
 
 
-
-    async getF5HostInfo() {
-
-        var host: string = ext.hostStatusBar.text;
-        const password: string = await getPassword(host)
-
-        // const pswd = ext.keytar.getPassword('f5Hosts', host);
-        // console.log(`getF5HostInfo - host: ${host} - password: ${password}`);
-
-        if (host || password) {
-            var [username, host] = host.split('@');
-            getAuthToken(host, username, password)
+    /**
+     * AS3 tasks - returns executed tasks
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async getAS3Task(device: string, password: string, id: string) {
+        // console.log(`issueBash: ${device} - ${password}`);
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
             .then( hostToken => {
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
-
-                getF5Info(hostToken.host, hostToken.token)
-                .then( f5Info => {
-
-                    vscode.workspace.openTextDocument({ 
-                        language: 'json', 
-                        content: JSON.stringify(f5Info, undefined, 4) 
-                    })
-                    .then( doc => 
-                        vscode.window.showTextDocument(
-                            doc, 
-                            { 
-                                preview: false 
-                            }
-                        )
-                    )
-                });
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    `/mgmt/shared/appsvcs/task/${id}`, 
+                    hostToken.token,
+                )
             });
-        } else {
-            console.error(`getF5HostInfo - NO host or password details: ${host} - ${password}`);
-            vscode.window.showInformationMessage(`Connect to device first!!!`);
-            //instead of errors, just call the connect command
-        }
     }
+
 
     async getF5FastInfo() {
         
@@ -568,20 +627,20 @@ const getF5Info = (host: string, token: string) => makeRequest({
 });
 
 
-const getAS3Tasks = (host: string, token: string) => makeRequest({
-    host,
-    path: '/mgmt/shared/appsvcs/task/',
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-F5-Auth-Token': token
-    }
-})
-.then( response => {
-    console.log('value in getF5Info: ' + JSON.stringify(response));
-    // Promise.resolve(value.body.token);
-    return response.body;
-});
+// const getAS3Tasks = (host: string, token: string) => makeRequest({
+//     host,
+//     path: '/mgmt/shared/appsvcs/task/',
+//     method: 'GET',
+//     headers: {
+//         'Content-Type': 'application/json',
+//         'X-F5-Auth-Token': token
+//     }
+// })
+// .then( response => {
+//     console.log('value in getF5Info: ' + JSON.stringify(response));
+//     // Promise.resolve(value.body.token);
+//     return response.body;
+// });
 
 
 
@@ -604,16 +663,16 @@ const callHTTP = (method: string, host: string, path: string, token: string, pay
 });
 
 
-const getFastInfo = (host: string, token: string) => makeRequest({
-    host,
-    path: '/mgmt/shared/fast/info',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-F5-Auth-Token': token
-    }
-})
-.then( response => {
-    console.log('value in getFastInfo: ' + JSON.stringify(response));
-    // Promise.resolve(value.body.token);
-    return response.body;
-});
+// const getFastInfo = (host: string, token: string) => makeRequest({
+//     host,
+//     path: '/mgmt/shared/fast/info',
+//     headers: {
+//         'Content-Type': 'application/json',
+//         'X-F5-Auth-Token': token
+//     }
+// })
+// .then( response => {
+//     console.log('value in getFastInfo: ' + JSON.stringify(response));
+//     // Promise.resolve(value.body.token);
+//     return response.body;
+// });

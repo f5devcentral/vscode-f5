@@ -66,15 +66,19 @@
 			"f5-fast-view-container": [
 				{
 					"id": "f5Hosts",
-					"name": "f5 Hosts"
+					"name": "F5 Hosts"
 				},
 				{
 					"id": "fastTemplates",
 					"name": "FAST Templates"
 				},
 				{
-					"id": "as3",
-					"name": "AS3"
+					"id": "as3Tenants",
+					"name": "AS3 Tenants"
+				},
+				{
+					"id": "as3Tasks",
+					"name": "AS3 Tasks"
 				},
 				{
 					"id": "tsExamples",
@@ -181,7 +185,15 @@
 				"title": "f5-fast: post AS3 declaration"
 			},
 			{
-				"command": "f5-as3.refreshTree",
+				"command": "f5-as3.refreshTenantsTree",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5-as3.refreshTasksTree",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -290,8 +302,13 @@
 					"group": "navigation"
 				},
 				{
-					"command": "f5-as3.refreshTree",
-					"when": "view == as3",
+					"command": "f5-as3.refreshTenantsTree",
+					"when": "view == as3Tenants",
+					"group": "navigation"
+				},
+				{
+					"command": "f5-as3.refreshTasksTree",
+					"when": "view == as3Tasks",
 					"group": "navigation"
 				},
 				{

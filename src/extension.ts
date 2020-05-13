@@ -12,6 +12,7 @@ import { DepNodeProvider, Dependency } from './treeViewsProviders/nodeDependenci
 import { MemFS } from './fileSystemProvider';
 import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
 import { as3TreeProvider } from './treeViewsProviders/as3TreeProvider';
+import { as3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
 import { exampleTsDecsProvider, exampleTsDec } from './treeViewsProviders/githubTsExamples';
 import { fastTemplatesTreeProvider } from './treeViewsProviders/fastTemplatesTreeProvider';
 import { f5Api } from './utils/f5Api'
@@ -30,7 +31,8 @@ import {
 	setDOBar, 
 	setTSBar, 
 	getDevice,
-	displayJsonInEditor
+	displayJsonInEditor,
+	setFastBar
 } from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
@@ -48,6 +50,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(ext.hostStatusBar);
 	ext.hostNameBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 19);
 	context.subscriptions.push(ext.hostNameBar);
+	ext.fastBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 18);
+	context.subscriptions.push(ext.fastBar);
 	ext.as3Bar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 18);
 	context.subscriptions.push(ext.as3Bar);
 	ext.doBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 17);
@@ -79,13 +83,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	/**
 	 * #########################################################################
-	 *	         ########  ######## ##     ## ####  ######  ########  ######  
-	 *	         ##     ## ##       ##     ##  ##  ##    ## ##       ##    ## 
-	 *	         ##     ## ##       ##     ##  ##  ##       ##       ##       
-	 *	         ##     ## ######   ##     ##  ##  ##       ######    ######  
-	 *	         ##     ## ##        ##   ##   ##  ##       ##             ## 
-	 *	         ##     ## ##         ## ##    ##  ##    ## ##       ##    ## 
-	 * 	         ########  ########    ###    ####  ######  ########  ######  
+	 *	     ########  ######## ##     ## ####  ######  ########  ######  
+	 *	     ##     ## ##       ##     ##  ##  ##    ## ##       ##    ## 
+	 *	     ##     ## ##       ##     ##  ##  ##       ##       ##       
+	 *	     ##     ## ######   ##     ##  ##  ##       ######    ######  
+	 *	     ##     ## ##        ##   ##   ##  ##       ##             ## 
+	 *	     ##     ## ##         ## ##    ##  ##    ## ##       ##    ## 
+	 * 	     ########  ########    ###    ####  ######  ########  ######  
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Banner3&t=Devices
 	 * #########################################################################
 	 */
@@ -103,6 +107,14 @@ export function activate(context: vscode.ExtensionContext) {
 		if (bigipHosts === undefined) {
 			throw new Error('no hosts in configuration')
 		}
+
+		// clear status bars before new connect
+		setHostStatusBar();
+		setHostnameBar();
+		setFastBar();
+		setAS3Bar();
+		setDOBar();
+		setTSBar();	
 		
 		if (!device) {
 			device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
@@ -119,8 +131,19 @@ export function activate(context: vscode.ExtensionContext) {
 		return device;
 	}));
 	
-	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', () => {
-		ext.f5Api.getF5HostInfo();
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', async () => {
+		var device: string | undefined = ext.hostStatusBar.text
+		
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5.connectDevice');
+		}
+		
+		if (device === undefined) {
+			throw new Error('no hosts in configuration')
+		}
+		const password: string = await getPassword(device)
+		const hostInfo  = ext.f5Api.getF5HostInfo(device, password);
+		displayJsonInEditor(hostInfo)
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
@@ -128,6 +151,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// clear status bars
 		setHostStatusBar();
 		setHostnameBar();
+		setFastBar();
 		setAS3Bar();
 		setDOBar();
 		setTSBar();
@@ -141,6 +165,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// clear status bars 
 		setHostStatusBar();
 		setHostnameBar();
+		setFastBar();
 		setAS3Bar();
 		setDOBar();
 		setTSBar();
@@ -295,11 +320,11 @@ export function activate(context: vscode.ExtensionContext) {
 	/**
 	 * ###########################################################################
 	 * 
-	 *  FFFFFFF   AAA    SSSSS  TTTTTTT 
- 	 *  FF       AAAAA  SS        TTT   
- 	 *  FFFF    AA   AA  SSSSS    TTT   
- 	 *  FF      AAAAAAA      SS   TTT   
- 	 *  FF      AA   AA  SSSSS    TTT   
+	 *  			FFFFFFF   AAA    SSSSS  TTTTTTT 
+ 	 *  			FF       AAAAA  SS        TTT   
+ 	 *  			FFFF    AA   AA  SSSSS    TTT   
+ 	 *  			FF      AAAAAAA      SS   TTT   
+ 	 *  			FF      AA   AA  SSSSS    TTT   
 	  * 
 	  * ############################################################################
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
@@ -323,11 +348,11 @@ export function activate(context: vscode.ExtensionContext) {
 	/**
 	 * ############################################################################
 	 * 
-	 * 		 AAA     SSSSS   333333  
-	 * 		 AAAAA   SS          3333 
-	 * 		AA   AA   SSSSS     3333  
-	 * 		AAAAAAA       SS      333 
-	 * 		AA   AA   SSSSS   333333  
+	 * 				  AAA     SSSSS   333333  
+	 * 				 AAAAA   SS          3333 
+	 * 				AA   AA   SSSSS     3333  
+	 * 				AAAAAAA       SS      333 
+	 * 				AA   AA   SSSSS   333333  
 	 * 
 	 * 
 	 * ############################################################################
@@ -336,13 +361,31 @@ export function activate(context: vscode.ExtensionContext) {
 
 	
 	// setting up as3 tree
+	const as3TenantTree = new as3TenantTreeProvider('');
+	vscode.window.registerTreeDataProvider('as3Tenants', as3TenantTree);
+	vscode.commands.registerCommand('f5-as3.refreshTenantsTree', () => as3TenantTree.refresh());
+	
+	// setting up as3 tree
 	const as3Tree = new as3TreeProvider('');
-	vscode.window.registerTreeDataProvider('as3', as3Tree);
-	vscode.commands.registerCommand('f5-as3.refreshTree', () => as3Tree.refresh());
+	vscode.window.registerTreeDataProvider('as3Tasks', as3Tree);
+	vscode.commands.registerCommand('f5-as3.refreshTasksTree', () => as3Tree.refresh());
 
-	// context.subscriptions.push(vscode.commands.registerCommand('f5-as3.listTasks', () => {
-	// 	f5API.listAS3Tasks();
-	// }));
+	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
+		
+		var device: string | undefined = ext.hostStatusBar.text
+		
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5.connectDevice');
+		}
+		
+		if (device === undefined) {
+			throw new Error('no hosts in configuration')
+		}
+		
+		const password = await getPassword(device)
+		const dec = await ext.f5Api.getAS3Task(device, password, id);
+		displayJsonInEditor(dec.body);
+	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', () => {
 
@@ -387,12 +430,12 @@ export function activate(context: vscode.ExtensionContext) {
 	/**
 	 * #########################################################################
 	 * 
-	 *		 TTTTTTT  SSSSS  	d888888P .d88888b   _______    _____ 	  ████████ ███████ 
-	 *		   TTT   SS      	   88    88.    "' |__   __|  / ____|	     ██    ██      
-	 *		   TTT    SSSSS  	   88    `Y88888b.    | |    | (___  	     ██    ███████ 
-	 *		   TTT        SS 	   88          `8b    | |     \___ \ 	     ██         ██ 
-	 *		   TTT    SSSSS  	   88    d8'   .8P    | |     ____) |	     ██    ███████ 
-	 * 						 	   dP     Y88888P     |_|    |_____/ 	                   
+	 *			 TTTTTTT  SSSSS  	
+	 *			   TTT   SS      	
+	 *			   TTT    SSSSS  	
+	 *			   TTT        SS 	
+	 *			   TTT    SSSSS  	
+	 * 	
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=TS
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=ANSI%20Regular&t=TS
 	 * #########################################################################
@@ -435,31 +478,18 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getDec', async () => {
 		
 		var device: string | undefined = ext.hostStatusBar.text
-		// console.log(`TS device from hostStatusBar: ${JSON.stringify(device)}`);
 		
 		if (!device) {
 			device = await vscode.commands.executeCommand('f5.connectDevice');
-			// return bigip;
-			// console.log(`TS GET	bigip: ${JSON.stringify(device)}`);
 		}
 		
 		if (device === undefined) {
 			throw new Error('no hosts in configuration')
 		}
-		// // get device
-		// const device = await getDevice();
-		// console.log(`TS GET	device: ${device}`);
-		
-		// get password
+
 		const password = await getPassword(device)
-		// console.log(`TS GET	password: ${password}`);
-
-		// get TS declaration
 		const dec = await ext.f5Api.getTSDec(device, password);
-
 		displayJsonInEditor(dec.body.declaration);
-
-		// console.log(`TS DECLARATION: ${JSON.stringify(dec)}`)
 
 	}));
 
@@ -475,7 +505,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const password = await getPassword(device);
 
 		// if selected text, capture that, if not, capture entire document
-
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return; // No open text editor
@@ -487,7 +516,6 @@ export function activate(context: vscode.ExtensionContext) {
 			// validate json structure before send?  something like: try => JSON.parse?
 
 			const text = editor.document.getText();
-			// console.log(`CAPTURING ENTIRE EDITOR DOC: ${text}`)
 
 			if (!isValidJson(text)) {
 				return vscode.window.showErrorMessage('Not valid JSON');
@@ -503,7 +531,6 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 			
-			// console.log(`SELECTED TEXT: ${text}`)
 			tsDecResponse = await ext.f5Api.postTSDec(device, password, JSON.parse(text));
 			displayJsonInEditor(tsDecResponse);
 		} 
@@ -558,7 +585,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const resp = await ext.f5Api.getDoDec(device, password);
 
 		if (resp.body === []) {
-			// console.log(`f5.getDec resp: ${JSON.stringify(resp)}`);
 			vscode.window.showInformationMessage(`No declaration detected on device`);
 			return;
 		} else {
@@ -658,11 +684,11 @@ export function activate(context: vscode.ExtensionContext) {
 /**
  * #########################################################################
  * 
- * 		UU   UU TTTTTTT IIIII LL      
- * 		UU   UU   TTT    III  LL      
- * 		UU   UU   TTT    III  LL      
- * 		UU   UU   TTT    III  LL      
- * 		 UUUUU    TTT   IIIII LLLLLLL 
+ * 		UU   UU  TTTTTTT  IIIII  LL      
+ * 		UU   UU    TTT     III   LL      
+ * 		UU   UU    TTT     III   LL      
+ * 		UU   UU    TTT     III   LL      
+ * 		 UUUUU     TTT    IIIII  LLLLLLL 
  * 
  * #########################################################################
  * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=UTIL
@@ -694,16 +720,6 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', () => {
 		chuckJoke();
 	}));
-
-
-
-	
-
-
-
-
-
-
 
 }
 
