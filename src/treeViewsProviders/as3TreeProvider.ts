@@ -50,18 +50,40 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 		// const decCall = [ "task1", "task2", "task3"]
 
 		console.log(`as3Tree decCall: ${JSON.stringify(decCall.body.items)}`);
+
+		const taskHeader: as3Item = new as3Item(
+			'AS3 Tasks',
+			'',
+			vscode.TreeItemCollapsibleState.Collapsed,
+			{
+				command: '',
+				title: '',
+				arguments: ['none']
+			}
+		);
 		
-		const treeItems = decCall.body.map((item:any): as3Item => {
+		const taskItems = decCall.body.items.map((item:any): as3Item => {
+
+			const taskId = item.id
+			console.log(`taskId: ${taskId}`);
+			
+			const shortId = taskId.split('-').pop();
+			console.log(`shortId: ${shortId}`);
+
 			return (new as3Item(
-				item.name, 
+				shortId,
+				item.declaration.controls.archiveTimestamp,
 				vscode.TreeItemCollapsibleState.None, 
 				{
 					command: 'f5-ts.getAs3item',
 					title: 'hostTitle',
-					arguments: [item.download_url]
+					arguments: [item.id]
 			}))
 		});
 
+		// var treeItems =  [taskHeader: [taskItems]]
+		var treeItems =  taskItems
+		// treeItems = taskItems
         return Promise.resolve(treeItems);
 	}
     
@@ -71,20 +93,20 @@ export class as3TreeProvider implements vscode.TreeDataProvider<as3Item> {
 export class as3Item extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		// private version: string,
+		private version: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 	}
 
-	// get tooltip(): string {
-	// 	return `Connect`;
-	// }
+	get tooltip(): string {
+		return `Connect`;
+	}
 
-	// get description(): string {
-	// 	return 'descLoc';
-	// }
+	get description(): string {
+		return this.version;
+	}
 
 	// iconPath = {
 	// 	light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
