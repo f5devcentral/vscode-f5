@@ -8,11 +8,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 
 
-## [0.1.3] - (5-12-2020)
+## [0.1.3] - (5-13-2020)
 
 ### Added
 - Tree view to display TS examples from github
 - hostname/tmos version status bar
+- Fast/version status bar
+- AS3 Tasks view
 
 ## [0.1.2] - (5-10-2020)
 
