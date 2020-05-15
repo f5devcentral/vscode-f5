@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { ext } from '../extensionVariables'
+import { ext } from '../extensionVariables';
 
-export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTemplate> {
+export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTemplate> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<fastTemplate | undefined> = new vscode.EventEmitter<fastTemplate | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<fastTemplate | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<FastTemplate | undefined> = new vscode.EventEmitter<FastTemplate | undefined>();
+	readonly onDidChangeTreeData: vscode.Event<FastTemplate | undefined> = this._onDidChangeTreeData.event;
 
 	constructor(private workspaceRoot: string) {
 	}
@@ -13,52 +13,30 @@ export class fastTemplatesTreeProvider implements vscode.TreeDataProvider<fastTe
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: fastTemplate): vscode.TreeItem {
+	getTreeItem(element: FastTemplate): vscode.TreeItem {
 		return element;
 	}
 
-	getChildren(element?: fastTemplate): Thenable<fastTemplate[]> {
-        // console.log(`statusBar: ${JSON.stringify(stat)}`);
+	async getChildren(element?: FastTemplate): Promise<FastTemplate[]> {
 		
-        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
-
-		if ( bigipHosts === undefined) {
-			throw new Error('No configured hosts - from as3TreeProvider');
-		}
-		
-		// console.log(`hostStatusBar in fastTree: ${ext.hostStatusBar}`)
-   
-        // takes individual host item and creates a tree item
-        const treeHosts = (name: string): fastTemplate => {
-            const treeItem = new fastTemplate(name, vscode.TreeItemCollapsibleState.None, {
-                command: 'f5.connectDevice',
-                title: 'hostTitle',
-                arguments: [name]
-            });
-            // console.log(`treeItem: ${JSON.stringify(treeItem)}`);
-            return treeItem;
-        }
-
-		// takes list of bigip hosts from the workspace config file, in the variable "bigipHosts"
-		//		for each item in list assign item to "host", feed "host" to the function treeHosts
-		//		treeHosts return a treeItem, that gets returned as a list of treeItems in the promise.resolve
-		// basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
-        const treeItems = bigipHosts.map(host => treeHosts(host));
-
-        // console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
-
+		//  need to get all this working...
+		var treeItems = [];
+		treeItems.push(
+			new FastTemplate(
+				'coming soon', 
+				vscode.TreeItemCollapsibleState.None, 
+				{ 
+					command: 'f5-as3.getDecs',
+					title: '', 
+					arguments: ['none']
+				}
+			)
+		);
         return Promise.resolve(treeItems);
 	}
-
-	// private getTemplateList(): string[] {
-
-	// }
-    
-
 }
 
-export class fastTemplate extends vscode.TreeItem {
+export class FastTemplate extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		// private version: string,

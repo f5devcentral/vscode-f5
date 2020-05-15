@@ -3,16 +3,12 @@
 import * as vscode from 'vscode';
 
 import { chuckJoke } from './chuckJoke';
-import { carTreeDataProvider } from './carTreeView';
-import { DepNodeProvider, Dependency } from './treeViewsProviders/nodeDependencies';
-import { MemFS } from './fileSystemProvider';
 import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
 import { exampleTsDecsProvider, exampleTsDec } from './treeViewsProviders/githubTsExamples';
-import { fastTemplatesTreeProvider } from './treeViewsProviders/fastTemplatesTreeProvider';
+import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTemplatesTreeProvider';
 import { F5Api } from './utils/f5Api';
-import { Url } from 'url';
 import { callHTTPS } from './utils/externalAPIs';
 import { 
 	setHostStatusBar,
@@ -86,8 +82,6 @@ export function activate(context: vscode.ExtensionContext) {
 	 */
 	
 
-		// trying to setup tree provider to list f5 hosts from config file
-	// const hostsTreeProvider = new F5TreeProvider(vscode.workspace.getConfiguration().get('f5.hosts'));
 	const hostsTreeProvider = new F5TreeProvider('');
 	vscode.window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
@@ -133,8 +127,8 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 		const password: string = await getPassword(device);
-		const hostInfo  = ext.f5Api.getF5HostInfo(device, password);
-		displayJsonInEditor(hostInfo);
+		const hostInfo  = await ext.f5Api.getF5HostInfo(device, password);
+		displayJsonInEditor(hostInfo.body);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
@@ -146,6 +140,11 @@ export function activate(context: vscode.ExtensionContext) {
 		setAS3Bar();
 		setDOBar();
 		setTSBar();
+
+		// refresh views to clear trees
+		// vscode.commands.executeCommand('f5-fast.refreshTemplates');
+		vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
+		vscode.commands.executeCommand('f5-as3.refreshTasksTree');
 
 		return vscode.window.showInformationMessage('clearing selected bigip and status bar details');
 	}));
@@ -160,6 +159,10 @@ export function activate(context: vscode.ExtensionContext) {
 		setAS3Bar();
 		setDOBar();
 		setTSBar();
+
+		// refresh views to clear trees
+		vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
+		vscode.commands.executeCommand('f5-as3.refreshTasksTree');
 
 		// get list of items in keytar for the 'f5Hosts' service
 		await ext.keyTar.findCredentials('f5Hosts').then( list => {
@@ -322,12 +325,30 @@ export function activate(context: vscode.ExtensionContext) {
 	 */
 	
 	// setting up hosts tree
-	const templatesTreeProvider = new F5TreeProvider('');
-	vscode.window.registerTreeDataProvider('fastTemplates', templatesTreeProvider);
-	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => templatesTreeProvider.refresh());
+	const fastTreeProvider = new FastTemplatesTreeProvider('');
+	vscode.window.registerTreeDataProvider('fastTemplates', fastTreeProvider);
+	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => fastTreeProvider.refresh());
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getFastInfo', () => {
-		ext.f5Api.getF5FastInfo();
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getFastInfo', async () => {
+		var device: string | undefined = ext.hostStatusBar.text;
+		
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5.connectDevice');
+		}
+
+		if (device === undefined) {
+			throw new Error('no hosts in configuration');
+		}
+
+		if(ext.fastBar.text === '') {
+			return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');
+		}
+		
+
+		const password = await getPassword(device);
+		const fast = await ext.f5Api.getF5FastInfo(device, password);
+		displayJsonInEditor(fast.body);
+
 	}));
 
 
@@ -361,6 +382,16 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('as3Tasks', as3Tree);
 	vscode.commands.registerCommand('f5-as3.refreshTasksTree', () => as3Tree.refresh());
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getDecs', async (tenant) => {
+		// this command is not exposed through the package.json
+		// the only way this gets called, is by the as3 tenants tree, 
+		//		which means a device has to be selected to populate the tree
+		var device: string | undefined = ext.hostStatusBar.text;
+		const password = await getPassword(device);
+		const response = await ext.f5Api.getAS3Decs(device, password, tenant);
+		displayJsonInEditor(response.body);
+	}));
+
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
 		
 		var device: string | undefined = ext.hostStatusBar.text;
@@ -378,8 +409,19 @@ export function activate(context: vscode.ExtensionContext) {
 		displayJsonInEditor(dec.body);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', async () => {
 
+		var device: string | undefined = ext.hostStatusBar.text;
+		
+		if (!device) {
+			device = await vscode.commands.executeCommand('f5.connectDevice');
+		}
+		
+		if (device === undefined) {
+			throw new Error('no hosts in configuration');
+		}
+		
+		const password = await getPassword(device);
 		// if selected text, capture that, if not, capture entire document
 
 		var editor = vscode.window.activeTextEditor;
@@ -399,8 +441,9 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 
-
-			ext.f5Api.postAS3(JSON.parse(text));
+			const response = await ext.f5Api.postAS3Dec(device, password, JSON.parse(text));
+			displayJsonInEditor(response);
+			
 		} else {
 			// post selected text/declaration
 			// var selection = editor.selection;
@@ -409,8 +452,8 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 			
-			// console.log(`SELECTED TEXT: ${text}`)
-			ext.f5Api.postAS3(JSON.parse(text));
+			const response = await ext.f5Api.postAS3Dec(device, password, JSON.parse(text));
+			displayJsonInEditor(response);
 		} 
 		
 	}));

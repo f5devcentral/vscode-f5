@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)utomation (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -83,20 +83,6 @@
 				{
 					"id": "tsExamples",
 					"name": "TS Examples"
-				},
-				{
-					"id": "nodeDependencies",
-					"name": "node Dependencies"
-				},
-				{
-					"id": "carTree",
-					"name": "Car Tree"
-				}
-			],
-			"explorer": [
-				{
-					"id": "f5Fast",
-					"name": "f5 faster"
 				}
 			]
 		},
@@ -261,32 +247,8 @@
 				"title": "Delete"
 			},
 			{
-				"command": "nodeDependencies.refreshEntry",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "nodeDependencies.addEntry",
-				"title": "Addd"
-			},
-			{
-				"command": "nodeDependencies.editEntry",
-				"title": "Edit",
-				"icon": {
-					"light": "resources/light/edit.svg",
-					"dark": "resources/dark/edit.svg"
-				}
-			},
-			{
 				"command": "chuckJoke",
 				"title": "f5: Chuck Joke"
-			},
-			{
-				"command": "nodeDependencies.deleteEntry",
-				"title": "Delete"
 			}
 		],
 		"menus": {
@@ -326,28 +288,9 @@
 					"command": "f5-ts.disableTsExamples",
 					"when": "view == tsExamples",
 					"group": "navigation"
-				},
-				{
-					"command": "nodeDependencies.refreshEntry",
-					"when": "view == nodeDependencies",
-					"group": "navigation"
-				},
-				{
-					"command": "nodeDependencies.addEntry",
-					"when": "view == nodeDependencies",
-					"group": "navigation"
 				}
 			],
 			"view/item/context": [
-				{
-					"command": "nodeDependencies.editEntry",
-					"when": "view == nodeDependencies && viewItem == dependency",
-					"group": "inline"
-				},
-				{
-					"command": "nodeDependencies.deleteEntry",
-					"when": "view == nodeDependencies && viewItem == dependency"
-				},
 				{
 					"command": "f5.editHost",
 					"when": "view == f5Hosts",

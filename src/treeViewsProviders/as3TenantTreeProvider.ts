@@ -13,6 +13,7 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
+		// make api call here, store data in a memento
 	}
 
 	getTreeItem(element: AS3TenantItem): vscode.TreeItem {
@@ -22,114 +23,53 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 	async getChildren(element?: AS3TenantItem): Promise<AS3TenantItem[]> {
 		
 		var device = ext.hostStatusBar.text;
+		var as3 = ext.as3Bar.text;
 
-		if (!device) {
-			return Promise.reject('Select device to get as3 tenant info');
+		if (!device || !as3) {
+			console.log('AS3TenantTree: no device or as3 detected');
+			return Promise.resolve([]);
 		}
-		
+		/*
+		 * need to hold api call results in a memento, then access the memento as needed
+		 * use the refresh button/function above to make refresh api data.
+		 * possibly use the refresh as the main data fetch so it only happens when the user wants it...
+		 */
+
+		 // get memento data, parse and make tree as needed
 		const password = await getPassword(device);
-		const tenantsFull = await ext.f5Api.as3Tenants(device, password);
-		const bodyKeys = Object.keys(tenantsFull.body);
+		const tenantsFull = await ext.f5Api.getAS3Decs(device, password);
+		// const bodyKeys = Object.keys(tenantsFull.body);
 
-		var newTreeItems: any[] = [];
-		for ( const tenant in tenantsFull.body) {
-			// var newTenants = [];
-			// console.log(`PROP OF BODY!!!!  ${tenant}`);
-			if(isObject(tenantsFull.body[tenant])) {
-				// console.log(`OBJECT!!!!  ${tenant}`);
-				if(tenant !== 'controls') {
-
-					var tenApps = [];
-					var tenantDef = new AS3TenantItem(tenant, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
-						{ command: '', title: '', arguments: ['none'] });
-					// newTenants.push(tenantDef);
-					// tenantDef.push("children" = []);
-					
-					// newTenants.push(tenantDef);
-					// newTreeItems"children"] = [];
-					
-
-					for ( const app in tenantsFull.body[tenant]) {
-						console.log(`TENANT-APP!!!!  ${tenant}-${app}`);
-						const appDef = new AS3TenantItem(app, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
-							{ command: '', title: '', arguments: ['none'] });
-						tenApps.push(appDef);
-					}
-					// const tenApps.push("children": {})
-					// newTreeItems.push(tenantDef.children { tenApps });
-
-					// console.log(`tenantDef:  ${JSON.stringify(tenantDef)}`);
-					// console.log(`newTenants:  ${JSON.stringify(newTenants)}`);
-					// console.log(`tenApps:  ${JSON.stringify(tenApps)}`);
-					
-					// newTenants.push();
-					// newTreeItems.push('children: {}');
-					// Object.defineProperty(tenantDef, 'children', []);		// worked to add children object
-					
-					
-					// tenantDef.push(tenApps);
-					// newTreeItems.tenantDef.push(tenApps);
-					// newTreeItems.concat(tenantDef, tenApps);
-					console.log(`tenApps:  ${JSON.stringify(tenantDef)}`);
-					
-					console.log(`TENAPPDEF:  ${JSON.stringify(newTreeItems)}`);
-					
+		var treeItems = [];
+		if (element) {
+			// get children for the provided element/tenant
+			//		element comes from selectinga  parent tree member
+			for ( const app in tenantsFull.body[element.label]) {
+				if(isObject(tenantsFull.body[element.label][app])) {
+					console.log(`TENANT-APP!!!!  ${element.label}-${app}`);
+					treeItems.push(new AS3TenantItem(app, '', '', vscode.TreeItemCollapsibleState.None, 
+						{ command: '', title: '', arguments: ['none'] }));
 				}
 			}
-			
-		}
 
-
-		// const taskItems = tenantsFull.body.items.map((item:any) => {
-		const tenantItems = bodyKeys.map((item: string) => {
-
-			const tenant: AS3TenantItem = new AS3TenantItem(
-				item,
-				'',
-				'',
-				vscode.TreeItemCollapsibleState.Collapsed, 
-				{
-					command: '',
-					title: '',
-					arguments: ['none']
-				}
+		} else {
+			// no element/item, so returning parent tenants
+			// default/empty "All-Tenants" Parent item
+			treeItems.push(
+				new AS3TenantItem('Get-All-Tenants', '', '', vscode.TreeItemCollapsibleState.None, 
+						{ command: 'f5-as3.getDecs', title: '', arguments: [''] })
 			);
 
-			console.log(`tenantItems item: ${item}`);
+			for ( const tenant in tenantsFull.body) {
+				if(isObject(tenantsFull.body[tenant])) {
+					if(tenant !== 'controls') {
+						treeItems.push(new AS3TenantItem(tenant, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+						{ command: 'f5-as3.getDecs', title: '', arguments: [tenant] }));
+					}
+				}
+			}
+		}
 
-			
-			// debugger;
-
-			const appKeys = Object.keys(tenantsFull.body[item]);
-
-			//using the key get a list of key on this object item
-			const apps = appKeys.map( (appItem: string) => {
-				// const app: AS3TenantItem = new AS3TenantItem(
-				// 	appItem,
-				// 	'',
-				// 	'',
-				// 	vscode.TreeItemCollapsibleState.Collapsed, 
-				// 	{
-				// 		command: '',
-				// 		title: '',
-				// 		arguments: ['none']
-				// 	}
-				// );
-			// console.log(`APP:  ${app}`);
-				
-			});
-
-			
-			const tenantApps = tenant;
-			return tenantApps;
-		});
-
-		// var treeItems =  [taskHeader: [taskItems]]
-		var treeItems =  tenantItems;
-		// var treeItems =  tenantHeader;
-		// debugger;
-
-		// treeItems = taskItems
         return Promise.resolve(treeItems);
 	}
     

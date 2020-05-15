@@ -72,7 +72,7 @@ X-F5-Auth-Token: {{authToken}}
 
 
 ###   # CHECK as3 declaration status
-GET https://{{host}}/mgmt/shared/appsvcs/task/{{decID.response.body.id}}
+# GET https://{{host}}/mgmt/shared/appsvcs/task/{{decID.response.body.id}}
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
@@ -85,14 +85,14 @@ X-F5-Auth-Token: {{authToken}}
 
 ###   # get as3 declarations for tenent
 # @name decID
-GET https://{{host}}/mgmt/shared/appsvcs/declare/Sample_http_06a/
+GET https://{{host}}/mgmt/shared/appsvcs/declare/Sample_01/
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
 
 ###   # get as3 declaration
 # @name decID
-GET https://{{host}}/mgmt/shared/appsvcs/declare/
+GET https://{{host}}/mgmt/shared/appsvcs/declare
 #  ?$select=id
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
@@ -100,7 +100,7 @@ X-F5-Auth-Token: {{authToken}}
 ###   # DELETE!!! as3 declaration
 # @name decID
 DELETE https://{{host}}/mgmt/shared/appsvcs/declare/Sample_01/
-  ?async=true
+  # ?async=true
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 

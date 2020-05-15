@@ -125,15 +125,13 @@ export class F5Api {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
-                // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
-
+                // if (hostToken === undefined) {
+                //     throw new Error('hostToken blank, auth failed');
+                // }
                 return callHTTP(
-                    'POST', 
+                    'GET', 
                     hostToken.host, 
-                    '/mgmt/tm/util/bash', 
+                    '/mgmt/shared/identified-devices/config/device-info', 
                     hostToken.token
                 );
             }
@@ -153,10 +151,10 @@ export class F5Api {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
-                // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
+                // if (hostToken === undefined) {
+                //     throw new Error('hostToken blank, auth failed');
+                // }
+                // // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
 
                 return callHTTP(
                     'POST', 
@@ -308,7 +306,6 @@ export class F5Api {
      * @param password User Password
      */
     async doTasks(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -325,19 +322,20 @@ export class F5Api {
 
 
     /**
-     * AS3 Tenants - returns configured tenants
+     * AS3 declarations
+     * no tenant, returns ALL AS3 decs
      * @param device BIG-IP/Host/Device in <user>@<host/ip> format
      * @param password User Password
+     * @param tenant tenant(optional)
      */
-    async as3Tenants(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
+    async getAS3Decs(device: string, password: string, tenant: string = '') {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
                 return callHTTP(
                     'GET', 
                     hostToken.host, 
-                    '/mgmt/shared/appsvcs/declare/', 
+                    `/mgmt/shared/appsvcs/declare/${tenant}`, 
                     hostToken.token,
                 );
             }
@@ -351,8 +349,7 @@ export class F5Api {
      * @param device BIG-IP/Host/Device in <user>@<host/ip> format
      * @param password User Password
      */
-    async as3Tasks(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
+    async getAS3Tasks(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -373,7 +370,6 @@ export class F5Api {
      * @param password User Password
      */
     async getAS3Task(device: string, password: string, id: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -383,110 +379,117 @@ export class F5Api {
                     `/mgmt/shared/appsvcs/task/${id}`, 
                     hostToken.token,
                 );
-            });
+            }
+        );
     }
 
 
-    async getF5FastInfo() {
-        
-        var host: string = ext.hostStatusBar.text;
-        // const password: string = ext.hostStatusBar.password;
-        const password: string = await getPassword(host);
 
-        if (host || password) {
-            var [username, host] = host.split('@');
-            getAuthToken(host, username, password)
+    /**
+     * Get Fast Info - fast service version/details
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     */
+    async getF5FastInfo(device: string, password: string) {
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
             .then( hostToken => {
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
-
-                callHTTP('GET', hostToken.host, '/mgmt/shared/fast/info', hostToken.token)
-                .then( f5Info => {
-
-                    vscode.workspace.openTextDocument({ 
-                        language: 'json', 
-                        content: JSON.stringify(f5Info, undefined, 4) 
-                    })
-                    .then( doc => 
-                        vscode.window.showTextDocument(
-                            doc, 
-                            { 
-                                preview: false 
-                            }
-                        )
-                    );
-                });
-            });
-        } else {
-            console.error(`getF5FastInfo - NO host or password details: ${host} - ${password}`);
-            vscode.window.showInformationMessage(`Connect to device first!!!`);
-            //instead of errors, just call the connect command
-        }
+                return callHTTP(
+                    'GET', 
+                    hostToken.host, 
+                    `/mgmt/shared/fast/info`, 
+                    hostToken.token,
+                );
+            }
+        );
     }
 
-    async postAS3(dec: object) {
-        var host: string = ext.hostStatusBar.text;
-        // const password: string = ext.hostStatusBar.password;
-        const password: string = await getPassword(host);
 
-        console.log(`declartion to postAS3: ${JSON.stringify(dec)}`);
-        
-        if (host || password) {
-            var [username, host] = host.split('@');
-            getAuthToken(host, username, password)
+
+    /**
+     * Post AS3 Dec
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     * @param dec Delcaration
+     */
+    async postAS3Dec(device: string, password: string, dec: object) {
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
             .then( hostToken => {
-                if (hostToken === undefined) {
-                    throw new Error('hostToken blank, auth failed');
-                }
+                return callHTTP(
+                    'POST', 
+                    hostToken.host, 
+                    `/mgmt/shared/appsvcs/declare/`, 
+                    hostToken.token,
+                    dec
+                );
+            }
+        );
+    }
+
+
+//     async postAS3(dec: object) {
+//         var host: string = ext.hostStatusBar.text;
+//         // const password: string = ext.hostStatusBar.password;
+//         const password: string = await getPassword(host);
+
+//         console.log(`declartion to postAS3: ${JSON.stringify(dec)}`);
+        
+//         if (host || password) {
+//             var [username, host] = host.split('@');
+//             getAuthToken(host, username, password)
+//             .then( hostToken => {
+//                 if (hostToken === undefined) {
+//                     throw new Error('hostToken blank, auth failed');
+//                 }
                 
-                callHTTP('POST', hostToken.host, '/mgmt/shared/appsvcs/declare/', hostToken.token, dec)
-                .then( postInfo => {
+//                 callHTTP('POST', hostToken.host, '/mgmt/shared/appsvcs/declare/', hostToken.token, dec)
+//                 .then( postInfo => {
                     
-                    console.log(`postAS3 response: ${JSON.stringify(postInfo)}`);
+//                     console.log(`postAS3 response: ${JSON.stringify(postInfo)}`);
                     
-                    // if postInfo resposecode == 202
-                    //      capture 'id'
-                    //      GET on id will http/200
+//                     // if postInfo resposecode == 202
+//                     //      capture 'id'
+//                     //      GET on id will http/200
 
-                    vscode.workspace.openTextDocument({ 
-                        language: 'json', 
-                        content: JSON.stringify(postInfo, undefined, 4) 
-                    })
-                    .then( doc => {
-                        vscode.window.showTextDocument( doc, { preview: false });
+//                     vscode.workspace.openTextDocument({ 
+//                         language: 'json', 
+//                         content: JSON.stringify(postInfo, undefined, 4) 
+//                     })
+//                     .then( doc => {
+//                         vscode.window.showTextDocument( doc, { preview: false });
 
-                        // if (postInfo.status == 202) {
-                        //     // postInfo.body.id
-                        //     console.log(`post STATUS: ${JSON.stringify(postInfo.body.id)}`)
+//                         // if (postInfo.status == 202) {
+//                         //     // postInfo.body.id
+//                         //     console.log(`post STATUS: ${JSON.stringify(postInfo.body.id)}`)
                         
-                        //     vscode.window.showQuickPick(['yes', 'no'], {placeHolder: 'follow post async?'})
-                        //     .then( selection => {
-                        //         if (selection == 'yes'){
-                        //             console.log(`WINDOW SELECTION:  ${selection}`)
-                        //             // callHTTP('GET', hostToken.host, `/mgmt/shared/appsvcs/tasks/${postInfo.body.id}`, hostToken.token)
-                        //             // .then( newPostInfo => {
-                        //             //     // var lastLine = vscode.TextEdit.document.lineAt(textEditor.document.lineCount - 1);
-                        //             //     vscode.TextEdit.insert(-1, newPostInfo)
-                        //             // });
-                        //         } 
-                        //         // else {
-                        //         //     throw new Error('User Cancelled AS3 post follow-up')
-                        //         // }
-                        //     });
-                        // }
+//                         //     vscode.window.showQuickPick(['yes', 'no'], {placeHolder: 'follow post async?'})
+//                         //     .then( selection => {
+//                         //         if (selection == 'yes'){
+//                         //             console.log(`WINDOW SELECTION:  ${selection}`)
+//                         //             // callHTTP('GET', hostToken.host, `/mgmt/shared/appsvcs/tasks/${postInfo.body.id}`, hostToken.token)
+//                         //             // .then( newPostInfo => {
+//                         //             //     // var lastLine = vscode.TextEdit.document.lineAt(textEditor.document.lineCount - 1);
+//                         //             //     vscode.TextEdit.insert(-1, newPostInfo)
+//                         //             // });
+//                         //         } 
+//                         //         // else {
+//                         //         //     throw new Error('User Cancelled AS3 post follow-up')
+//                         //         // }
+//                         //     });
+//                         // }
                         
-                    });
+//                     });
 
 
-                });
-            });
-        } else {
-            console.error(`postInfo - NO host or password details: ${host} - ${password}`);
-            vscode.window.showInformationMessage(`Connect to device first!!!`);
-            //instead of errors, just call the connect command
-        }
-    }
+//                 });
+//             });
+//         } else {
+//             console.error(`postInfo - NO host or password details: ${host} - ${password}`);
+//             vscode.window.showInformationMessage(`Connect to device first!!!`);
+//             //instead of errors, just call the connect command
+//         }
+//     }
 };
 
 
@@ -573,7 +576,8 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
 
 
 
-const getAuthToken = async (host: string, username: string, password: string) => makeRequest({
+const getAuthToken = async (host: string, username: string, password: string) => makeRequest(
+{
     host,
     path: '/mgmt/shared/authn/login',
     method: 'POST',
@@ -613,20 +617,20 @@ const getAuthToken = async (host: string, username: string, password: string) =>
 
 
 
-const getF5Info = (host: string, token: string) => makeRequest({
-    host,
-    path: '/mgmt/shared/identified-devices/config/device-info',
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-F5-Auth-Token': token
-    }
-})
-.then( response => {
-    console.log('value in getF5Info: ' + JSON.stringify(response));
-    // Promise.resolve(value.body.token);
-    return response.body;
-});
+// const getF5Info = (host: string, token: string) => makeRequest({
+//     host,
+//     path: '/mgmt/shared/identified-devices/config/device-info',
+//     method: 'GET',
+//     headers: {
+//         'Content-Type': 'application/json',
+//         'X-F5-Auth-Token': token
+//     }
+// })
+// .then( response => {
+//     console.log('value in getF5Info: ' + JSON.stringify(response));
+//     // Promise.resolve(value.body.token);
+//     return response.body;
+// });
 
 
 // const getAS3Tasks = (host: string, token: string) => makeRequest({

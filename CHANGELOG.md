@@ -6,13 +6,23 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.4] - (5-15-2020)
 
+### Added
+- AS3 tenants tree
+-- two level tree hiarchy representing deployed tenant and apps for each tenant
+-- click to get 'Get-All-Tenants' to get ALL declarations
+-- click tenant to get declaration for that tenant
 
 ## [0.1.3] - (5-13-2020)
 
 ### Added
 - Tree view to display TS examples from github
+- get/post Delcaratinve Onboarding (DO) declarations
+- base example snippets for as3/do/ts
+-- in a json file, start typing (as3, do, ts, example, f5)
 - hostname/tmos version status bar
+-- click to get device info
 - Fast/version status bar
 - AS3 Tasks view
 
@@ -26,7 +36,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.1.1] - (5-8-2020)
 
 ### Added
-- password caching
+- password caching with keytar
 
 ## [0.1.0] - (5-7-2020)
 

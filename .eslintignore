@@ -1,0 +1,9 @@
+# *.http
+
+
+{
+    "ignorePatterns": ["*.http", "**/vendor/*.js"],
+    "rules": {
+        //...
+    }
+}

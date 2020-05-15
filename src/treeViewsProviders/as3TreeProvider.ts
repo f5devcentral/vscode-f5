@@ -22,14 +22,15 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3Item> {
 	async getChildren(element?: AS3Item): Promise<AS3Item[]> {
 
 		var device = ext.hostStatusBar.text;
+		var as3 = ext.as3Bar.text;
 
-		if (!device) {
-			return Promise.reject('Select device to get as3 task info');
-			// return Promise.resolve('');
+		if (!device || !as3 ) {
+			console.log('AS3TasksTree: no device or as3 detected');
+			return Promise.resolve([]);
 		}
 
 		const password = await getPassword(device);
-		const decCall = await ext.f5Api.as3Tasks(device, password);
+		const decCall = await ext.f5Api.getAS3Tasks(device, password);
 		const taskItems = decCall.body.items.map((item:any) => {
 
 			const taskId = item.id;

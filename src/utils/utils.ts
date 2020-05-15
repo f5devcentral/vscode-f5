@@ -71,7 +71,7 @@ export function setFastBar(text: string = '', tip: string = '') {
  */
 export function setAS3Bar(text: string = '', tip: string = '') {
 
-    ext.as3Bar.command = 'f5-fast.getAS3All';
+    ext.as3Bar.command = 'f5-as3.getDecs';
     ext.as3Bar.text = text ? text || '' : '';
     ext.as3Bar.tooltip = tip ? tip || '' : '';
 
