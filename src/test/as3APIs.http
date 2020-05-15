@@ -93,6 +93,7 @@ X-F5-Auth-Token: {{authToken}}
 ###   # get as3 declaration
 # @name decID
 GET https://{{host}}/mgmt/shared/appsvcs/declare/
+#  ?$select=id
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 

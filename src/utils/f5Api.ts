@@ -10,7 +10,7 @@ import {
     setDOBar, 
     setTSBar,
     getPassword
- } from './utils'
+ } from './utils';
 import { ext } from '../extensionVariables';
 // import { rejects } from 'assert';
 // import { KeyTar, tryGetKeyTar } from './utils/keytar';
@@ -18,7 +18,7 @@ import { ext } from '../extensionVariables';
 /**
  * F5 API commands
  */
-export class f5Api {
+export class F5Api {
 
 
     async connectF5(device: string, password: string) {
@@ -28,7 +28,7 @@ export class f5Api {
             .then( async hostToken => {
 
                 // cache password in keytar
-                ext.keyTar.setPassword('f5Hosts', device, password)
+                ext.keyTar.setPassword('f5Hosts', device, password);
                 
                 setHostStatusBar(device);
                 // const now = getHostStatusBar();
@@ -41,12 +41,12 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/identified-devices/config/device-info', 
                     hostToken.token
-                )
+                );
 
                 if (hostInfo.status === 200) {
                     // console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
-                    const text = `${hostInfo.body.hostname}`
-                    const tip = `TMOS: ${hostInfo.body.version}`
+                    const text = `${hostInfo.body.hostname}`;
+                    const tip = `TMOS: ${hostInfo.body.version}`;
                     setHostnameBar(text, tip);
                 }
 
@@ -55,12 +55,12 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/telemetry/info', 
                     hostToken.token
-                )
+                );
 
                 if (tsInfo.status === 200) {
                     // console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
-                    const text = `TS(${tsInfo.body.version})`
-                    const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `
+                    const text = `TS(${tsInfo.body.version})`;
+                    const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `;
                     setTSBar(text, tip);
                 }
 
@@ -70,11 +70,11 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/fast/info', 
                     hostToken.token
-                )
+                );
                     
                 if (fastInfo.status === 200) {
                     // console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
-                    const text = `FAST(${fastInfo.body.version})`
+                    const text = `FAST(${fastInfo.body.version})`;
                     // const tip = `schemaCurrent: ${fastInfo.body.schemaCurrent} `
                     setFastBar(text);
                 }
@@ -85,12 +85,12 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/appsvcs/info', 
                     hostToken.token
-                )
+                );
 
                 if (as3Info.status === 200) {
                     // console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
-                    const text = `AS3(${as3Info.body.version})`
-                    const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `
+                    const text = `AS3(${as3Info.body.version})`;
+                    const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `;
                     setAS3Bar(text, tip);
                 }
 
@@ -99,17 +99,17 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/declarative-onboarding/info', 
                     hostToken.token
-                )
+                );
 
                 if (doInfo.status === 200) {
                     // console.log(`DO INFO: ${JSON.stringify(doInfo.body)}`)
                     // for some reason DO responds with a list for version info...
-                    const text = `DO(${doInfo.body[0].version})`
-                    const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `
+                    const text = `DO(${doInfo.body[0].version})`;
+                    const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `;
                     setDOBar(text, tip);
                 }
             }
-        )
+        );
         // return auth;
     }
 
@@ -135,9 +135,9 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/tm/util/bash', 
                     hostToken.token
-                )
+                );
             }
-        )
+        );
     }
 
 
@@ -167,9 +167,9 @@ export class f5Api {
                         command: 'run',
                         utilCmdArgs: `-c '${cmd}'`
                     }
-                )
+                );
             }
-        )
+        );
     }
 
 
@@ -186,7 +186,7 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/telemetry/info', 
                     hostToken.token
-                )
+                );
             }
         );
     }
@@ -208,7 +208,7 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/telemetry/declare', 
                     hostToken.token
-                )
+                );
             }
         );
     }
@@ -230,7 +230,7 @@ export class f5Api {
                     '/mgmt/shared/telemetry/declare', 
                     hostToken.token,
                     dec
-                )
+                );
             }
         );
     }
@@ -251,9 +251,9 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/declarative-onboarding/', 
                     hostToken.token
-                )
+                );
             }
-        )
+        );
     }
 
 
@@ -273,7 +273,7 @@ export class f5Api {
                     '/mgmt/shared/declarative-onboarding/', 
                     hostToken.token,
                     dec
-                )
+                );
             }
         );
     }
@@ -295,7 +295,7 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/declarative-onboarding/inspect', 
                     hostToken.token,
-                )
+                );
             }
         );
     }
@@ -317,9 +317,9 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/declarative-onboarding/task', 
                     hostToken.token,
-                )
+                );
             }
-        )
+        );
     }
 
 
@@ -339,9 +339,9 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/appsvcs/declare/', 
                     hostToken.token,
-                )
+                );
             }
-        )
+        );
     }
 
 
@@ -361,9 +361,9 @@ export class f5Api {
                     hostToken.host, 
                     '/mgmt/shared/appsvcs/task/', 
                     hostToken.token,
-                )
+                );
             }
-        )
+        );
     }
 
 
@@ -382,7 +382,7 @@ export class f5Api {
                     hostToken.host, 
                     `/mgmt/shared/appsvcs/task/${id}`, 
                     hostToken.token,
-                )
+                );
             });
     }
 
@@ -391,7 +391,7 @@ export class f5Api {
         
         var host: string = ext.hostStatusBar.text;
         // const password: string = ext.hostStatusBar.password;
-        const password: string = await getPassword(host)
+        const password: string = await getPassword(host);
 
         if (host || password) {
             var [username, host] = host.split('@');
@@ -415,7 +415,7 @@ export class f5Api {
                                 preview: false 
                             }
                         )
-                    )
+                    );
                 });
             });
         } else {
@@ -428,9 +428,9 @@ export class f5Api {
     async postAS3(dec: object) {
         var host: string = ext.hostStatusBar.text;
         // const password: string = ext.hostStatusBar.password;
-        const password: string = await getPassword(host)
+        const password: string = await getPassword(host);
 
-        console.log(`declartion to postAS3: ${JSON.stringify(dec)}`)
+        console.log(`declartion to postAS3: ${JSON.stringify(dec)}`);
         
         if (host || password) {
             var [username, host] = host.split('@');
@@ -443,7 +443,7 @@ export class f5Api {
                 callHTTP('POST', hostToken.host, '/mgmt/shared/appsvcs/declare/', hostToken.token, dec)
                 .then( postInfo => {
                     
-                    console.log(`postAS3 response: ${JSON.stringify(postInfo)}`)
+                    console.log(`postAS3 response: ${JSON.stringify(postInfo)}`);
                     
                     // if postInfo resposecode == 202
                     //      capture 'id'
@@ -454,7 +454,7 @@ export class f5Api {
                         content: JSON.stringify(postInfo, undefined, 4) 
                     })
                     .then( doc => {
-                        vscode.window.showTextDocument( doc, { preview: false })
+                        vscode.window.showTextDocument( doc, { preview: false });
 
                         // if (postInfo.status == 202) {
                         //     // postInfo.body.id
@@ -476,7 +476,7 @@ export class f5Api {
                         //     });
                         // }
                         
-                    })
+                    });
 
 
                 });
@@ -502,7 +502,7 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
         headers: {
             'Content-Type': 'application/json'
         }
-    }
+    };
 
     console.log('makeRequest---opts: ' + JSON.stringify(opts));
     
@@ -541,7 +541,7 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                 //     console.log(`GOT 401!!!!!`)
                 // }
                 
-                const goodResp: Array<number> = [200, 201, 202]
+                const goodResp: Array<number> = [200, 201, 202];
                 // was trying to check against array above with arr.includes or arr.indexOf
                 if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404) {
                     return resolve({
@@ -564,7 +564,9 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
         });
 
         // if a payload was passed in, post it!
-        if (payload) req.write(JSON.stringify(payload));
+        if (payload) {
+            req.write(JSON.stringify(payload));
+        }
         req.end();
     });
 };
@@ -585,13 +587,13 @@ const getAuthToken = async (host: string, username: string, password: string) =>
         return { 
             host: host, 
             token: response.body.token.token 
-        }
+        };
     } else {
         // clear cached password for this device
         ext.keyTar.deletePassword(
             'f5Hosts',
             `${username}@${host}`
-            )
+            );
             throw new Error(`error from getAuthTokenNOT200: ${response}`);
     }
     

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { f5Api } from './f5Api'
+import { F5Api } from './f5Api';
 
 // const f5API = new f5Api();
 
@@ -141,7 +141,7 @@ export async function displayJsonInEditor(item: object): Promise<any> {
                 preview: false 
             }
         )
-    )
+    );
 }
 
 export function isValidJson(json: string) {
@@ -159,7 +159,7 @@ export function isValidJson(json: string) {
 export async function getDevice(): Promise<any> {
 
     // if device in statusBar, return that
-    const device: string = ext.hostStatusBar.text
+    const device: string = ext.hostStatusBar.text;
     // console.log(`getDevice from hostStatusBar: ${device}`);
     
     // if not, get device list from config and prompt to select device
@@ -169,7 +169,7 @@ export async function getDevice(): Promise<any> {
 		
         if (bigipHosts === undefined) {
             // should kick off "add device"
-            throw new Error('no hosts in configuration')
+            throw new Error('no hosts in configuration');
         }
         // console.log(`getDevice devices from config: ${JSON.stringify(bigipHosts)}`);
 
@@ -177,13 +177,13 @@ export async function getDevice(): Promise<any> {
 
         if (device === undefined) {
                 // should kick off "add device"
-                throw new Error('no hosts in configuration')
+                throw new Error('no hosts in configuration');
             }
 
         // console.log(`getDevice from quickPick: ${device}`);
 
         if (!device) {
-            throw new Error('user exited device input')
+            throw new Error('user exited device input');
         }
 
         // fire connectF5 to establish all the other details:
@@ -204,7 +204,7 @@ export async function getPassword(device: string): Promise<any> {
 
     // console.log(`getPassword Device: ${device}`);
     
-    let password = await ext.keyTar.getPassword('f5Hosts', device).then( passwd => passwd )
+    let password = await ext.keyTar.getPassword('f5Hosts', device).then( passwd => passwd );
     
     // console.log(`IS PASSWORD IN KEYTAR?: ${password}`);
     if (!password) {
@@ -212,28 +212,28 @@ export async function getPassword(device: string): Promise<any> {
         password = await vscode.window.showInputBox({ password: true})
         .then( password => {
             if (!password) {
-                throw new Error('User cancelled password input')
+                throw new Error('User cancelled password input');
             }
             // console.log(`USER INPUT PASSWORD!!! - ${password}`);
             return password;
-            })
+            });
     }
     // console.log(`PASSWORD BOUT TO BE RETURNED!!! - ${password}`);
     return password;
 }
 
 export function setMemento(key:string, value: string) {
-    ext.context.globalState.update(key, value)
+    ext.context.globalState.update(key, value);
 }
 
 export function getMemento(key:string) {
-    return ext.context.globalState.get(key)
+    return ext.context.globalState.get(key);
 }
 
 export function setMementoW(key:string, value: string) {
-    ext.context.workspaceState.update(key, value)
+    ext.context.workspaceState.update(key, value);
 }
 
 export function getMementoW(key:string) {
-    return ext.context.workspaceState.get(key)
+    return ext.context.workspaceState.get(key);
 }

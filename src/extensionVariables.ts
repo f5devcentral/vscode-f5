@@ -6,8 +6,8 @@
 import { ExtensionContext, TreeView, StatusBarItem } from "vscode";
 // import { KeyTar } from "./utils/keytar";
 import * as keyTarType from "keytar";
-import { MemFS } from './fileSystemProvider'
-import { f5Api } from './utils/f5Api'
+import { MemFS } from './fileSystemProvider';
+import { F5Api } from './utils/f5Api';
 // import * as f5Api from './f5Api'
 // import { } from './carTreeView'
 
@@ -28,22 +28,22 @@ export namespace ext {
     export let doBar: StatusBarItem;
     export let tsBar: StatusBarItem;
     // export class f5Api { };
-    export let f5Api: f5Api;
+    export let f5Api: F5Api;
     export let carTreeData: object | undefined;
     export let tsExampleView: object | undefined;
 }
 
 
 export namespace git {
-    export let latestAS3schema: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json'
-    export let examplesAS3: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json'
+    export let latestAS3schema: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';
+    export let examplesAS3: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';
 
-    export let latestDOschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json'
-    export let examplesDO: string = 'https://github.com/F5Networks/f5-declarative-onboarding/tree/master/examples'
+    export let latestDOschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json';
+    export let examplesDO: string = 'https://github.com/F5Networks/f5-declarative-onboarding/tree/master/examples';
     
     
-    export let latestTSschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json'
-    export let examplesTS: string = 'https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples/declarations'
+    export let latestTSschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json';
+    export let examplesTS: string = 'https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples/declarations';
 }
 
 
