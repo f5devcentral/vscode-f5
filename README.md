@@ -6,6 +6,8 @@ This extension is intented to help interface with the FAST service to manage tem
 
 In it's current state it can help create/get/post declarations for F5 ILX extensions, including AS3/DO/TS.
 
+*** please see release tab to download the latest release ***
+
 ---
 
 ## Index
