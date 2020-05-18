@@ -29,6 +29,7 @@ import {
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
 import * as keyTarType from 'keytar';
+import { MemFS } from './treeViewsProviders/fileSystemProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -50,6 +51,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(ext.doBar);
 	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 16);
 	context.subscriptions.push(ext.tsBar);
+
+	// create virtual file store
+	ext.memFs = new MemFS();
+    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', ext.memFs, { isCaseSensitive: true }));
+    let initialized = false;
 
 
 	// exploring classes to group all f5 api calls
@@ -390,6 +396,17 @@ export function activate(context: vscode.ExtensionContext) {
 		const password = await getPassword(device);
 		const response = await ext.f5Api.getAS3Decs(device, password, tenant);
 		displayJsonInEditor(response.body);
+	}));
+	
+	
+	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
+		
+		var device: string | undefined = ext.hostStatusBar.text;
+		const password = await getPassword(device);
+		const response = await ext.f5Api.delAS3Tenant(device, password, tenant.label);
+		displayJsonInEditor(response.body);
+		as3Tree.refresh();
+
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {

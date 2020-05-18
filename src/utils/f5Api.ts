@@ -345,6 +345,28 @@ export class F5Api {
 
 
     /**
+     * Delete AS3 Tenant
+     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param password User Password
+     * @param tenant tenant
+     */
+    async delAS3Tenant(device: string, password: string, tenant: string) {
+        var [username, host] = device.split('@');
+        return getAuthToken(host, username, password)
+            .then( hostToken => {
+                return callHTTP(
+                    'DELETE', 
+                    hostToken.host, 
+                    `/mgmt/shared/appsvcs/declare/${tenant}`, 
+                    hostToken.token,
+                );
+            }
+        );
+    }
+
+
+
+    /**
      * AS3 tasks - returns executed tasks
      * @param device BIG-IP/Host/Device in <user>@<host/ip> format
      * @param password User Password

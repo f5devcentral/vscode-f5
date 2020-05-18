@@ -12,6 +12,70 @@ Good guide about Typscript, making/recieving api calls, and developing Typscript
 
 Node.JS native https.get module [https://nodejs.org/api/https.html#https_https_get_options_callback]
 
+
+## Features and workflows (revise)
+
+* Connect to FAST service/engine (via API)
+  * Manage multiple FAST services
+    * select which one to work with
+  * Authenticate
+    * Basic Auth
+    * Token Auth
+  * List templates
+  * Modify template
+  * Upload template
+  * Clone template?
+  * Create template
+  * Deploy template
+* Highlight suggested variable placement
+  * take a raw as3 declaration with no variables, just unique names like posting directly to as3, with a hot-key-combo, highlight all the typical areas that would need to be replaced with variables to make the declaration a template
+* Intelligent posting:
+  * utilize async functions
+  * key off 202 of original post till job completes
+  * Settings like job check delay 3 or 5 seconds
+* Autocomplete
+  * Provide suggestions for autocomplete of words
+* CodeSnippets
+  * Provide code snippets to complete parts of the declaration
+  * start typing a class object name, it can provide the remaining brackets/commas to comlete the object, including required class definition
+  * Once class definition is complete provide options for snippits/autocomplete of options only available to that class
+* Provide easy links to public github repos, schemas, and documentation
+
+
+## Markdown information
+
+* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
+* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+
+---
+
+## Visual Studio Code History
+
+Details about VS Code, what it is, how it compares to other tools and popularity:
+
+* [WikiPedia: Visual Studio Code](https://en.wikipedia.org/wiki/Visual_Studio_Code)
+* [What is the difference between an IDE and an editor?](https://discuss.atom.io/t/what-is-the-difference-between-an-ide-and-an-editor/32629)
+* [StackOverFlow: Developer Survey Results](https://insights.stackoverflow.com/survey/2019#development-environments-and-tools)
+
+---
+
+## Requirements
+
+Currently utilizing built in node modules, no external dependencies yet...
+
+### Imports:
+
+* http/https
+
+### Future dependency predictions:
+* some sort of json/yaml linter(intellisense) (what is the difference?)
+* json parser?
+* authentication
+  * basic
+  * auth token
+* timestamp/uuid generator
+* CodeLens to provide inline links to do things like post highlighted json...[https://github.com/microsoft/vscode-extension-samples/tree/master/codelens-sample]
+
 ---
 
 ## Ideas!!!

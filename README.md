@@ -2,20 +2,9 @@
 
 This is the README for the F5 Automation Services Templates(FAST), "vscode-f5-fast". 
 
-This extension is intented to help interface with the FAST servoce to manage templates and deploy applications.
+This extension is intented to help interface with the FAST service to manage templates and deploy applications.
 
-## Demo of early stages..
-
-### Demo showing device mgmt (add, modify, delete, connect, show F5 host info)
-![demo1](./README_docs/f5-demo-hostMgmt_5.7.2020.gif)
-
-### Demo showing connect to device, load sample AS3 from local, post AS3 to connected F5, see response
-![demo1](./README_docs/f5-demo-postAS3_5.7.2020.gif)
-
-
-![demo1](./README_docs/f5-demo-1_4.27.2020.gif)
-
-![demo2](./README_docs/vscode-fast_demo_01.png)
+In it's current state it can help create/get/post declarations for F5 ILX extensions, including AS3/DO/TS.
 
 ---
 
@@ -30,106 +19,179 @@ This extension is intented to help interface with the FAST servoce to manage tem
 
 ---
 
-## Features and workflows
+## Extension Commands
 
-* Connect to FAST service/engine (via API)
-  * Manage multiple FAST services
-    * select which one to work with
-  * Authenticate
-    * Basic Auth
-    * Token Auth
-  * List templates
-  * Modify template
-  * Upload template
-  * Clone template?
-  * Create template
-  * Deploy template
-* Highlight suggested variable placement
-  * take a raw as3 declaration with no variables, just unique names like posting directly to as3, with a hot-key-combo, highlight all the typical areas that would need to be replaced with variables to make the declaration a template
-* Intelligent posting:
-  * utilize async functions
-  * key off 202 of original post till job completes
-  * Settings like job check delay 3 or 5 seconds
-* Autocomplete
-  * Provide suggestions for autocomplete of words
-* CodeSnippets
-  * Provide code snippets to complete parts of the declaration
-  * start typing a class object name, it can provide the remaining brackets/commas to comlete the object, including required class definition
-  * Once class definition is complete provide options for snippits/autocomplete of options only available to that class
-* Provide easy links to public github repos, schemas, and documentation
+Extension commands are access through the command palette by pressing `F1` or `cntrl+shift+p`
 
----
+This extension provides the following commands and are active on workspace load (if extension is installed and enabled).
 
-## History
+* `F5: Connect to Device`: Used to select a device from list to connect to
+* `F5: Disconnect`: Disconnect from current device
+* `F5: Disconnect and Clear All Passwords`: Disconnect from current device and clear ALL cached passwords
+* `F5: Show Device Info`: Displays json output of F5 Host information, including platform/licensing/software/macAddresses/vlans
+* `F5: Add Host`: Prompts to add a new host to the configured list
+* `F5: Remote Command Execute`: Prompts for command to execute on device via BASH API (account must have advanced shell enabled)
+* `F5: Settings`: Opens VS Code settings window focused on F5-Fast settings (currently only device list)
 
-Details about VS Code, what it is, how it compares to other tools and popularity:
+* `F5-Fast: Show Info`: Displays json output of F5-Fast service info
 
-* [WikiPedia: Visual Studio Code](https://en.wikipedia.org/wiki/Visual_Studio_Code)
-* [What is the difference between an IDE and an editor?](https://discuss.atom.io/t/what-is-the-difference-between-an-ide-and-an-editor/32629)
-* [StackOverFlow: Developer Survey Results](https://insights.stackoverflow.com/survey/2019#development-environments-and-tools)
+* `F5-AS3: Post Declaration`: Post entire active editor contents as AS3 declaration to selected device (can also select/highlight text)
+
+* `F5-DO: Inspect`: Displays json output of the DO 'inspect' endpoint
+* `F5-DO: Get Current Declaration`: Displays json output of the current declaration, if there is one
+* `F5-DO: Get Tasks`: Displays json output of the task history
+* `F5-DO: Post Declaration`: Post entire active editor contents as DO declaration to selected device (can also select/highlight text to be sent)
+
+* `F5-TS: Show Info`: Displays json output of TS service info
+* `F5-TS: Get Current Declaration`: Displays json output of the current declaration, if there is one
+* `F5-TS: Post Declaration`: Post entire active editor contents as TS declaration to selected device (can also select/highlight text to be send)
+
+
+* `ChuckJoke`: When you need some inspiration...
 
 ---
 
-## Requirements
+# How To's
 
-Currently utilizing built in node modules, no external dependencies yet...
+## Basic device management (add/edit/delete, connect/disconnect)
 
-### Imports:
+- To add a device
+  - Add under the vscode extension settings
+    - Press `F1`, type `f5`, select "F5: Settings", click add item button
+        -- or --
+  - Add device from the F5 HOSTS view
+    - Click `F5: Add HOST` button in top right of the extension view for "F5 HOSTS"
 
-* http/https
+- To Modify a device:
+  - Modify under the vscode extension settings
+    - Press `F1`, type `f5`, select "F5: Settings", click pencil icon next to item to modify
+        -- or --
+  - Modify device from the F5 HOSTS view
+    - Click the pencil icon on the right of the host entry in the "F5 HOSTS" view
 
-### Future dependency predictions:
-* some sort of json/yaml linter(intellisense) (what is the difference?)
-* json parser?
-* authentication
-  * basic
-  * auth token
-* timestamp/uuid generator
-* CodeLens to provide inline links to do things like post highlighted json...[https://github.com/microsoft/vscode-extension-samples/tree/master/codelens-sample]
+- To Delete a device:
+  - Delete under the vscode extension settings
+    - Press `F1`, type `f5`, select "F5: Settings", click "X" icon next to item to delete
+        -- or --
+  - Delete device from the F5 HOSTS view
+    - 'Right-Click`, select "DELETE" from the menu that appears next to the host entry in the "F5 HOSTS" view
+
+## Device Mgmt (add, modify, delete devices)
+![Device Management](./README_docs/images/deviceMgmt_5.18.2020.gif)
+
+---
+
+## Connecting/Disconnecting and password caching
+
+Connect means to select a device to work with.  When connected, commands/api calls will be executed on that device.
+
+Passwords are cached automatically.  They can be cleared with the "F5: Disconnect and Clear ALL Passwords"
+
+No need to disconnect when switching devices
+
+If authentication to a device ever failes (401 response), password cache for that device will be cleared and prompt for a new one
+
+*** passwords are cached using system encryption with KeyTar ***
+
+- To connect to a device
+  - Select the device in the 'F5 Hosts' view on the left
+      -- or --
+  - Press `F1`, type `f5`, select "F5: Connect to Device", select device from prompt
+
+- To Disconnect from a device
+  - Click on the <user>@<device> object in the status bar at the bottom
+      -- or --
+  - Press `F1`, type `f5`, select "F5: Disconnect from Device"
+
+![Device Connecting](./README_docs/images/connectDisPassCache_5.18.2020.gif)
+
+--- 
+
+## AS3 Management (get/post/delete/tenants/tasks)
+
+Once a device is connected, and the extension detects that AS3 is installed, a status bar will show up on the bottom indicating the running AS3 service verson.  
+
+The AS3 Tenant TreeView on the left shows AS3 tenants and apps for each tenant.  Select a tenant to see all the app configuration details for that tenant.  You cannot select individual apps from the tree, they are just there for visibility
+
+The AS3 Tasks TreeVew on the left is just to provide some visibility into the tasks/jobs that the AS3 service has run. 
+
+To post an AS3 declaration, select the command from the palette by pressing `F1`.  You may need to search for 'as3' or 'f5'.
+
+Select the declaration text to send or it will capture the entire editor window
+
+To delete a tenant, right click the tenant in the AS3 Tenant TreeView on the left and select "Delete"
+
+![AS3 Management](./README_docs/images/as3GetPostDeleteTask_5.18.2020.gif)
+
+---
+
+## DO Management (get/post)
+
+If the extension detects the DO is running, a status bar will show up on the bottom showing the running service software version
+
+Select the status bar item to see the current DO declaration 
+
+Select the command from the palette drop down to post a declaration
+
+![DO Mgmt](./README_docs/images/getModifyDO_5.18.2020.gif)
+
+---
+
+## TS Management (get/post/clear)
+
+If the extension detects the TS is running, a status bar will show up on the bottom showing the running service software version
+
+Select the status bar item to see the current TS declaration 
+
+Select the command from the palette drop down to post a declaration
+
+![DO Mgmt](./README_docs/images/getModifyTS_5.18.2020.gif)
+
+---
+
+## Remote Command Execute
+
+Command to issue on the remote device.  Good for quickly getting information while building declarations!
+
+![DO Mgmt](./README_docs/images/remoteCMD_5.18.2020.gif)
+
+
+
+---
+
+
+
 
 ---
 
 ## Extension Settings
 
-******** **NONE at this time** *********
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `f5.hosts`: a list of f5 devices to connect to
+
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+HTTP/422 responses - Can happen for a handful of reasons:
+- Getting DO declaration when device has settings DO can configure but device was not deployed with DO (it can't manage the settings that are already there)
+- Improperly formatted/wrong declaration
+  - Sometimes this is from the '$schema' reference in the declaration
+- Sometimes you can fix a DO HTTP/400 response by overwriting with a clean/updated declaration
 
-## Release Notes
+You cannot select a tenant application in the tree view.  It is only for visibility.  Select the tenant for configuration
 
-Users appreciate release notes as you update your extension.
 
-### 1.0.0
-
-Initial release of this amazing extension!!!
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
 
 ---
 
-### For more information
+## installing vsix 
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+The plan is to publish this to the Microsoft Marketplace so it can be installed like every other extension, but for these early stages manual installation is necessary
 
-**Enjoy!**
+Different ways to install vsix:
+- https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix
+- https://github.com/eamodio/vscode-gitlens/wiki/Installing-Prereleases-(vsix)
 
 
 ## Running the extension for dev

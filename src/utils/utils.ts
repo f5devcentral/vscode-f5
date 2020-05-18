@@ -4,6 +4,12 @@ import { F5Api } from './f5Api';
 
 // const f5API = new f5Api();
 
+/**
+ * Host Connectivity Status Bar
+ * Feed it text, it will show up
+ * Feed it nothing, it will disappear!
+ * @param host selected host/device from config
+ */
 export function setHostStatusBar(host: string = '') {
 
     ext.hostStatusBar.command = 'f5.disconnect';
@@ -48,7 +54,7 @@ export function setHostnameBar(text: string = '', tip: string = '') {
  */
 export function setFastBar(text: string = '', tip: string = '') {
 
-    // ext.fastBar.command = 'f5-fast.something';
+    ext.fastBar.command = 'f5-fast.getFastInfo';
     ext.fastBar.text = text ? text || '' : '';
     ext.fastBar.tooltip = tip ? tip || '' : '';
 
@@ -77,9 +83,14 @@ export function setAS3Bar(text: string = '', tip: string = '') {
 
     if (text) {
         ext.as3Bar.show();
+        // refresh trees
+        vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
+        vscode.commands.executeCommand('f5-as3.refreshTasksTree');
     } else {
         ext.as3Bar.hide();
     }
+
+
 
 };
 

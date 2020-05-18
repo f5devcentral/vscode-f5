@@ -5,6 +5,7 @@
 
 import { ExtensionContext, TreeView, StatusBarItem } from "vscode";
 import * as keyTarType from "keytar";
+import { MemFS } from './treeViewsProviders/fileSystemProvider'
 import { F5Api } from './utils/f5Api';
 
 type KeyTar = typeof keyTarType;
@@ -17,6 +18,7 @@ type KeyTar = typeof keyTarType;
 export namespace ext {
     export let context: ExtensionContext;
     export let keyTar: KeyTar;
+    export let memFs: MemFS;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;
     export let as3Bar: StatusBarItem;

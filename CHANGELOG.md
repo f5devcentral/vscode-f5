@@ -6,6 +6,13 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.5] - (5-18-2020)
+
+### Added
+- AS3 Delete Tenant command - Right click tenant item in tree
+- auto refresh AS3 trees when AS3 service detected
+- Documentation in README, including demo gifs of workflows
+
 ## [0.1.4] - (5-15-2020)
 
 ### Added

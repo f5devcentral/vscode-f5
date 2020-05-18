@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)utomation (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -108,43 +108,53 @@
 		"commands": [
 			{
 				"command": "f5.connectDevice",
-				"title": "f5: Connect to Device"
+				"title": "Connect to Device",
+				"category": "F5"
 			},
 			{
 				"command": "f5.disconnect",
-				"title": "f5: Disconnect from Device"
+				"title": "Disconnect from Device",
+				"category": "F5"
 			},
 			{
 				"command": "f5.clearPasswords",
-				"title": "f5: Disconnect and Clear all Passwords"
+				"title": "Disconnect and Clear all Passwords",
+				"category": "F5"
 			},
 			{
 				"command": "f5.getF5HostInfo",
-				"title": "f5: Show F5 Device Info"
+				"title": "Show Device Info",
+				"category": "F5"
 			},
 			{
 				"command": "f5.addHost",
-				"title": "f5: Add Host"
+				"title": "Add Host",
+				"category": "F5"
 			},
 			{
 				"command": "f5.editHost",
-				"title": "f5: Edit Host"
+				"title": "Edit Host",
+				"category": "F5"
 			},
 			{
 				"command": "f5.removeHost",
-				"title": "f5: Remove Host"
+				"title": "Remove Host",
+				"category": "F5"
 			},
 			{
 				"command": "f5.remoteCommand",
-				"title": "f5: Remote Command Execute"
+				"title": "Remote Command Execute",
+				"category": "F5"
 			},
 			{
 				"command": "f5.openSettings",
-				"title": "f5: settings"
+				"title": "Settings",
+				"category": "F5"
 			},
 			{
 				"command": "f5.refreshHostsTree",
-				"title": "Refresh",
+				"title": "Refresh Devices",
+				"category": "F5",
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
@@ -152,7 +162,8 @@
 			},
 			{
 				"command": "f5-fast.getFastInfo",
-				"title": "f5-fast: Show F5 Fast Info"
+				"title": "Show Info",
+				"category": "F5-Fast"
 			},
 			{
 				"command": "f5-fast.refreshTemplates",
@@ -163,16 +174,19 @@
 				}
 			},
 			{
-				"command": "f5-as3.listTasks",
-				"title": "f5-fast: List AS3 Tasks"
+				"command": "f5-as3.postDec",
+				"title": "Post Declaration",
+				"category": "F5-AS3"
 			},
 			{
-				"command": "f5-as3.postDec",
-				"title": "f5-fast: post AS3 declaration"
+				"command": "f5-as3.deleteTenant",
+				"title": "Delete Tenant",
+				"category": "F5-AS3"
 			},
 			{
 				"command": "f5-as3.refreshTenantsTree",
-				"title": "Refresh",
+				"title": "Refresh Tenants Tree",
+				"category": "F5-AS3",
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
@@ -180,7 +194,8 @@
 			},
 			{
 				"command": "f5-as3.refreshTasksTree",
-				"title": "Refresh",
+				"title": "Refresh Tasks Tree",
+				"category": "F5-AS3",
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
@@ -188,43 +203,51 @@
 			},
 			{
 				"command": "f5-do.inspect",
-				"title": "f5-do: DO Inspect"
+				"title": "Inspect",
+				"category": "F5-DO"
 			},
 			{
 				"command": "f5-do.getDec",
-				"title": "f5-do: Get DO Dec"
+				"title": "Get Current Declaration",
+				"category": "F5-DO"
 			},
 			{
 				"command": "f5-do.getTasks",
-				"title": "f5-do: Get DO tasks"
+				"title": "Get Tasks",
+				"category": "F5-DO"
 			},
 			{
 				"command": "f5-do.postDec",
-				"title": "f5-do: Post DO Dec"
+				"title": "Post Declaration",
+				"category": "F5-DO"
 			},
 			{
 				"command": "f5-ts.info",
-				"title": "f5-ts: Show F5 TS Info"
+				"title": "Show Info",
+				"category": "F5-TS"
 			},
 			{
 				"command": "f5-ts.getDec",
-				"title": "f5-ts: Get Current TS Declaration"
+				"title": "Get Current Declaration",
+				"category": "F5-TS"
 			},
 			{
 				"command": "f5-ts.postDec",
-				"title": "f5-ts: Post TS Declaration"
+				"title": "Post Declaration",
+				"category": "F5-TS"
 			},
 			{
 				"command": "f5-ts.enableTsExamples",
-				"title": "f5-ts: Enable TS examples Tree"
+				"title": "Populate Examples Tree",
+				"category": "F5-TS"
 			},
 			{
 				"command": "writeMemento",
-				"title": "f5: writeMemento"
+				"title": "writeMemento"
 			},
 			{
 				"command": "readMemento",
-				"title": "f5: readMemento"
+				"title": "readMemento"
 			},
 			{
 				"command": "f5-ts.enableTsExamples",
@@ -244,11 +267,12 @@
 			},
 			{
 				"command": "f5.removeHost",
-				"title": "Delete"
+				"title": "Delete",
+				"category": "F5"
 			},
 			{
 				"command": "chuckJoke",
-				"title": "f5: Chuck Joke"
+				"title": "Chuck Joke"
 			}
 		],
 		"menus": {
@@ -303,6 +327,10 @@
 				{
 					"command": "f5.getF5HostInfo",
 					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5-as3.deleteTenant",
+					"when": "view == as3Tenants"
 				}
 			]
 		}
