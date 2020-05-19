@@ -1,10 +1,10 @@
 
 
-@host = 192.168.200.131
+@host = 10.200.244.15
 #@host = 10.200.244.5
 
 @user = admin
-@upass = benrocks
+@upass = ben4Rocks!
 @authToken = {{loginA.response.body.token.token}}
 
 ###   # get bigip auth token
@@ -18,7 +18,23 @@ Content-Type: application/json
     "logonProviderName": "provider"
 }
 
-###   # get as3 service info
+###   # get as3 service info - WORKS
+GET https://{{host}}/mgmt/shared/identified-devices/config/device-info
+    # ?$select=groupName
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+###   # get f5 host info
+GET https://{{host}}/mgmt/shared/identified-devices/config/device-info
+  #?$select=hostname,managementAddress,version,product,platformMarketingName
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+
+
+
+###   # get as3 service info - WORKS
 GET https://{{host}}/mgmt/shared/appsvcs/info
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}

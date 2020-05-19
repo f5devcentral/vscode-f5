@@ -8,12 +8,10 @@ import {
     setAS3Bar, 
     setFastBar,
     setDOBar, 
-    setTSBar,
-    getPassword
+    setTSBar
  } from './utils';
 import { ext } from '../extensionVariables';
-// import { rejects } from 'assert';
-// import { KeyTar, tryGetKeyTar } from './utils/keytar';
+
 
 /**
  * F5 API commands
@@ -22,7 +20,6 @@ export class F5Api {
 
 
     async connectF5(device: string, password: string) {
-        // console.log(`connectF5: ${device} - ${password}`);
         var [username, host] = device.split('@');
         getAuthToken(host, username, password)
             .then( async hostToken => {
@@ -31,11 +28,9 @@ export class F5Api {
                 ext.keyTar.setPassword('f5Hosts', device, password);
                 
                 setHostStatusBar(device);
-                // const now = getHostStatusBar();
-                // console.log(`getHostStatusBar from connectF5: ${JSON.stringify(now)}`)
                 vscode.window.showInformationMessage(`Successfully connected to ${host}`);
-                // return hostToken;
 
+                //********** Host info **********/
                 const hostInfo = await callHTTP(
                     'GET', 
                     hostToken.host, 
@@ -44,12 +39,12 @@ export class F5Api {
                 );
 
                 if (hostInfo.status === 200) {
-                    // console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
                     const text = `${hostInfo.body.hostname}`;
                     const tip = `TMOS: ${hostInfo.body.version}`;
                     setHostnameBar(text, tip);
                 }
 
+                //********** TS info **********/
                 const tsInfo = await callHTTP(
                     'GET', 
                     hostToken.host, 
@@ -58,7 +53,6 @@ export class F5Api {
                 );
 
                 if (tsInfo.status === 200) {
-                    // console.log(`TS INFO: ${JSON.stringify(tsInfo.body)}`)
                     const text = `TS(${tsInfo.body.version})`;
                     const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `;
                     setTSBar(text, tip);
@@ -73,9 +67,7 @@ export class F5Api {
                 );
                     
                 if (fastInfo.status === 200) {
-                    // console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
                     const text = `FAST(${fastInfo.body.version})`;
-                    // const tip = `schemaCurrent: ${fastInfo.body.schemaCurrent} `
                     setFastBar(text);
                 }
                     
@@ -88,7 +80,6 @@ export class F5Api {
                 );
 
                 if (as3Info.status === 200) {
-                    // console.log(`AS3 INFO: ${JSON.stringify(as3Info.body)}`)
                     const text = `AS3(${as3Info.body.version})`;
                     const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `;
                     setAS3Bar(text, tip);
@@ -102,7 +93,6 @@ export class F5Api {
                 );
 
                 if (doInfo.status === 200) {
-                    // console.log(`DO INFO: ${JSON.stringify(doInfo.body)}`)
                     // for some reason DO responds with a list for version info...
                     const text = `DO(${doInfo.body[0].version})`;
                     const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `;
@@ -110,7 +100,6 @@ export class F5Api {
                 }
             }
         );
-        // return auth;
     }
 
 
@@ -121,13 +110,9 @@ export class F5Api {
      * @param password User Password
      */
     async getF5HostInfo(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
-                // if (hostToken === undefined) {
-                //     throw new Error('hostToken blank, auth failed');
-                // }
                 return callHTTP(
                     'GET', 
                     hostToken.host, 
@@ -147,15 +132,9 @@ export class F5Api {
      * @param cmd Bash command to execute, or tmsh + <tmsh command>
      */
     async issueBash(device: string, password: string, cmd: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
-                // if (hostToken === undefined) {
-                //     throw new Error('hostToken blank, auth failed');
-                // }
-                // // console.log(`inside-connectF5-hostToken: ${JSON.stringify(hostToken)}`);
-
                 return callHTTP(
                     'POST', 
                     hostToken.host, 
@@ -175,7 +154,6 @@ export class F5Api {
     * Used to issue bash commands to device over API
     */
     async getTsInfo(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -197,7 +175,6 @@ export class F5Api {
      * @param password User Password
      */
     async getTSDec(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -218,7 +195,6 @@ export class F5Api {
      * @param password User Password
      */
     async postTSDec(device: string, password: string, dec: object) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -240,7 +216,6 @@ export class F5Api {
      * @param password User Password
      */
     async getDoDec(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -261,7 +236,6 @@ export class F5Api {
      * @param password User Password
      */
     async postDoDec(device: string, password: string, dec: object) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -284,7 +258,6 @@ export class F5Api {
      * @param password User Password
      */
     async doInspect(device: string, password: string) {
-        // console.log(`issueBash: ${device} - ${password}`);
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
             .then( hostToken => {
@@ -448,70 +421,6 @@ export class F5Api {
             }
         );
     }
-
-
-//     async postAS3(dec: object) {
-//         var host: string = ext.hostStatusBar.text;
-//         // const password: string = ext.hostStatusBar.password;
-//         const password: string = await getPassword(host);
-
-//         console.log(`declartion to postAS3: ${JSON.stringify(dec)}`);
-        
-//         if (host || password) {
-//             var [username, host] = host.split('@');
-//             getAuthToken(host, username, password)
-//             .then( hostToken => {
-//                 if (hostToken === undefined) {
-//                     throw new Error('hostToken blank, auth failed');
-//                 }
-                
-//                 callHTTP('POST', hostToken.host, '/mgmt/shared/appsvcs/declare/', hostToken.token, dec)
-//                 .then( postInfo => {
-                    
-//                     console.log(`postAS3 response: ${JSON.stringify(postInfo)}`);
-                    
-//                     // if postInfo resposecode == 202
-//                     //      capture 'id'
-//                     //      GET on id will http/200
-
-//                     vscode.workspace.openTextDocument({ 
-//                         language: 'json', 
-//                         content: JSON.stringify(postInfo, undefined, 4) 
-//                     })
-//                     .then( doc => {
-//                         vscode.window.showTextDocument( doc, { preview: false });
-
-//                         // if (postInfo.status == 202) {
-//                         //     // postInfo.body.id
-//                         //     console.log(`post STATUS: ${JSON.stringify(postInfo.body.id)}`)
-                        
-//                         //     vscode.window.showQuickPick(['yes', 'no'], {placeHolder: 'follow post async?'})
-//                         //     .then( selection => {
-//                         //         if (selection == 'yes'){
-//                         //             console.log(`WINDOW SELECTION:  ${selection}`)
-//                         //             // callHTTP('GET', hostToken.host, `/mgmt/shared/appsvcs/tasks/${postInfo.body.id}`, hostToken.token)
-//                         //             // .then( newPostInfo => {
-//                         //             //     // var lastLine = vscode.TextEdit.document.lineAt(textEditor.document.lineCount - 1);
-//                         //             //     vscode.TextEdit.insert(-1, newPostInfo)
-//                         //             // });
-//                         //         } 
-//                         //         // else {
-//                         //         //     throw new Error('User Cancelled AS3 post follow-up')
-//                         //         // }
-//                         //     });
-//                         // }
-                        
-//                     });
-
-
-//                 });
-//             });
-//         } else {
-//             console.error(`postInfo - NO host or password details: ${host} - ${password}`);
-//             vscode.window.showInformationMessage(`Connect to device first!!!`);
-//             //instead of errors, just call the connect command
-//         }
-//     }
 };
 
 
@@ -520,30 +429,25 @@ export class F5Api {
 function makeRequest(opts: object, payload: object = {}): Promise<any> {
 
     const defaultOpts = {
-        // host: '',
-        // path: '',
-        // method: 'GET',
+        host: <string> '',
+        path: <string> '',
+        method: <string> 'GET',
         rejectUnauthorized: false,
         headers: {
             'Content-Type': 'application/json'
         }
     };
 
-    console.log('makeRequest---opts: ' + JSON.stringify(opts));
-    
     // combine defaults with passed in options
     const combOpts = Object.assign({}, defaultOpts, opts);
 
-    // console.log('makeRequest---combOpts: ' + JSON.stringify(combOpts));
-    // console.log('makeRequest---defaultOpts: ' + JSON.stringify(defaultOpts));
-    // console.log('makeRequest---payload: ' + JSON.stringify(payload));
-    
-    // console.log('Bout to call API token request')
+    console.log(`HTTP-REQUEST: ${combOpts.host} - ${combOpts.method} - ${combOpts.path}`);
+    console.log(combOpts);
+
     return new Promise((resolve, reject) => {
         const req = request(combOpts, (res) => {
             const buffer: any = [];
             res.setEncoding('utf8');
-            // console.log('Sending::: ' )
             res.on('data', (data) => {
                 buffer.push(data);
             });
@@ -557,14 +461,18 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                     return reject(new Error(`Invalid response object ${combOpts}`));
                 };
                 
-                 // configure global logging parameters
+                // // TODO: configure global logging system
                 // console.log('makeRequest***STATUS: ' + res.statusCode);
                 // console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
                 // console.log('makeRequest***BODY: ' + JSON.stringify(body));
 
-                // if (res.statusCode == 401) {
-                //     console.log(`GOT 401!!!!!`)
-                // }
+                console.log(`HTTP-RESPONSE: ${res.statusCode}`);
+                console.log({
+                    status: res.statusCode,
+                    headers: res.headers,
+                    body
+                });
+
                 
                 const goodResp: Array<number> = [200, 201, 202];
                 // was trying to check against array above with arr.includes or arr.indexOf
@@ -620,57 +528,9 @@ const getAuthToken = async (host: string, username: string, password: string) =>
             'f5Hosts',
             `${username}@${host}`
             );
-            throw new Error(`error from getAuthTokenNOT200: ${response}`);
+        throw new Error(`error from getAuthTokenNOT200: ${response}`);
     }
-    
-    // if (response.status != 200) {
-    //     // clear cached password for this device
-    //     ext.keyTar.deletePassword(
-    //         'f5Hosts',
-    //         `${username}@${host}`
-    //         )
-    //     throw new Error(`error from getAuthTokenNOT200: ${response}`);
-    // }
-    // return { 
-    //     host: host, 
-    //     token: response.body.token.token 
-    // };
 });
-
-
-
-// const getF5Info = (host: string, token: string) => makeRequest({
-//     host,
-//     path: '/mgmt/shared/identified-devices/config/device-info',
-//     method: 'GET',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'X-F5-Auth-Token': token
-//     }
-// })
-// .then( response => {
-//     console.log('value in getF5Info: ' + JSON.stringify(response));
-//     // Promise.resolve(value.body.token);
-//     return response.body;
-// });
-
-
-// const getAS3Tasks = (host: string, token: string) => makeRequest({
-//     host,
-//     path: '/mgmt/shared/appsvcs/task/',
-//     method: 'GET',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'X-F5-Auth-Token': token
-//     }
-// })
-// .then( response => {
-//     console.log('value in getF5Info: ' + JSON.stringify(response));
-//     // Promise.resolve(value.body.token);
-//     return response.body;
-// });
-
-
 
 const callHTTP = (method: string, host: string, path: string, token: string, payload: object = {}) => makeRequest(
     {
@@ -685,8 +545,6 @@ const callHTTP = (method: string, host: string, path: string, token: string, pay
     payload
 )
 .then( response => {
-    console.log('response from callHTTP: ' + JSON.stringify(response));
-    // Promise.resolve(value.body.token);
     return response;
 });
 
