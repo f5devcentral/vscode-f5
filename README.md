@@ -1,6 +1,6 @@
 # vscode-f5-fast README
 
-This is the README for the F5 Automation Services Templates(FAST), "vscode-f5-fast". 
+This is the README for the F5 Application Services Templates(FAST), "vscode-f5-fast". 
 
 This extension is intented to help interface with the FAST service to manage templates and deploy applications.
 

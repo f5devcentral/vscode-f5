@@ -218,7 +218,7 @@ export function activate(context: vscode.ExtensionContext) {
 				throw new Error('Update device inputBox cancelled');
 			}
 
-			const deviceRex = /^[\w-.]+@[\w-.]+$/;
+			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
 			if (!bigipHosts.includes(input) && deviceRex.test(input)) {
 
 				const newBigipHosts = bigipHosts.map( item => {
@@ -261,7 +261,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			// const deviceRex = /^[a-zA-Z]+\d*@\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/		// matches only if host is IP
-			const deviceRex = /^[\w-.]+@[\w-.]+$/;		// matches any username combo an F5 will accept and host/ip
+			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
 			// console.log(`Match RegEx? ${deviceRex.test(newHost)}`)	// does it match regex pattern?
 			// console.log(`Existing? ${bigipHosts?.includes(newHost)}`)	// it it already in the list?
 
