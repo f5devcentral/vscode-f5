@@ -4,9 +4,17 @@ This is the README for the F5 Application Services Templates(FAST), "vscode-f5-f
 
 This extension is intented to help interface with the FAST service to manage templates and deploy applications.
 
-In it's current state it can help create/get/post declarations for F5 ILX extensions, including AS3/DO/TS.
+While the ultimate goal of this tool is integrate with FAST and assist in template authoring, deployment and testing, it also integrates with other F5 ILX extensibility like AS3/DO/TS.
 
-*** please see release tab to download the latest release ***
+This extension typically works with any F5 product running tmos and/or any of the primary ILX extensions(AS3/DO/TS), including BIG-IQ.
+
+
+### Download via the Microsoft extension marketplace or directly from within VSCode
+> https://marketplace.visualstudio.com/items?itemName=DumpySquare.vscode-f5-fast
+
+*** please see release tab to download the latest release for other install methods ***
+
+
 
 ---
 
@@ -14,10 +22,9 @@ In it's current state it can help create/get/post declarations for F5 ILX extens
 
 * [CHANGELOG](CHANGELOG.md)
 * [VS Code Exension Dev Quickstart](./README_docs/vsc-extension-quickstart.md)
-* [Project Ideas](./README_docs/project_details.md)
-* [Extension Interface](./README_docs/extensionInterface.md)
-* [Detailed work flow ideas](./README_docs/workflows.md)
 * [Research](./README_docs/research.md)
+
+Future extension features and enhancements have been moved to the repo issues(enhancements) for better tracking
 
 ---
 
@@ -95,14 +102,14 @@ If authentication to a device ever failes (401 response), password cache for tha
 
 *** passwords are cached using system encryption with KeyTar ***
 
-- To connect to a device
+- To connect to a device:
   - Select the device in the 'F5 Hosts' view on the left
-      -- or --
+    - -- or --
   - Press `F1`, type `f5`, select "F5: Connect to Device", select device from prompt
 
-- To Disconnect from a device
-  - Click on the <user>@<device> object in the status bar at the bottom
-      -- or --
+- To Disconnect from a device:
+  - Click on the user@device object in the status bar at the bottom
+    -  -- or --
   - Press `F1`, type `f5`, select "F5: Disconnect from Device"
 
 ![Device Connecting](./README_docs/images/connectDisPassCache_5.18.2020.gif)
@@ -147,7 +154,7 @@ Select the status bar item to see the current TS declaration
 
 Select the command from the palette drop down to post a declaration
 
-![DO Mgmt](./README_docs/images/getModifyTS_5.18.2020.gif)
+![TS Mgmt](./README_docs/images/getModifyTS_5.18.2020.gif)
 
 ---
 
@@ -155,11 +162,8 @@ Select the command from the palette drop down to post a declaration
 
 Command to issue on the remote device.  Good for quickly getting information while building declarations!
 
-![DO Mgmt](./README_docs/images/remoteCMD_5.18.2020.gif)
+![Remote Command Execute](./README_docs/images/remoteCMD_5.18.2020.gif)
 
-
-
----
 
 
 
@@ -183,13 +187,27 @@ HTTP/422 responses - Can happen for a handful of reasons:
 
 You cannot select a tenant application in the tree view.  It is only for visibility.  Select the tenant for configuration
 
-
-
 ---
+
+## Client side extension debugging
+
+VScode has a built in debugger very much like Chrome.  This can be used to gain insight to what is happening when things don't respond as expected.
+
+If you are having issues, it may be best to start here and capture the output as described below:
+
+- In the main VSCode window, along the top, select **Help**, then **Toggle Developer Tools**, select the **Console** tab.
+  - Then, explore the requests and responses to see if there are any areas of concern
+    - Expand some of the objects by clicking the little triangle next to the obejct under a request or response to inspect
+
+If needed, **right-click** on an entry, then select **save-as** to save the log including expanded objects to a file.  This can be used for troubleshooting
+
+![vscode debugging console](./README_docs/images/vscodeDebugConsole_5.20.2020.PNG)
 
 ## installing vsix 
 
-The plan is to publish this to the Microsoft Marketplace so it can be installed like every other extension, but for these early stages manual installation is necessary
+The recommended way to get this extension is to install from the Microsoft VScode extension marketplace or from within VSCode directly, under the extensions activity bar view on the left.
+
+If you still need to install from vsix, they can be downloaded under the 'release' tab above: https://github.com/DumpySquare/vscode-f5-fast/releases
 
 Different ways to install vsix:
 - https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix

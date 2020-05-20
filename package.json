@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"keywords": [
 		"f5",
 		"f5networks",

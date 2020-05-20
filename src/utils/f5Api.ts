@@ -424,19 +424,30 @@ export class F5Api {
 };
 
 
+interface OptsObject {
+    host: string,
+    port?: number,
+    path: string,
+    method?: string,
+    headers?: object,
+}
 
-
-function makeRequest(opts: object, payload: object = {}): Promise<any> {
+function makeRequest(opts: OptsObject, payload: object = {}): Promise<any> {
 
     const defaultOpts = {
-        host: <string> '',
-        path: <string> '',
-        method: <string> 'GET',
+        port: 443,
+        method: 'GET',
         rejectUnauthorized: false,
         headers: {
             'Content-Type': 'application/json'
         }
     };
+
+    if(opts.host.includes(':')) {
+        var [host, port] = opts.host.split(':');
+        opts.host = host;
+        opts.port = parseInt(port);
+    }
 
     // combine defaults with passed in options
     const combOpts = Object.assign({}, defaultOpts, opts);
@@ -458,6 +469,8 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                 try {
                     body = JSON.parse(body);
                 } catch (e) {
+                    console.log(combOpts);
+                    console.log(e);
                     return reject(new Error(`Invalid response object ${combOpts}`));
                 };
                 
@@ -483,7 +496,7 @@ function makeRequest(opts: object, payload: object = {}): Promise<any> {
                         body
                     });
                 } else {
-
+                    vscode.window.showErrorMessage(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
                     console.error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
                     return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
                 }
@@ -547,18 +560,3 @@ const callHTTP = (method: string, host: string, path: string, token: string, pay
 .then( response => {
     return response;
 });
-
-
-// const getFastInfo = (host: string, token: string) => makeRequest({
-//     host,
-//     path: '/mgmt/shared/fast/info',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'X-F5-Auth-Token': token
-//     }
-// })
-// .then( response => {
-//     console.log('value in getFastInfo: ' + JSON.stringify(response));
-//     // Promise.resolve(value.body.token);
-//     return response.body;
-// });

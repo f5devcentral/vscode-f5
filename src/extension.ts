@@ -19,7 +19,7 @@ import {
 	getMementoW, 
 	isValidJson, 
 	getPassword, 
-	setAS3Bar, 
+	setAS3Bar,
 	setDOBar, 
 	setTSBar, 
 	getDevice,
@@ -52,11 +52,10 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 16);
 	context.subscriptions.push(ext.tsBar);
 
-	// create virtual file store
+	// create virtual file store - testing new feature...
 	ext.memFs = new MemFS();
     context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', ext.memFs, { isCaseSensitive: true }));
     let initialized = false;
-
 
 	// exploring classes to group all f5 api calls
 	// const f5API = new f5Api();
@@ -76,13 +75,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	/**
 	 * #########################################################################
-	 *	     ########  ######## ##     ## ####  ######  ########  ######  
+	 *
+	 * 	     ########  ######## ##     ## ####  ######  ########  ######  
 	 *	     ##     ## ##       ##     ##  ##  ##    ## ##       ##    ## 
 	 *	     ##     ## ##       ##     ##  ##  ##       ##       ##       
 	 *	     ##     ## ######   ##     ##  ##  ##       ######    ######  
 	 *	     ##     ## ##        ##   ##   ##  ##       ##             ## 
 	 *	     ##     ## ##         ## ##    ##  ##    ## ##       ##    ## 
 	 * 	     ########  ########    ###    ####  ######  ########  ######  
+	 * 
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Banner3&t=Devices
 	 * #########################################################################
 	 */
@@ -372,7 +373,6 @@ export function activate(context: vscode.ExtensionContext) {
 	 * 				AAAAAAA       SS      333 
 	 * 				AA   AA   SSSSS   333333  
 	 * 
-	 * 
 	 * ############################################################################
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=AS3
 	 */
@@ -611,6 +611,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 /**
  * #########################################################################
+ * 
  * 			 █████    ██████  
  *			 ██   ██ ██    ██ 
  *			 ██   ██ ██    ██ 

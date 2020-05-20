@@ -6,6 +6,20 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+
+## [0.1.7] - (5-20-2020)
+
+### Modified
+- More work to allow port specification on device item: user@device.domain.net:8443
+- Added more feedback (warning pop up) for failed api calls
+- Documentation on client side logging and BIG-IQ usage
+
+## [0.1.6] - (5-19-2020)
+
+### Modified
+- Device add/modify
+  - Relaxed regex to allow :port for single nic ve
+
 ## [0.1.5] - (5-18-2020)
 
 ### Added
@@ -17,9 +31,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 - AS3 tenants tree
--- two level tree hiarchy representing deployed tenant and apps for each tenant
--- click to get 'Get-All-Tenants' to get ALL declarations
--- click tenant to get declaration for that tenant
+  - two level tree hiarchy representing deployed tenant and apps for each tenant
+  - click to get 'Get-All-Tenants' to get ALL declarations
+  - click tenant to get declaration for that tenant
 
 ## [0.1.3] - (5-13-2020)
 
@@ -27,9 +41,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Tree view to display TS examples from github
 - get/post Delcaratinve Onboarding (DO) declarations
 - base example snippets for as3/do/ts
--- in a json file, start typing (as3, do, ts, example, f5)
+  - in a json file, start typing (as3, do, ts, example, f5)
 - hostname/tmos version status bar
--- click to get device info
+  - click to get device info
 - Fast/version status bar
 - AS3 Tasks view
 
@@ -56,9 +70,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 - Device Tree features
--- Modify entry
--- Remove entry
--- Add entry
+  - Modify entry
+  - Remove entry
+  - Add entry
 
 ## [0.0.3] - (4-26-2020)
 
