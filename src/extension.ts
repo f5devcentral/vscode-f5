@@ -405,6 +405,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const password = await getPassword(device);
 		const response = await ext.f5Api.delAS3Tenant(device, password, tenant.label);
 		displayJsonInEditor(response.body);
+		as3TenantTree.refresh();
 		as3Tree.refresh();
 
 	}));
@@ -441,6 +442,11 @@ export function activate(context: vscode.ExtensionContext) {
 		const password = await getPassword(device);
 		// if selected text, capture that, if not, capture entire document
 
+		// selectbox for post options... like async
+		let postParam = await vscode.window.showQuickPick(["none", "async=true"], { canPickMany: false, placeHolder: 'Additional options?' });
+
+		console.log(`POST-PARAM:  ${postParam}`);
+
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return; // No open text editor
@@ -458,8 +464,12 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 
+			// use the following logic to implement robust async logic
+			// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/as3.sh
 			const response = await ext.f5Api.postAS3Dec(device, password, JSON.parse(text));
 			displayJsonInEditor(response);
+			as3TenantTree.refresh();
+			as3Tree.refresh();
 			
 		} else {
 			// post selected text/declaration
@@ -471,6 +481,8 @@ export function activate(context: vscode.ExtensionContext) {
 			
 			const response = await ext.f5Api.postAS3Dec(device, password, JSON.parse(text));
 			displayJsonInEditor(response);
+			as3TenantTree.refresh();
+			as3Tree.refresh();
 		} 
 		
 	}));
@@ -675,6 +687,8 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 
+			// Use the following logic for robust async post
+			// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/onboard_v2.tpl#L775
 			doDecResponse = await ext.f5Api.postDoDec(device, password, JSON.parse(text));
 			displayJsonInEditor(doDecResponse);
 		} else {

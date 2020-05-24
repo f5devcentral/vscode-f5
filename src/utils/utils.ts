@@ -209,7 +209,7 @@ export async function getDevice(): Promise<any> {
 
 /**
  * Get password from keytar or prompt
- * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
  */
 export async function getPassword(device: string): Promise<any> {
 
@@ -220,7 +220,11 @@ export async function getPassword(device: string): Promise<any> {
     // console.log(`IS PASSWORD IN KEYTAR?: ${password}`);
     if (!password) {
         // console.log(`NO PASSWORD IN KEYTAR! - PROMPTING!!! - ${password}`);
-        password = await vscode.window.showInputBox({ password: true})
+        password = await vscode.window.showInputBox({
+            placeHolder: 'Password',
+            prompt: 'Input device password:  ',
+            password: true
+        })
         .then( password => {
             if (!password) {
                 throw new Error('User cancelled password input');

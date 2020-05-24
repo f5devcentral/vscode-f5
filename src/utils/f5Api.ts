@@ -22,7 +22,7 @@ export class F5Api {
     async connectF5(device: string, password: string) {
         var [username, host] = device.split('@');
         getAuthToken(host, username, password)
-            .then( async hostToken => {
+            .then( async token => {
 
                 // cache password in keytar
                 ext.keyTar.setPassword('f5Hosts', device, password);
@@ -33,9 +33,9 @@ export class F5Api {
                 //********** Host info **********/
                 const hostInfo = await callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host, 
                     '/mgmt/shared/identified-devices/config/device-info', 
-                    hostToken.token
+                    token
                 );
 
                 if (hostInfo.status === 200) {
@@ -47,9 +47,9 @@ export class F5Api {
                 //********** TS info **********/
                 const tsInfo = await callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host, 
                     '/mgmt/shared/telemetry/info', 
-                    hostToken.token
+                    token
                 );
 
                 if (tsInfo.status === 200) {
@@ -61,9 +61,9 @@ export class F5Api {
                 //********** FAST info **********/
                 const fastInfo = await callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host, 
                     '/mgmt/shared/fast/info', 
-                    hostToken.token
+                    token
                 );
                     
                 if (fastInfo.status === 200) {
@@ -74,9 +74,9 @@ export class F5Api {
                 //********** AS3 info **********/
                 const as3Info = await callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host, 
                     '/mgmt/shared/appsvcs/info', 
-                    hostToken.token
+                    token
                 );
 
                 if (as3Info.status === 200) {
@@ -87,9 +87,9 @@ export class F5Api {
 
                 const doInfo = await callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host, 
                     '/mgmt/shared/declarative-onboarding/info', 
-                    hostToken.token
+                    token
                 );
 
                 if (doInfo.status === 200) {
@@ -112,12 +112,12 @@ export class F5Api {
     async getF5HostInfo(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host, 
                     '/mgmt/shared/identified-devices/config/device-info', 
-                    hostToken.token
+                    token
                 );
             }
         );
@@ -134,12 +134,12 @@ export class F5Api {
     async issueBash(device: string, password: string, cmd: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'POST', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/tm/util/bash', 
-                    hostToken.token,
+                    token,
                     {
                         command: 'run',
                         utilCmdArgs: `-c '${cmd}'`
@@ -156,12 +156,12 @@ export class F5Api {
     async getTsInfo(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/telemetry/info', 
-                    hostToken.token
+                    token
                 );
             }
         );
@@ -177,12 +177,12 @@ export class F5Api {
     async getTSDec(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/telemetry/declare', 
-                    hostToken.token
+                    token
                 );
             }
         );
@@ -197,12 +197,12 @@ export class F5Api {
     async postTSDec(device: string, password: string, dec: object) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'POST', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/telemetry/declare', 
-                    hostToken.token,
+                    token,
                     dec
                 );
             }
@@ -218,12 +218,12 @@ export class F5Api {
     async getDoDec(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/declarative-onboarding/', 
-                    hostToken.token
+                    token
                 );
             }
         );
@@ -238,12 +238,12 @@ export class F5Api {
     async postDoDec(device: string, password: string, dec: object) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'POST', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/declarative-onboarding/', 
-                    hostToken.token,
+                    token,
                     dec
                 );
             }
@@ -260,12 +260,12 @@ export class F5Api {
     async doInspect(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/declarative-onboarding/inspect', 
-                    hostToken.token,
+                    token,
                 );
             }
         );
@@ -281,12 +281,12 @@ export class F5Api {
     async doTasks(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/declarative-onboarding/task', 
-                    hostToken.token,
+                    token,
                 );
             }
         );
@@ -304,12 +304,12 @@ export class F5Api {
     async getAS3Decs(device: string, password: string, tenant: string = '') {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     `/mgmt/shared/appsvcs/declare/${tenant}`, 
-                    hostToken.token,
+                    token,
                 );
             }
         );
@@ -326,12 +326,12 @@ export class F5Api {
     async delAS3Tenant(device: string, password: string, tenant: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'DELETE', 
-                    hostToken.host, 
+                    host,
                     `/mgmt/shared/appsvcs/declare/${tenant}`, 
-                    hostToken.token,
+                    token,
                 );
             }
         );
@@ -347,12 +347,12 @@ export class F5Api {
     async getAS3Tasks(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     '/mgmt/shared/appsvcs/task/', 
-                    hostToken.token,
+                    token,
                 );
             }
         );
@@ -367,12 +367,12 @@ export class F5Api {
     async getAS3Task(device: string, password: string, id: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token=> {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host,
                     `/mgmt/shared/appsvcs/task/${id}`, 
-                    hostToken.token,
+                    token,
                 );
             }
         );
@@ -388,12 +388,12 @@ export class F5Api {
     async getF5FastInfo(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token => {
                 return callHTTP(
                     'GET', 
-                    hostToken.host, 
+                    host, 
                     `/mgmt/shared/fast/info`, 
-                    hostToken.token,
+                    token,
                 );
             }
         );
@@ -410,12 +410,12 @@ export class F5Api {
     async postAS3Dec(device: string, password: string, dec: object) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
-            .then( hostToken => {
+            .then( token => {
                 return callHTTP(
                     'POST', 
-                    hostToken.host, 
+                    host, 
                     `/mgmt/shared/appsvcs/declare/`, 
-                    hostToken.token,
+                    token,
                     dec
                 );
             }
@@ -432,6 +432,11 @@ interface OptsObject {
     headers?: object,
 }
 
+/**
+ * Core HTTPs request
+ * @param opts https call options
+ * @param payload http call payload
+ */
 function makeRequest(opts: OptsObject, payload: object = {}): Promise<any> {
 
     const defaultOpts = {
@@ -489,7 +494,12 @@ function makeRequest(opts: OptsObject, payload: object = {}): Promise<any> {
                 
                 const goodResp: Array<number> = [200, 201, 202];
                 // was trying to check against array above with arr.includes or arr.indexOf
-                if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404) {
+                /**
+                 * Opening this up to any response code, to handle errors higher in logic
+                 * might need to key off 500s and more 400s when waitng for DO
+                 */
+                // if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404 || res.statusCode === 422) {
+                    if (res.statusCode) {
                     return resolve({
                         status: res.statusCode,
                         headers: res.headers,
@@ -518,7 +528,12 @@ function makeRequest(opts: OptsObject, payload: object = {}): Promise<any> {
 };
 
 
-
+/**
+ * Get tmos auth token
+ * @param host fqdn or IP address of destination
+ * @param username 
+ * @param password 
+ */
 const getAuthToken = async (host: string, username: string, password: string) => makeRequest(
 {
     host,
@@ -529,19 +544,18 @@ const getAuthToken = async (host: string, username: string, password: string) =>
     username,
     password
 })
-.then( response => {
-    if (response.status === 200) {
-        return { 
-            host: host, 
-            token: response.body.token.token 
-        };
+.then( res => {
+    if (res.status === 200) {
+        return res.body.token.token;
     } else {
         // clear cached password for this device
         ext.keyTar.deletePassword(
             'f5Hosts',
             `${username}@${host}`
             );
-        throw new Error(`error from getAuthTokenNOT200: ${response}`);
+            vscode.window.showErrorMessage(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
+            console.error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
+            throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
     }
 });
 

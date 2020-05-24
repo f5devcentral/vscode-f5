@@ -302,7 +302,6 @@
 					"when": "view == fastTemplates",
 					"group": "navigation"
 				},
-
 				{
 					"command": "f5-ts.enableTsExamples",
 					"when": "view == tsExamples",
@@ -319,6 +318,10 @@
 					"command": "f5.editHost",
 					"when": "view == f5Hosts",
 					"group": "inline"
+				},
+				{
+					"command": "f5.editHost",
+					"when": "view == f5Hosts"
 				},
 				{
 					"command": "f5.removeHost",
