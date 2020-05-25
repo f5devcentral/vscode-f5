@@ -99,7 +99,7 @@
 						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format"
 					},
 					"f5.as3Post.async": {
-						"type":"boolean",
+						"type": "boolean",
 						"default": true,
 						"description": "Make as3 posts async by default"
 					}
