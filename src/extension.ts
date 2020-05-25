@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import { manyJokes, chuckJoke } from './chuckJoke';
+import { chuckJoke } from './chuckJoke';
 import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
@@ -51,11 +51,6 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(ext.doBar);
 	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 16);
 	context.subscriptions.push(ext.tsBar);
-
-	// create virtual file store - testing new feature...
-	ext.memFs = new MemFS();
-    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('memfs', ext.memFs, { isCaseSensitive: true }));
-    let initialized = false;
 
 	// exploring classes to group all f5 api calls
 	// const f5API = new f5Api();
@@ -247,13 +242,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.openSettings', () => {
 		// not sure where this would return anything to...
-		return vscode.commands.executeCommand("workbench.action.openSettings", "f5-fast");
+		return vscode.commands.executeCommand("workbench.action.openSettings", "f5");
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.addHost', () => {
 
-		vscode.window.showInputBox({prompt: 'Device/BIG-IP/Host      ', placeHolder: '<user>@<host/ip>'})
+		vscode.window.showInputBox({prompt: 'Device/BIG-IP/Host', placeHolder: '<user>@<host/ip>'})
 		.then(newHost => {
 			const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 
@@ -405,6 +400,8 @@ export function activate(context: vscode.ExtensionContext) {
 		const password = await getPassword(device);
 		const response = await ext.f5Api.delAS3Tenant(device, password, tenant.label);
 		displayJsonInEditor(response.body);
+		// give a little time to finish
+		await new Promise(resolve => { setTimeout(resolve, 3000); });
 		as3TenantTree.refresh();
 		as3Tree.refresh();
 
@@ -413,6 +410,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
 		
 		var device: string | undefined = ext.hostStatusBar.text;
+
 		
 		if (!device) {
 			device = await vscode.commands.executeCommand('f5.connectDevice');
@@ -430,7 +428,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', async () => {
 
 		var device: string | undefined = ext.hostStatusBar.text;
-		
+		ext.as3AsyncPost = vscode.workspace.getConfiguration().get('f5.as3Post.async');
+		// const postParam: string | undefined = vscode.workspace.getConfiguration().get('f5.as3Post.async');
+
 		if (!device) {
 			device = await vscode.commands.executeCommand('f5.connectDevice');
 		}
@@ -443,47 +443,45 @@ export function activate(context: vscode.ExtensionContext) {
 		// if selected text, capture that, if not, capture entire document
 
 		// selectbox for post options... like async
-		let postParam = await vscode.window.showQuickPick(["none", "async=true"], { canPickMany: false, placeHolder: 'Additional options?' });
+		// let postParam = await vscode.window.showQuickPick(
+		// 	["none", "async=true"], 
+		// 	{ 
+		// 		canPickMany: false,
+		// 		placeHolder: 'Additional options?'
+		// 	}
+		// );
+		// console.log(`POST-PARAM:  ${postParam}`);
 
-		console.log(`POST-PARAM:  ${postParam}`);
+
+		let postParam;
+		if(ext.as3AsyncPost) {
+			postParam = 'async=true';
+		} else {
+			postParam = undefined;
+		}
 
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return; // No open text editor
 		}
 
-		// if text is selected in editor
+		let text: string;
 		if (editor.selection.isEmpty) {
-			// post entire page
-			// validate json structure before send?  something like: try => JSON.parse?
-
-			const text = editor.document.getText();
-			// console.log(`ENTIRE DOC: ${text}`)
-
-			if (!isValidJson(text)) {
-				return vscode.window.showErrorMessage('Not valid JSON');
-			}
-
-			// use the following logic to implement robust async logic
-			// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/as3.sh
-			const response = await ext.f5Api.postAS3Dec(device, password, JSON.parse(text));
-			displayJsonInEditor(response);
-			as3TenantTree.refresh();
-			as3Tree.refresh();
-			
+			text = editor.document.getText();	// entire editor/doc window
 		} else {
-			// post selected text/declaration
-			// var selection = editor.selection;
-			const text = editor.document.getText(editor.selection);
-			if (!isValidJson(text)) {
-				return vscode.window.showErrorMessage('Not valid JSON');
-			}
-			
-			const response = await ext.f5Api.postAS3Dec(device, password, JSON.parse(text));
-			displayJsonInEditor(response);
-			as3TenantTree.refresh();
-			as3Tree.refresh();
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
+
+		if (!isValidJson(text)) {
+			return vscode.window.showErrorMessage('Not valid JSON object');
+		}
+
+		// use the following logic to implement robust async
+		// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/as3.sh
+		const response = await ext.f5Api.postAS3Dec(device, password, postParam, JSON.parse(text));
+		displayJsonInEditor(response.body);
+		as3TenantTree.refresh();
+		as3Tree.refresh();
 		
 	}));
 
@@ -784,25 +782,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
-		// chuckJoke();
-		const ben1 = manyJokes();
-		console.log(`ben1: ${ben1}`);
-		
-
-		// await vscode.window.withProgress(
-		// 	{
-		// 		location: vscode.ProgressLocation.Notification,
-		// 		title: "Test 2: report only message"
-		// 	},
-		// 	async (progress) => {
-		// 		setTimeout(function () { console.log('starting'); }, 3000);
-				
-		// 		for (let i = 0; i < 10; ++i) {
-		// 			progress.report({ message: `message ${i}` });
-		// 			setTimeout(function () { console.log(`message ${i}`); }, 1000);
-		// 			// await wait2();
-		// 		}
-		// 	});
+		chuckJoke();
 	}));
 
 }

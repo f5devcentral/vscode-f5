@@ -6,16 +6,23 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [0.1.8] - (5-21-2020)
+## [0.1.8] - (5-25-2020)
 
 ### Modified
 - Now allowing all http responses so it would show more information about failing declarations
   - Was only allowing 200/201/202/404/422
-  - This will also allow for more robust error handling for future async operations
+  - This was to allow for more robust error handling for async post operations
 - Updated password prompt to provide more clarity of what is expected
+- Refined conditions that clear cached passwords
+  - [issue #19]https://github.com/DumpySquare/vscode-f5-fast/issues/19
 
 ### Added
 - Auto-refresh AS3 trees after tenant delete or declaration post
+  - includes a slight pause to let processing complete before refresh
+- AS3 async post
+  - Settings boolean enabled by default, to default all as3 posts to async
+  - Provides "progress bar" with details about dec post status
+- DO async post
 
 ## [0.1.7] - (5-20-2020)
 
@@ -29,6 +36,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Modified
 - Device add/modify
   - Relaxed regex to allow :port for single nic ve
+  - [issue #5] https://github.com/DumpySquare/vscode-f5-fast/issues/5
 
 ## [0.1.5] - (5-18-2020)
 

@@ -106,7 +106,7 @@ export class F5Api {
 
     /**
      * Used to get F5 Host info
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async getF5HostInfo(device: string, password: string) {
@@ -127,7 +127,7 @@ export class F5Api {
 
     /**
      * Used to issue bash commands to device over API
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      * @param cmd Bash command to execute, or tmsh + <tmsh command>
      */
@@ -150,9 +150,11 @@ export class F5Api {
     }
 
 
-    /*
-    * Used to issue bash commands to device over API
-    */
+    /**
+     * Get Telemetry Streaming Service info
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+     * @param password User Password
+     */
     async getTsInfo(device: string, password: string) {
         var [username, host] = device.split('@');
         return getAuthToken(host, username, password)
@@ -171,7 +173,7 @@ export class F5Api {
 
     /**
      * Get current Telemetry Streaming Declaration
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async getTSDec(device: string, password: string) {
@@ -191,7 +193,7 @@ export class F5Api {
 
     /**
      * Get current Telemetry Streaming Declaration
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async postTSDec(device: string, password: string, dec: object) {
@@ -212,7 +214,7 @@ export class F5Api {
 
     /**
      * Get current Declarative Onboarding Declaration
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async getDoDec(device: string, password: string) {
@@ -232,29 +234,64 @@ export class F5Api {
 
     /**
      * POST Declarative Onboarding Declaration
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
+     * @param dec DO declaration object
      */
     async postDoDec(device: string, password: string, dec: object) {
         var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'POST', 
-                    host,
-                    '/mgmt/shared/declarative-onboarding/', 
-                    token,
-                    dec
-                );
+
+        const authToken = await getAuthToken(host, username, password);
+        const progressPost = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "Posting Declaration",
+            cancellable: true
+        }, async (progress, token) => {
+            token.onCancellationRequested(() => {
+                // this logs but doesn't actually cancel...
+                console.log("User canceled the async post");
+                return new Error(`User canceled the async post`);
+            });
+
+            // post initial dec
+            let response = await callHTTP('POST', host, `/mgmt/shared/declarative-onboarding/`, authToken, dec);
+
+            // if bad dec, return response
+            if(response.status === 422) {
+                return response;
             }
-        );
+
+            progress.report({ message: `${response.body.result.message}`});
+            await new Promise(resolve => { setTimeout(resolve, 1000); });
+
+            let taskId: string | undefined;
+            if(response.status === 202) {
+                taskId = response.body.id;
+
+                // get got a 202 and a taskId (single dec), check task status till complete
+                while(taskId) {
+                    response = await callHTTP('GET', host, `/mgmt/shared/declarative-onboarding/task/${taskId}`, authToken);
+
+                    // if not 'in progress', its done, clear taskId to break loop
+                    if(response.body.result.status === 'FINISHED' || response.body.result.status === 'ERROR' || response.body.result.status === 'OK'){
+                        taskId = undefined;
+                        return response;
+                    }
+                    progress.report({ message: `${response.body.result.message}`});
+                    await new Promise(resolve => { setTimeout(resolve, 2000); });
+                }
+            }
+            // return response from regular post
+            return response;
+        });
+        return progressPost;
     }
 
 
 
     /**
      * DO Inspect - returns potential DO configuration items
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async doInspect(device: string, password: string) {
@@ -275,7 +312,7 @@ export class F5Api {
 
     /**
      * DO tasks - returns executed tasks
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async doTasks(device: string, password: string) {
@@ -297,7 +334,7 @@ export class F5Api {
     /**
      * AS3 declarations
      * no tenant, returns ALL AS3 decs
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      * @param tenant tenant(optional)
      */
@@ -319,7 +356,7 @@ export class F5Api {
 
     /**
      * Delete AS3 Tenant
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      * @param tenant tenant
      */
@@ -341,7 +378,7 @@ export class F5Api {
 
     /**
      * AS3 tasks - returns executed tasks
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async getAS3Tasks(device: string, password: string) {
@@ -361,7 +398,7 @@ export class F5Api {
 
     /**
      * AS3 tasks - returns executed tasks
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async getAS3Task(device: string, password: string, id: string) {
@@ -382,7 +419,7 @@ export class F5Api {
 
     /**
      * Get Fast Info - fast service version/details
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
      */
     async getF5FastInfo(device: string, password: string) {
@@ -403,23 +440,77 @@ export class F5Api {
 
     /**
      * Post AS3 Dec
-     * @param device BIG-IP/Host/Device in <user>@<host/ip> format
+     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
      * @param password User Password
+     * @param postParam 
      * @param dec Delcaration
      */
-    async postAS3Dec(device: string, password: string, dec: object) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token => {
-                return callHTTP(
-                    'POST', 
-                    host, 
-                    `/mgmt/shared/appsvcs/declare/`, 
-                    token,
-                    dec
-                );
+    async postAS3Dec(device: string, password: string, postParam: string = '', dec: object) {
+        const [username, host] = device.split('@');
+
+        const authToken = await getAuthToken(host, username, password);
+        const progressPost = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "Posting Declaration",
+            cancellable: true
+        }, async (progress, token) => {
+            token.onCancellationRequested(() => {
+                // this logs but doesn't actually cancel...
+                console.log("User canceled the async post");
+                return new Error(`User canceled the async post`);
+            });
+
+            // post initial dec
+            let response = await callHTTP('POST', host, `/mgmt/shared/appsvcs/declare?${postParam}`, authToken, dec);
+
+            // if bad dec, return response
+            if(response.status === 422) {
+                return response;
             }
-        );
+
+            // if post has multiple decs it will return with an array of status's for each
+            //      so we just stick with "processing"
+            if(response.body.hasOwnProperty('items')){
+                progress.report({ message: `  processing multiple declarations...`});
+                await new Promise(resolve => { setTimeout(resolve, 1000); });
+            } else {
+                // single dec detected...
+                progress.report({ message: `${response.body.results[0].message}`});
+                await new Promise(resolve => { setTimeout(resolve, 1000); });
+            }
+
+        
+            let taskId: string | undefined;
+            if(response.status === 202) {
+                taskId = response.body.id;
+
+                // get got a 202 and a taskId (single dec), check task status till complete
+                while(taskId) {
+                    response = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${taskId}`, authToken);
+
+                    // if not 'in progress', its done, clear taskId to break loop
+                    if(response.body.results[0].message !== 'in progress'){
+                        taskId = undefined;
+                        return response;
+                    }
+
+                    progress.report({ message: `${response.body.results[0].message}`});
+                    await new Promise(resolve => { setTimeout(resolve, 3000); });
+
+                }
+                // return response from successful async
+                // return response;
+
+                progress.report({ message: `Found multiple decs, check tasks view for details`});
+                await new Promise(resolve => { setTimeout(resolve, 3000); });
+                
+                progress.report({ message: `refreshing as3 tree views...`});
+                await new Promise(resolve => { setTimeout(resolve, 3000); });
+            }
+            // return response from regular post
+            return response;
+        });
+        return progressPost;
     }
 };
 
@@ -544,18 +635,20 @@ const getAuthToken = async (host: string, username: string, password: string) =>
     username,
     password
 })
-.then( res => {
+.then( async res => {
     if (res.status === 200) {
         return res.body.token.token;
-    } else {
+    } else if (res.status === 401 && res.body.message === "Authentication failed.") {
         // clear cached password for this device
-        ext.keyTar.deletePassword(
-            'f5Hosts',
-            `${username}@${host}`
-            );
-            vscode.window.showErrorMessage(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-            console.error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-            throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
+        ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
+
+        vscode.window.showErrorMessage(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
+        console.error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
+        throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
+    } else {
+        // await new Promise(resolve => { setTimeout(resolve, 3000); });
+        throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
+        
     }
 });
 

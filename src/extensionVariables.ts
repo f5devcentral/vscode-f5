@@ -3,13 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, TreeView, StatusBarItem } from "vscode";
+import { ExtensionContext, TreeView, StatusBarItem, workspace } from "vscode";
 import * as keyTarType from "keytar";
-import { MemFS } from './treeViewsProviders/fileSystemProvider'
 import { F5Api } from './utils/f5Api';
 
 type KeyTar = typeof keyTarType;
-// type f5ApiClass = typeof Class; 
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -18,20 +16,20 @@ type KeyTar = typeof keyTarType;
 export namespace ext {
     export let context: ExtensionContext;
     export let keyTar: KeyTar;
-    export let memFs: MemFS;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;
     export let as3Bar: StatusBarItem;
     export let fastBar: StatusBarItem;
     export let doBar: StatusBarItem;
     export let tsBar: StatusBarItem;
-    // export class f5Api { };
+    export let as3AsyncPost: boolean | undefined;
     export let f5Api: F5Api;
     export let carTreeData: object | undefined;
     export let tsExampleView: object | undefined;
 }
 
 
+// all this can possibly be replaced by the f5-cli
 export namespace git {
     export let latestAS3schema: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';
     export let examplesAS3: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';

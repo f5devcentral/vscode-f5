@@ -39,11 +39,7 @@
 		"Snippets"
 	],
 	"activationEvents": [
-		"onCommand:chuckJoke",
-		"onCommand:f5.remoteCommand",
-		"onCommand:f5.openSettings",
-		"onCommand:f5.connectDevice",
-		"onView:f5Hosts"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -56,14 +52,14 @@
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "f5-fast-view-container",
+					"id": "f5-view-container",
 					"title": "BIG-IPs",
 					"icon": "images/f5_white_24x24.svg"
 				}
 			]
 		},
 		"views": {
-			"f5-fast-view-container": [
+			"f5-view-container": [
 				{
 					"id": "f5Hosts",
 					"name": "F5 Hosts"
@@ -94,13 +90,18 @@
 						"type": "array",
 						"items": {
 							"type": "string",
-							"description": "BIG-IP/Fast Host",
+							"description": "BIG-IP/Device/Host",
 							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
 						},
 						"default": [
 							"admin@192.168.1.245"
 						],
 						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format"
+					},
+					"f5.as3Post.async": {
+						"type":"boolean",
+						"default": true,
+						"description": "Make as3 posts async by default"
 					}
 				}
 			}
