@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import { chuckJoke } from './chuckJoke';
+import { manyJokes, chuckJoke } from './chuckJoke';
 import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
@@ -783,8 +783,26 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`Memento! ${mento1}`);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', () => {
-		chuckJoke();
+	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
+		// chuckJoke();
+		const ben1 = manyJokes();
+		console.log(`ben1: ${ben1}`);
+		
+
+		// await vscode.window.withProgress(
+		// 	{
+		// 		location: vscode.ProgressLocation.Notification,
+		// 		title: "Test 2: report only message"
+		// 	},
+		// 	async (progress) => {
+		// 		setTimeout(function () { console.log('starting'); }, 3000);
+				
+		// 		for (let i = 0; i < 10; ++i) {
+		// 			progress.report({ message: `message ${i}` });
+		// 			setTimeout(function () { console.log(`message ${i}`); }, 1000);
+		// 			// await wait2();
+		// 		}
+		// 	});
 	}));
 
 }
