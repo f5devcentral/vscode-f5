@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getPassword } from '../utils/utils';
 import { ext } from '../extensionVariables';
+import * as f5Api from '../utils/f5Api';
 // import { callHTTPS } from '../utils/externalAPIs'
 
 export class AS3TreeProvider implements vscode.TreeDataProvider<AS3Item> {
@@ -30,7 +31,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3Item> {
 		}
 
 		const password = await getPassword(device);
-		const decCall = await ext.f5Api.getAS3Tasks(device, password);
+		const decCall = await f5Api.getAS3Tasks(device, password);
 		const taskItems = decCall.body.items.map((item:any) => {
 
 			const taskId = item.id;

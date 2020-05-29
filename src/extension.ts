@@ -8,24 +8,9 @@ import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
 import { exampleTsDecsProvider, exampleTsDec } from './treeViewsProviders/githubTsExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTemplatesTreeProvider';
-import { F5Api } from './utils/f5Api';
+import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
-import { 
-	setHostStatusBar,
-	setHostnameBar, 
-	setMemento, 
-	getMemento, 
-	setMementoW, 
-	getMementoW, 
-	isValidJson, 
-	getPassword, 
-	setAS3Bar,
-	setDOBar, 
-	setTSBar, 
-	getDevice,
-	displayJsonInEditor,
-	setFastBar
-} from './utils/utils';
+import * as utils from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
 import * as keyTarType from 'keytar';
@@ -54,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// exploring classes to group all f5 api calls
 	// const f5API = new f5Api();
-	ext.f5Api = new F5Api;
+	// ext.f5Api = new F5Api;
 
 	// Setup keyTar global var
 	// type KeyTar = typeof keyTarType;
@@ -96,12 +81,12 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		// clear status bars before new connect
-		setHostStatusBar();
-		setHostnameBar();
-		setFastBar();
-		setAS3Bar();
-		setDOBar();
-		setTSBar();	
+		utils.setHostStatusBar();
+		utils.setHostnameBar();
+		utils.setFastBar();
+		utils.setAS3Bar();
+		utils.setDOBar();
+		utils.setTSBar();	
 		
 		if (!device) {
 			device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
@@ -112,9 +97,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		// console.log(`connectDevice, pre-password device: ${device}`);
 		
-		const password: string = await getPassword(device);
+		const password: string = await utils.getPassword(device);
 		// console.log(`connectDevice, device/password: ${device}/${password}`);
-		ext.f5Api.connectF5(device, password);
+		f5Api.connectF5(device, password);
 		return device;
 	}));
 	
@@ -128,20 +113,20 @@ export function activate(context: vscode.ExtensionContext) {
 		if (device === undefined) {
 			throw new Error('no hosts in configuration');
 		}
-		const password: string = await getPassword(device);
-		const hostInfo  = await ext.f5Api.getF5HostInfo(device, password);
-		displayJsonInEditor(hostInfo.body);
+		const password: string = await utils.getPassword(device);
+		const hostInfo  = await f5Api.getF5HostInfo(device, password);
+		utils.displayJsonInEditor(hostInfo.body);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
 
 		// clear status bars
-		setHostStatusBar();
-		setHostnameBar();
-		setFastBar();
-		setAS3Bar();
-		setDOBar();
-		setTSBar();
+		utils.setHostStatusBar();
+		utils.setHostnameBar();
+		utils.setFastBar();
+		utils.setAS3Bar();
+		utils.setDOBar();
+		utils.setTSBar();
 
 		// refresh views to clear trees
 		// vscode.commands.executeCommand('f5-fast.refreshTemplates');
@@ -155,12 +140,12 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log('CLEARING KEYTAR PASSWORD CACHE');
 
 		// clear status bars 
-		setHostStatusBar();
-		setHostnameBar();
-		setFastBar();
-		setAS3Bar();
-		setDOBar();
-		setTSBar();
+		utils.setHostStatusBar();
+		utils.setHostnameBar();
+		utils.setFastBar();
+		utils.setAS3Bar();
+		utils.setDOBar();
+		utils.setTSBar();
 
 		// refresh views to clear trees
 		vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
@@ -280,7 +265,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const host = ext.hostStatusBar.text;
 
 		if (host) {
-			const password = await getPassword(host);
+			const password = await utils.getPassword(host);
 			const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' });
 			// const cmd = await vscode.window.showInputBox({ content: 'Bash Command to Execute?' })
 			
@@ -289,7 +274,7 @@ export function activate(context: vscode.ExtensionContext) {
 				throw new Error('Remote Command inputBox cancelled');
 			}
 
-			const bashResp = await ext.f5Api.issueBash(host, password, cmd);
+			const bashResp = await f5Api.issueBash(host, password, cmd);
 
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
@@ -347,9 +332,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 
-		const password = await getPassword(device);
-		const fast = await ext.f5Api.getF5FastInfo(device, password);
-		displayJsonInEditor(fast.body);
+		const password = await utils.getPassword(device);
+		const fast = await f5Api.getF5FastInfo(device, password);
+		utils.displayJsonInEditor(fast.body);
 
 	}));
 
@@ -388,18 +373,18 @@ export function activate(context: vscode.ExtensionContext) {
 		// the only way this gets called, is by the as3 tenants tree, 
 		//		which means a device has to be selected to populate the tree
 		var device: string | undefined = ext.hostStatusBar.text;
-		const password = await getPassword(device);
-		const response = await ext.f5Api.getAS3Decs(device, password, tenant);
-		displayJsonInEditor(response.body);
+		const password = await utils.getPassword(device);
+		const response = await f5Api.getAS3Decs(device, password, tenant);
+		utils.displayJsonInEditor(response.body);
 	}));
 	
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
 		
 		var device: string | undefined = ext.hostStatusBar.text;
-		const password = await getPassword(device);
-		const response = await ext.f5Api.delAS3Tenant(device, password, tenant.label);
-		displayJsonInEditor(response.body);
+		const password = await utils.getPassword(device);
+		const response = await f5Api.delAS3Tenant(device, password, tenant.label);
+		utils.displayJsonInEditor(response.body);
 		// give a little time to finish
 		await new Promise(resolve => { setTimeout(resolve, 3000); });
 		as3TenantTree.refresh();
@@ -420,9 +405,9 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 		
-		const password = await getPassword(device);
-		const dec = await ext.f5Api.getAS3Task(device, password, id);
-		displayJsonInEditor(dec.body);
+		const password = await utils.getPassword(device);
+		const dec = await f5Api.getAS3Task(device, password, id);
+		utils.displayJsonInEditor(dec.body);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', async () => {
@@ -439,7 +424,7 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 		
-		const password = await getPassword(device);
+		const password = await utils.getPassword(device);
 		// if selected text, capture that, if not, capture entire document
 
 		// selectbox for post options... like async
@@ -472,14 +457,14 @@ export function activate(context: vscode.ExtensionContext) {
 			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		if (!isValidJson(text)) {
+		if (!utils.isValidJson(text)) {
 			return vscode.window.showErrorMessage('Not valid JSON object');
 		}
 
 		// use the following logic to implement robust async
 		// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/as3.sh
-		const response = await ext.f5Api.postAS3Dec(device, password, postParam, JSON.parse(text));
-		displayJsonInEditor(response.body);
+		const response = await f5Api.postAS3Dec(device, password, postParam, JSON.parse(text));
+		utils.displayJsonInEditor(response.body);
 		as3TenantTree.refresh();
 		as3Tree.refresh();
 		
@@ -524,14 +509,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
 		const host = ext.hostStatusBar.text;
 		if (host) {
-			const password = await getPassword(host);
-			const tsInfo = await ext.f5Api.getTsInfo(host, password);
+			const password = await utils.getPassword(host);
+			const tsInfo = await f5Api.getTsInfo(host, password);
 
 			if ( tsInfo === undefined ) {
 				throw new Error('getTsInfo failed');
 			};
 
-			displayJsonInEditor(tsInfo);
+			utils.displayJsonInEditor(tsInfo);
 		};
 	}));
 
@@ -548,9 +533,9 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 
-		const password = await getPassword(device);
-		const dec = await ext.f5Api.getTSDec(device, password);
-		displayJsonInEditor(dec.body.declaration);
+		const password = await utils.getPassword(device);
+		const dec = await f5Api.getTSDec(device, password);
+		utils.displayJsonInEditor(dec.body.declaration);
 
 	}));
 
@@ -563,7 +548,7 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('Connect to device first');
 		}
 
-		const password = await getPassword(device);
+		const password = await utils.getPassword(device);
 
 		// if selected text, capture that, if not, capture entire document
 		var editor = vscode.window.activeTextEditor;
@@ -578,22 +563,22 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const text = editor.document.getText();
 
-			if (!isValidJson(text)) {
+			if (!utils.isValidJson(text)) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 
-			tsDecResponse = await ext.f5Api.postTSDec(device, password, JSON.parse(text));
-			displayJsonInEditor(tsDecResponse);
+			tsDecResponse = await f5Api.postTSDec(device, password, JSON.parse(text));
+			utils.displayJsonInEditor(tsDecResponse);
 		} else {
 			// post selected text/declaration
 			// var selection = editor.selection;
 			const text = editor.document.getText(editor.selection);
-			if (!isValidJson(text)) {
+			if (!utils.isValidJson(text)) {
 				return vscode.window.showErrorMessage('Not valid JSON');
 			}
 			
-			tsDecResponse = await ext.f5Api.postTSDec(device, password, JSON.parse(text));
-			displayJsonInEditor(tsDecResponse);
+			tsDecResponse = await f5Api.postTSDec(device, password, JSON.parse(text));
+			utils.displayJsonInEditor(tsDecResponse);
 		} 
 
 	}));
@@ -612,7 +597,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return resp;
 		});
 
-		displayJsonInEditor(decCall.body);
+		utils.displayJsonInEditor(decCall.body);
 	}));
 
 
@@ -643,14 +628,14 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 		
-		const password = await getPassword(device);
-		const resp = await ext.f5Api.getDoDec(device, password);
+		const password = await utils.getPassword(device);
+		const resp = await f5Api.getDoDec(device, password);
 
 		if (resp.body === []) {
 			vscode.window.showInformationMessage(`No declaration detected on device`);
 			return;
 		} else {
-			return displayJsonInEditor(resp.body.declaration);
+			return utils.displayJsonInEditor(resp.body.declaration);
 		}
 
 	}));
@@ -664,7 +649,7 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('Connect to device first');
 		}
 
-		const password = await getPassword(device);
+		const password = await utils.getPassword(device);
 
 		// if selected text, capture that, if not, capture entire document
 
@@ -673,34 +658,49 @@ export function activate(context: vscode.ExtensionContext) {
 			return; // No open text editor
 		}
 
-		// if text is selected in editor
-		if (editor.selection.isEmpty) {
-			// post entire page
-			// validate json structure before send?  something like: try => JSON.parse?
+		// // if text is selected in editor
+		// if (editor.selection.isEmpty) {
+		// 	// post entire page
+		// 	// validate json structure before send?  something like: try => JSON.parse?
 
-			const text = editor.document.getText();
-			// console.log(`CAPTURING ENTIRE EDITOR DOC: ${text}`)
+		// 	const text = editor.document.getText();
+		// 	// console.log(`CAPTURING ENTIRE EDITOR DOC: ${text}`)
 
-			if (!isValidJson(text)) {
-				return vscode.window.showErrorMessage('Not valid JSON');
-			}
+		// 	if (!utils.isValidJson(text)) {
+		// 		return vscode.window.showErrorMessage('Not valid JSON');
+		// 	}
 
-			// Use the following logic for robust async post
-			// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/onboard_v2.tpl#L775
-			doDecResponse = await ext.f5Api.postDoDec(device, password, JSON.parse(text));
-			displayJsonInEditor(doDecResponse);
-		} else {
-			// post selected text/declaration
-			// var selection = editor.selection;
-			const text = editor.document.getText(editor.selection);
-			if (!isValidJson(text)) {
-				return vscode.window.showErrorMessage('Not valid JSON');
-			}
+		// 	// Use the following logic for robust async post
+		// 	// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/onboard_v2.tpl#L775
+		// 	doDecResponse = await f5Api.postDoDec(device, password, JSON.parse(text));
+		// 	utils.displayJsonInEditor(doDecResponse);
+		// } else {
+		// 	// post selected text/declaration
+		// 	// var selection = editor.selection;
+		// 	const text = editor.document.getText(editor.selection);
+		// 	if (!utils.isValidJson(text)) {
+		// 		return vscode.window.showErrorMessage('Not valid JSON');
+		// 	}
 			
-			// console.log(`SELECTED TEXT: ${text}`)
-			doDecResponse = await ext.f5Api.postTSDec(device, password, JSON.parse(text));
-			displayJsonInEditor(doDecResponse);
+		// 	// console.log(`SELECTED TEXT: ${text}`)
+		// 	doDecResponse = await f5Api.postTSDec(device, password, JSON.parse(text));
+		// 	utils.displayJsonInEditor(doDecResponse.body);
+		// } 
+
+
+		let text: string;
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
+
+		if (!utils.isValidJson(text)) {
+			return vscode.window.showErrorMessage('Not valid JSON object');
+		}
+
+		const response = await f5Api.postDoDec(device, password, JSON.parse(text));
+		utils.displayJsonInEditor(response.body);
 
 	}));
 
@@ -716,10 +716,10 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 		
-		const password = await getPassword(device);
-		const resp = await ext.f5Api.doInspect(device, password);
+		const password = await utils.getPassword(device);
+		const resp = await f5Api.doInspect(device, password);
 
-		displayJsonInEditor(resp.body);
+		utils.displayJsonInEditor(resp.body);
 	}));
 
 
@@ -735,10 +735,10 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 		
-		const password = await getPassword(device);
-		const resp = await ext.f5Api.doTasks(device, password);
+		const password = await utils.getPassword(device);
+		const resp = await f5Api.doTasks(device, password);
 
-		displayJsonInEditor(resp.body);
+		utils.displayJsonInEditor(resp.body);
 	}));
 
 
@@ -770,19 +770,58 @@ export function activate(context: vscode.ExtensionContext) {
 			if (value === undefined) {
 				throw new Error('write memeto inputBox cancelled');
 			}
-			setMementoW('key1', value);
+			utils.setMementoW('key1', value);
 		});
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('readMemento', async () => {
 		// console.log('placeholder for testing commands - 2');
 		
-		const mento1 = getMementoW('key1');
+		const mento1 = utils.getMementoW('key1');
 		vscode.window.showInformationMessage(`Memento! ${mento1}`);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
 		chuckJoke();
+
+		// const decSamp = {
+		// 	"schemaVersion": "1.5.0",
+		// 	"class": "Device",
+		// 	"async": true,
+		// 	"Common": {
+		// 		"class": "Tenant",
+		// 		"myLicense": {
+		// 			"class": "License",
+		// 			"licenseType": "licensePool",
+		// 			"licensePool": "F5-BIG-VEP3-1G-25V13",
+		// 			"overwrite": true,
+		// 			"bigIpUsername": "admin",
+		// 			"reachable": true,
+		// 			"unitOfMeasure": "monthly"
+		// 		},
+		// 		"myDns": {
+		// 			"class": "DNS",
+		// 			"nameServers": [
+		// 				"192.168.200.7"
+		// 			],
+		// 			"search": [
+		// 				"benlab.io"
+		// 			]
+		// 		},
+		// 		"myNtp": {
+		// 			"class": "NTP",
+		// 			"servers": [
+		// 				"us.pool.ntp.org"
+		// 			],
+		// 			"timezone": "US/Central"
+		// 		},
+		// 		"hostname": "ilx01.benlab.io"
+		// 	},
+		// 	"label": "ilx-dev"
+		// };
+
+		// utils.isDoDecAsync(decSamp);
+
 	}));
 
 }

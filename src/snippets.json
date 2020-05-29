@@ -1,6 +1,8 @@
 {
   "example F5 AS3 declaration": {
-    "prefix": ["as3", "example", "f5", "dec"],
+    "prefix": [
+      "as3-Sample_01"
+    ],
     "body": [
       "{",
       "   \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",",
@@ -46,7 +48,9 @@
     "description": ""
   },
   "example F5 DO declaration": {
-    "prefix": ["do", "example", "f5", "dec"],
+    "prefix": [
+      "do-sample1"
+    ],
     "body": [
       "{",
       "  \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json\",",
@@ -207,7 +211,9 @@
     "description": ""
   },
   "example F5 Telemetry Streaming declaration": {
-    "prefix": ["ts", "example", "f5", "dec"],
+    "prefix": [
+      "ts-sample1"
+    ],
     "body": [
       "{",
       "    \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json\",",

@@ -2,24 +2,17 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
-import { 
-    setHostStatusBar, 
-    setHostnameBar,
-    setAS3Bar, 
-    setFastBar,
-    setDOBar, 
-    setTSBar
- } from './utils';
+import * as utils from './utils';
 import { ext } from '../extensionVariables';
 
 
 /**
  * F5 API commands
  */
-export class F5Api {
+// export class F5Api {
 
 
-    async connectF5(device: string, password: string) {
+export async function connectF5(device: string, password: string) {
         var [username, host] = device.split('@');
         getAuthToken(host, username, password)
             .then( async token => {
@@ -27,7 +20,7 @@ export class F5Api {
                 // cache password in keytar
                 ext.keyTar.setPassword('f5Hosts', device, password);
                 
-                setHostStatusBar(device);
+                utils.setHostStatusBar(device);
                 vscode.window.showInformationMessage(`Successfully connected to ${host}`);
 
                 //********** Host info **********/
@@ -41,7 +34,7 @@ export class F5Api {
                 if (hostInfo.status === 200) {
                     const text = `${hostInfo.body.hostname}`;
                     const tip = `TMOS: ${hostInfo.body.version}`;
-                    setHostnameBar(text, tip);
+                    utils.setHostnameBar(text, tip);
                 }
 
                 //********** TS info **********/
@@ -55,7 +48,7 @@ export class F5Api {
                 if (tsInfo.status === 200) {
                     const text = `TS(${tsInfo.body.version})`;
                     const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `;
-                    setTSBar(text, tip);
+                    utils.setTSBar(text, tip);
                 }
 
                 //********** FAST info **********/
@@ -68,7 +61,7 @@ export class F5Api {
                     
                 if (fastInfo.status === 200) {
                     const text = `FAST(${fastInfo.body.version})`;
-                    setFastBar(text);
+                    utils.setFastBar(text);
                 }
                     
                 //********** AS3 info **********/
@@ -82,7 +75,7 @@ export class F5Api {
                 if (as3Info.status === 200) {
                     const text = `AS3(${as3Info.body.version})`;
                     const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `;
-                    setAS3Bar(text, tip);
+                    utils.setAS3Bar(text, tip);
                 }
 
                 const doInfo = await callHTTP(
@@ -96,7 +89,7 @@ export class F5Api {
                     // for some reason DO responds with a list for version info...
                     const text = `DO(${doInfo.body[0].version})`;
                     const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `;
-                    setDOBar(text, tip);
+                    utils.setDOBar(text, tip);
                 }
             }
         );
@@ -104,348 +97,356 @@ export class F5Api {
 
 
 
-    /**
-     * Used to get F5 Host info
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async getF5HostInfo(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host, 
-                    '/mgmt/shared/identified-devices/config/device-info', 
-                    token
-                );
-            }
-        );
-    }
+/**
+ * Used to get F5 Host info
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function getF5HostInfo(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host, 
+                '/mgmt/shared/identified-devices/config/device-info', 
+                token
+            );
+        }
+    );
+}
 
 
 
-    /**
-     * Used to issue bash commands to device over API
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     * @param cmd Bash command to execute, or tmsh + <tmsh command>
-     */
-    async issueBash(device: string, password: string, cmd: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'POST', 
-                    host,
-                    '/mgmt/tm/util/bash', 
-                    token,
-                    {
-                        command: 'run',
-                        utilCmdArgs: `-c '${cmd}'`
-                    }
-                );
-            }
-        );
-    }
-
-
-    /**
-     * Get Telemetry Streaming Service info
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async getTsInfo(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    '/mgmt/shared/telemetry/info', 
-                    token
-                );
-            }
-        );
-    }
-
-
-
-    /**
-     * Get current Telemetry Streaming Declaration
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async getTSDec(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    '/mgmt/shared/telemetry/declare', 
-                    token
-                );
-            }
-        );
-    }
-
-
-    /**
-     * Get current Telemetry Streaming Declaration
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async postTSDec(device: string, password: string, dec: object) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'POST', 
-                    host,
-                    '/mgmt/shared/telemetry/declare', 
-                    token,
-                    dec
-                );
-            }
-        );
-    }
-
-
-    /**
-     * Get current Declarative Onboarding Declaration
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async getDoDec(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    '/mgmt/shared/declarative-onboarding/', 
-                    token
-                );
-            }
-        );
-    }
-
-
-    /**
-     * POST Declarative Onboarding Declaration
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     * @param dec DO declaration object
-     */
-    async postDoDec(device: string, password: string, dec: object) {
-        var [username, host] = device.split('@');
-
-        const authToken = await getAuthToken(host, username, password);
-        const progressPost = await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: "Posting Declaration",
-            cancellable: true
-        }, async (progress, token) => {
-            token.onCancellationRequested(() => {
-                // this logs but doesn't actually cancel...
-                console.log("User canceled the async post");
-                return new Error(`User canceled the async post`);
-            });
-
-            // post initial dec
-            let response = await callHTTP('POST', host, `/mgmt/shared/declarative-onboarding/`, authToken, dec);
-
-            // if bad dec, return response
-            if(response.status === 422) {
-                return response;
-            }
-
-            progress.report({ message: `${response.body.result.message}`});
-            await new Promise(resolve => { setTimeout(resolve, 1000); });
-
-            let taskId: string | undefined;
-            if(response.status === 202) {
-                taskId = response.body.id;
-
-                // get got a 202 and a taskId (single dec), check task status till complete
-                while(taskId) {
-                    response = await callHTTP('GET', host, `/mgmt/shared/declarative-onboarding/task/${taskId}`, authToken);
-
-                    // if not 'in progress', its done, clear taskId to break loop
-                    if(response.body.result.status === 'FINISHED' || response.body.result.status === 'ERROR' || response.body.result.status === 'OK'){
-                        taskId = undefined;
-                        return response;
-                    }
-                    progress.report({ message: `${response.body.result.message}`});
-                    await new Promise(resolve => { setTimeout(resolve, 2000); });
+/**
+ * Used to issue bash commands to device over API
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ * @param cmd Bash command to execute, or tmsh + <tmsh command>
+ */
+export async function issueBash(device: string, password: string, cmd: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'POST', 
+                host,
+                '/mgmt/tm/util/bash', 
+                token,
+                {
+                    command: 'run',
+                    utilCmdArgs: `-c '${cmd}'`
                 }
-            }
-            // return response from regular post
-            return response;
+            );
+        }
+    );
+}
+
+
+/**
+ * Get Telemetry Streaming Service info
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function getTsInfo(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                '/mgmt/shared/telemetry/info', 
+                token
+            );
+        }
+    );
+}
+
+
+
+/**
+ * Get current Telemetry Streaming Declaration
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function getTSDec(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                '/mgmt/shared/telemetry/declare', 
+                token
+            );
+        }
+    );
+}
+
+
+/**
+ * Get current Telemetry Streaming Declaration
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function postTSDec(device: string, password: string, dec: object) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'POST', 
+                host,
+                '/mgmt/shared/telemetry/declare', 
+                token,
+                dec
+            );
+        }
+    );
+}
+
+
+/**
+ * Get current Declarative Onboarding Declaration
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function getDoDec(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                '/mgmt/shared/declarative-onboarding/', 
+                token
+            );
+        }
+    );
+}
+
+
+interface Dec {
+    async?: string
+}
+
+/**
+ * POST Declarative Onboarding Declaration
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ * @param dec DO declaration object
+ */
+export async function postDoDec(device: string, password: string, dec: Dec) {
+    var [username, host] = device.split('@');
+
+    if((dec.hasOwnProperty('async') && dec.async === 'false' ) || !dec.hasOwnProperty('async')) {
+        vscode.window.showWarningMessage('async DO post highly recommended!!!');
+    }
+
+    const authToken = await getAuthToken(host, username, password);
+    const progressPost = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Posting Declaration",
+        cancellable: true
+    }, async (progress, token) => {
+        token.onCancellationRequested(() => {
+            // this logs but doesn't actually cancel...
+            console.log("User canceled the async post");
+            return new Error(`User canceled the async post`);
         });
-        return progressPost;
-    }
 
+        // post initial dec
+        let response = await callHTTP('POST', host, `/mgmt/shared/declarative-onboarding/`, authToken, dec);
 
+        // if bad dec, return response
+        if(response.status === 422) {
+            return response;
+        }
 
-    /**
-     * DO Inspect - returns potential DO configuration items
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async doInspect(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    '/mgmt/shared/declarative-onboarding/inspect', 
-                    token,
-                );
+        progress.report({ message: `${response.body.result.message}`});
+        await new Promise(resolve => { setTimeout(resolve, 1000); });
+
+        let taskId: string | undefined;
+        if(response.status === 202) {
+            taskId = response.body.id;
+
+            // get got a 202 and a taskId (single dec), check task status till complete
+            while(taskId) {
+                response = await callHTTP('GET', host, `/mgmt/shared/declarative-onboarding/task/${taskId}`, authToken);
+
+                // if not 'in progress', its done, clear taskId to break loop
+                if(response.body.result.status === 'FINISHED' || response.body.result.status === 'ERROR' || response.body.result.status === 'OK'){
+                    taskId = undefined;
+                    return response;
+                }
+                progress.report({ message: `${response.body.result.message}`});
+                await new Promise(resolve => { setTimeout(resolve, 2000); });
             }
-        );
-    }
+        }
+        // return response from regular post
+        return response;
+    });
+    return progressPost;
+}
 
 
 
-    /**
-     * DO tasks - returns executed tasks
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async doTasks(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    '/mgmt/shared/declarative-onboarding/task', 
-                    token,
-                );
-            }
-        );
-    }
+/**
+ * DO Inspect - returns potential DO configuration items
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function doInspect(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                '/mgmt/shared/declarative-onboarding/inspect', 
+                token,
+            );
+        }
+    );
+}
 
 
 
-    /**
-     * AS3 declarations
-     * no tenant, returns ALL AS3 decs
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     * @param tenant tenant(optional)
-     */
-    async getAS3Decs(device: string, password: string, tenant: string = '') {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    `/mgmt/shared/appsvcs/declare/${tenant}`, 
-                    token,
-                );
-            }
-        );
-    }
+/**
+ * DO tasks - returns executed tasks
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function doTasks(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                '/mgmt/shared/declarative-onboarding/task', 
+                token,
+            );
+        }
+    );
+}
 
 
 
-    /**
-     * Delete AS3 Tenant
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     * @param tenant tenant
-     */
-    async delAS3Tenant(device: string, password: string, tenant: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'DELETE', 
-                    host,
-                    `/mgmt/shared/appsvcs/declare/${tenant}`, 
-                    token,
-                );
-            }
-        );
-    }
+/**
+ * AS3 declarations
+ * no tenant, returns ALL AS3 decs
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ * @param tenant tenant(optional)
+ */
+export async function getAS3Decs(device: string, password: string, tenant: string = '') {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                `/mgmt/shared/appsvcs/declare/${tenant}`, 
+                token,
+            );
+        }
+    );
+}
 
 
 
-    /**
-     * AS3 tasks - returns executed tasks
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async getAS3Tasks(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    '/mgmt/shared/appsvcs/task/', 
-                    token,
-                );
-            }
-        );
-    }
-
-
-    /**
-     * AS3 tasks - returns executed tasks
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async getAS3Task(device: string, password: string, id: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token=> {
-                return callHTTP(
-                    'GET', 
-                    host,
-                    `/mgmt/shared/appsvcs/task/${id}`, 
-                    token,
-                );
-            }
-        );
-    }
+/**
+ * Delete AS3 Tenant
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ * @param tenant tenant
+ */
+export async function delAS3Tenant(device: string, password: string, tenant: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'DELETE', 
+                host,
+                `/mgmt/shared/appsvcs/declare/${tenant}`, 
+                token,
+            );
+        }
+    );
+}
 
 
 
-    /**
-     * Get Fast Info - fast service version/details
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     */
-    async getF5FastInfo(device: string, password: string) {
-        var [username, host] = device.split('@');
-        return getAuthToken(host, username, password)
-            .then( token => {
-                return callHTTP(
-                    'GET', 
-                    host, 
-                    `/mgmt/shared/fast/info`, 
-                    token,
-                );
-            }
-        );
-    }
+/**
+ * AS3 tasks - returns executed tasks
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function getAS3Tasks(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                '/mgmt/shared/appsvcs/task/', 
+                token,
+            );
+        }
+    );
+}
+
+
+/**
+ * AS3 tasks - returns executed tasks
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function getAS3Task(device: string, password: string, id: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token=> {
+            return callHTTP(
+                'GET', 
+                host,
+                `/mgmt/shared/appsvcs/task/${id}`, 
+                token,
+            );
+        }
+    );
+}
 
 
 
-    /**
-     * Post AS3 Dec
-     * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
-     * @param password User Password
-     * @param postParam 
-     * @param dec Delcaration
-     */
-    async postAS3Dec(device: string, password: string, postParam: string = '', dec: object) {
+/**
+ * Get Fast Info - fast service version/details
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ */
+export async function getF5FastInfo(device: string, password: string) {
+    var [username, host] = device.split('@');
+    return getAuthToken(host, username, password)
+        .then( token => {
+            return callHTTP(
+                'GET', 
+                host, 
+                `/mgmt/shared/fast/info`, 
+                token,
+            );
+        }
+    );
+};
+
+
+
+/**
+ * Post AS3 Dec
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ * @param postParam 
+ * @param dec Delcaration
+ */
+export async function postAS3Dec(device: string, password: string, postParam: string = '', dec: object) {
         const [username, host] = device.split('@');
 
         const authToken = await getAuthToken(host, username, password);
@@ -512,7 +513,7 @@ export class F5Api {
         });
         return progressPost;
     }
-};
+// };
 
 
 interface OptsObject {

@@ -3,9 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, TreeView, StatusBarItem, workspace } from "vscode";
+import { ExtensionContext, StatusBarItem } from "vscode";
 import * as keyTarType from "keytar";
-import { F5Api } from './utils/f5Api';
+// import { F5Api } from './utils/f5Api';
 
 type KeyTar = typeof keyTarType;
 
@@ -23,7 +23,7 @@ export namespace ext {
     export let doBar: StatusBarItem;
     export let tsBar: StatusBarItem;
     export let as3AsyncPost: boolean | undefined;
-    export let f5Api: F5Api;
+    // export let f5Api: F5Api;
     export let carTreeData: object | undefined;
     export let tsExampleView: object | undefined;
 }

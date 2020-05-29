@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getPassword } from '../utils/utils';
 import { ext } from '../extensionVariables';
+import * as f5Api from '../utils/f5Api';
 // import { callHTTPS } from '../utils/externalAPIs'
 
 export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantItem> {
@@ -37,7 +38,7 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 
 		 // get memento data, parse and make tree as needed
 		const password = await getPassword(device);
-		const tenantsFull = await ext.f5Api.getAS3Decs(device, password);
+		const tenantsFull = await f5Api.getAS3Decs(device, password);
 		// const bodyKeys = Object.keys(tenantsFull.body);
 
 		var treeItems = [];

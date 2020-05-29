@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { F5Api } from './f5Api';
+// import { F5Api } from './f5Api';
 
 // const f5API = new f5Api();
 
@@ -252,3 +252,34 @@ export function setMementoW(key:string, value: string) {
 export function getMementoW(key:string) {
     return ext.context.workspaceState.get(key);
 }
+
+
+
+
+
+/**
+ * Checks to see if DO dec contains ("async": false)
+ * if not async, pop up warning message
+ * @param dec posting DO dec
+ */
+// export function isDoDecAsync(dec: Dec) {
+//     // if dec object contains "async": false,
+//     //  then show erro message
+
+
+
+//     if((dec.hasOwnProperty('async') && dec.async === false) || !dec.hasOwnProperty('async')) {
+//         vscode.window.showWarningMessage('async DO post highly recommended!!!')
+//     }
+
+    // console.log(dec.hasOwnProperty('async'));
+    
+
+    // if('async' in dec) {
+    //     if(dec.async = false) {
+            
+    //     }
+    // }
+
+
+// }
