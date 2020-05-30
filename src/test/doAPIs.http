@@ -1,6 +1,6 @@
 
-@host = 10.200.244.100
-#@host = 10.200.244.5
+# @host = 10.200.244.100
+@host = 192.168.200.131
 
 @user = admin
 @upass = benrocks

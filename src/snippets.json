@@ -1,5 +1,5 @@
 {
-  "example F5 AS3 declaration": {
+  "example_F5_AS3_declaration": {
     "prefix": [
       "as3-Sample_01"
     ],
@@ -47,7 +47,7 @@
     ],
     "description": ""
   },
-  "example F5 DO declaration": {
+  "example_F5_DO_declaration": {
     "prefix": [
       "do-sample1"
     ],
@@ -210,7 +210,7 @@
     ],
     "description": ""
   },
-  "example F5 Telemetry Streaming declaration": {
+  "example_F5_Telemetry_Streaming_declaration": {
     "prefix": [
       "ts-sample1"
     ],

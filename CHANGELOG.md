@@ -6,6 +6,13 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.9] - (5-25-2020)
+
+### Modified
+- Added warning when posting sync DO dec that async is highly recommended
+- *** setup progress bar for tenant delete and any other longer operation
+- *** webview output for re-usable window
+
 ## [0.1.8] - (5-25-2020)
 
 ### Modified
