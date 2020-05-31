@@ -21,7 +21,7 @@ export async function connectF5(device: string, password: string) {
                 ext.keyTar.setPassword('f5Hosts', device, password);
                 
                 utils.setHostStatusBar(device);
-                vscode.window.showInformationMessage(`Successfully connected to ${host}`);
+                // vscode.window.showInformationMessage(`Successfully connected to ${host}`);
 
                 //********** Host info **********/
                 const hostInfo = await callHTTP(
@@ -126,20 +126,36 @@ export async function getF5HostInfo(device: string, password: string) {
  */
 export async function issueBash(device: string, password: string, cmd: string) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'POST', 
-                host,
-                '/mgmt/tm/util/bash', 
-                token,
-                {
-                    command: 'run',
-                    utilCmdArgs: `-c '${cmd}'`
-                }
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const responseA = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Issuing base command over API`
+    }, async () => {
+        let responseB = await callHTTP('POST', host, `/mgmt/tm/util/bash`, authToken,
+            {
+                command: 'run',
+                utilCmdArgs: `-c '${cmd}'`
+            }
+        );
+        return responseB;
+    });
+    return responseA;
+
+    // var [username, host] = device.split('@');
+    // return getAuthToken(host, username, password)
+    //     .then( token=> {
+    //         return callHTTP(
+    //             'POST', 
+    //             host,
+    //             '/mgmt/tm/util/bash', 
+    //             token,
+    //             {
+    //                 command: 'run',
+    //                 utilCmdArgs: `-c '${cmd}'`
+    //             }
+    //         );
+    //     }
+    // );
 }
 
 
@@ -171,16 +187,27 @@ export async function getTsInfo(device: string, password: string) {
  */
 export async function getTSDec(device: string, password: string) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'GET', 
-                host,
-                '/mgmt/shared/telemetry/declare', 
-                token
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const responseA = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Getting TS Dec`
+    }, async () => {
+        let responseB = await callHTTP('GET', host, `/mgmt/shared/telemetry/declare`, authToken);
+        return responseB;
+    });
+    return responseA;
+
+    // var [username, host] = device.split('@');
+    // return getAuthToken(host, username, password)
+    //     .then( token=> {
+    //         return callHTTP(
+    //             'GET', 
+    //             host,
+    //             '/mgmt/shared/telemetry/declare', 
+    //             token
+    //         );
+    //     }
+    // );
 }
 
 
@@ -191,17 +218,28 @@ export async function getTSDec(device: string, password: string) {
  */
 export async function postTSDec(device: string, password: string, dec: object) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'POST', 
-                host,
-                '/mgmt/shared/telemetry/declare', 
-                token,
-                dec
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const responseA = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Posting TS Dec`
+    }, async () => {
+        let responseB = await callHTTP('POST', host, `/mgmt/shared/telemetry/declare`, authToken, dec);
+        return responseB;
+    });
+    return responseA;
+
+    // var [username, host] = device.split('@');
+    // return getAuthToken(host, username, password)
+    //     .then( token=> {
+    //         return callHTTP(
+    //             'POST', 
+    //             host,
+    //             '/mgmt/shared/telemetry/declare', 
+    //             token,
+    //             dec
+    //         );
+    //     }
+    // );
 }
 
 
@@ -212,16 +250,27 @@ export async function postTSDec(device: string, password: string, dec: object) {
  */
 export async function getDoDec(device: string, password: string) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'GET', 
-                host,
-                '/mgmt/shared/declarative-onboarding/', 
-                token
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const responseA = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Getting DO Dec`
+    }, async () => {
+        let responseB = await callHTTP('GET', host, `/mgmt/shared/declarative-onboarding/`, authToken);
+        return responseB;
+    });
+    return responseA;
+
+    // var [username, host] = device.split('@');
+    // return getAuthToken(host, username, password)
+    //     .then( token=> {
+    //         return callHTTP(
+    //             'GET', 
+    //             host,
+    //             '/mgmt/shared/declarative-onboarding/', 
+    //             token
+    //         );
+    //     }
+    // );
 }
 
 
@@ -245,7 +294,7 @@ export async function postDoDec(device: string, password: string, dec: Dec) {
     const authToken = await getAuthToken(host, username, password);
     const progressPost = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: "Posting Declaration",
+        title: "Posting DO Declaration",
         cancellable: true
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
@@ -279,7 +328,7 @@ export async function postDoDec(device: string, password: string, dec: Dec) {
                     return response;
                 }
                 progress.report({ message: `${response.body.result.message}`});
-                await new Promise(resolve => { setTimeout(resolve, 2000); });
+                await new Promise(resolve => { setTimeout(resolve, (ext.settings.asyncInterval * 1000)); });
             }
         }
         // return response from regular post
@@ -297,16 +346,27 @@ export async function postDoDec(device: string, password: string, dec: Dec) {
  */
 export async function doInspect(device: string, password: string) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'GET', 
-                host,
-                '/mgmt/shared/declarative-onboarding/inspect', 
-                token,
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const responseA = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Getting DO Inspect`
+    }, async () => {
+        let responseB = await callHTTP('GET', host, `/mgmt/shared/declarative-onboarding/inspect`, authToken);
+        return responseB;
+    });
+    return responseA;
+
+    // var [username, host] = device.split('@');
+    // return getAuthToken(host, username, password)
+    //     .then( token=> {
+    //         return callHTTP(
+    //             'GET', 
+    //             host,
+    //             '/mgmt/shared/declarative-onboarding/inspect', 
+    //             token,
+    //         );
+    //     }
+    // );
 }
 
 
@@ -318,16 +378,27 @@ export async function doInspect(device: string, password: string) {
  */
 export async function doTasks(device: string, password: string) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'GET', 
-                host,
-                '/mgmt/shared/declarative-onboarding/task', 
-                token,
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const responseA = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Getting DO Tasks`
+    }, async () => {
+        let responseB = await callHTTP('GET', host, `/mgmt/shared/declarative-onboarding/task`, authToken);
+        return responseB;
+    });
+    return responseA;
+
+    // var [username, host] = device.split('@');
+    // return getAuthToken(host, username, password)
+    //     .then( token=> {
+    //         return callHTTP(
+    //             'GET', 
+    //             host,
+    //             '/mgmt/shared/declarative-onboarding/task', 
+    //             token,
+    //         );
+    //     }
+    // );
 }
 
 
@@ -363,16 +434,15 @@ export async function getAS3Decs(device: string, password: string, tenant: strin
  */
 export async function delAS3Tenant(device: string, password: string, tenant: string) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'DELETE', 
-                host,
-                `/mgmt/shared/appsvcs/declare/${tenant}`, 
-                token,
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const progressDelete = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Deleting ${tenant} Declaration`
+    }, async () => {
+        let response = await callHTTP('DELETE', host, `/mgmt/shared/appsvcs/declare/${tenant}`, authToken);
+        return response;
+    });
+    return progressDelete;
 }
 
 
@@ -404,16 +474,27 @@ export async function getAS3Tasks(device: string, password: string) {
  */
 export async function getAS3Task(device: string, password: string, id: string) {
     var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token=> {
-            return callHTTP(
-                'GET', 
-                host,
-                `/mgmt/shared/appsvcs/task/${id}`, 
-                token,
-            );
-        }
-    );
+    const authToken = await getAuthToken(host, username, password);
+    const responseA = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Getting AS3 Task`
+    }, async () => {
+        let responseB = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${id}`, authToken);
+        return responseB;
+    });
+    return responseA;
+
+    // var [username, host] = device.split('@');
+    // return getAuthToken(host, username, password)
+    //     .then( token=> {
+    //         return callHTTP(
+    //             'GET', 
+    //             host,
+    //             `/mgmt/shared/appsvcs/task/${id}`, 
+    //             token,
+    //         );
+    //     }
+    // );
 }
 
 
@@ -496,7 +577,7 @@ export async function postAS3Dec(device: string, password: string, postParam: st
                     }
 
                     progress.report({ message: `${response.body.results[0].message}`});
-                    await new Promise(resolve => { setTimeout(resolve, 3000); });
+                    await new Promise(resolve => { setTimeout(resolve, (ext.settings.asyncInterval * 1000)); });
 
                 }
                 // return response from successful async

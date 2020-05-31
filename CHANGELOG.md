@@ -6,7 +6,7 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [0.1.9] - (5-25-2020)
+## [0.1.9] - (5-31-2020)
 
 ### Added
 - Added warning when posting syncronous DO dec that async is highly recommended
@@ -21,11 +21,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - show=full
   - show=expanded
   
-- *** setup progress bar for tenant delete and any other longer operation
-  - get device info?
-  - get current do/ts dec?
+- setup progress bar for issueBase, getTSDec, postTSDec, getDoDec, doInspect, doTasks, deleteAS3Tenant, getAS3Task
 
-- *** webview output for re-usable window
+- Created webview output for re-usable window
+  - *in developement* - enable in settings under, 'previewResponseInUntitledDocument'
+  - The webview is easily re-usable, to keep opening a new tab for every call, but they don't allow the user to modify and repost like the regular json output
+
+- Settings key for seconds between async Task status updates
+  - f5.asyncInterval - default = 5 (seconds)
 
 ## [0.1.8] - (5-25-2020)
 

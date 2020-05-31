@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import { chuckJoke, chuckJoke2, chuckJoke1 } from './chuckJoke';
+import { chuckJoke2, chuckJoke1 } from './chuckJoke';
 import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
@@ -13,9 +13,10 @@ import { callHTTPS } from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
-import { displayWebView } from './webview';
+import { displayWebView, WebViewPanel } from './webview';
 import * as keyTarType from 'keytar';
 // import { MemFS } from './treeViewsProviders/fileSystemProvider';
+// import { HttpResponseWebview } from './responseWebview';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -41,6 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// exploring classes to group all f5 api calls
 	// const f5API = new f5Api();
 	// ext.f5Api = new F5Api;
+	// let webview = new HttpResponseWebview(context);
 
 	// Setup keyTar global var
 	// type KeyTar = typeof keyTarType;
@@ -374,7 +376,12 @@ export function activate(context: vscode.ExtensionContext) {
 		var device: string | undefined = ext.hostStatusBar.text;
 		const password = await utils.getPassword(device);
 		const response = await f5Api.getAS3Decs(device, password, tenant);
-		utils.displayJsonInEditor(response.body);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
 	}));
 
 
@@ -393,7 +400,13 @@ export function activate(context: vscode.ExtensionContext) {
 		var device: string | undefined = ext.hostStatusBar.text;
 		const password = await utils.getPassword(device);
 		const response = await f5Api.delAS3Tenant(device, password, tenant.label);
-		utils.displayJsonInEditor(response.body);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
+	
 		// give a little time to finish
 		await new Promise(resolve => { setTimeout(resolve, 3000); });
 		as3TenantTree.refresh();
@@ -402,10 +415,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
-		
 		var device: string | undefined = ext.hostStatusBar.text;
-
-		
 		if (!device) {
 			device = await vscode.commands.executeCommand('f5.connectDevice');
 		}
@@ -415,8 +425,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 		const password = await utils.getPassword(device);
-		const dec = await f5Api.getAS3Task(device, password, id);
-		utils.displayJsonInEditor(dec.body);
+		const response = await f5Api.getAS3Task(device, password, id);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
+
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', async () => {
@@ -462,7 +478,14 @@ export function activate(context: vscode.ExtensionContext) {
 		// use the following logic to implement robust async
 		// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/as3.sh
 		const response = await f5Api.postAS3Dec(device, password, postParam, JSON.parse(text));
-		utils.displayJsonInEditor(response.body);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
+
+
 		as3TenantTree.refresh();
 		as3Tree.refresh();
 		
@@ -534,7 +557,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const password = await utils.getPassword(device);
 		const dec = await f5Api.getTSDec(device, password);
 		utils.displayJsonInEditor(dec.body.declaration);
-
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.postDec', async () => {
@@ -754,6 +776,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
 		chuckJoke1();
+		// const catPanel = CatCodingPanel.render(context.extensionPath);
 		// chuckJoke2();
 		// displayWebView({ name: 'inputing some info'});
 	}));

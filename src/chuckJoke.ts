@@ -15,7 +15,7 @@ export function chuckJoke1() {
         host: 'api.chucknorris.io',
         path: '/jokes/random',
         method: 'GET',
-    }
+    };
     
     // console.log('Bout to call request')
     const req = request(chuckApiCall, response => {
@@ -36,7 +36,7 @@ export function chuckJoke1() {
             // const content = `Chuck Joke: \r\n\r\n${ result.value }`
             // const content = `Chuck Joke: \r\n\r\n${ result }`
             
-            const content = { chuckJoke: result.value }
+            const content = { chuckJoke: result.value };
 
             if (result) {
                 // vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(content , undefined, 4) })
@@ -59,7 +59,7 @@ function getJoke() {
         host: 'api.chucknorris.io',
         path: '/jokes/random',
         method: 'GET',
-    }
+    };
     
     // console.log('Bout to call request')
     const req = request(chuckApiCall, response => {

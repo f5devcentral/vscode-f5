@@ -1,5 +1,6 @@
 {
   "example_F5_AS3_declaration": {
+    "scope": "json",
     "prefix": [
       "as3-Sample_01"
     ],

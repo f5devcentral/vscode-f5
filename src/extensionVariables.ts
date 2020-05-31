@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, StatusBarItem } from "vscode";
+import { ExtensionContext, StatusBarItem, workspace, ViewColumn } from "vscode";
 import * as keyTarType from "keytar";
 // import { F5Api } from './utils/f5Api';
 
@@ -26,7 +26,27 @@ export namespace ext {
     // export let f5Api: F5Api;
     export let carTreeData: object | undefined;
     export let tsExampleView: object | undefined;
+    
+    export namespace settings {
+        export let as3PostAsync: boolean;
+        export let asyncInterval: number;
+        export let timeoutInMilliseconds: number;
+        export let showResponseInDifferentTab: boolean;
+        export let previewResponseInUntitledDocument: boolean;
+        export let previewColumn: ViewColumn;
+        export let previewResponsePanelTakeFocus: boolean;
+        export let logLevel: string;
+    }
 }
+
+ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
+ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
+ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
+ext.settings.showResponseInDifferentTab = workspace.getConfiguration().get('f5.showResponseInDifferentTab', false);
+ext.settings.previewResponseInUntitledDocument = workspace.getConfiguration().get('f5.previewResponseInUntitledDocument', false);
+ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.previewColumn', 'two'));
+ext.settings.previewResponsePanelTakeFocus = workspace.getConfiguration().get('f5.previewResponsePanelTakeFocus', true);
+ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
 
 
 // all this can possibly be replaced by the f5-cli
@@ -42,6 +62,17 @@ export namespace git {
     export let examplesTS: string = 'https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples/declarations';
 }
 
+
+function parseColumn(value: string): ViewColumn {
+    value = value.toLowerCase();
+    switch (value) {
+        case 'current':
+            return ViewColumn.Active;
+        case 'beside':
+        default:
+            return ViewColumn.Beside;
+    }
+}
 
 /*
 // external links - for testing and future use
