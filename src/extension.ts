@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import { chuckJoke } from './chuckJoke';
+import { chuckJoke, chuckJoke2, chuckJoke1 } from './chuckJoke';
 import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
@@ -13,8 +13,9 @@ import { callHTTPS } from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { test } from 'mocha';
 import { ext } from './extensionVariables';
+import { displayWebView } from './webview';
 import * as keyTarType from 'keytar';
-import { MemFS } from './treeViewsProviders/fileSystemProvider';
+// import { MemFS } from './treeViewsProviders/fileSystemProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -553,6 +554,9 @@ export function activate(context: vscode.ExtensionContext) {
 			return; // No open text editor
 		}
 
+		// TODO clean up following logic to look like other posts
+		//		and have it only display body
+
 		// if text is selected in editor
 		if (editor.selection.isEmpty) {
 			// post entire page
@@ -749,46 +753,9 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
-		chuckJoke();
-
-		// const decSamp = {
-		// 	"schemaVersion": "1.5.0",
-		// 	"class": "Device",
-		// 	"async": true,
-		// 	"Common": {
-		// 		"class": "Tenant",
-		// 		"myLicense": {
-		// 			"class": "License",
-		// 			"licenseType": "licensePool",
-		// 			"licensePool": "F5-BIG-VEP3-1G-25V13",
-		// 			"overwrite": true,
-		// 			"bigIpUsername": "admin",
-		// 			"reachable": true,
-		// 			"unitOfMeasure": "monthly"
-		// 		},
-		// 		"myDns": {
-		// 			"class": "DNS",
-		// 			"nameServers": [
-		// 				"192.168.200.7"
-		// 			],
-		// 			"search": [
-		// 				"benlab.io"
-		// 			]
-		// 		},
-		// 		"myNtp": {
-		// 			"class": "NTP",
-		// 			"servers": [
-		// 				"us.pool.ntp.org"
-		// 			],
-		// 			"timezone": "US/Central"
-		// 		},
-		// 		"hostname": "ilx01.benlab.io"
-		// 	},
-		// 	"label": "ilx-dev"
-		// };
-
-		// utils.isDoDecAsync(decSamp);
-
+		chuckJoke1();
+		// chuckJoke2();
+		// displayWebView({ name: 'inputing some info'});
 	}));
 
 }
