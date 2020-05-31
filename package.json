@@ -49,6 +49,20 @@
 				"path": "./src/snippets.json"
 			}
 		],
+		"jsonValidation": [
+      {
+        "fileMatch": "*.as3.json",
+        "url": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
+      },
+      {
+        "fileMatch": "*.do.json",
+        "url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json"
+      },
+      {
+        "fileMatch": "*.ts.json",
+        "url": "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json"
+      }
+    ],
 		"viewsContainers": {
 			"activitybar": [
 				{
@@ -115,7 +129,8 @@
 			{
 				"command": "f5.disconnect",
 				"title": "Disconnect from Device",
-				"category": "F5"
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.clearPasswords",
@@ -130,11 +145,6 @@
 			{
 				"command": "f5.addHost",
 				"title": "Add Host",
-				"category": "F5"
-			},
-			{
-				"command": "f5.editHost",
-				"title": "Edit Host",
 				"category": "F5"
 			},
 			{
@@ -162,13 +172,14 @@
 				}
 			},
 			{
-				"command": "f5-fast.getFastInfo",
+				"command": "f5-fast.getInfo",
 				"title": "Show Info",
 				"category": "F5-Fast"
 			},
 			{
 				"command": "f5-fast.refreshTemplates",
 				"title": "Refresh",
+				"category": "F5",
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
@@ -177,7 +188,20 @@
 			{
 				"command": "f5-as3.postDec",
 				"title": "Post Declaration",
-				"category": "F5-AS3"
+				"category": "F5-AS3",
+				"enablement": "f5.as3Installed"
+			},
+			{
+				"command": "f5-as3.fullTenant",
+				"title": "Full Tenant",
+				"category": "F5-AS3",
+				"enablement": "view == as3Tenants"
+			},
+			{
+				"command": "f5-as3.expandedTenant",
+				"title": "Expanded Tenant",
+				"category": "F5-AS3",
+				"enablement": "view == as3Tenants"
 			},
 			{
 				"command": "f5-as3.deleteTenant",
@@ -244,23 +268,22 @@
 			},
 			{
 				"command": "writeMemento",
-				"title": "writeMemento"
+				"title": "writeMemento",
+				"category": "F5"
 			},
 			{
 				"command": "readMemento",
-				"title": "readMemento"
+				"title": "readMemento",
+				"category": "F5"
 			},
 			{
 				"command": "f5-ts.enableTsExamples",
 				"title": "Enable"
 			},
 			{
-				"command": "f5-ts.disableTsExamples",
-				"title": "Disable"
-			},
-			{
 				"command": "f5.editHost",
-				"title": "Edit",
+				"title": "Edit Host",
+				"category": "F5",
 				"icon": {
 					"light": "resources/light/edit.svg",
 					"dark": "resources/dark/edit.svg"
@@ -273,7 +296,8 @@
 			},
 			{
 				"command": "chuckJoke",
-				"title": "Chuck Joke"
+				"title": "Chuck Joke",
+				"category": "F5"
 			}
 		],
 		"menus": {
@@ -307,11 +331,84 @@
 					"command": "f5-ts.enableTsExamples",
 					"when": "view == tsExamples",
 					"group": "navigation"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "f5.disconnect",
+					"when": "f5.device"
 				},
 				{
-					"command": "f5-ts.disableTsExamples",
-					"when": "view == tsExamples",
-					"group": "navigation"
+					"command": "f5.getF5HostInfo",
+					"when": "f5.device"
+				},
+				{
+					"command": "f5.removeHost",
+					"when": "none"
+				},
+				{
+					"command": "f5.editHost",
+					"when": "none"
+				},
+				{
+					"command": "f5.refreshHostsTree",
+					"when": "none"
+				},
+				{
+					"command": "f5-fast.getInfo",
+					"when": "f5.fastInstalled"
+				},
+				{
+					"command": "f5-as3.postDec",
+					"when": "f5.as3Installed"
+				},
+				{
+					"command": "f5-as3.deleteTenant",
+					"when": "none"
+				},
+				{
+					"command": "f5-as3.fullTenant",
+					"when": "none"
+				},
+				{
+					"command": "f5-as3.expandedTenant",
+					"when": "none"
+				},
+				{
+					"command": "f5-as3.refreshTenantsTree",
+					"when": "none"
+				},
+				{
+					"command": "f5-as3.refreshTasksTree",
+					"when": "none"
+				},
+				{
+					"command": "f5-do.inspect",
+					"when": "f5.doInstalled"
+				},
+				{
+					"command": "f5-do.getDec",
+					"when": "f5.doInstalled"
+				},
+				{
+					"command": "f5-do.postDec",
+					"when": "f5.doInstalled"
+				},
+				{
+					"command": "f5-do.getTasks",
+					"when": "f5.doInstalled"
+				},
+				{
+					"command": "f5-ts.info",
+					"when": "f5.tsInstalled"
+				},
+				{
+					"command": "f5-ts.getDec",
+					"when": "f5.tsInstalled"
+				},
+				{
+					"command": "f5-ts.postDec",
+					"when": "f5.tsInstalled"
 				}
 			],
 			"view/item/context": [
@@ -331,6 +428,14 @@
 				{
 					"command": "f5.getF5HostInfo",
 					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5-as3.fullTenant",
+					"when": "view == as3Tenants"
+				},
+				{
+					"command": "f5-as3.expandedTenant",
+					"when": "view == as3Tenants"
 				},
 				{
 					"command": "f5-as3.deleteTenant",

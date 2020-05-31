@@ -10,16 +10,19 @@ import { ext } from '../extensionVariables';
  * Feed it nothing, it will disappear!
  * @param host selected host/device from config
  */
-export function setHostStatusBar(host: string = '') {
+export async function setHostStatusBar(host: string = '') {
 
+    
     ext.hostStatusBar.command = 'f5.disconnect';
     ext.hostStatusBar.text = host ? host || '' : '';
     ext.hostStatusBar.tooltip = 'Disconnect';
-
+    
     if (host) {
         ext.hostStatusBar.show();
+        vscode.commands.executeCommand('setContext', 'f5.device', true);
     } else {
         ext.hostStatusBar.hide();
+        vscode.commands.executeCommand('setContext', 'f5.device', false);
     }
 };
 
@@ -30,7 +33,7 @@ export function setHostStatusBar(host: string = '') {
  * @param text text to display in status bar
  * @param tip text to display when hover
  */
-export function setHostnameBar(text: string = '', tip: string = '') {
+export async function setHostnameBar(text: string = '', tip: string = '') {
 
     ext.hostNameBar.command = 'f5.getF5HostInfo';
     ext.hostNameBar.text = text ? text || '' : '';
@@ -52,16 +55,18 @@ export function setHostnameBar(text: string = '', tip: string = '') {
  * @param text text to display in status bar
  * @param tip text to display when hover
  */
-export function setFastBar(text: string = '', tip: string = '') {
+export async function setFastBar(text: string = '', tip: string = '') {
 
-    ext.fastBar.command = 'f5-fast.getFastInfo';
+    ext.fastBar.command = 'f5-fast.getInfo';
     ext.fastBar.text = text ? text || '' : '';
     ext.fastBar.tooltip = tip ? tip || '' : '';
 
     if (text) {
         ext.fastBar.show();
+        vscode.commands.executeCommand('setContext', 'f5.fastInstalled', true);
     } else {
         ext.fastBar.hide();
+        vscode.commands.executeCommand('setContext', 'f5.fastInstalled', false);
     }
 
 };
@@ -75,7 +80,7 @@ export function setFastBar(text: string = '', tip: string = '') {
  * @param text text to display in status bar
  * @param tip text to display when hover
  */
-export function setAS3Bar(text: string = '', tip: string = '') {
+export async function setAS3Bar(text: string = '', tip: string = '') {
 
     ext.as3Bar.command = 'f5-as3.getDecs';
     ext.as3Bar.text = text ? text || '' : '';
@@ -83,11 +88,14 @@ export function setAS3Bar(text: string = '', tip: string = '') {
 
     if (text) {
         ext.as3Bar.show();
+        vscode.commands.executeCommand('setContext', 'f5.as3Installed', true);
+        
         // refresh trees
         vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
         vscode.commands.executeCommand('f5-as3.refreshTasksTree');
     } else {
         ext.as3Bar.hide();
+        vscode.commands.executeCommand('setContext', 'f5.as3Installed', false);
     }
 
 
@@ -101,7 +109,7 @@ export function setAS3Bar(text: string = '', tip: string = '') {
  * @param text text to display in status bar
  * @param tip text to display when hover
  */
-export function setDOBar(text: string = '', tip: string = '') {
+export async function setDOBar(text: string = '', tip: string = '') {
 
     ext.doBar.command = 'f5-do.getDec';
     ext.doBar.text = text ? text || '' : '';
@@ -109,8 +117,10 @@ export function setDOBar(text: string = '', tip: string = '') {
 
     if (text) {
         ext.doBar.show();
+        vscode.commands.executeCommand('setContext', 'f5.doInstalled', true);
     } else {
         ext.doBar.hide();
+        vscode.commands.executeCommand('setContext', 'f5.doInstalled', false);
     }
 
 };
@@ -122,7 +132,7 @@ export function setDOBar(text: string = '', tip: string = '') {
  * @param text text to display in status bar
  * @param tip text to display when hover
  */
-export function setTSBar(text: string = '', tip: string = '') {
+export async function setTSBar(text: string = '', tip: string = '') {
 
     ext.tsBar.command = 'f5-ts.getDec';
     ext.tsBar.text = text ? text || '' : '';
@@ -130,8 +140,10 @@ export function setTSBar(text: string = '', tip: string = '') {
 
     if (text) {
         ext.tsBar.show();
+        vscode.commands.executeCommand('setContext', 'f5.tsInstalled', true);
     } else {
         ext.tsBar.hide();
+        vscode.commands.executeCommand('setContext', 'f5.tsInstalled', false);
     }
 
 };
@@ -167,45 +179,48 @@ export function isValidJson(json: string) {
 /**
  * Return currently selected device, or prompts to select one
  */
-export async function getDevice(): Promise<any> {
+// export async function getDevice(): Promise<any> {
 
-    // if device in statusBar, return that
-    const device: string = ext.hostStatusBar.text;
-    // console.log(`getDevice from hostStatusBar: ${device}`);
+//     // if device in statusBar, return that
+//     const device: string = ext.hostStatusBar.text;
+//     // console.log(`getDevice from hostStatusBar: ${device}`);
     
-    // if not, get device list from config and prompt to select device
-    //  select device and connect
-    if (!device) {
-        const bigipHosts: vscode.QuickPickItem[] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
+//     // if not, get device list from config and prompt to select device
+//     //  select device and connect
+//     if (!device) {
+//         const bigipHosts: vscode.QuickPickItem[] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
 		
-        if (bigipHosts === undefined) {
-            // should kick off "add device"
-            throw new Error('no hosts in configuration');
-        }
-        // console.log(`getDevice devices from config: ${JSON.stringify(bigipHosts)}`);
+//         if (bigipHosts === undefined) {
+//             // should kick off "add device"
+//             throw new Error('no hosts in configuration');
+//         }
+//         // console.log(`getDevice devices from config: ${JSON.stringify(bigipHosts)}`);
 
-        const device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
+//         const device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
 
-        if (device === undefined) {
-                // should kick off "add device"
-                throw new Error('no hosts in configuration');
-            }
+//         if (device === undefined) {
+//                 // should kick off "add device"
+//                 throw new Error('no hosts in configuration');
+//             }
 
-        // console.log(`getDevice from quickPick: ${device}`);
+//         // console.log(`getDevice from quickPick: ${device}`);
 
-        if (!device) {
-            throw new Error('user exited device input');
-        }
+//         if (!device) {
+//             throw new Error('user exited device input');
+//         }
 
-        // fire connectF5 to establish all the other details:
-        // const host: string = device;
-        // const password = await getPassword(device);
-        // f5API.connectF5(host, password);
-        return device;
-    }
-    // console.log(`getDevice returning: ${device}`);
-    return device;
-}
+//         // fire connectF5 to establish all the other details:
+//         // const host: string = device;
+//         // const password = await getPassword(device);
+//         // f5API.connectF5(host, password);
+//         return device;
+//     }
+//     // console.log(`getDevice returning: ${device}`);
+//     return device;
+// }
+
+
+
 
 /**
  * Get password from keytar or prompt

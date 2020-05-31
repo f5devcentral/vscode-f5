@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(ext.doBar);
 	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 16);
 	context.subscriptions.push(ext.tsBar);
-
+	
 	// exploring classes to group all f5 api calls
 	// const f5API = new f5Api();
 	// ext.f5Api = new F5Api;
@@ -93,12 +93,9 @@ export function activate(context: vscode.ExtensionContext) {
 			if (!device) {
 				throw new Error('user exited device input');
 			}
-			// console.log(`connectDevice, device quick pick answer: ${device}`);
 		}
-		// console.log(`connectDevice, pre-password device: ${device}`);
 		
 		const password: string = await utils.getPassword(device);
-		// console.log(`connectDevice, device/password: ${device}/${password}`);
 		f5Api.connectF5(device, password);
 		return device;
 	}));
@@ -113,6 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if (device === undefined) {
 			throw new Error('no hosts in configuration');
 		}
+
 		const password: string = await utils.getPassword(device);
 		const hostInfo  = await f5Api.getF5HostInfo(device, password);
 		utils.displayJsonInEditor(hostInfo.body);
@@ -184,7 +182,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// TODO: if hostID === undefined => quickSelect device list
 		
 		// console.log(`Edit Host command: ${JSON.stringify(hostID)}`)
-		vscode.window.showInformationMessage(`Editing ${JSON.stringify(hostID.label)} host!!!`);
+		// vscode.window.showInformationMessage(`Editing ${JSON.stringify(hostID.label)} host!!!`);
 		
 		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		// console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
@@ -316,7 +314,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('fastTemplates', fastTreeProvider);
 	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => fastTreeProvider.refresh());
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getFastInfo', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
 		var device: string | undefined = ext.hostStatusBar.text;
 		
 		if (!device) {
@@ -377,6 +375,16 @@ export function activate(context: vscode.ExtensionContext) {
 		const response = await f5Api.getAS3Decs(device, password, tenant);
 		utils.displayJsonInEditor(response.body);
 	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.fullTenant', async (tenant) => {
+		// call f5-as3.getDecs with tenant and full param
+		vscode.commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=full`);
+	}));
+	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.expandedTenant', async (tenant) => {
+		// call f5-as3.getDecs with tenant and full param
+		vscode.commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=expanded`);
+	}));
 	
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
@@ -426,17 +434,6 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const password = await utils.getPassword(device);
 		// if selected text, capture that, if not, capture entire document
-
-		// selectbox for post options... like async
-		// let postParam = await vscode.window.showQuickPick(
-		// 	["none", "async=true"], 
-		// 	{ 
-		// 		canPickMany: false,
-		// 		placeHolder: 'Additional options?'
-		// 	}
-		// );
-		// console.log(`POST-PARAM:  ${postParam}`);
-
 
 		let postParam;
 		if(ext.as3AsyncPost) {
@@ -657,36 +654,6 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!editor) {
 			return; // No open text editor
 		}
-
-		// // if text is selected in editor
-		// if (editor.selection.isEmpty) {
-		// 	// post entire page
-		// 	// validate json structure before send?  something like: try => JSON.parse?
-
-		// 	const text = editor.document.getText();
-		// 	// console.log(`CAPTURING ENTIRE EDITOR DOC: ${text}`)
-
-		// 	if (!utils.isValidJson(text)) {
-		// 		return vscode.window.showErrorMessage('Not valid JSON');
-		// 	}
-
-		// 	// Use the following logic for robust async post
-		// 	// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/onboard_v2.tpl#L775
-		// 	doDecResponse = await f5Api.postDoDec(device, password, JSON.parse(text));
-		// 	utils.displayJsonInEditor(doDecResponse);
-		// } else {
-		// 	// post selected text/declaration
-		// 	// var selection = editor.selection;
-		// 	const text = editor.document.getText(editor.selection);
-		// 	if (!utils.isValidJson(text)) {
-		// 		return vscode.window.showErrorMessage('Not valid JSON');
-		// 	}
-			
-		// 	// console.log(`SELECTED TEXT: ${text}`)
-		// 	doDecResponse = await f5Api.postTSDec(device, password, JSON.parse(text));
-		// 	utils.displayJsonInEditor(doDecResponse.body);
-		// } 
-
 
 		let text: string;
 		if (editor.selection.isEmpty) {

@@ -8,9 +8,23 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.1.9] - (5-25-2020)
 
-### Modified
-- Added warning when posting sync DO dec that async is highly recommended
+### Added
+- Added warning when posting syncronous DO dec that async is highly recommended
+- Defined file types for the different ATC services (as3/do/ts) to provide auto schema validation
+  - This happend with files from a defined workspace, like opening a folder
+  - *.as3.json - will auto reference the latest online as3 schema
+  - *.do.json - will auto reference the latest online do schema
+  - *.ts.json - will auto reference the latest online ts schema
+
+- Setup right click on as3 tenant options
+  - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/as3-api.html
+  - show=full
+  - show=expanded
+  
 - *** setup progress bar for tenant delete and any other longer operation
+  - get device info?
+  - get current do/ts dec?
+
 - *** webview output for re-usable window
 
 ## [0.1.8] - (5-25-2020)
