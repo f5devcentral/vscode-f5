@@ -12,7 +12,7 @@ import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { test } from 'mocha';
-import { ext } from './extensionVariables';
+import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
 import * as keyTarType from 'keytar';
 // import { MemFS } from './treeViewsProviders/fileSystemProvider';
@@ -484,12 +484,109 @@ export function activate(context: vscode.ExtensionContext) {
 		} else {
 			WebViewPanel.render(context.extensionPath, response.body);
 		}
-
-
 		as3TenantTree.refresh();
-		as3Tree.refresh();
-		
+		as3Tree.refresh();		
 	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.injectSchemaRef', async () => {
+		
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			return; // No open text editor
+		}
+
+		let text: string;
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
+		} 
+
+		if (!utils.isValidJson(text)) {
+			return vscode.window.showErrorMessage('Not valid JSON object');
+		}
+		
+		var newText = JSON.parse(text);
+		if(!newText.hasOwnProperty('$schema')) {
+			//if it has the class property, see what it is
+			if(newText.hasOwnProperty('class') && newText.class === 'AS3') {
+				newText['$schema'] = git.latestAS3schema;
+
+			} else if (newText.hasOwnProperty('class') && newText.class === 'Device') {
+				newText['$schema'] = git.latestDOschema;
+				
+			} else if (newText.hasOwnProperty('class') && newText.class === 'Telemetry') {
+				newText['$schema'] = git.latestTSschema;
+			} else {
+				vscode.window.showInformationMessage(`Could not find base declaration class for as3/do/ts`);
+			}
+		} else {
+			vscode.window.showInformationMessage(`Removing ${newText.$schema}`);
+			delete newText.$schema;
+
+		}
+
+		console.log(`newText below`);
+		console.log(newText);
+
+		const {activeTextEditor} = vscode.window;
+
+        if (activeTextEditor && activeTextEditor.document.languageId === 'json') {
+            const {document} = activeTextEditor;
+			const firstLine = document.lineAt(0);
+			const lastLine = document.lineAt(document.lineCount - 1);
+			var textRange = new vscode.Range(0,
+			firstLine.range.start.character,
+			document.lineCount - 1,
+			lastLine.range.end.character);
+			editor.edit( edit => {
+				edit.replace(textRange, newText)
+			});
+            // if (firstLine.text !== '42') {
+            //     const edit = new vscode.WorkspaceEdit();
+            //     edit.insert(document.uri, firstLine.range.start, '42\n');
+            //     return vscode.workspace.applyEdit(edit)
+            // }
+        }
+		// const { activeTextEditor } = vscode.window;
+		// const { document } = activeTextEditor;
+
+		// const fullText = document.getText();
+		// const fullRange = new vscode.Range(
+		// 	document.positionAt(0),
+		// 	document.positionAt(fullText.length - 1)
+		// )
+
+		// let invalidRange = new Range(0, 0, textDocument.lineCount /*intentionally missing the '-1' */, 0);
+		// let fullRange = textDocument.validateRange(invalidRange);
+		// editor.edit(edit => edit.replace(fullRange, newText));
+		
+		// editor.edit(edit => {
+		// 	const startPosition = new Position(0, 0);
+		// 	const endPosition = vscode.TextDocument.lineAt(document.lineCount - 1).range.end;
+		// 	edit.replace(new Range(startPosition, endPosition), newText);
+		// });
+
+		// var firstLine = textEdit.document.lineAt(0);
+		// var lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
+		// var textRange = new vscode.Range(0,
+		// firstLine.range.start.character,
+		// textEditor.document.lineCount - 1,
+		// lastLine.range.end.character);
+
+		// textEditor.edit(function (editBuilder) {
+		// 	editBuilder.replace(textRange, '$1');
+		// });
+
+
+		// editor.edit(builder => builder.replace(textRange, newText));
+		// });
+
+	}));
+
+
+
 
 
 

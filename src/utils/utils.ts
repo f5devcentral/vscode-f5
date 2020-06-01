@@ -169,8 +169,8 @@ export async function displayJsonInEditor(item: object): Promise<any> {
 
 export function isValidJson(json: string) {
     try {
-        JSON.parse(json);
-        return true;
+        return JSON.parse(json);
+        // return true;
     } catch (e) {
         return false;
     }

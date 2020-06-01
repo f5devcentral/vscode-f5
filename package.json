@@ -354,6 +354,11 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.injectSchemaRef",
+				"title": "Inject/Remove Schema Reference",
+				"category": "F5"
+			},
+			{
 				"command": "chuckJoke",
 				"title": "Chuck Joke",
 				"category": "F5"
