@@ -46,7 +46,7 @@
 		"snippets": [
 			{
 				"language": "json",
-				"path": "./src/snippets.json"
+				"path": "./snippets.json"
 			}
 		],
 		"jsonValidation": [

@@ -3,8 +3,10 @@
 out/test/**
 src/**
 .gitignore
+README_docs/**
 vsc-extension-quickstart.md
 **/tsconfig.json
 **/.eslintrc.json
 **/*.map
 **/*.ts
+# **/*.gif
