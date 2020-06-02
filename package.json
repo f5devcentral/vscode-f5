@@ -236,6 +236,16 @@
 				"category": "F5-Fast"
 			},
 			{
+				"command": "f5-fast.renderYmlTemplate",
+				"title": "Render YAML Template",
+				"category": "F5-Fast"
+			},
+			{
+				"command": "f5-fast.renderHtmlPreview",
+				"title": "Render HTML Preview",
+				"category": "F5-Fast"
+			},
+			{
 				"command": "f5-fast.refreshTemplates",
 				"title": "Refresh",
 				"category": "F5",
@@ -530,6 +540,7 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
+		"@f5devcentral/f5-fast-core": "^0.5.1",
 		"@types/highlight.js": "^9.12.4",
 		"code-highlight-linenums": "^0.2.1",
 		"fs": "0.0.1-security",

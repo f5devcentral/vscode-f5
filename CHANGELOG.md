@@ -16,12 +16,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - *.do.json - will auto reference the latest online do schema
   - *.ts.json - will auto reference the latest online ts schema
 
-- Setup right click on as3 tenant options
+- Added following right click on as3 tenant options
   - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/as3-api.html
   - show=full
   - show=expanded
   
-- setup progress bar for issueBase, getTSDec, postTSDec, getDoDec, doInspect, doTasks, deleteAS3Tenant, getAS3Task
+- Setup progress bar for issueBase, getTSDec, postTSDec, getDoDec, doInspect, doTasks, deleteAS3Tenant, getAS3Task
 
 - Created webview output for re-usable window
   - *in developement* - enable in settings under, 'previewResponseInUntitledDocument'
@@ -29,6 +29,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Settings key for seconds between async Task status updates
   - f5.asyncInterval - default = 5 (seconds)
+
+- Cleaned up .vsix package by removing unnecessary documentation and images
+
+- Added warning when posting syncronous DO declaration, that recommends "async" posting
 
 ## [0.1.8] - (5-25-2020)
 

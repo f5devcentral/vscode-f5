@@ -437,7 +437,7 @@ export async function delAS3Tenant(device: string, password: string, tenant: str
     const authToken = await getAuthToken(host, username, password);
     const progressDelete = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: `Deleting ${tenant} Declaration`
+        title: `Deleting ${tenant} Tenant`
     }, async () => {
         let response = await callHTTP('DELETE', host, `/mgmt/shared/appsvcs/declare/${tenant}`, authToken);
         return response;

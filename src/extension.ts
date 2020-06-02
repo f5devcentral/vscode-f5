@@ -15,6 +15,9 @@ import { test } from 'mocha';
 import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
 import * as keyTarType from 'keytar';
+import * as f5FastApi from './utils/f5FastApi';
+import * as f5FastUtils from './utils/f5FastUtils';
+
 // import { MemFS } from './treeViewsProviders/fileSystemProvider';
 // import { HttpResponseWebview } from './responseWebview';
 
@@ -332,10 +335,50 @@ export function activate(context: vscode.ExtensionContext) {
 			return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');
 		}
 		
-
 		const password = await utils.getPassword(device);
 		const fast = await f5Api.getF5FastInfo(device, password);
 		utils.displayJsonInEditor(fast.body);
+
+	}));
+
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderYmlTemplate', async () => {
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// if (!device) {device = await vscode.commands.executeCommand('f5.connectDevice');}
+		// if (device === undefined) {throw new Error('no hosts in configuration');}
+		// if(ext.fastBar.text === '') {return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');}
+
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {	return; // No open text editor
+		}
+
+		let text: string;
+		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
+		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		} 
+
+		f5FastUtils.templateFromYaml(text);
+
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderHtmlPreview', async () => {
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// if (!device) {device = await vscode.commands.executeCommand('f5.connectDevice');}
+		// if (device === undefined) {throw new Error('no hosts in configuration');}
+		// if(ext.fastBar.text === '') {return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');}
+
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {	return; // No open text editor
+		}
+
+		let text: string;
+		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
+		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		} 
+
+		f5FastUtils.renderHtmlPreview(text);
 
 	}));
 
@@ -541,7 +584,7 @@ export function activate(context: vscode.ExtensionContext) {
 			document.lineCount - 1,
 			lastLine.range.end.character);
 			editor.edit( edit => {
-				edit.replace(textRange, newText)
+				edit.replace(textRange, newText);
 			});
             // if (firstLine.text !== '42') {
             //     const edit = new vscode.WorkspaceEdit();
