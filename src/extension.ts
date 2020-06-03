@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 
 import { chuckJoke2, chuckJoke1 } from './chuckJoke';
-import { F5TreeProvider, f5Host } from './treeViewsProviders/hostsTreeProvider';
+import { F5TreeProvider, F5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
 import { exampleTsDecsProvider, exampleTsDec } from './treeViewsProviders/githubTsExamples';
@@ -341,6 +341,21 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApps', async () => {
+		
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.listTasks', async () => {
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.listTemplates', async () => {
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.listTemplateSets', async () => {
+	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderYmlTemplate', async () => {

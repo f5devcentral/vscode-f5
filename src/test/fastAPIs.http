@@ -36,8 +36,28 @@ GET https://{{host}}/mgmt/shared/
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
+
+
+###   # get fast templates
+GET https://{{host}}/mgmt/shared/fast/applications
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+###   # get fast templates
+GET https://{{host}}/mgmt/shared/fast/tasks
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
 ###   # get fast templates
 GET https://{{host}}/mgmt/shared/fast/templates
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+###   # get fast templates
+GET https://{{host}}/mgmt/shared/fast/templatesets
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 

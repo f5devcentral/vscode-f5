@@ -27,7 +27,7 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 		var as3 = ext.as3Bar.text;
 
 		if (!device || !as3) {
-			console.log('AS3TenantTree: no device or as3 detected');
+			// console.log('AS3TenantTree: no device or as3 detected');
 			return Promise.resolve([]);
 		}
 		/*
@@ -47,7 +47,7 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 			//		element comes from selectinga  parent tree member
 			for ( const app in tenantsFull.body[element.label]) {
 				if(isObject(tenantsFull.body[element.label][app])) {
-					console.log(`TENANT-APP!!!!  ${element.label}-${app}`);
+					// console.log(`TENANT-APP!!!!  ${element.label}-${app}`);
 					treeItems.push(new AS3TenantItem(app, '', '', vscode.TreeItemCollapsibleState.None, 
 						{ command: '', title: '', arguments: ['none'] }));
 				}

@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 
-export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
+export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<f5Host | undefined> = new vscode.EventEmitter<f5Host | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<f5Host | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<F5Host | undefined> = new vscode.EventEmitter<F5Host | undefined>();
+	readonly onDidChangeTreeData: vscode.Event<F5Host | undefined> = this._onDidChangeTreeData.event;
 
 	constructor(private workspaceRoot: string) {
 	}
@@ -12,11 +12,11 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: f5Host): vscode.TreeItem {
+	getTreeItem(element: F5Host): vscode.TreeItem {
 		return element;
 	}
 
-	getChildren(element?: f5Host): Thenable<f5Host[]> {
+	getChildren(element?: F5Host): Thenable<F5Host[]> {
         
         const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
@@ -26,15 +26,15 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
 		}
    
         // takes individual host item and creates a tree item
-        const treeHosts = (name: string): f5Host => {
-            const treeItem = new f5Host(name, vscode.TreeItemCollapsibleState.None, {
+        const treeHosts = (name: string): F5Host => {
+            const treeItem = new F5Host(name, vscode.TreeItemCollapsibleState.None, {
                 command: 'f5.connectDevice',
                 title: 'hostTitle',
                 arguments: [name]
             });
             // console.log(`treeItem: ${JSON.stringify(treeItem)}`);
             return treeItem;
-        }
+        };
 
 		// takes list of bigip hosts from the workspace config file, in the variable "bigipHosts"
 		//		for each item in list assign item to "host", feed "host" to the function treeHosts
@@ -50,7 +50,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<f5Host> {
 
 }
 
-export class f5Host extends vscode.TreeItem {
+export class F5Host extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		// private version: string,

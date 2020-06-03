@@ -236,6 +236,26 @@
 				"category": "F5-Fast"
 			},
 			{
+				"command": "f5-fast.getApps",
+				"title": "Get Deployed FAST Applications",
+				"category": "F5-Fast"
+			},
+			{
+				"command": "f5-fast.listTasks",
+				"title": "List FAST Tasks",
+				"category": "F5-Fast"
+			},
+			{
+				"command": "f5-fast.listTemplates",
+				"title": "List FAST Templates",
+				"category": "F5-Fast"
+			},
+			{
+				"command": "f5-fast.listTemplateSets",
+				"title": "List FAST Template Sets",
+				"category": "F5-Fast"
+			},
+			{
 				"command": "f5-fast.renderYmlTemplate",
 				"title": "Render YAML Template",
 				"category": "F5-Fast"

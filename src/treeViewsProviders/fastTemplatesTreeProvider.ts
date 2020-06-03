@@ -1,10 +1,14 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+import * as f5FastApi from '../utils/f5FastApi';
+import { getAuthToken, callHTTP } from '../utils/coreHTTPS';
+import * as utils from '../utils/utils';
+// import * as f5FastUtils from './utils/f5FastUtils';
 
-export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTemplate> {
+export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTreeItem> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<FastTemplate | undefined> = new vscode.EventEmitter<FastTemplate | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<FastTemplate | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<FastTreeItem | undefined> = new vscode.EventEmitter<FastTreeItem | undefined>();
+	readonly onDidChangeTreeData: vscode.Event<FastTreeItem | undefined> = this._onDidChangeTreeData.event;
 
 	constructor(private workspaceRoot: string) {
 	}
@@ -13,33 +17,107 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTe
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: FastTemplate): vscode.TreeItem {
+	getTreeItem(element: FastTreeItem): vscode.TreeItem {
 		return element;
 	}
 
-	async getChildren(element?: FastTemplate): Promise<FastTemplate[]> {
-		
+	async getChildren(element?: FastTreeItem): Promise<FastTreeItem[]> {
 		//  need to get all this working...
+		
+		const device = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		const fast = ext.fastBar.text;
+		const [username, host] = device.split('@');
+
+		if (!device || !fast) {
+			// console.log('AS3TenantTree: no device or as3 detected');
+			return Promise.resolve([]);
+		}
+		
 		var treeItems = [];
+
+		if(element) {
+			// parent element selected, so return necessary children items
+			if(element.label === 'Deployed Applications') {
+				const authToken = await getAuthToken(host, username, password);
+				const apps = await callHTTP('GET', host, '/mgmt/shared/fast/applications', authToken);
+
+				apps.body.forEach( (item: { tenant?: string; name?: string; }) => {
+					treeItems.push(new FastTreeItem(`${item.tenant}-${item.name}`, '', '', vscode.TreeItemCollapsibleState.None,
+					{ command: '', title: '', arguments: ['none'] } ));
+				});
+
+
+			} else if (element.label === 'Tasks') {
+				const authToken = await getAuthToken(host, username, password);
+				const tasks = await callHTTP('GET', host, '/mgmt/shared/fast/tasks', authToken);
+
+				var subTitle: string;
+				tasks.body.slice(0, 5).map( (item: { id: string; code: number; tenant?: any; application?: any; message: string; }) => {
+					const shortId = item.id.split('-').pop();
+
+					if(item.code === 200) {
+						subTitle = `${item.code} - ${item.tenant}/${item.application}`;
+					} else {
+						subTitle = `${item.code} - ${item.message}`;
+					}
+
+					treeItems.push(new FastTreeItem(`${shortId}`, subTitle, '', vscode.TreeItemCollapsibleState.None,
+					{ command: '', title: '', arguments: ['none'] } ));
+				});
+
+			} else if (element.label === 'Templates') {
+				const authToken = await getAuthToken(host, username, password);
+				const templates = await callHTTP('GET', host, '/mgmt/shared/fast/templates', authToken);
+
+				templates.body.map( (item: any) => {
+					treeItems.push(new FastTreeItem(`${item}`, '', '', vscode.TreeItemCollapsibleState.None,
+					{ command: '', title: '', arguments: ['none'] } ));
+				});
+
+			} else if (element.label === 'Template Sets') {
+				const authToken = await getAuthToken(host, username, password);
+				const tSets = await callHTTP('GET', host, '/mgmt/shared/fast/templatesets', authToken);
+
+				tSets.body.map( (item: any) => {
+					treeItems.push(new FastTreeItem(`${item.name}`, '', '', vscode.TreeItemCollapsibleState.None,
+					{ command: '', title: '', arguments: ['none'] } ));
+				});
+			}
+
+
+
+		} else {
+			
+		// no element selected, so return parent items
 		treeItems.push(
-			new FastTemplate(
-				'coming soon', 
-				vscode.TreeItemCollapsibleState.None, 
-				{ 
-					command: 'f5-as3.getDecs',
-					title: '', 
-					arguments: ['none']
-				}
-			)
+			new FastTreeItem('Deployed Applications', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+				{ command: 'f5-fast.getApps', title: '', arguments: ['none'] })
 		);
+		treeItems.push(
+			new FastTreeItem('Tasks', 'Last 5', '', vscode.TreeItemCollapsibleState.Collapsed, 
+				{ command: 'f5-fast.listTasks', title: '', arguments: ['none'] })
+		);
+		treeItems.push(
+			new FastTreeItem('Templates', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+				{ command: 'f5-fast.listTemplates', title: '', arguments: ['none'] })
+		);
+		treeItems.push(
+			new FastTreeItem('Template Sets', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+				{ command: 'f5-fast.listTemplateSets', title: '', arguments: ['none'] })
+		);
+
+		}
+
         return Promise.resolve(treeItems);
 	}
 }
 
-export class FastTemplate extends vscode.TreeItem {
+export class FastTreeItem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		// private version: string,
+		public version: string,
+		private toolTip: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
@@ -47,12 +125,12 @@ export class FastTemplate extends vscode.TreeItem {
 	}
 
 	get tooltip(): string {
-		return `show!`;
+		return this.toolTip;
 	}
 
-	// get description(): string {
-	// 	return 'descLoc';
-	// }
+	get description(): string {
+		return this.version;
+	}
 
 	// iconPath = {
 	// 	light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),

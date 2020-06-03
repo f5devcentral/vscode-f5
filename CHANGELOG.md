@@ -6,6 +6,16 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+
+## [0.1.10] - (6-5-2020)
+
+### Adding
+- *** fast view
+  - *** list deployed fast apps
+  - *** list fast tasks
+  - *** list fast templates
+  - *** list fast template sets
+
 ## [0.1.9] - (5-31-2020)
 
 ### Added
