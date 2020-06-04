@@ -1,10 +1,10 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { request } from 'https';
+// import { request } from 'https';
 import * as utils from './utils';
 import { ext } from '../extensionVariables';
-import { getAuthToken, callHTTP } from './coreHTTPS';
+import { getAuthToken, callHTTP } from './coreF5HTTPS';
 
 
 /**

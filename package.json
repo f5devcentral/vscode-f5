@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -79,8 +79,8 @@
 					"name": "F5 Hosts"
 				},
 				{
-					"id": "fastTemplates",
-					"name": "FAST Templates",
+					"id": "fastView",
+					"name": "FAST View",
 					"when": "f5.fastInstalled"
 				},
 				{
@@ -256,6 +256,26 @@
 				"category": "F5-Fast"
 			},
 			{
+				"command": "f5-fast.convJson2Mst",
+				"title": "Convert json as3 to mst for templating",
+				"category": "F5-Fast"
+			},
+			{
+				"command": "f5-fast.deployApp",
+				"title": "Deploy Fast App",
+				"category": "F5-Fast"
+			},
+			{
+				"command": "f5-fast.postAsNewTemplate",
+				"title": "Post MST as new Fast Template",
+				"category": "F5-Fast"
+			},
+			{
+				"command": "f5-fast.deleteFastApp",
+				"title": "Delete FAST App",
+				"category": "F5-Fast"
+			},
+			{
 				"command": "f5-fast.renderYmlTemplate",
 				"title": "Render YAML Template",
 				"category": "F5-Fast"
@@ -367,7 +387,8 @@
 			},
 			{
 				"command": "f5-ts.enableTsExamples",
-				"title": "Enable"
+				"title": "Example TS Declarations",
+				"category": "F5"
 			},
 			{
 				"command": "f5.editHost",
@@ -418,7 +439,7 @@
 				},
 				{
 					"command": "f5-fast.refreshTemplates",
-					"when": "view == fastTemplates",
+					"when": "view == fastView",
 					"group": "navigation"
 				},
 				{
@@ -451,6 +472,34 @@
 				{
 					"command": "f5-fast.getInfo",
 					"when": "f5.fastInstalled"
+				},
+				{
+					"command": "f5-fast.getApps",
+					"when": "none"
+				},
+				{
+					"command": "f5-fast.postAsNewTemplate",
+					"when": "f5.fastInstalled"
+				},
+				{
+					"command": "f5-fast.deployApp",
+					"when": "f5.fastInstalled"
+				},
+				{
+					"command": "f5-fast.deleteFastApp",
+					"when": "none"
+				},
+				{
+					"command": "f5-fast.listTasks",
+					"when": "none"
+				},
+				{
+					"command": "f5-fast.listTemplates",
+					"when": "none"
+				},
+				{
+					"command": "f5-fast.listTemplateSets",
+					"when": "none"
 				},
 				{
 					"command": "f5-as3.postDec",
@@ -501,6 +550,10 @@
 					"when": "f5.tsInstalled"
 				},
 				{
+					"command": "f5-ts.enableTsExamples",
+					"when": "none"
+				},
+				{
 					"command": "f5-ts.postDec",
 					"when": "f5.tsInstalled"
 				}
@@ -522,6 +575,10 @@
 				{
 					"command": "f5.getF5HostInfo",
 					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5-fast.deleteFastApp",
+					"when": "view == fastView"
 				},
 				{
 					"command": "f5-as3.fullTenant",
@@ -562,10 +619,12 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.5.1",
 		"@types/highlight.js": "^9.12.4",
+		"@types/jszip": "^3.4.1",
 		"code-highlight-linenums": "^0.2.1",
 		"fs": "0.0.1-security",
 		"highlight.js": "^10.0.3",
 		"https": "^1.0.0",
+		"jszip": "^3.4.0",
 		"keytar": "^5.6.0",
 		"vsce": "^1.75.0"
 	}

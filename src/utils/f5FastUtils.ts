@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
 import * as fs from 'fs';
-import { displayWebView } from './fastHtmlPreveiwWebview';
+// import { displayWebView } from './fastHtmlPreveiwWebview';
 
 const fast = require('@f5devcentral/f5-fast-core');
 
@@ -10,32 +10,20 @@ const fast = require('@f5devcentral/f5-fast-core');
 // https://github.com/zinkem/fast-docker/blob/master/templates/index.yaml
 
 
-export async function renderHtmlPreview(input: string) {
-    // fast.guiUtils.generateHtmlPreview(input)
-    // .then( (viewA: any) => {
-    //     console.log(viewA);
-    // });
+// export async function renderHtmlPreview(input: string) {
+//     // fast.guiUtils.generateHtmlPreview(input)
+//     // .then( (viewA: any) => {
+//     //     console.log(viewA);
+//     // });
 
-    const schema = {
-        properties: {
-            foo: { type: 'string' }
-        }
-    };
-    const view = {};
-    const htmlData = fast.guiUtils.generateHtmlPreview(schema, view);
-    // console.log(htmlData);
+//     const templateEngine = await fast.Template.loadYaml(input);
 
-    // fs.writeFileSync(path.join(ext.context.extensionPath, "test.html"), htmlData, 'utf-8');
-    // fs.writeFileSync(path.join(ext.context.extensionPath, "test.html"), htmlData, 'utf-8'), (err: any, data: any) => {
-    //     if (err) {
-    //         throw err;
-    //     };
-    //     console.log(data);
-    // };
-
-    displayWebView(htmlData);
+//     const schema = templateEngine.getParametersSchema();
+//     // const view = {};
+//     const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
+//     displayWebView(htmlData);
     
-}
+// }
 
 
 export async function templateFromYaml(input: string) {

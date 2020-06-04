@@ -26,7 +26,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3Item> {
 		var as3 = ext.as3Bar.text;
 
 		if (!device || !as3 ) {
-			console.log('AS3TasksTree: no device or as3 detected');
+			// console.log('AS3TasksTree: no device or as3 detected');
 			return Promise.resolve([]);
 		}
 

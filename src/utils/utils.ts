@@ -167,6 +167,26 @@ export async function displayJsonInEditor(item: object): Promise<any> {
     );
 }
 
+
+/**
+ * display mst in new editor window
+ * @param item json object to display in new editor for mst
+ */
+export async function displayMstInEditor(item: object): Promise<any> {
+    vscode.workspace.openTextDocument({ 
+        language: 'handlebars', 
+        content: JSON.stringify(item, undefined, 4) 
+    })
+    .then( doc => 
+        vscode.window.showTextDocument(
+            doc, 
+            { 
+                preview: false 
+            }
+        )
+    );
+}
+
 export function isValidJson(json: string) {
     try {
         return JSON.parse(json);
@@ -175,49 +195,6 @@ export function isValidJson(json: string) {
         return false;
     }
 }
-
-/**
- * Return currently selected device, or prompts to select one
- */
-// export async function getDevice(): Promise<any> {
-
-//     // if device in statusBar, return that
-//     const device: string = ext.hostStatusBar.text;
-//     // console.log(`getDevice from hostStatusBar: ${device}`);
-    
-//     // if not, get device list from config and prompt to select device
-//     //  select device and connect
-//     if (!device) {
-//         const bigipHosts: vscode.QuickPickItem[] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
-		
-//         if (bigipHosts === undefined) {
-//             // should kick off "add device"
-//             throw new Error('no hosts in configuration');
-//         }
-//         // console.log(`getDevice devices from config: ${JSON.stringify(bigipHosts)}`);
-
-//         const device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
-
-//         if (device === undefined) {
-//                 // should kick off "add device"
-//                 throw new Error('no hosts in configuration');
-//             }
-
-//         // console.log(`getDevice from quickPick: ${device}`);
-
-//         if (!device) {
-//             throw new Error('user exited device input');
-//         }
-
-//         // fire connectF5 to establish all the other details:
-//         // const host: string = device;
-//         // const password = await getPassword(device);
-//         // f5API.connectF5(host, password);
-//         return device;
-//     }
-//     // console.log(`getDevice returning: ${device}`);
-//     return device;
-// }
 
 
 
@@ -267,34 +244,3 @@ export function setMementoW(key:string, value: string) {
 export function getMementoW(key:string) {
     return ext.context.workspaceState.get(key);
 }
-
-
-
-
-
-/**
- * Checks to see if DO dec contains ("async": false)
- * if not async, pop up warning message
- * @param dec posting DO dec
- */
-// export function isDoDecAsync(dec: Dec) {
-//     // if dec object contains "async": false,
-//     //  then show erro message
-
-
-
-//     if((dec.hasOwnProperty('async') && dec.async === false) || !dec.hasOwnProperty('async')) {
-//         vscode.window.showWarningMessage('async DO post highly recommended!!!')
-//     }
-
-    // console.log(dec.hasOwnProperty('async'));
-    
-
-    // if('async' in dec) {
-    //     if(dec.async = false) {
-            
-    //     }
-    // }
-
-
-// }

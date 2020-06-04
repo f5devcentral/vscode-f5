@@ -15,12 +15,12 @@ import { ext } from '../extensionVariables';
  * working this catCodeing webView example
  * https://code.visualstudio.com/api/extension-guides/webview
  */
-export class WebViewPanel {
+export class FastWebViewPanel {
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
 
-	public static currentPanel: WebViewPanel | undefined;
+	public static currentPanel: FastWebViewPanel | undefined;
 
 	public static readonly viewType = 'catCoding';
 
@@ -34,16 +34,16 @@ export class WebViewPanel {
 			: undefined;
 
 		// If we already have a panel, show it.
-		if (WebViewPanel.currentPanel) {
-            WebViewPanel.currentPanel._panel.reveal(column);
-            WebViewPanel.currentPanel.update(data);
+		if (FastWebViewPanel.currentPanel) {
+            FastWebViewPanel.currentPanel._panel.reveal(column);
+            FastWebViewPanel.currentPanel.update(data);
 			return;
 		}
 
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
-			WebViewPanel.viewType,
-			'ReponsePanel',
+			FastWebViewPanel.viewType,
+			'Rendered HTML',
 			column || vscode.ViewColumn.One,
 			{
 				enableScripts: true,
@@ -52,11 +52,11 @@ export class WebViewPanel {
             }
 		);
 
-		WebViewPanel.currentPanel = new WebViewPanel(panel, extensionPath, data);
+		FastWebViewPanel.currentPanel = new FastWebViewPanel(panel, extensionPath, data);
 	}
 
 	public static revive(panel: vscode.WebviewPanel, extensionPath: string, data: string) {
-		WebViewPanel.currentPanel = new WebViewPanel(panel, extensionPath, data);
+		FastWebViewPanel.currentPanel = new FastWebViewPanel(panel, extensionPath, data);
 	}
 
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string, data: string) {
@@ -102,7 +102,7 @@ export class WebViewPanel {
 	}
 
 	public dispose() {
-		WebViewPanel.currentPanel = undefined;
+		FastWebViewPanel.currentPanel = undefined;
 
 		// Clean up our resources
 		this._panel.dispose();
@@ -204,41 +204,41 @@ export class WebViewPanel {
 
 
 
-export async function displayWebView(info: string) {
+// export async function displayWebView(info: string) {
     
-    // Track currently webview panel
-    let currentPanel: vscode.WebviewPanel | undefined;
+//     // Track currently webview panel
+//     let currentPanel: vscode.WebviewPanel | undefined;
 
-    const columnToShowIn = vscode.window.activeTextEditor
-    ? vscode.window.activeTextEditor.viewColumn
-    : undefined;
+//     const columnToShowIn = vscode.window.activeTextEditor
+//     ? vscode.window.activeTextEditor.viewColumn
+//     : undefined;
 
-    if (currentPanel) {
-    // If we already have a panel, show it in the target column
-    currentPanel.reveal(columnToShowIn);
-    } else {
-    // Otherwise, create a new panel
-        currentPanel = vscode.window.createWebviewPanel(
-            'atcResponse',
-            'ATC Response',
-            vscode.ViewColumn.Two,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true
-            }
-        );
-        // currentPanel.webview.html = getWebviewContent(JSON.stringify(info, null, 4));
-        currentPanel.webview.html = info;
+//     if (currentPanel) {
+//     // If we already have a panel, show it in the target column
+//     currentPanel.reveal(columnToShowIn);
+//     } else {
+//     // Otherwise, create a new panel
+//         currentPanel = vscode.window.createWebviewPanel(
+//             'atcResponse',
+//             'ATC Response',
+//             vscode.ViewColumn.Two,
+//             {
+//                 enableScripts: true,
+//                 retainContextWhenHidden: true
+//             }
+//         );
+//         // currentPanel.webview.html = getWebviewContent(JSON.stringify(info, null, 4));
+//         currentPanel.webview.html = info;
 
-        currentPanel.onDidDispose(
-            () => {
-                currentPanel = undefined;
-            },
-            null,
-            ext.context.subscriptions
-        );
-    }
-}
+//         currentPanel.onDidDispose(
+//             () => {
+//                 currentPanel = undefined;
+//             },
+//             null,
+//             ext.context.subscriptions
+//         );
+//     }
+// }
 
 // function getWebviewContent(stuff : string) {
 //     const highlightedCode = hljs.highlightAuto(stuff).value;

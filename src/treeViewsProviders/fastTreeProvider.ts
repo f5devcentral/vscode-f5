@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import * as f5FastApi from '../utils/f5FastApi';
-import { getAuthToken, callHTTP } from '../utils/coreHTTPS';
+import { getAuthToken, callHTTP } from '../utils/coreF5HTTPS';
 import * as utils from '../utils/utils';
 // import * as f5FastUtils from './utils/f5FastUtils';
 
@@ -43,8 +43,8 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 				const apps = await callHTTP('GET', host, '/mgmt/shared/fast/applications', authToken);
 
 				apps.body.forEach( (item: { tenant?: string; name?: string; }) => {
-					treeItems.push(new FastTreeItem(`${item.tenant}-${item.name}`, '', '', vscode.TreeItemCollapsibleState.None,
-					{ command: '', title: '', arguments: ['none'] } ));
+					treeItems.push(new FastTreeItem(`${item.tenant}/${item.name}`, '', '', vscode.TreeItemCollapsibleState.None,
+					{ command: 'f5-fast.getApp', title: '', arguments: [`${item.tenant}/${item.name}`] } ));
 				});
 
 
@@ -63,7 +63,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 					}
 
 					treeItems.push(new FastTreeItem(`${shortId}`, subTitle, '', vscode.TreeItemCollapsibleState.None,
-					{ command: '', title: '', arguments: ['none'] } ));
+					{ command: 'f5-fast.getTask', title: '', arguments: [item.id] } ));
 				});
 
 			} else if (element.label === 'Templates') {
@@ -72,7 +72,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 
 				templates.body.map( (item: any) => {
 					treeItems.push(new FastTreeItem(`${item}`, '', '', vscode.TreeItemCollapsibleState.None,
-					{ command: '', title: '', arguments: ['none'] } ));
+					{ command: 'f5-fast.getTemplate', title: '', arguments: [item] } ));
 				});
 
 			} else if (element.label === 'Template Sets') {
@@ -81,7 +81,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 
 				tSets.body.map( (item: any) => {
 					treeItems.push(new FastTreeItem(`${item.name}`, '', '', vscode.TreeItemCollapsibleState.None,
-					{ command: '', title: '', arguments: ['none'] } ));
+					{ command: 'f5-fast.getTemplateSets', title: '', arguments: [item.name] } ));
 				});
 			}
 

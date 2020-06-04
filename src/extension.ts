@@ -4,19 +4,23 @@ import * as vscode from 'vscode';
 
 import { chuckJoke2, chuckJoke1 } from './chuckJoke';
 import { F5TreeProvider, F5Host } from './treeViewsProviders/hostsTreeProvider';
-import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
+import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
 import { exampleTsDecsProvider, exampleTsDec } from './treeViewsProviders/githubTsExamples';
-import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTemplatesTreeProvider';
+import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { test } from 'mocha';
 import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
+import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
 import * as keyTarType from 'keytar';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
+import { getAuthToken, callHTTP } from './utils/coreF5HTTPS';
+const fast = require('@f5devcentral/f5-fast-core');
+var JSZip = require("jszip");
 
 // import { MemFS } from './treeViewsProviders/fileSystemProvider';
 // import { HttpResponseWebview } from './responseWebview';
@@ -46,6 +50,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// const f5API = new f5Api();
 	// ext.f5Api = new F5Api;
 	// let webview = new HttpResponseWebview(context);
+
+	const zip = new JSZip();
 
 	// Setup keyTar global var
 	// type KeyTar = typeof keyTarType;
@@ -317,7 +323,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	// setting up hosts tree
 	const fastTreeProvider = new FastTemplatesTreeProvider('');
-	vscode.window.registerTreeDataProvider('fastTemplates', fastTreeProvider);
+	vscode.window.registerTreeDataProvider('fastView', fastTreeProvider);
 	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => fastTreeProvider.refresh());
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
@@ -331,30 +337,207 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 
-		if(ext.fastBar.text === '') {
-			return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');
+		const password = await utils.getPassword(device);
+		const response = await f5Api.getF5FastInfo(device, password);
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deployApp', async () => {
+		const device = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		// const fast = ext.fastBar.text;
+		const [username, host] = device.split('@');
+
+		// get editor window
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {	
+			return; // No open text editor
+		}
+
+		// capture selected text or all text in editor
+		let text: string;
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
+		} 
+
+		// TODO: make this a try sequence to only parse the json once
+		let jsonText: object;
+		if(utils.isValidJson(text)){
+			jsonText = JSON.parse(text);
+		} else {
+			vscode.window.showWarningMessage(`Not valid json object`);
+			return;
 		}
 		
+		const response = await f5FastApi.deployFastApp(device, password, '', jsonText);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
+
+		// give a little time to finish before refreshing trees
+		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		fastTreeProvider.refresh();
+		as3TenantTree.refresh();
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApp', async (tenApp) => {
+		const device = ext.hostStatusBar.text;
 		const password = await utils.getPassword(device);
-		const fast = await f5Api.getF5FastInfo(device, password);
-		utils.displayJsonInEditor(fast.body);
-
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApps', async () => {
+		// const fast = ext.fastBar.text;
+		const [username, host] = device.split('@');
 		
+		const authToken = await getAuthToken(host, username, password);
+		const task = await callHTTP('GET', host, `/mgmt/shared/fast/applications/${tenApp}`, authToken);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(task.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, task.body);
+		}
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.listTasks', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTask', async (taskId) => {
+		const device = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		const [username, host] = device.split('@');
+		
+		const authToken = await getAuthToken(host, username, password);
+		const task = await callHTTP('GET', host, `/mgmt/shared/fast/tasks/${taskId}`, authToken);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(task.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, task.body);
+		}
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.listTemplates', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplate', async (template) => {
+		const device = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		const [username, host] = device.split('@');
+		
+		const authToken = await getAuthToken(host, username, password);
+		const fTemp = await callHTTP('GET', host, `/mgmt/shared/fast/templates/${template}`, authToken);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(fTemp.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, fTemp.body);
+		}
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
+		const device = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		const [username, host] = device.split('@');
+		
+		const authToken = await getAuthToken(host, username, password);
+		const fTempSet = await callHTTP('GET', host, `/mgmt/shared/fast/templatesets/${set}`, authToken);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(fTempSet.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, fTempSet.body);
+		}
+
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.listTemplateSets', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.convJson2Mst', async () => {
+
+		// get editor window
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {	return; // No open text editor
+		}
+
+		// capture selected text or all text in editor
+		let text: string;
+		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
+		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		} 
+
+		if(utils.isValidJson(text)){
+
+			//TODO:  parse object and find the level for just ADC,
+			//		need to remove all the AS3 details since fast will handle that
+			// - if it's an object and it contains "class" key and value should be "Tenant"
+			utils.displayMstInEditor(JSON.parse(text));
+		} else {
+			vscode.window.showWarningMessage(`not valid json object`);
+		}
+
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postAsNewTemplate', async () => {
+		const device = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		// const fast = ext.fastBar.text;
+		const [username, host] = device.split('@');
+		
+		// get editor window
+		var editor = vscode.window.activeTextEditor;
+		if (!editor) {	return; // No open text editor
+		}
+
+		// capture selected text or all text in editor
+		let text: string;
+		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
+		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		} 
+
+		/**
+		 * documentation want us to zip, upload, then tell fast to import the zip
+		 * 		they have thier reasons, but for now, that seems complicated
+		 * 	Looking to just echo the file in through the bash endpoint
+		 * https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/template-authoring.html
+		 * 
+		 * directory is: /var/config/rest/iapps/f5-appsvcs-templates/templatesets/examples
+		 * 
+		 */
+
+		zip.file('test.mst', text);
+
+		const file = await zip.generateAsync();
+
+		const authToken = await getAuthToken(host, username, password);
+		const fTemp = await callHTTP('POST', host, `/mgmt/shared/file-transfer/uploads/${file}`, authToken);
+
+		// console.log(fast.Template.validate(text));
+
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {
+		
+		var device: string | undefined = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		const response = await f5FastApi.delTenApp(device, password, tenApp.label);
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
+	
+		// give a little time to finish
+		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		fastTreeProvider.refresh();
+		as3TenantTree.refresh();
+
 	}));
 
 
@@ -364,16 +547,32 @@ export function activate(context: vscode.ExtensionContext) {
 		// if (device === undefined) {throw new Error('no hosts in configuration');}
 		// if(ext.fastBar.text === '') {return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');}
 
+		/**
+		 * this is working through the f5 fast template creating process
+		 * https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/template-authoring.html
+		 * 
+		 * I think I was trying to take in a params.yml file to feed into an .mst file to test the output before
+		 * 		being able to upload to fast as a template
+		 */
+
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {	return; // No open text editor
 		}
 
 		let text: string;
-		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
-		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		f5FastUtils.templateFromYaml(text);
+		// const templateEngine = await fast.Template.loadYaml(text);
+
+		// const schema = templateEngine.getParametersSchema();
+		// // const view = {};
+		// const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
+		// displayWebView(htmlData);
+		// f5FastUtils.templateFromYaml(text);
 
 	}));
 
@@ -384,16 +583,30 @@ export function activate(context: vscode.ExtensionContext) {
 		// if (device === undefined) {throw new Error('no hosts in configuration');}
 		// if(ext.fastBar.text === '') {return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');}
 
+		/**
+		 * this view is requested by zinke as part of the template authoring process
+		 * 	The view should consume/watch the yml file that defines the user inputs for the template
+		 * 	Every time a save occurs, it should refresh with the changes to streamline the authoring process
+		 */
+
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {	return; // No open text editor
 		}
 
 		let text: string;
-		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
-		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		f5FastUtils.renderHtmlPreview(text);
+		const templateEngine = await fast.Template.loadYaml(text);
+
+		const schema = templateEngine.getParametersSchema();
+
+		const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
+		FastWebViewPanel.render(context.extensionPath, htmlData);
+		// f5FastUtils.renderHtmlPreview(text);
 
 	}));
 
@@ -444,11 +657,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.fullTenant', async (tenant) => {
-		// call f5-as3.getDecs with tenant and full param
 		vscode.commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=full`);
 	}));
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.expandedTenant', async (tenant) => {
-		// call f5-as3.getDecs with tenant and full param
 		vscode.commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=expanded`);
 	}));
 	
@@ -547,7 +758,14 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
+	/**
+	 * experimental - this feature is intented to grab the current json object declaration in the editor,
+	 * 		try to figure out if it's as3/do/ts, then apply the appropriate schema reference in the object
+	 * 	if it detects the schema already there, it will remove it.
+	 */
 	context.subscriptions.push(vscode.commands.registerCommand('f5.injectSchemaRef', async () => {
+
+		vscode.window.showWarningMessage('experimental feature in development');
 		
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
@@ -734,31 +952,24 @@ export function activate(context: vscode.ExtensionContext) {
 		// TODO clean up following logic to look like other posts
 		//		and have it only display body
 
-		// if text is selected in editor
+		let text: string;
 		if (editor.selection.isEmpty) {
-			// post entire page
-			// validate json structure before send?  something like: try => JSON.parse?
-
-			const text = editor.document.getText();
-
-			if (!utils.isValidJson(text)) {
-				return vscode.window.showErrorMessage('Not valid JSON');
-			}
-
-			tsDecResponse = await f5Api.postTSDec(device, password, JSON.parse(text));
-			utils.displayJsonInEditor(tsDecResponse);
+			text = editor.document.getText();	// entire editor/doc window
 		} else {
-			// post selected text/declaration
-			// var selection = editor.selection;
-			const text = editor.document.getText(editor.selection);
-			if (!utils.isValidJson(text)) {
-				return vscode.window.showErrorMessage('Not valid JSON');
-			}
-			
-			tsDecResponse = await f5Api.postTSDec(device, password, JSON.parse(text));
-			utils.displayJsonInEditor(tsDecResponse);
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
+		if (!utils.isValidJson(text)) {
+			return vscode.window.showErrorMessage('Not valid JSON object');
+		}
+
+		const response = await f5Api.postTSDec(device, password, JSON.parse(text));
+
+		if (ext.settings.previewResponseInUntitledDocument) {
+			utils.displayJsonInEditor(response.body);
+		} else {
+			WebViewPanel.render(context.extensionPath, response.body);
+		}
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getGitHubExampleTs', async (decUrl) => {

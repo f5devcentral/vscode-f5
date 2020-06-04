@@ -45,7 +45,7 @@ X-F5-Auth-Token: {{authToken}}
 
 
 ###   # get fast templates
-GET https://{{host}}/mgmt/shared/fast/tasks
+GET https://{{host}}/mgmt/shared/fast/tasks/d81a4ce7-03e5-4c92-8d15-b15cd82b40ba
 Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
@@ -62,9 +62,36 @@ Content-Type: application/json
 X-F5-Auth-Token: {{authToken}}
 
 
-#   /tasks
-#   /tasks/{taskId}
 
+
+
+
+
+###   # POST fast application
+POST https://{{host}}/mgmt/shared/fast/applications
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+{
+  "name": "examples/simple_http",
+  "parameters": {
+      "tenant_name": "ten3",
+      "application_name": "app1",
+      "virtual_port": 80,
+      "virtual_address": "10.80.0.10",
+      "server_port": 80,
+      "server_addresses": [
+          "10.80.0.21",
+          "10.80.0.22"
+      ]
+  }
+}
+
+
+###   #delete fast applicataion
+DELETE https://{{host}}/mgmt/shared/fast/applications/ten3/app1
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
 
 
 

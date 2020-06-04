@@ -7,14 +7,27 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
-## [0.1.10] - (6-5-2020)
+## [0.1.10] - (6-4-2020)
 
-### Adding
-- *** fast view
-  - *** list deployed fast apps
-  - *** list fast tasks
-  - *** list fast templates
-  - *** list fast template sets
+### Added
+- Populated fast view on left
+  - list deployed fast apps
+    - click to view individual app configurations and deployment constants
+    - right click to delete app in tenant
+  - list fast tasks (only last 5)
+    - click to see task details
+  - list fast templates
+    - click to see full template details
+  - list fast template sets
+    - click to see templates in each template set
+
+- FAST: "Deploy FAST App" command
+  - takes in json object of template parameters
+- FAST: "Convert json as3 to mst for templating" command
+  - used to take as3 json and change it to .mst file for templating
+- FAST: "Render HTML View" command
+  - takes selected template view yml and presents rendered HTML view the user will see
+
 
 ## [0.1.9] - (5-31-2020)
 
