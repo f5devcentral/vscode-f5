@@ -6,7 +6,7 @@ import { chuckJoke2, chuckJoke1 } from './chuckJoke';
 import { F5TreeProvider, F5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
-import { exampleTsDecsProvider, exampleTsDec } from './treeViewsProviders/githubTsExamples';
+import { ExampleDecsProvider, ExampleDec } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
@@ -882,11 +882,11 @@ export function activate(context: vscode.ExtensionContext) {
 	 * 
 	 */
 
-	const tsDecTree = new exampleTsDecsProvider('testDataInput');
+	const tsDecTree = new ExampleDecsProvider('testDataInput');
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.enableTsExamples', () => {
 		// chuckJoke();
 		// setting up example TS dec tree
-		vscode.window.registerTreeDataProvider('tsExamples', new exampleTsDecsProvider('testDataInput'));
+		vscode.window.registerTreeDataProvider('tsExamples', tsDecTree);
 		// no need for refresh since we get a fresh tree every "enable" or window/workspace reload
 		vscode.commands.registerCommand('refreshTsExamleTree', () => tsDecTree.refresh());		// never wired up to get called...
 	}));

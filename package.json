@@ -3,12 +3,12 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "0.1.10",
+	"version": "0.1.11",
 	"keywords": [
 		"f5",
 		"f5networks",
 		"AS3",
-		"fast",
+		"FAST",
 		"DO",
 		"TS",
 		"bigip",
@@ -612,7 +612,6 @@
 		"@typescript-eslint/parser": "^2.18.0",
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
-		"mocha": "^7.0.1",
 		"typescript": "^3.7.5",
 		"vscode-test": "^1.3.0"
 	},

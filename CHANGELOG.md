@@ -7,6 +7,35 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
+## [1.0.0] - (6-5-2020) - pending
+
+INITIAL FULL RELEASE!!!
+
+Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/TS)
+
+- Host/F5/Device mgmt including add/modify/delete
+  - service discovery for installed ATC services
+  - password caching
+  - execute bash/tmsh command on device
+- FAST visibility with app deploy and delete
+- AS3 visibility with app deploy,inspect/delete
+- DO view/modify/post device declartion
+- code snippets to provide basic as3/do/ts examples
+- automatic schema validation with (*.as3.json/*.do.json/*.ts.json) files
+- example DO/TS declarations straight from official F5 github repos
+
+
+## [0.1.11] - (6-4-2020)
+
+- Fixed the following 
+```
+CVE-2020-7598
+moderate severity
+Vulnerable versions: < 0.2.1
+Patched version: 0.2.1
+minimist before 1.2.2 could be tricked into adding or modifying properties of Object.prototype using a "constructor" or "proto" payload.
+```
+
 ## [0.1.10] - (6-4-2020)
 
 ### Added

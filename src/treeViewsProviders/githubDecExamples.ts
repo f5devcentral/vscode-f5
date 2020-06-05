@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
-import { callHTTPS } from '../utils/externalAPIs'
+import { callHTTPS } from '../utils/externalAPIs';
 
 
-export class exampleTsDecsProvider implements vscode.TreeDataProvider<exampleTsDec> {
+export class ExampleDecsProvider implements vscode.TreeDataProvider<ExampleDec> {
 	dispose() {
 		throw new Error("Method not implemented.");
 	}
 
-	private _onDidChangeTreeData: vscode.EventEmitter<exampleTsDec | undefined> = new vscode.EventEmitter<exampleTsDec | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<exampleTsDec | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<ExampleDec | undefined> = new vscode.EventEmitter<ExampleDec | undefined>();
+	readonly onDidChangeTreeData: vscode.Event<ExampleDec | undefined> = this._onDidChangeTreeData.event;
 
 	constructor(private inCommingData: string) {
 	}
@@ -17,11 +17,11 @@ export class exampleTsDecsProvider implements vscode.TreeDataProvider<exampleTsD
 		this._onDidChangeTreeData.fire();
 	}
 
-    getTreeItem(element: exampleTsDec): vscode.TreeItem {
+    getTreeItem(element: ExampleDec): vscode.TreeItem {
 		return element;
 	}
 
-	async getChildren(element?: exampleTsDec): Promise<exampleTsDec[]> {
+	async getChildren(element?: ExampleDec): Promise<ExampleDec[]> {
         
 		const decCall = await callHTTPS({
 		    method: 'GET',
@@ -32,20 +32,20 @@ export class exampleTsDecsProvider implements vscode.TreeDataProvider<exampleTsD
 		        'User-Agent': 'nodejs native HTTPS'
 		    }
 		}).then( resp => {
-			return resp
-		})
+			return resp;
+		});
 
 		console.log(`decCall: ${JSON.stringify(decCall)}`);
 		
-		const treeItems = decCall.body.map((item:any): exampleTsDec => {
-			return (new exampleTsDec(
+		const treeItems = decCall.body.map((item:any): ExampleDec => {
+			return (new ExampleDec(
 				item.name, 
 				vscode.TreeItemCollapsibleState.None, 
 				{
 					command: 'f5-ts.getGitHubExampleTs',
 					title: 'hostTitle',
 					arguments: [item.download_url]
-			}))
+			}));
 		});
 
 		// if ( bigipHosts === undefined) {
@@ -75,7 +75,7 @@ export class exampleTsDecsProvider implements vscode.TreeDataProvider<exampleTsD
 
 }
 
-export class exampleTsDec extends vscode.TreeItem {
+export class ExampleDec extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		// private version: string,
