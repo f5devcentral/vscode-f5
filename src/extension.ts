@@ -466,9 +466,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// capture selected text or all text in editor
 		let text: string;
-		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
-		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
+
+		console.log(JSON.stringify(text));
 
 		if(utils.isValidJson(text)){
 
@@ -534,7 +538,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	
 		// give a little time to finish
-		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		await new Promise(resolve => { setTimeout(resolve, 3000); });	await new Promise(resolve => { setTimeout(resolve, 3000); });
 		fastTreeProvider.refresh();
 		as3TenantTree.refresh();
 
