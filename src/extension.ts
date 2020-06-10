@@ -316,8 +316,8 @@ export function activate(context: vscode.ExtensionContext) {
  	 *  			FFFF    AA   AA  SSSSS    TTT   
  	 *  			FF      AAAAAAA      SS   TTT   
  	 *  			FF      AA   AA  SSSSS    TTT   
-	  * 
-	  * ############################################################################
+	 * 
+	 * ############################################################################
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
 	 */
 	
@@ -500,8 +500,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// capture selected text or all text in editor
 		let text: string;
-		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
-		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
 		/**
@@ -514,13 +516,13 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 
 		 */
 
-		zip.file('test.mst', text);
+		 f5FastUtils.zipPost(text);
 
-		const file = await zip.generateAsync();
-
-		const authToken = await getAuthToken(host, username, password);
-		const fTemp = await callHTTP('POST', host, `/mgmt/shared/file-transfer/uploads/${file}`, authToken);
-
+		//	//	first try to make zip and post within memory 
+		 // zip.file('test.mst', text);
+		// const file = await zip.generateAsync();
+		// const authToken = await getAuthToken(host, username, password);
+		// const fTemp = await callHTTP('POST', host, `/mgmt/shared/file-transfer/uploads/${file}`, authToken);
 		// console.log(fast.Template.validate(text));
 
 	}));
