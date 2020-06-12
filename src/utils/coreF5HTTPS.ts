@@ -63,6 +63,12 @@ export const callHTTP = (method: string, host: string, path: string, token: stri
 
 
 
+/**
+ * multi part upload example
+ * https://github.com/f5devcentral/f5-icontrollx-dev-kit/blob/master/lib/util.js#L242
+ */
+
+
 
 interface OptsObject {
     host: string,
