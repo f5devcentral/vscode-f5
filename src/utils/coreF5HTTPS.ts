@@ -114,6 +114,21 @@ const httpCopyToHost = (opts, rpmPath, done) => {
     return multipartUpload(http_options, rpmPath, (err) => {
         done(err, `/var/config/rest/downloads/${rpmName}`);
     });
+};
+
+// utility method to set up HTTP options based on API options argument (i.e. devconfig.json)
+const prepareReqOptions = (user_opts, path) => {
+    // support both basic auth via USER/PASS or token auth via header
+    if( user_opts.HOST === 'localhost' && user_opts.PORT == 8100 )
+        https = require('http');
+
+    return {
+        hostname: user_opts.HOST,
+        port: user_opts.PORT || 443,
+        auth: user_opts.USER ? `${user_opts.USER}:${user_opts.PASS}` : undefined,
+        headers: user_opts.AUTH_TOKEN ? { 'x-f5-auth-token': user_opts.AUTH_TOKEN } : {},
+        path: path
+    };
 }
 
 const copyToHost = httpCopyToHost;

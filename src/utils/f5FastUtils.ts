@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { getAuthToken, callHTTP, multiPartUploadSDK } from './coreF5HTTPS';
+import { getAuthToken, callHTTP, multiPartUploadSDK, deployToBigIp } from './coreF5HTTPS';
 import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -33,7 +33,7 @@ export async function zipPost (doc: string) {
     const coreDir = ext.context.extensionPath;
     const tmpDir = '/fastTemplateUpload/';
     const fullTempDir = path.join(coreDir, tmpDir);
-    const zipOut = path.join(fullTempDir, 'fastTempUpload.zip');
+    const zipOut = path.join(coreDir, 'fastTempUpload.zip');
 
     console.log(fullTempDir);
     // log whats in the current coreDir-ext storagePath
@@ -63,7 +63,11 @@ export async function zipPost (doc: string) {
 
     const authToken = await getAuthToken(host, username, password);
 
-    const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+    //f5-sdk-js version
+    const deploy = await deployToBigIp({host, user: username, password}, zipOut);
+
+    // icontrollx-dev-kit version
+    // const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
 
 
 
