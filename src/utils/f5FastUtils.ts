@@ -1,6 +1,8 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+import { getAuthToken, callHTTP, multiPartUploadSDK } from './coreF5HTTPS';
+import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -14,6 +16,11 @@ https://github.com/f5devcentral/f5-fast-core/blob/develop/cli.js
 
 const fast = require('@f5devcentral/f5-fast-core');
 
+
+/**
+ * single fast template validate, zip, upload and import function
+ * @param doc template from editor (or selection)
+ */
 export async function zipPost (doc: string) {
 
     /*
@@ -47,8 +54,29 @@ export async function zipPost (doc: string) {
     // const tempZip = packageTemplateSet(fullTempDir);
     const package1 = await packageTemplateSet2(fullTempDir, zipOut);
     console.log(package1);
-    
-    // debugger;
+    console.log('zipOut', zipOut);
+
+    const device = ext.hostStatusBar.text;
+    const password = await utils.getPassword(device);
+    // const fast = ext.fastBar.text;
+    const [username, host] = device.split('@');
+
+    const authToken = await getAuthToken(host, username, password);
+
+    const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+
+
+
+    const importStatus = await callHTTP(
+        'POST',
+        host,
+        '/mgmt/shared/fast/templatesets',
+        authToken,
+        {
+            name: 'fastTempUpload'
+        });
+
+    debugger;
     // console.log(`Pending Delete`);
     // // if the temp directory is there, list contents, delete all files, then delete the directory
     // if (fs.existsSync(fullTempDir)) {
@@ -68,7 +96,12 @@ export async function zipPost (doc: string) {
 
 // https://github.com/zinkem/fast-docker/blob/master/templates/index.yaml
 
-
+/**
+ * Second try - WORKING!!!!
+ * package templateSet function from f5-fast-core cli
+ * @param tsPath path to folder containing ONLY fast templates
+ * @param dst output path/file.zip
+ */
 async function packageTemplateSet2(tsPath: string, dst?: string) {
     console.log('packagingTemplateSet, path: ', tsPath, 'destination: ', dst);
     
@@ -96,7 +129,11 @@ async function packageTemplateSet2(tsPath: string, dst?: string) {
 }
 
 
-
+/**
+ * f5-fast-core load template function
+ * https://github.com/f5devcentral/f5-fast-core/blob/develop/cli.js
+ * @param templatePath 
+ */
 async function loadTemplate(templatePath: string) {
     const tmplName = path.basename(templatePath, path.extname(templatePath));
     const tsName = path.basename(path.dirname(templatePath));
@@ -119,7 +156,11 @@ const validateTemplate = (templatePath: string) => loadTemplate(templatePath)
     });
 
 
-
+/**
+ * f5-fast-core validate template set function
+ * https://github.com/f5devcentral/f5-fast-core/blob/develop/cli.js
+ * @param tsPath 
+ */
 async function validateTemplateSet (tsPath: string) {
     const tsName = path.basename(tsPath);
     const tsDir = path.dirname(tsPath);
@@ -134,6 +175,13 @@ async function validateTemplateSet (tsPath: string) {
         });
 };
 
+
+/**
+ *  NOT WORKING
+ * f5-fast-core package template set function 
+ * @param tsPath 
+ * @param dst 
+ */
 function packageTemplateSet(tsPath: string, dst?: string) {
     console.log('packagingTemplateSet, path: ', tsPath, dst);
     

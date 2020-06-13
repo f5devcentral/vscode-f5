@@ -488,10 +488,12 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postAsNewTemplate', async () => {
-		const device = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		// const fast = ext.fastBar.text;
-		const [username, host] = device.split('@');
+		// const device = ext.hostStatusBar.text;
+		// const password = await utils.getPassword(device);
+		// // const fast = ext.fastBar.text;
+		// const [username, host] = device.split('@');
+
+		// const authToken = await getAuthToken(host, username, password);
 		
 		// get editor window
 		var editor = vscode.window.activeTextEditor;
