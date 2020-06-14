@@ -620,6 +620,7 @@
 		"@f5devcentral/f5-fast-core": "^0.5.1",
 		"@types/highlight.js": "^9.12.4",
 		"@types/jszip": "^3.4.1",
+		"axios": "^0.19.2",
 		"code-highlight-linenums": "^0.2.1",
 		"fs": "0.0.1-security",
 		"highlight.js": "^10.0.3",

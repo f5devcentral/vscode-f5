@@ -2,18 +2,16 @@
 'use strict';
 import * as vscode from 'vscode';
 import { request } from 'https';
+var https = require('https');
 import * as fs from 'fs';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
+import https from 'https';
+import axios from 'axios';
 
 
 const { Writable } = require('stream');
 const { EventEmitter } = require('events');
-
-
-
-
-
 
 /**
  * Get tmos auth token
@@ -79,12 +77,12 @@ export const callHTTP = (method: string, host: string, path: string, token: stri
  * https://github.com/f5devcentral/f5-icontrollx-dev-kit/blob/master/lib/util.js#L242
  */
 class ResponseBuffer extends Writable {
-    constructor(opts) {
+    constructor(opts?: any) {
         super(opts);
         this.text = '';
     }
 
-    _write(chunk, encoding, callback) {
+    _write(chunk: any, encoding: any, callback: () => void) {
         this.text += chunk;
         callback();
     }
@@ -105,22 +103,23 @@ const checkForHttpError = (res: any) => {
 };
 
 
-const httpCopyToHost = (opts, rpmPath, done) => {
-    const rpmName = rpmPath.split('/').pop();
+const httpCopyToHost = (opts: any, rpmPath: string, done: (arg0: any, arg1: string) => void) => {
+    const rpmName2 = rpmPath.split('/').pop();
+    const rpmName = path.parse(rpmPath).base;
 
     const http_options = prepareReqOptions(opts, `/mgmt/shared/file-transfer/uploads/${rpmName}`);
     http_options.method = 'POST';
 
-    return multipartUpload(http_options, rpmPath, (err) => {
+    return multipartUpload(http_options, rpmPath, (err: any) => {
         done(err, `/var/config/rest/downloads/${rpmName}`);
     });
 };
 
 // utility method to set up HTTP options based on API options argument (i.e. devconfig.json)
-const prepareReqOptions = (user_opts, path) => {
+const prepareReqOptions = (user_opts: { HOST: string; PORT: number; USER: any; PASS: any; AUTH_TOKEN: any; }, path: string) => {
     // support both basic auth via USER/PASS or token auth via header
-    if( user_opts.HOST === 'localhost' && user_opts.PORT == 8100 )
-        https = require('http');
+    // if( user_opts.HOST === 'localhost' && user_opts.PORT == 8100 )
+    //     https = require('http');
 
     return {
         hostname: user_opts.HOST,
@@ -129,12 +128,11 @@ const prepareReqOptions = (user_opts, path) => {
         headers: user_opts.AUTH_TOKEN ? { 'x-f5-auth-token': user_opts.AUTH_TOKEN } : {},
         path: path
     };
-}
+};
 
 const copyToHost = httpCopyToHost;
 exports.copyToHost = copyToHost;
 
-// ```
 // EXAMPLE DETAILS ON HOW TO CALL deployToBigIp -> 
 //                                 copyToHost(httpCopyToHost) -> 
 //                                 multipartUpload
@@ -151,13 +149,13 @@ exports.copyToHost = copyToHost;
 //  const rpmPath = '/local/path/to/project.rpm';
 
 //  icrdk.deployToBigIp(opts, rpmPath, );
-//  ```;
+//  
 
-exports.deployToBigIp = (options, rpmPath, cb) => {
+exports.deployToBigIp = (options: any, rpmPath: any, cb: (arg0: any) => void) => {
 
-    return copyToHost(options, rpmPath, (err, rpm) => {
+    return copyToHost(options, rpmPath, (err: any, rpm: any) => {
         if (err) {
-            if(cb) cb(err);
+            if(cb) {cb(err);}
         } else {
             // installRpmOnBigIp(options, rpm, cb);
             console.log('WAS SUPPOSED TO INSTALL RPM ON BIGIP, BUT NOT HERE...');
@@ -175,14 +173,18 @@ exports.deployToBigIp = (options, rpmPath, cb) => {
  * @param file_path path to file for upload
  * @param cb callback?
  */
-export async function multipartUpload(opts, file_path, cb) {
+export async function multipartUpload(opts: object , file_path: fs.PathLike, cb: any) {
+    console.log('multipartUpload:', opts, file_path, cb);
+    
     const eventLog = new EventEmitter();
     const fstats = fs.statSync(file_path);
     const CHUNK_SIZE = 1000000;
-    const upload_part = (start, end) => {
-        eventLog.emit('progress', 'Sending chunk ' + start + '-' + end + ' of ' + fstats.size + '...');
-        const req = request(opts, (res) => {
-            eventLog.emit('progress', `UPLOAD REQUEST STATUS (${start}-${end}): ${res.statusCode}`);
+    const upload_part = (start: number, end: number) => {
+        // eventLog.emit('progress', 'Sending chunk ' + start + '-' + end + ' of ' + fstats.size + '...');
+        console.log('progress', 'Sending chunk ' + start + '-' + end + ' of ' + fstats.size + '...');
+        const req = https.request(opts, (res: any) => {
+            // eventLog.emit('progress', `UPLOAD REQUEST STATUS (${start}-${end}): ${res.statusCode}`);
+            console.log('progress', `UPLOAD REQUEST STATUS (${start}-${end}): ${res.statusCode}`);
             res.setEncoding('utf8');
             const resbuf = new ResponseBuffer();
             res.pipe(resbuf);
@@ -190,25 +192,25 @@ export async function multipartUpload(opts, file_path, cb) {
                 const error = checkForHttpError(res);
                 if (error) {
                     error.body = resbuf.text;
-                    if (cb) cb(error);
+                    if (cb) {cb(error);}
                     return;
                 }
 
                 if (end === fstats.size - 1) {
-                    if(cb) cb();
+                    if(cb) {cb();}
                 } else {
                     const next_start = start + CHUNK_SIZE;
                     const next_end = (() => {
                         if(end + CHUNK_SIZE > fstats.size - 1)
-                            return fstats.size - 1;
+                            {return fstats.size - 1;}
                         return end + CHUNK_SIZE;
-                    })()
+                    })();
                     upload_part(next_start, next_end);
                 }
             });
         });
 
-        req.on('error', (err) => { if (cb) cb(err); });
+        req.on('error', (err) => { if (cb) {cb(err);} });
 
         req.setHeader('Content-Type', 'application/octet-stream');
         req.setHeader('Content-Range', start + '-' + end + '/' + fstats.size);
@@ -224,9 +226,9 @@ export async function multipartUpload(opts, file_path, cb) {
 
     setImmediate(() => {
         if (CHUNK_SIZE < fstats.size)
-            upload_part(0, CHUNK_SIZE-1);
+            {upload_part(0, CHUNK_SIZE-1);}
         else
-            upload_part(0, fstats.size-1);
+            {upload_part(0, fstats.size-1);}
     });
 
     return eventLog;
@@ -242,7 +244,7 @@ export async function multipartUpload(opts, file_path, cb) {
  * @param token aut token
  */
 
-export async function multiPartUploadSDK(file: string, host: string, token: string): Promise<void> {
+export async function multiPartUploadSDK(file: string, host: string, token: string) {
 
     console.log('MULTI-PART-UPLOAD-SDK', file, host, token);
 
@@ -259,20 +261,37 @@ export async function multiPartUploadSDK(file: string, host: string, token: stri
     let uploadStat;
     while (end <= fileStats.size - 1 && start < end) {
 
-        uploadStat = await makeRequest(
+        uploadStat = await makeRequestILX( host, `/mgmt/shared/file-transfer/uploads/${fileName2}`, 
             {
                 method: 'POST',
-                host,
-                path: `/mgmt/shared/file-transfer/uploads/${fileName2}`,
                 headers: {
                     'X-F5-Auth-Token': token,
                     'Content-Type': 'application/octet-stream',
                     'Content-Range': `${start}-${end}/${fileStats.size}`,
                     'Content-Length': end - start + 1
                 },
-            },
-            fs.createReadStream(file, { start, end })
+                body: fs.createReadStream(file, { start, end }),
+                // contentType: 'raw'
+            }
         );
+
+        // tried utilizing the makeRequest function already in this extension...
+        //          NOT WORKING!!!!
+
+        // uploadStat = await makeRequest(
+        //     {
+        //         method: 'POST',
+        //         host,
+        //         path: `/mgmt/shared/file-transfer/uploads/${fileName2}`,
+        //         headers: {
+        //             'X-F5-Auth-Token': token,
+        //             'Content-Type': 'application/octet-stream',
+        //             'Content-Range': `${start}-${end}/${fileStats.size}`,
+        //             'Content-Length': end - start + 1
+        //         },
+        //     },
+        //     fs.createReadStream(file, { start, end })
+        // );
 
         start += chunkSize;
         if (end + chunkSize < fileStats.size - 1) { // more to go
@@ -288,6 +307,54 @@ export async function multiPartUploadSDK(file: string, host: string, token: stri
     console.log('upload stat done', uploadStat);
     return uploadStat;
 };
+
+
+async function makeRequestILX(host: string, uri: string, options?: {
+    method?: any; /* eslint-disable-line @typescript-eslint/no-explicit-any */
+    port?: number;
+    body?: object;
+    headers?: object;
+    basicAuth?: object;
+    advancedReturn?: boolean;
+}): Promise<object> {
+    options = options || {};
+
+    // logger.debug(`Making HTTP request: ${host} ${uri} ${miscUtils.stringify(options)}`);
+    console.log(`Making HTTP request: ${host} ${uri} `);
+
+    const httpResponse = await axios.request<Response>({
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        }),
+        method: options['method'] || 'GET',
+        baseURL: `https://${host}:${options['port'] || 443}`,
+        url: uri,
+        headers: options['headers'] !== undefined ? options['headers'] : {},
+        data: options['body'] || null,
+        auth: options['basicAuth'] !== undefined ? {
+            username: options['basicAuth']['user'],
+            password: options['basicAuth']['password']
+        } : null,
+        validateStatus: null
+    });
+
+    // check for advanced return
+    if (options.advancedReturn) {
+        return {
+            statusCode: httpResponse.status,
+            body: httpResponse.data
+        }
+    }
+
+    // check for unsuccessful request
+    if (httpResponse.status > 300) {
+        return Promise.reject(new Error(
+            `HTTP request failed: ${httpResponse.status}`
+        ));
+    }
+    // return response body
+    return httpResponse.data;
+}
 
 
 

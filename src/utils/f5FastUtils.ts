@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { getAuthToken, callHTTP, multiPartUploadSDK, deployToBigIp } from './coreF5HTTPS';
+import { getAuthToken, callHTTP, multiPartUploadSDK, deployToBigIp, multiPartUploadILX } from './coreF5HTTPS';
 import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -29,58 +29,94 @@ export async function zipPost (doc: string) {
     https://code.visualstudio.com/api/references/vscode-api#ExtensionContext
     */
 
-    // const coreDir = ext.context.globalStoragePath;
-    const coreDir = ext.context.extensionPath;
-    const tmpDir = '/fastTemplateUpload/';
-    const fullTempDir = path.join(coreDir, tmpDir);
-    const zipOut = path.join(coreDir, 'fastTempUpload.zip');
 
-    console.log(fullTempDir);
-    // log whats in the current coreDir-ext storagePath
-    console.log(fs.readdirSync(coreDir));
+    //get folder name from user
+    //  potentially make this an input/select box to allow create a new folder or select existing
+    const fastTemplateFolderName = await vscode.window.showInputBox({
+        prompt: 'Destination FAST Templates Folder Name ---',
+        value: 'default'
+    });
+
+    // get template name from user
+    const fastTemplateName = await vscode.window.showInputBox({
+        placeHolder: 'appTemplate1',
+        value: 'testTemplate',
+        prompt: 'Input Destination FAST Template Name ---'
+    });
+
+    /**
+     * Add logic to make user provide template name
+     *  if !fastTemplateName -> warning message -> throw error
+     */
+
+    // debugger;
+    
+    
+    // const coreDir = ext.context.globalStoragePath;
+    // --- set extension context directory, ie-windows10: c:\Users\TestUser\vscode-f5-fast\
+    const coreDir = ext.context.extensionPath; 
+    // const tmpDir = fastTemplateFolderName;
+    const fullTempDir = path.join(coreDir, 'fastTemplateFolderUploadTemp');
+    const zipOut = path.join(coreDir, `${fastTemplateFolderName}.zip`);
+    // const zipOut = path.join(coreDir, 'dummy.txt');
+    
+    console.log('fast Template Folder Name: ', fastTemplateFolderName);
+    console.log('fast Template Name: ', fastTemplateName);
+    console.log('base directory: ', coreDir);
+    console.log('full Temp directory: ', fullTempDir);
+    console.log('zip output dir/fileName: ', zipOut);
+
+
+    // console.log(fullTempDir);
+    // // log whats in the current coreDir-ext storagePath
+    // console.log(fs.readdirSync(coreDir));
     
     // debugger;
     //  if the temp directory is not there, create it
+    //      this shouldn't happen but if things get stuck half way...
     if (!fs.existsSync(fullTempDir)) {
         fs.mkdirSync(fullTempDir);
     }
-    // log whats in the new folder in above dir
-    console.log(fs.readdirSync(fullTempDir));
 
-    fs.writeFileSync(path.join(fullTempDir, 'testFile.mst'), doc);
+    // // log whats in the new folder in above dir
+    // console.log(fs.readdirSync(fullTempDir));
+
+    fs.writeFileSync(path.join(fullTempDir, `${fastTemplateName}.mst`), doc);
     // fs.writeFileSync(path.join(coreDir, 'testFile.txt'), 'testttties!!!');
     
     // debugger;
     // const tempZip = packageTemplateSet(fullTempDir);
     const package1 = await packageTemplateSet2(fullTempDir, zipOut);
-    console.log(package1);
-    console.log('zipOut', zipOut);
+    // console.log(package1);
+    // console.log('zipOut', zipOut);
+
+
+    /**
+     * if we have gotten this far, it's time to get ready for POST
+     */
 
     const device = ext.hostStatusBar.text;
     const password = await utils.getPassword(device);
-    // const fast = ext.fastBar.text;
     const [username, host] = device.split('@');
-
     const authToken = await getAuthToken(host, username, password);
 
     //f5-sdk-js version
-    const deploy = await deployToBigIp({host, user: username, password}, zipOut);
-
+    const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+    console.log('sdk upload response', uploadStatus);
+    
     // icontrollx-dev-kit version
-    // const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+    // const deploy = await deployToBigIp({host, user: username, password}, zipOut);
+    // console.log('ilx upload response', deploy);
 
 
-
-    const importStatus = await callHTTP(
-        'POST',
-        host,
-        '/mgmt/shared/fast/templatesets',
-        authToken,
+    // debugger;
+    const importStatus = await callHTTP('POST', host, '/mgmt/shared/fast/templatesets', authToken,
         {
-            name: 'fastTempUpload'
+            name: fastTemplateFolderName
         });
+    console.log('template import status: ', importStatus);
+    
 
-    debugger;
     // console.log(`Pending Delete`);
     // // if the temp directory is there, list contents, delete all files, then delete the directory
     // if (fs.existsSync(fullTempDir)) {
