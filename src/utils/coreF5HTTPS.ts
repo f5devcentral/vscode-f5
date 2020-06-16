@@ -294,18 +294,20 @@ export async function multiPartUploadSDK(file: string, host: string, token: stri
 
 
 /**
- * Axios HTTPS agent from f5-sdk-js
+ * Axios HTTPS agent 
+ * modeled after f5-sdk-js implementation
+ * Will probably become the new https method, but will need some refactoring
  * @param host hostname/IP
  * @param uri http uri path
  * @param options http options (method, port, body, headers, basicAuth)
  */
-async function makeRequestAX(host: string, uri: string, options?: {
+async function makeRequestAX(host: string, uri: string, options: {
     method?: any; 
     port?: number;
     body?: object;
     headers?: object;
-    // auth?: AxiosBasicCredentials
-    basicAuth?: object;
+    // auth?: object;
+    // basicAuth?: object;
     // advancedReturn?: boolean;
 }): Promise<object> {
     options = options || {};
@@ -322,11 +324,11 @@ async function makeRequestAX(host: string, uri: string, options?: {
         url: uri,
         headers: options['headers'] !== undefined ? options['headers'] : {},
         data: options['body'] || null,
-        auth: options['basicAuth'] !== undefined ? {
-            username: options['basicAuth']['user'],
-            password: options['basicAuth']['password']
-        } : null,
-        validateStatus: null
+        // auth: options['basicAuth'] !== undefined ? {
+        //     username: options['basicAuth']['user'],
+        //     password: options['basicAuth']['password']
+        // } : null,
+        // validateStatus: null
     });
 
     // // check for advanced return
