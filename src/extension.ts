@@ -497,7 +497,8 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		// get editor window
 		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	return; // No open text editor
+		if (!editor) {	
+			return; // No open text editor
 		}
 
 		// capture selected text or all text in editor
@@ -508,25 +509,7 @@ export function activate(context: vscode.ExtensionContext) {
 			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		/**
-		 * documentation want us to zip, upload, then tell fast to import the zip
-		 * 		they have thier reasons, but for now, that seems complicated
-		 * 	Looking to just echo the file in through the bash endpoint
-		 * https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/template-authoring.html
-		 * 
-		 * directory is: /var/config/rest/iapps/f5-appsvcs-templates/templatesets/examples
-		 * 
-		 */
-
 		 f5FastUtils.zipPost(text);
-
-		//	//	first try to make zip and post within memory 
-		 // zip.file('test.mst', text);
-		// const file = await zip.generateAsync();
-		// const authToken = await getAuthToken(host, username, password);
-		// const fTemp = await callHTTP('POST', host, `/mgmt/shared/file-transfer/uploads/${file}`, authToken);
-		// console.log(fast.Template.validate(text));
-
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {

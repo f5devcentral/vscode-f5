@@ -19,7 +19,8 @@ const fast = require('@f5devcentral/f5-fast-core');
 
 /**
  * single fast template validate, zip, upload and import function
- * @param doc template from editor (or selection)
+ * will detect what device is currently selected
+ * @param doc template/text from editor (or selection)
  */
 export async function zipPost (doc: string) {
 
@@ -28,7 +29,6 @@ export async function zipPost (doc: string) {
     https://nodejs.org/api/fs.html#fs_fs_mkdtemp_prefix_options_callback
     https://code.visualstudio.com/api/references/vscode-api#ExtensionContext
     */
-
 
     //get folder name from user
     //  potentially make this an input/select box to allow create a new folder or select existing
@@ -44,12 +44,10 @@ export async function zipPost (doc: string) {
         prompt: 'Input Destination FAST Template Name ---'
     });
 
-    /**
-     * Add logic to make user provide template name
-     *  if !fastTemplateName -> warning message -> throw error
-     */
-
-    // debugger;
+    if (!fastTemplateName) {
+        // if no destination template name provided, it will fail, so exit
+        return vscode.window.showWarningMessage('No destination FAST template name provided!');
+    }
     
     
     // const coreDir = ext.context.globalStoragePath;
@@ -86,7 +84,7 @@ export async function zipPost (doc: string) {
     
     // debugger;
     // const tempZip = packageTemplateSet(fullTempDir);
-    const package1 = await packageTemplateSet2(fullTempDir, zipOut);
+    const zipedTemplates = await packageTemplateSet2(fullTempDir, zipOut);
     // console.log(package1);
     // console.log('zipOut', zipOut);
 
@@ -117,20 +115,20 @@ export async function zipPost (doc: string) {
     console.log('template import status: ', importStatus);
     
 
-    // console.log(`Pending Delete`);
-    // // if the temp directory is there, list contents, delete all files, then delete the directory
-    // if (fs.existsSync(fullTempDir)) {
-    //     const dirContents = fs.readdirSync(fullTempDir);
-    //     // debugger;
-    //     dirContents.map( item => {
-    //         const pathFile = path.join(fullTempDir, item);
-    //         console.log(`Deleting file: ${pathFile}`);
-    //         fs.unlinkSync(pathFile);
-    //     });
+    console.log(`Pending Delete`);
+    // if the temp directory is there, list contents, delete all files, then delete the directory
+    if (fs.existsSync(fullTempDir)) {
+        const dirContents = fs.readdirSync(fullTempDir);
+        // debugger;
+        dirContents.map( item => {
+            const pathFile = path.join(fullTempDir, item);
+            console.log(`Deleting file: ${pathFile}`);
+            fs.unlinkSync(pathFile);
+        });
         
-    //     console.log(`Deleting folder: ${fullTempDir}`);
-    //     fs.rmdirSync(fullTempDir, { recursive: true });
-    // }
+        console.log(`Deleting folder: ${fullTempDir}`);
+        fs.rmdirSync(fullTempDir, { recursive: true });
+    }
 }
 
 
@@ -216,29 +214,29 @@ async function validateTemplateSet (tsPath: string) {
 };
 
 
-/**
- *  NOT WORKING
- * f5-fast-core package template set function 
- * @param tsPath 
- * @param dst 
- */
-function packageTemplateSet(tsPath: string, dst?: string) {
-    console.log('packagingTemplateSet, path: ', tsPath, dst);
+// /**
+//  *  NOT WORKING
+//  * f5-fast-core package template set function 
+//  * @param tsPath 
+//  * @param dst 
+//  */
+// function packageTemplateSet(tsPath: string, dst?: string) {
+//     console.log('packagingTemplateSet, path: ', tsPath, dst);
     
-    // validateTemplateSet(tsPath)
-    // .then(() => {
-    //     const tsName = path.basename(tsPath);
-    //     const tsDir = path.dirname(tsPath);
-    //     const provider = new fast.FsTemplateProvider(tsDir, [tsName]);
-    //     console.log('provider', provider);
+//     // validateTemplateSet(tsPath)
+//     // .then(() => {
+//     //     const tsName = path.basename(tsPath);
+//     //     const tsDir = path.dirname(tsPath);
+//     //     const provider = new fast.FsTemplateProvider(tsDir, [tsName]);
+//     //     console.log('provider', provider);
 
-    //     dst = dst || `./${tsName}.zip`;
-    //     console.log('dest file name', dst);
+//     //     dst = dst || `./${tsName}.zip`;
+//     //     console.log('dest file name', dst);
         
 
-    //     return provider.buildPackage(tsName, dst)
-    //         .then(() => {
-    //             console.log(`Template set "${tsName}" packaged as ${dst}`);
-    //         });
-    // });
-};
+//     //     return provider.buildPackage(tsName, dst)
+//     //         .then(() => {
+//     //             console.log(`Template set "${tsName}" packaged as ${dst}`);
+//     //         });
+//     // });
+// };
