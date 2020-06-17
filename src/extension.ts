@@ -316,8 +316,8 @@ export function activate(context: vscode.ExtensionContext) {
  	 *  			FFFF    AA   AA  SSSSS    TTT   
  	 *  			FF      AAAAAAA      SS   TTT   
  	 *  			FF      AA   AA  SSSSS    TTT   
-	  * 
-	  * ############################################################################
+	 * 
+	 * ############################################################################
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
 	 */
 	
@@ -466,9 +466,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// capture selected text or all text in editor
 		let text: string;
-		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
-		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
+
+		console.log(JSON.stringify(text));
 
 		if(utils.isValidJson(text)){
 
@@ -484,41 +488,28 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postAsNewTemplate', async () => {
-		const device = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		// const fast = ext.fastBar.text;
-		const [username, host] = device.split('@');
+		// const device = ext.hostStatusBar.text;
+		// const password = await utils.getPassword(device);
+		// // const fast = ext.fastBar.text;
+		// const [username, host] = device.split('@');
+
+		// const authToken = await getAuthToken(host, username, password);
 		
 		// get editor window
 		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	return; // No open text editor
+		if (!editor) {	
+			return; // No open text editor
 		}
 
 		// capture selected text or all text in editor
 		let text: string;
-		if (editor.selection.isEmpty) {text = editor.document.getText();	// entire editor/doc window
-		} else {text = editor.document.getText(editor.selection);	// highlighted text
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		/**
-		 * documentation want us to zip, upload, then tell fast to import the zip
-		 * 		they have thier reasons, but for now, that seems complicated
-		 * 	Looking to just echo the file in through the bash endpoint
-		 * https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/template-authoring.html
-		 * 
-		 * directory is: /var/config/rest/iapps/f5-appsvcs-templates/templatesets/examples
-		 * 
-		 */
-
-		zip.file('test.mst', text);
-
-		const file = await zip.generateAsync();
-
-		const authToken = await getAuthToken(host, username, password);
-		const fTemp = await callHTTP('POST', host, `/mgmt/shared/file-transfer/uploads/${file}`, authToken);
-
-		// console.log(fast.Template.validate(text));
-
+		 f5FastUtils.zipPost(text);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {
@@ -534,7 +525,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	
 		// give a little time to finish
-		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		await new Promise(resolve => { setTimeout(resolve, 3000); });	await new Promise(resolve => { setTimeout(resolve, 3000); });
 		fastTreeProvider.refresh();
 		as3TenantTree.refresh();
 

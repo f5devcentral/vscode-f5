@@ -153,7 +153,7 @@ export async function setTSBar(text: string = '', tip: string = '') {
  * @param item json object to display in new editor
  */
 export async function displayJsonInEditor(item: object): Promise<any> {
-    vscode.workspace.openTextDocument({ 
+    return vscode.workspace.openTextDocument({ 
         language: 'json', 
         content: JSON.stringify(item, undefined, 4) 
     })
