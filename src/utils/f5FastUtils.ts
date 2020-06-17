@@ -145,6 +145,9 @@ export async function zipPost (doc: string) {
             console.log(`Deleting folder: ${fullTempDir}`);
             fs.rmdirSync(fullTempDir, { recursive: true });
         }
+        // remove zip file
+        console.log(`Deleting zip: ${zipOut}`);
+        fs.unlinkSync(zipOut);
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
     });
