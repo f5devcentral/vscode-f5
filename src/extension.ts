@@ -509,7 +509,74 @@ export function activate(context: vscode.ExtensionContext) {
 			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		 f5FastUtils.zipPost(text);
+		 f5FastUtils.zipPostTemplate(text);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async () => {
+
+		// get list of open workspaces
+		const workspaces: [] = vscode.workspace.workspaceFolders;
+		console.log('workspaces', workspaces);
+		
+		// if no open workspace...
+		if(!workspaces) {
+			// Show message to select workspace
+			await vscode.window.showInformationMessage('See top bar to open a workspace with Fast Templates first');
+			// pop up to selecte a workspace
+			await vscode.window.showWorkspaceFolderPick();
+			// return to begining of function to try again
+			return vscode.commands.executeCommand('f5-fast.postTemplateSet');
+		}
+	
+		const ben1 = vscode.workspace.workspaceFolders![0]!.uri;
+		const wkspPath = ben1.fsPath;
+		// vscode.workspace.fs.readDirectory(vscode.Uri.file('/'));
+		const ben2 = await vscode.workspace.fs.readDirectory(ben1);
+	
+		// console.log('workspace', vscode.workspace);
+		console.log('workspace name', vscode.workspace.name);
+		// console.log('workspace folders', vscode.workspace.fs.readDirectory(vscode.Uri.file('/rest.http')));
+		// // const fileUri = ;
+		// const folderPath = posix.dirname(workspaces[0].uri.path);
+		// const folderUri = fileUri.with({ path: folderPath });
+		
+		// const wkspFolders = vscode.workspace.fs.readDirectory(workspaces);
+		let wkspc;
+		if (workspaces.length > 1) {
+			wkspc = await vscode.window.showQuickPick(workspaces);
+		} else {
+			wkspc = workspaces[0];
+		}
+		
+		let wFolders = [];
+		for (const [name, type] of await vscode.workspace.fs.readDirectory(ben1)) {
+
+			if (type === vscode.FileType.Directory){
+				console.log('---directory', name);
+				wFolders.push(name);
+			}
+		};
+		// const wkspcContents: [] = await vscode.workspace.fs.readDirectory(ben1);
+		// console.log('workspace contents', wkspcContents);
+		// const wkspcFolders = wkspcContents.filter( item => item[1] === vscode.FileType.Directory);
+		// 	// {
+		// 	// if(item[1] === 2) {
+		// 	// 	console.log();
+		// 	// 	return item[0];
+		// 	// } else {
+		// 	// 	return;
+		// 	// }
+		// // });
+		// console.log('workspace folders', wkspcFolders);
+		const selectedFolder = await vscode.window.showQuickPick(wFolders);
+
+		if(!selectedFolder) {
+			return vscode.window.showInformationMessage('Must select a Fast Template Set folder');
+		}
+
+		// const fullSelectedFolderPath = `${wkspPath}\\${selectedFolder}`;
+
+		f5FastUtils.zipPostTempSet(wkspPath, selectedFolder);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {

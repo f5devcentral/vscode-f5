@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "0.1.11",
+	"version": "0.2.0",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -271,6 +271,11 @@
 				"category": "F5-Fast"
 			},
 			{
+				"command": "f5-fast.postTemplateSet",
+				"title": "Post Template Set",
+				"category": "F5-Fast"
+			},
+			{
 				"command": "f5-fast.deleteFastApp",
 				"title": "Delete FAST App",
 				"category": "F5-Fast"
@@ -479,6 +484,10 @@
 				},
 				{
 					"command": "f5-fast.postAsNewTemplate",
+					"when": "f5.fastInstalled"
+				},
+				{
+					"command": "f5-fast.postTemplateSet",
 					"when": "f5.fastInstalled"
 				},
 				{
