@@ -43,7 +43,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 				const apps = await callHTTP('GET', host, '/mgmt/shared/fast/applications', authToken);
 
 				apps.body.forEach( (item: { tenant?: string; name?: string; }) => {
-					treeItems.push(new FastTreeItem(`${item.tenant}/${item.name}`, '', '', vscode.TreeItemCollapsibleState.None,
+					treeItems.push(new FastTreeItem(`${item.tenant}/${item.name}`, '', '', 'fastApp', vscode.TreeItemCollapsibleState.None,
 					{ command: 'f5-fast.getApp', title: '', arguments: [`${item.tenant}/${item.name}`] } ));
 				});
 
@@ -62,7 +62,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 						subTitle = `${item.code} - ${item.message}`;
 					}
 
-					treeItems.push(new FastTreeItem(`${shortId}`, subTitle, '', vscode.TreeItemCollapsibleState.None,
+					treeItems.push(new FastTreeItem(`${shortId}`, subTitle, '', '', vscode.TreeItemCollapsibleState.None,
 					{ command: 'f5-fast.getTask', title: '', arguments: [item.id] } ));
 				});
 
@@ -71,7 +71,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 				const templates = await callHTTP('GET', host, '/mgmt/shared/fast/templates', authToken);
 
 				templates.body.map( (item: any) => {
-					treeItems.push(new FastTreeItem(`${item}`, '', '', vscode.TreeItemCollapsibleState.None,
+					treeItems.push(new FastTreeItem(`${item}`, '', '', 'fastTemplate', vscode.TreeItemCollapsibleState.None,
 					{ command: 'f5-fast.getTemplate', title: '', arguments: [item] } ));
 				});
 
@@ -80,7 +80,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 				const tSets = await callHTTP('GET', host, '/mgmt/shared/fast/templatesets', authToken);
 
 				tSets.body.map( (item: any) => {
-					treeItems.push(new FastTreeItem(`${item.name}`, '', '', vscode.TreeItemCollapsibleState.None,
+					treeItems.push(new FastTreeItem(`${item.name}`, '', '', 'fastTemplateSet', vscode.TreeItemCollapsibleState.None,
 					{ command: 'f5-fast.getTemplateSets', title: '', arguments: [item.name] } ));
 				});
 			}
@@ -91,24 +91,25 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 			
 		// no element selected, so return parent items
 		treeItems.push(
-			new FastTreeItem('Deployed Applications', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+			new FastTreeItem('Deployed Applications', '', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 				{ command: 'f5-fast.getApps', title: '', arguments: ['none'] })
 		);
 		treeItems.push(
-			new FastTreeItem('Tasks', 'Last 5', '', vscode.TreeItemCollapsibleState.Collapsed, 
+			new FastTreeItem('Tasks', 'Last 5', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 				{ command: 'f5-fast.listTasks', title: '', arguments: ['none'] })
 		);
 		treeItems.push(
-			new FastTreeItem('Templates', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+			new FastTreeItem('Templates', '', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 				{ command: 'f5-fast.listTemplates', title: '', arguments: ['none'] })
 		);
 		treeItems.push(
-			new FastTreeItem('Template Sets', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+			new FastTreeItem('Template Sets', '', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 				{ command: 'f5-fast.listTemplateSets', title: '', arguments: ['none'] })
 		);
 
 		}
 
+		// debugger;
         return Promise.resolve(treeItems);
 	}
 }
@@ -118,6 +119,7 @@ export class FastTreeItem extends vscode.TreeItem {
 		public readonly label: string,
 		public version: string,
 		private toolTip: string,
+		private context: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
@@ -137,6 +139,6 @@ export class FastTreeItem extends vscode.TreeItem {
 	// 	dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
 	// };
 
-    // contextValue = 'dependency';
+    contextValue = this.context;
     
 }

@@ -174,38 +174,6 @@ export async function zipPostTempSet (basePath: string, folder: string) {
             return new Error(`User canceled the template set`);
         });
         
-        // progress.report({ message: `Validating and packaging templates`});
-        
-        // //get folder name from user
-        // //  potentially make this an input/select box to allow create a new folder or select existing
-        // const fastTemplateFolderName = await vscode.window.showInputBox({
-        //     prompt: 'Destination FAST Templates Folder Name ---',
-        //     value: 'default'
-        // });
-        
-        // progress.report({ message: `Please provide a Template Name`});
-        // // get template name from user
-        // const fastTemplateName = await vscode.window.showInputBox({
-        //     placeHolder: 'appTemplate1',
-        //     value: 'testTemplate',
-        //     prompt: 'Input Destination FAST Template Name ---'
-        // });
-
-
-        // if (!fastTemplateName) {
-        //     // if no destination template name provided, it will fail, so exit
-        //     return vscode.window.showWarningMessage('No destination FAST template name provided!');
-        // }
-        
-        
-        // const coreDir = ext.context.globalStoragePath;
-        // --- set extension context directory, ie-windows10: c:\Users\TestUser\vscode-f5-fast\
-        // const coreDir = ext.context.extensionPath; 
-
-
-        // const tmpDir = fastTemplateFolderName;
-        // const fullTempDir = path.join(coreDir, 'fastTemplateFolderUploadTemp');
-        // const fullTempDir = path.join(coreDir, folder);
         const zipOut = path.join(basePath, `${folder}.zip`);
         // const zipOut = path.join(coreDir, 'dummy.txt');
         
@@ -284,28 +252,28 @@ export async function zipPostTempSet (basePath: string, folder: string) {
 async function packageTemplateSet2(tsPath: string, dst: string) {
     console.log('packagingTemplateSet, path: ', tsPath, 'destination: ', dst);
     
-    await validateTemplateSet(tsPath)
+    const tempVal = await validateTemplateSet(tsPath)
     .then(async () => {
         const tsName = path.basename(tsPath);
         const tsDir = path.dirname(tsPath);
         const provider = new fast.FsTemplateProvider(tsDir, [tsName]);
-        console.log('provider object below \\/\\/', provider);
+        // console.log('provider object below \\/\\/', provider);
 
-        dst = dst || `./${tsName}.zip`;
-        console.log('dest file name', dst);
+        // dst = dst || `./${tsName}.zip`;
+        // console.log('dest file name', dst);
         
         const fastPackage = await provider.buildPackage(tsName, dst)
             .then(() => {
-                console.log(`tspath ${tsPath}`);
+                // console.log(`tspath ${tsPath}`);
                 console.log(`Template set "${tsName}" packaged as ${dst}`);
                 return dst;
             })
             .catch((error: any) => {
                 console.log(error);
             });
-        return fastPackage;
+        // return fastPackage;
     });
-
+    return tempVal;
 }
 
 
@@ -350,7 +318,9 @@ async function validateTemplateSet (tsPath: string) {
     return provider.list()
         .then((templateList: any) => Promise.all(templateList.map((tmpl: any) => provider.fetch(tmpl))))
         .catch((e: { stack: any; }) => {
+            vscode.window.showWarningMessage(`Template set "${tsName}" failed validation:\n${e.stack}`);
             console.error(`Template set "${tsName}" failed validation:\n${e.stack}`);
+            return Promise.reject('Template set "${tsName}" failed validation');
             // process.exit(1);
         });
 };

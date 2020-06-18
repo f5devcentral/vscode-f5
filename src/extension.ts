@@ -530,21 +530,17 @@ export function activate(context: vscode.ExtensionContext) {
 	
 		const ben1 = vscode.workspace.workspaceFolders![0]!.uri;
 		const wkspPath = ben1.fsPath;
-		// vscode.workspace.fs.readDirectory(vscode.Uri.file('/'));
 		const ben2 = await vscode.workspace.fs.readDirectory(ben1);
 	
 		// console.log('workspace', vscode.workspace);
 		console.log('workspace name', vscode.workspace.name);
-		// console.log('workspace folders', vscode.workspace.fs.readDirectory(vscode.Uri.file('/rest.http')));
-		// // const fileUri = ;
-		// const folderPath = posix.dirname(workspaces[0].uri.path);
-		// const folderUri = fileUri.with({ path: folderPath });
-		
-		// const wkspFolders = vscode.workspace.fs.readDirectory(workspaces);
+
 		let wkspc;
 		if (workspaces.length > 1) {
+			// if more than one workspace open, have user select the workspace
 			wkspc = await vscode.window.showQuickPick(workspaces);
 		} else {
+			// else select the first workspace
 			wkspc = workspaces[0];
 		}
 		
@@ -556,27 +552,21 @@ export function activate(context: vscode.ExtensionContext) {
 				wFolders.push(name);
 			}
 		};
-		// const wkspcContents: [] = await vscode.workspace.fs.readDirectory(ben1);
-		// console.log('workspace contents', wkspcContents);
-		// const wkspcFolders = wkspcContents.filter( item => item[1] === vscode.FileType.Directory);
-		// 	// {
-		// 	// if(item[1] === 2) {
-		// 	// 	console.log();
-		// 	// 	return item[0];
-		// 	// } else {
-		// 	// 	return;
-		// 	// }
-		// // });
-		// console.log('workspace folders', wkspcFolders);
+
+		// have user select first level folder in workspace
 		const selectedFolder = await vscode.window.showQuickPick(wFolders);
 
 		if(!selectedFolder) {
+			// if user "escaped" folder selection window
 			return vscode.window.showInformationMessage('Must select a Fast Template Set folder');
 		}
 
 		// const fullSelectedFolderPath = `${wkspPath}\\${selectedFolder}`;
 
-		f5FastUtils.zipPostTempSet(wkspPath, selectedFolder);
+		await f5FastUtils.zipPostTempSet(wkspPath, selectedFolder);
+
+		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		fastTreeProvider.refresh();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {
@@ -592,9 +582,29 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	
 		// give a little time to finish
-		await new Promise(resolve => { setTimeout(resolve, 3000); });	await new Promise(resolve => { setTimeout(resolve, 3000); });
+		await new Promise(resolve => { setTimeout(resolve, 3000); });
 		fastTreeProvider.refresh();
 		as3TenantTree.refresh();
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastTempSet', async (tempSet) => {
+		
+		var device: string | undefined = ext.hostStatusBar.text;
+		const password = await utils.getPassword(device);
+		const response = await f5FastApi.delTempSet(device, password, tempSet.label);
+
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(response.body);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, response.body);
+		// }
+		
+		vscode.window.showInformationMessage(`Fast Template Set Delete: ${response.body.message}`);
+
+		// give a little time to finish
+		await new Promise(resolve => { setTimeout(resolve, 2000); });
+		fastTreeProvider.refresh();
 
 	}));
 

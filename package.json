@@ -281,6 +281,11 @@
 				"category": "F5-Fast"
 			},
 			{
+				"command": "f5-fast.deleteFastTempSet",
+				"title": "Delete FAST Template Set",
+				"category": "F5-Fast"
+			},
+			{
 				"command": "f5-fast.renderYmlTemplate",
 				"title": "Render YAML Template",
 				"category": "F5-Fast"
@@ -496,7 +501,11 @@
 				},
 				{
 					"command": "f5-fast.deleteFastApp",
-					"when": "none"
+					"when": "f5.fastInstalled"
+				},
+				{
+					"command": "f5-fast.deleteFastTempSet",
+					"when": "f5.fastInstalled"
 				},
 				{
 					"command": "f5-fast.listTasks",
@@ -587,7 +596,11 @@
 				},
 				{
 					"command": "f5-fast.deleteFastApp",
-					"when": "view == fastView"
+					"when": "view == fastView && viewItem == fastApp"
+				},
+				{
+					"command": "f5-fast.deleteFastTempSet",
+					"when": "view == fastView && viewItem == fastTemplateSet"
 				},
 				{
 					"command": "f5-as3.fullTenant",
