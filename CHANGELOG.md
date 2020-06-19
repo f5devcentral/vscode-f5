@@ -17,12 +17,22 @@ Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/
   - service discovery for installed ATC services
   - password caching
   - execute bash/tmsh command on device
-- FAST visibility with app deploy and delete
+- FAST functionality and visibility
+  - single template upload
+  - template set upload
+  - deploy fast app
+  - fast tree view
+    - view/delete deployed apps
+    - view tasks
+    - view/delete template
+    - view/delete template set
 - AS3 visibility with app deploy,inspect/delete
 - DO view/modify/post device declartion
 - code snippets to provide basic as3/do/ts examples
 - automatic schema validation with (*.as3.json/*.do.json/*.ts.json) files
 - example DO/TS declarations straight from official F5 github repos
+  - DO - Pending
+  - AS3 - PENDING
 
 
 ## [0.1.11] - (6-4-2020)
