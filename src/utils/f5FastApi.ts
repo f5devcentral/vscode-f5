@@ -134,6 +134,48 @@ export async function delTenApp(device: string, password: string, tenApp: string
 
 
 
+/**
+ * Delete FAST template set
+ * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
+ * @param password User Password
+ * @param tempSet templateSet anme
+ */
+export async function delTempSet(device: string, password: string, tempSet: string) {
+    var [username, host] = device.split('@');
+    const authToken = await getAuthToken(host, username, password);
+    const progressDelete = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Deleting FAST Template Set: ${tempSet}`
+    }, async (progress) => {
+        let response = await callHTTP('DELETE', host, `/mgmt/shared/fast/templatesets/${tempSet}`, authToken);
+        
+        let taskId: string | undefined;
+        if(response.status === 202) {
+            taskId = response.body.id;
+            
+            await new Promise(resolve => { setTimeout(resolve, 1000); });
+            while(taskId) {
+                response = await callHTTP('GET', host, `/mgmt/shared/fast/tasks/${taskId}`, authToken);
+
+                // if not 'in progress', its done, clear taskId to break loop
+                if(response.body.message !== 'in progress'){
+                    taskId = undefined;
+                    return response;
+                }
+
+                progress.report({ message: `${response.body.message}`});
+                await new Promise(resolve => { setTimeout(resolve, (ext.settings.asyncInterval * 1000)); });
+
+            }
+        }
+
+        return response;
+    });
+    return progressDelete;
+}
+
+
+
 
 
 // export function get
