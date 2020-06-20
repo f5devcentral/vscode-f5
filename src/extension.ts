@@ -950,21 +950,6 @@ export function activate(context: vscode.ExtensionContext) {
 	 * 
 	 */
 
-	const tsDecTree = new ExampleDecsProvider('testDataInput');
-	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.enableTsExamples', () => {
-		// chuckJoke();
-		// setting up example TS dec tree
-		vscode.window.registerTreeDataProvider('tsExamples', tsDecTree);
-		// no need for refresh since we get a fresh tree every "enable" or window/workspace reload
-		vscode.commands.registerCommand('refreshTsExamleTree', () => tsDecTree.refresh());		// never wired up to get called...
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.disableTsExamples', () => {
-		vscode.window.showInformationMessage(`Wire up clearing ts example view!`);
-		// I was thinking the following dispose would dispose of the registration and clear the tree, but that doesn't work
-		// I figure just leave it for now, at least it only loads when user "enables" it, 
-		tsDecTree.dispose();
-	}));
 
 
 
@@ -1040,7 +1025,13 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getGitHubExampleTs', async (decUrl) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
+
+		if(decUrl === 'tempAS3') {
+			// remove once as3 examples are available
+			return vscode.env.openExternal(vscode.Uri.parse('https://github.com/F5Networks/f5-appsvcs-extension/issues/280'));
+		}
+
 		decUrl = vscode.Uri.parse(decUrl);
 		const decCall = await callHTTPS({
 		    method: 'GET',
@@ -1184,6 +1175,10 @@ export function activate(context: vscode.ExtensionContext) {
  * #########################################################################
  * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=UTIL
  */
+
+
+	// register example delarations tree
+	vscode.window.registerTreeDataProvider('decExamples', new ExampleDecsProvider());
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('writeMemento', () => {

@@ -73,13 +73,11 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 
         return Promise.resolve(treeItems);
 	}
-    
-
 }
 
 function isObject(obj: object) {
 	return obj === Object(obj);
-  }
+}
 
 export class AS3TenantItem extends vscode.TreeItem {
 	constructor(
