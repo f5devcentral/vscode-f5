@@ -94,8 +94,8 @@
 					"when": "f5.as3Installed"
 				},
 				{
-					"id": "tsExamples",
-					"name": "TS Examples",
+					"id": "decExamples",
+					"name": "Declaration Examples",
 					"when": "f5.tsInstalled"
 				}
 			]
@@ -381,11 +381,6 @@
 				"category": "F5-TS"
 			},
 			{
-				"command": "f5-ts.enableTsExamples",
-				"title": "Populate Examples Tree",
-				"category": "F5-TS"
-			},
-			{
 				"command": "writeMemento",
 				"title": "writeMemento",
 				"category": "F5"
@@ -393,11 +388,6 @@
 			{
 				"command": "readMemento",
 				"title": "readMemento",
-				"category": "F5"
-			},
-			{
-				"command": "f5-ts.enableTsExamples",
-				"title": "Example TS Declarations",
 				"category": "F5"
 			},
 			{
@@ -450,11 +440,6 @@
 				{
 					"command": "f5-fast.refreshTemplates",
 					"when": "view == fastView",
-					"group": "navigation"
-				},
-				{
-					"command": "f5-ts.enableTsExamples",
-					"when": "view == tsExamples",
 					"group": "navigation"
 				}
 			],
@@ -566,10 +551,6 @@
 				{
 					"command": "f5-ts.getDec",
 					"when": "f5.tsInstalled"
-				},
-				{
-					"command": "f5-ts.enableTsExamples",
-					"when": "none"
 				},
 				{
 					"command": "f5-ts.postDec",
