@@ -11,7 +11,6 @@ import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider
 import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
 import * as utils from './utils/utils';
-import { test } from 'mocha';
 import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
 import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
@@ -20,9 +19,9 @@ import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import { getAuthToken, callHTTP } from './utils/coreF5HTTPS';
 import * as path from 'path';
-import { pathToFileURL } from 'url';
+import * as fs from 'fs';
+
 const fast = require('@f5devcentral/f5-fast-core');
-var JSZip = require("jszip");
 
 // import { MemFS } from './treeViewsProviders/fileSystemProvider';
 // import { HttpResponseWebview } from './responseWebview';
@@ -489,27 +488,31 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplate', async () => {
-		// const device = ext.hostStatusBar.text;
-		// const password = await utils.getPassword(device);
-		// // const fast = ext.fastBar.text;
-		// const [username, host] = device.split('@');
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplate', async (sFile) => {
 
-		// const authToken = await getAuthToken(host, username, password);
-		
-		// get editor window
-		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	
-			return; // No open text editor
-		}
+		let text: string | Buffer;
 
-		// capture selected text or all text in editor
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
+		if(!sFile) {
+			// not right click from explorer view, so gather file details
+
+			// get editor window
+			var editor = vscode.window.activeTextEditor;
+			if (!editor) {	
+				return; // No open text editor
+			}
+
+			// capture selected text or all text in editor
+			if (editor.selection.isEmpty) {
+				text = editor.document.getText();	// entire editor/doc window
+			} else {
+				text = editor.document.getText(editor.selection);	// highlighted text
+			} 
 		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+			// right click from explorer view, so load file contents
+			const fileContents = fs.readFileSync(sFile.fsPath);
+			// convert from buffer to string
+			text = fileContents.toString('utf8');
+		}
 
 		await f5FastUtils.zipPostTemplate(text);
 
@@ -520,8 +523,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async (sPath) => {
 
 		console.log('postTemplateSet selection', sPath);
-		let wkspPath: string;
-		let selectedFolder: string;
+		let wkspPath;
+		let selectedFolder;
 		
 		if(!sPath) {
 			// didn't get a path passed in from right click, so we have to gather necessary details
@@ -583,33 +586,7 @@ export function activate(context: vscode.ExtensionContext) {
 		} else {
 			console.log('caught selected path');
 			selectedFolder = sPath.fsPath;
-
-			// console.log(sPath.split('/'));
-			// console.log(`${sPath.split(path.sep)}`);
-
-			// var p1 = sPath.fsPath;
-			// var dirname = p1.match(/(.*)[\/\\]/)[2]||'';
-			// var fname = p1.match(/(.*)[\/\\]/);
-			// var fname = sPath.path.substring(0, sPath.path.lastIndexOf('/'));
-			
-			// get parent directory path
-			// var basePath = sPath.path.match(/(.*)[\/\\]/)[0]||'';
-			// get folder name
-			// var fname = sPath.path.substring((sPath.path.lastIndexOf('/')+1));
-			// console.log('dirname/fname', basePath, fname);
-			
-			
-			// wkspPath = sPath.fsPath.match(/(.*)[\/\\]/)[0]||'';
-			// selectedFolder = sPath.fsPath.substring((sPath.fsPath.lastIndexOf('\\')+1));
-
-			// var basePath = sPath.fsPath.substring(0, sPath.fsPath.lastIndexOf('\\'));
-			// var justFolderName = sPath.fsPath.substring((sPath.fsPath.lastIndexOf('\\')+1));
-			// debugger;
 		}
-
-		// const fullSelectedFolderPath = `${wkspPath}\\${selectedFolder}`;
-		// console.log('full-path', path.join(wkspPath, selectedFolder));
-		
 
 		await f5FastUtils.zipPostTempSet(selectedFolder);
 
