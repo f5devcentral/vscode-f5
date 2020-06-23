@@ -1,0 +1,37 @@
+{
+  "exmple F5 Fast Template": {
+  "prefix": "fast",
+  "body": [
+    "{",
+    "    \"class\": \"ADC\",",
+    "    \"schemaVersion\": \"3.14.0\",",
+    "    \"{{tenant_name}}\": {",
+    "        \"class\": \"Tenant\",",
+    "        \"{{app_name}}\": {",
+    "            \"class\": \"Application\",",
+    "            \"template\": \"l4\",",
+    "            \"serviceMain\": {",
+    "                \"class\": \"Service_L4\",",
+    "                \"virtualAddresses\": [\"{{virtual_address}}\"],",
+    "                \"virtualPort\": 8443,",
+    "                \"pool\": \"{{app_name}}_mgmt_tcp443_pool\"",
+    "            },",
+    "            \"{{app_name}}_mgmt_tcp443_pool\": {",
+    "                \"class\": \"Pool\",",
+    "                \"monitors\": [",
+    "                    \"https\"",
+    "                ],",
+    "                \"members\": [",
+    "                    {",
+    "                        \"servicePort\": {{port::integer}},",
+    "                        \"serverAddresses\": {{server_addresses::array}}",
+    "                    }",
+    "                ]",
+    "            }",
+    "        }",
+    "    }",
+    "}"
+  ],
+  "description": ""
+  }
+}

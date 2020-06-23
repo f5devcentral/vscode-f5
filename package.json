@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "0.2.0",
+	"version": "1.0.1",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -47,6 +47,10 @@
 			{
 				"language": "json",
 				"path": "./snippets.json"
+			},
+			{
+				"language": "mustache",
+				"path": "./mst_snippets.json"
 			}
 		],
 		"jsonValidation": [
@@ -266,8 +270,8 @@
 				"category": "F5-Fast"
 			},
 			{
-				"command": "f5-fast.postAsNewTemplate",
-				"title": "Post MST as new Fast Template",
+				"command": "f5-fast.postTemplate",
+				"title": "Post Template",
 				"category": "F5-Fast"
 			},
 			{
@@ -461,6 +465,10 @@
 					"when": "none"
 				},
 				{
+					"command": "f5.remoteCommand",
+					"when": "f5.device"
+				},
+				{
 					"command": "f5.refreshHostsTree",
 					"when": "none"
 				},
@@ -473,7 +481,7 @@
 					"when": "none"
 				},
 				{
-					"command": "f5-fast.postAsNewTemplate",
+					"command": "f5-fast.postTemplate",
 					"when": "f5.fastInstalled"
 				},
 				{
@@ -486,11 +494,11 @@
 				},
 				{
 					"command": "f5-fast.deleteFastApp",
-					"when": "f5.fastInstalled"
+					"when": "none"
 				},
 				{
 					"command": "f5-fast.deleteFastTempSet",
-					"when": "f5.fastInstalled"
+					"when": "none"
 				},
 				{
 					"command": "f5-fast.listTasks",

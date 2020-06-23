@@ -26,13 +26,14 @@ Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/
     - view tasks
     - view/delete template
     - view/delete template set
-- AS3 visibility with app deploy,inspect/delete
+  - fast snippet of example template
+- AS3 visibility with app deploy, inspect/delete
 - DO view/modify/post device declartion
 - code snippets to provide basic as3/do/ts examples
 - automatic schema validation with (*.as3.json/*.do.json/*.ts.json) files
 - example DO/TS declarations straight from official F5 github repos
-  - DO - Pending
-  - AS3 - PENDING
+  - DO
+  - AS3 - PENDING AS3 examples release
 
 
 ## [0.1.11] - (6-4-2020)

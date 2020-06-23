@@ -1,19 +1,16 @@
 # vscode-f5-fast README
 
-This is the README for the F5 Application Services Templates(FAST), "vscode-f5-fast". 
+This is the README for the F5 (A)pplication (S)ervices (T)emplates(FAST), "vscode-f5-fast". 
 
-This extension is intented to help interface with the FAST service to manage templates and deploy applications.
-
-While the ultimate goal of this tool is integrate with FAST and assist in template authoring, deployment and testing, it also integrates with other F5 ILX extensibility like AS3/DO/TS.
+This extension is intented to help interface with the F5 (A)utomated (T)ool(C)ain extensions, including FAST to manage templates/declarations.
 
 This extension typically works with any F5 product running tmos and/or any of the primary ILX extensions(AS3/DO/TS), including BIG-IQ.
+
+Any comments, questions or feature requests, please open a github repository issue
 
 
 ### Download via the Microsoft extension marketplace or directly from within VSCode
 > https://marketplace.visualstudio.com/items?itemName=DumpySquare.vscode-f5-fast
-
-*** please see release tab to download the latest release for other install methods ***
-
 
 
 ---
@@ -21,7 +18,6 @@ This extension typically works with any F5 product running tmos and/or any of th
 ## Index
 
 * [CHANGELOG](CHANGELOG.md)
-* [VS Code Exension Dev Quickstart](./README_docs/vsc-extension-quickstart.md)
 * [Research](./README_docs/research.md)
 
 Future extension features and enhancements have been moved to the repo issues(enhancements) for better tracking
@@ -43,8 +39,13 @@ This extension provides the following commands and are active on workspace load 
 * `F5: Settings`: Opens VS Code settings window focused on F5-Fast settings (currently only device list)
 
 * `F5-Fast: Show Info`: Displays json output of F5-Fast service info
+* `F5-Fast: Deploy Fast App`: Post editor or text selection as FAST application deployment parameters
+* `F5-Fast: Convert json as3 to mst for templating`: Takes an as3 json file type and changes it to .mst file type for templating
+* `F5-Fast: Post Template`: Posts current editor or text selection as a new single FAST template
+* `F5-Fast: Post Template Set`: Posts folder/templates as a Fast template set
+* `F5-Fast: Render HTML Preview`: Takes current editor or text selection and provide FAST HTML gui parameters preview
 
-* `F5-AS3: Post Declaration`: Post entire active editor contents as AS3 declaration to selected device (can also select/highlight text)
+* `F5-AS3: Post Declaration`: Post entire active editor selected contents as AS3 declaration to selected device (can also select/highlight text)
 
 * `F5-DO: Inspect`: Displays json output of the DO 'inspect' endpoint
 * `F5-DO: Get Current Declaration`: Displays json output of the current declaration, if there is one
@@ -56,7 +57,7 @@ This extension provides the following commands and are active on workspace load 
 * `F5-TS: Post Declaration`: Post entire active editor contents as TS declaration to selected device (can also select/highlight text to be send)
 
 
-* `ChuckJoke`: When you need some inspiration...
+* `F5: ChuckJoke`: When you need some inspiration...
 
 ---
 
@@ -113,6 +114,102 @@ If authentication to a device ever failes (401 response), password cache for tha
   - Press `F1`, type `f5`, select "F5: Disconnect from Device"
 
 ![Device Connecting](./README_docs/images/connectDisPassCache_5.18.2020.gif)
+
+
+---
+
+## FAST Management
+
+FAST view on the left will display applications deployed with device fast service, last five FAST tasks executed, templates and template sets
+
+![as3 to mst](./README_docs\images\FAST_view_6.23.2020.PNG)
+
+### How to create FAST template from AS3 declaration
+
+Open an as3 declaration, then open command palette with `F1`, and select `F5-Fast: Convert json as3 to mst for templating`, this should open a new tab with the same declaration but in a "handlbars" language.
+
+![as3 to mst](./README_docs\images\FAST_as3JSON_to_mst_6.22.2020.PNG)
+
+Next remove the AS3 class components. FAST will handle the as3 declaration components.
+
+![mst ADC declaration](./README_docs\images\FAST_mst_ADC_declaration_6.23.2020.PNG)
+
+Then parameterize the declaration
+
+![mst template params](./README_docs\images\FAST_mst_template_params_6.23.2020.PNG)
+
+### Uploading a single template
+
+Open an mst/template.
+
+Post template to fast engine via the command palette:  press `F1`, then filter/select `F5-Fast: Post mst as new fast template`.  Change the folder name if needed, provide a template name.
+
+```
+NOTE:  uploading a single template to an existing folder overwrites other templates.  The single template method is primarily for testing.  It is recommended to upload template sets
+```
+
+### Uploading a template set
+
+Template sets are the recommended method for long term template authoring and mgmt.  It is recommended to have a folder with different folders for the different template sets you may be creating.  
+
+*** example layout ***
+- main_templates_folder
+  - prod_templates
+  - qa_templates
+  - dev_templates
+  - infra_templates
+
+*** example directory structure ***
+- sample_decs
+  - app1Templates
+  - app2Templates
+  - goodFastTemplates
+
+Press `F1`, then filter/select `F5-Fast: Post Template Set`
+
+If multiple workspaces are open, it will ask to select a workspace
+
+Within the workspace, it will list all the first level folders, select the folder of Fast templates to upload
+
+```
+All files in the selected fast template folder must be valid templates.  Each template is validated before all of them are zipped and uploaded/installed to the selected device with fast service
+```
+
+* example of opening a workspace, then connecting to f5 with fast, and uploading folder of templates as a template set *
+![uploading template set](./README_docs\images\FAST_tempSet_upload_6.23.2020.gif)
+
+
+### Deploying an application through FAST
+
+To deploy an application with FAST, utilize the followin structure
+
+The name should reference the fast folder/template to deploy, while the parameters object should contain all the necessary paramters to deploy the template
+
+Press `F1`, then filter/select `F5-Fast: Deploy Fast App`
+
+```
+{
+  "name": "demo_step2b/demo_step2b",
+  "parameters": {
+      "tenant_name": "demoTen",
+      "app_name": "demoApp1",
+      "virtual_address": "100.0.0.1",
+      "port": 80,
+      "server_addresses": [
+          "100.0.0.11",
+          "100.0.0.12"
+      ]
+  }
+}
+```
+![deploy fast app](./README_docs\images\FAST_deployApp_6.23.2020.gif)
+
+### Delete Fast application
+
+Find the deployed application in the Fast view under "Deployed Applications", right click on the app, then select `Delete Fast App`
+
+![delete fast app](./README_docs\images\FAST_deleteApp_6.23.2020.gif)
+
 
 --- 
 

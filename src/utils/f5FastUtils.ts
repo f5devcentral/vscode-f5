@@ -201,7 +201,7 @@ export async function zipPostTempSet (basePath: string, folder: string) {
         const authToken = await getAuthToken(host, username, password);
 
         // //f5-sdk-js version
-        progress.report({ message: `Uploading Template`});
+        progress.report({ message: `Uploading Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
         const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
         console.log('sdk upload response', uploadStatus);
@@ -209,7 +209,7 @@ export async function zipPostTempSet (basePath: string, folder: string) {
 
 
         // debugger;
-        progress.report({ message: `Installing Template`});
+        progress.report({ message: `Installing Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
         const importStatus = await callHTTP('POST', host, '/mgmt/shared/fast/templatesets', authToken,
             {

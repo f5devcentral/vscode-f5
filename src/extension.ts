@@ -487,7 +487,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postAsNewTemplate', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplate', async () => {
 		// const device = ext.hostStatusBar.text;
 		// const password = await utils.getPassword(device);
 		// // const fast = ext.fastBar.text;
@@ -509,13 +509,16 @@ export function activate(context: vscode.ExtensionContext) {
 			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		 f5FastUtils.zipPostTemplate(text);
+		await f5FastUtils.zipPostTemplate(text);
+
+		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		fastTreeProvider.refresh();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async () => {
 
 		// get list of open workspaces
-		const workspaces: [] = vscode.workspace.workspaceFolders;
+		const workspaces: vscode.WorkspaceFolder[] | undefined= vscode.workspace.workspaceFolders;
 		console.log('workspaces', workspaces);
 		
 		// if no open workspace...
@@ -528,24 +531,28 @@ export function activate(context: vscode.ExtensionContext) {
 			return vscode.commands.executeCommand('f5-fast.postTemplateSet');
 		}
 	
-		const ben1 = vscode.workspace.workspaceFolders![0]!.uri;
-		const wkspPath = ben1.fsPath;
-		const ben2 = await vscode.workspace.fs.readDirectory(ben1);
+		const folder1 = vscode.workspace.workspaceFolders![0]!.uri;
+		const wkspPath = folder1.fsPath;
+		const folder2 = await vscode.workspace.fs.readDirectory(folder1);
 	
 		// console.log('workspace', vscode.workspace);
 		console.log('workspace name', vscode.workspace.name);
 
-		let wkspc;
-		if (workspaces.length > 1) {
-			// if more than one workspace open, have user select the workspace
-			wkspc = await vscode.window.showQuickPick(workspaces);
-		} else {
-			// else select the first workspace
-			wkspc = workspaces[0];
-		}
+		/**
+		 * having problems typing the workspaces to a list for quick pick
+		 * todo: get the following working
+		 */
+		// let wkspc;
+		// if (workspaces.length > 1) {
+		// 	// if more than one workspace open, have user select the workspace
+		// 	wkspc = await vscode.window.showQuickPick(workspaces);
+		// } else {
+		// 	// else select the first workspace
+		// 	wkspc = workspaces[0];
+		// }
 		
 		let wFolders = [];
-		for (const [name, type] of await vscode.workspace.fs.readDirectory(ben1)) {
+		for (const [name, type] of await vscode.workspace.fs.readDirectory(folder1)) {
 
 			if (type === vscode.FileType.Directory){
 				console.log('---directory', name);
