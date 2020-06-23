@@ -6,7 +6,7 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [1.0.1] - (6-23-2020)
+## [1.0.1-2] - (6-23-2020)
 
 ### Changed
 - Documentation tweaks
