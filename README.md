@@ -122,21 +122,21 @@ If authentication to a device ever failes (401 response), password cache for tha
 
 FAST view on the left will display applications deployed with device fast service, last five FAST tasks executed, templates and template sets
 
-![as3 to mst](./README_docs\images\FAST_view_6.23.2020.PNG)
+![as3 to mst](./README_docs/images/FAST_view_6.23.2020.PNG)
 
 ### How to create FAST template from AS3 declaration
 
 Open an as3 declaration, then open command palette with `F1`, and select `F5-Fast: Convert json as3 to mst for templating`, this should open a new tab with the same declaration but in a "handlbars" language.
 
-![as3 to mst](./README_docs\images\FAST_as3JSON_to_mst_6.22.2020.PNG)
+![as3 to mst](./README_docs/images/FAST_as3JSON_to_mst_6.22.2020.PNG)
 
 Next remove the AS3 class components. FAST will handle the as3 declaration components.
 
-![mst ADC declaration](./README_docs\images\FAST_mst_ADC_declaration_6.23.2020.PNG)
+![mst ADC declaration](./README_docs/images/FAST_mst_ADC_declaration_6.23.2020.PNG)
 
 Then parameterize the declaration
 
-![mst template params](./README_docs\images\FAST_mst_template_params_6.23.2020.PNG)
+![mst template params](./README_docs/images/FAST_mst_template_params_6.23.2020.PNG)
 
 ### Uploading a single template
 
@@ -176,7 +176,7 @@ All files in the selected fast template folder must be valid templates.  Each te
 ```
 
 * example of opening a workspace, then connecting to f5 with fast, and uploading folder of templates as a template set *
-![uploading template set](./README_docs\images\FAST_tempSet_upload_6.23.2020.gif)
+![uploading template set](./README_docs/images/FAST_tempSet_upload_6.23.2020.gif)
 
 
 ### Deploying an application through FAST
@@ -202,13 +202,13 @@ Press `F1`, then filter/select `F5-Fast: Deploy Fast App`
   }
 }
 ```
-![deploy fast app](./README_docs\images\FAST_deployApp_6.23.2020.gif)
+![deploy fast app](./README_docs/images/FAST_deployApp_6.23.2020.gif)
 
 ### Delete Fast application
 
 Find the deployed application in the Fast view under "Deployed Applications", right click on the app, then select `Delete Fast App`
 
-![delete fast app](./README_docs\images\FAST_deleteApp_6.23.2020.gif)
+![delete fast app](./README_docs/images/FAST_deleteApp_6.23.2020.gif)
 
 
 --- 
