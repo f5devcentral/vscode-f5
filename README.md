@@ -145,7 +145,9 @@ Open an mst/template.
 Post template to fast engine via the command palette:  press `F1`, then filter/select `F5-Fast: Post mst as new fast template`.  Change the folder name if needed, provide a template name.
 
 ```
-NOTE:  uploading a single template to an existing folder overwrites other templates.  The single template method is primarily for testing.  It is recommended to upload template sets
+NOTE:  Uploading a single template to an existing folder overwrites other templates.  
+        The single template method is primarily for testing.  
+        It is recommended to upload template sets
 ```
 
 ### Uploading a template set
