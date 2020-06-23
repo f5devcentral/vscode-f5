@@ -19,6 +19,8 @@ import * as keyTarType from 'keytar';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import { getAuthToken, callHTTP } from './utils/coreF5HTTPS';
+import * as path from 'path';
+import { pathToFileURL } from 'url';
 const fast = require('@f5devcentral/f5-fast-core');
 var JSZip = require("jszip");
 
@@ -515,62 +517,101 @@ export function activate(context: vscode.ExtensionContext) {
 		fastTreeProvider.refresh();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async (sPath) => {
 
-		// get list of open workspaces
-		const workspaces: vscode.WorkspaceFolder[] | undefined= vscode.workspace.workspaceFolders;
-		console.log('workspaces', workspaces);
+		console.log('postTemplateSet selection', sPath);
+		let wkspPath: string;
+		let selectedFolder: string;
 		
-		// if no open workspace...
-		if(!workspaces) {
-			// Show message to select workspace
-			await vscode.window.showInformationMessage('See top bar to open a workspace with Fast Templates first');
-			// pop up to selecte a workspace
-			await vscode.window.showWorkspaceFolderPick();
-			// return to begining of function to try again
-			return vscode.commands.executeCommand('f5-fast.postTemplateSet');
-		}
-	
-		const folder1 = vscode.workspace.workspaceFolders![0]!.uri;
-		const wkspPath = folder1.fsPath;
-		const folder2 = await vscode.workspace.fs.readDirectory(folder1);
-	
-		// console.log('workspace', vscode.workspace);
-		console.log('workspace name', vscode.workspace.name);
+		if(!sPath) {
+			// didn't get a path passed in from right click, so we have to gather necessary details
 
-		/**
-		 * having problems typing the workspaces to a list for quick pick
-		 * todo: get the following working
-		 */
-		// let wkspc;
-		// if (workspaces.length > 1) {
-		// 	// if more than one workspace open, have user select the workspace
-		// 	wkspc = await vscode.window.showQuickPick(workspaces);
-		// } else {
-		// 	// else select the first workspace
-		// 	wkspc = workspaces[0];
-		// }
-		
-		let wFolders = [];
-		for (const [name, type] of await vscode.workspace.fs.readDirectory(folder1)) {
-
-			if (type === vscode.FileType.Directory){
-				console.log('---directory', name);
-				wFolders.push(name);
+			// get list of open workspaces
+			const workspaces: vscode.WorkspaceFolder[] | undefined= vscode.workspace.workspaceFolders;
+			console.log('workspaces', workspaces);
+			
+			// if no open workspace...
+			if(!workspaces) {
+				// Show message to select workspace
+				await vscode.window.showInformationMessage('See top bar to open a workspace with Fast Templates first');
+				// pop up to selecte a workspace
+				await vscode.window.showWorkspaceFolderPick();
+				// return to begining of function to try again
+				return vscode.commands.executeCommand('f5-fast.postTemplateSet');
 			}
-		};
+		
+			const folder1 = vscode.workspace.workspaceFolders![0]!.uri;
+			wkspPath = folder1.fsPath;
+			const folder2 = await vscode.workspace.fs.readDirectory(folder1);
+		
+			// console.log('workspace', vscode.workspace);
+			console.log('workspace name', vscode.workspace.name);
+			
+			/**
+			 * having problems typing the workspaces to a list for quick pick
+			 * todo: get the following working
+			 */
+			// let wkspc;
+			// if (workspaces.length > 1) {
+			// 	// if more than one workspace open, have user select the workspace
+			// 	wkspc = await vscode.window.showQuickPick(workspaces);
+			// } else {
+			// 	// else select the first workspace
+			// 	wkspc = workspaces[0];
+			// }
+			
+			let wFolders = [];
+			for (const [name, type] of await vscode.workspace.fs.readDirectory(folder1)) {
 
-		// have user select first level folder in workspace
-		const selectedFolder = await vscode.window.showQuickPick(wFolders);
+				if (type === vscode.FileType.Directory){
+					console.log('---directory', name);
+					wFolders.push(name);
+				}
+			};
 
-		if(!selectedFolder) {
-			// if user "escaped" folder selection window
-			return vscode.window.showInformationMessage('Must select a Fast Template Set folder');
+			// have user select first level folder in workspace
+			selectedFolder = await vscode.window.showQuickPick(wFolders);
+			
+			if(!selectedFolder) {
+				// if user "escaped" folder selection window
+				return vscode.window.showInformationMessage('Must select a Fast Template Set folder');
+			}
+			console.log('workspace path', wkspPath);
+			console.log('workspace folder', selectedFolder);
+			selectedFolder = path.join(wkspPath, selectedFolder);
+
+		} else {
+			console.log('caught selected path');
+			selectedFolder = sPath.fsPath;
+
+			// console.log(sPath.split('/'));
+			// console.log(`${sPath.split(path.sep)}`);
+
+			// var p1 = sPath.fsPath;
+			// var dirname = p1.match(/(.*)[\/\\]/)[2]||'';
+			// var fname = p1.match(/(.*)[\/\\]/);
+			// var fname = sPath.path.substring(0, sPath.path.lastIndexOf('/'));
+			
+			// get parent directory path
+			// var basePath = sPath.path.match(/(.*)[\/\\]/)[0]||'';
+			// get folder name
+			// var fname = sPath.path.substring((sPath.path.lastIndexOf('/')+1));
+			// console.log('dirname/fname', basePath, fname);
+			
+			
+			// wkspPath = sPath.fsPath.match(/(.*)[\/\\]/)[0]||'';
+			// selectedFolder = sPath.fsPath.substring((sPath.fsPath.lastIndexOf('\\')+1));
+
+			// var basePath = sPath.fsPath.substring(0, sPath.fsPath.lastIndexOf('\\'));
+			// var justFolderName = sPath.fsPath.substring((sPath.fsPath.lastIndexOf('\\')+1));
+			// debugger;
 		}
 
 		// const fullSelectedFolderPath = `${wkspPath}\\${selectedFolder}`;
+		// console.log('full-path', path.join(wkspPath, selectedFolder));
+		
 
-		await f5FastUtils.zipPostTempSet(wkspPath, selectedFolder);
+		await f5FastUtils.zipPostTempSet(selectedFolder);
 
 		await new Promise(resolve => { setTimeout(resolve, 3000); });
 		fastTreeProvider.refresh();
