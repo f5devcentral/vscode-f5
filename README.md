@@ -173,9 +173,8 @@ If multiple workspaces are open, it will ask to select a workspace
 
 Within the workspace, it will list all the first level folders, select the folder of Fast templates to upload
 
-```
-All files in the selected fast template folder must be valid templates.  Each template is validated before all of them are zipped and uploaded/installed to the selected device with fast service
-```
+>All files in the selected fast template folder must be valid templates.  
+>Each template is validated before all of them are zipped and uploaded/installed to the selected device with fast service
 
 * example of opening a workspace, then connecting to f5 with fast, and uploading folder of templates as a template set *
 ![uploading template set](./README_docs/images/FAST_tempSet_upload_6.23.2020.gif)
