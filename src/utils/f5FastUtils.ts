@@ -47,7 +47,7 @@ export async function zipPostTemplate (doc: string) {
         //  potentially make this an input/select box to allow create a new folder or select existing
         const fastTemplateFolderName = await vscode.window.showInputBox({
             prompt: 'Destination FAST Templates Folder Name ---',
-            value: 'default'
+            value: 'test'
         });
         
         progress.report({ message: `Please provide a Template Name`});
