@@ -132,7 +132,7 @@ Open an as3 declaration, then open command palette with `F1`, and select `F5-Fas
 
 Next remove the AS3 class components. FAST will handle the as3 declaration components.
 
-![mst ADC declaration](./README_docs/images/FAST_mst_ADC_declaration_6.23.2020.PNG)
+![mst ADC declaration](./README_docs/images/FAST_mst_ADC_Declaration_6.23.2020.PNG)
 
 Then parameterize the declaration
 
