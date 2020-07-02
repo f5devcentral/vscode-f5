@@ -2,9 +2,11 @@
 
 import * as vscode from 'vscode';
 // import { request } from 'https';
+var https = require('https');
 import * as utils from './utils';
 import { ext } from '../extensionVariables';
 import { getAuthToken, callHTTP } from './coreF5HTTPS';
+import axios, { AxiosBasicCredentials } from 'axios';
 
 
 /**
@@ -23,6 +25,27 @@ export async function connectF5(device: string, password: string) {
                 
                 utils.setHostStatusBar(device);
                 // vscode.window.showInformationMessage(`Successfully connected to ${host}`);
+
+                /**
+                 * setup 
+                 * https://github.com/DumpySquare/vscode-f5-fast/issues/38
+                 * https://github.com/DumpySquare/vscode-f5-fast/issues/34
+                 */
+
+                const resp = await axios.request({
+                    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+                    method: 'GET',
+                    baseURL: `https://${host}`,
+                    url: '/mgmt/tm/auth/source',
+                    auth: { username, password }
+                    });
+
+                if (resp.status === 200) {
+                    // update the logonProvideName value
+                    ext.logonProviderName = resp.data.type;
+                }
+
+                debugger;
 
                 //********** Host info **********/
                 const hostInfo = await callHTTP(

@@ -15,6 +15,7 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
+    export let logonProviderName: string;
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;
