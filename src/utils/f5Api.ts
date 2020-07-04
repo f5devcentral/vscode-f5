@@ -17,6 +17,51 @@ import axios, { AxiosBasicCredentials } from 'axios';
 
 export async function connectF5(device: string, password: string) {
         var [username, host] = device.split('@');
+
+
+        /**
+         * setup logonProvider discovery
+         * discover what logonProvider is configured, default=tmos
+         * https://github.com/DumpySquare/vscode-f5-fast/issues/38
+         * https://github.com/DumpySquare/vscode-f5-fast/issues/34
+         */
+
+        const resp = await axios.request({
+            httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+            method: 'GET',
+            baseURL: `https://${host}`,
+            url: '/mgmt/tm/auth/source',
+            auth: { username, password }
+            });
+
+        // if req/resp successful
+        if (resp.status === 200) {
+            // if not default, update the logonProviderName value
+            if(resp.data.type !== 'local'){
+                console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
+                // change default 'tmos' value to what is configured
+                ext.logonProviderName = resp.data.type;
+            } else {
+                console.log(`TMOS local auth detected`);
+            }
+        } else if (resp.status === 401 && resp.data.message === "Authentication failed.") {
+            // clear cached password for this device
+            ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
+    
+            vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            throw new Error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        } else {
+            // await new Promise(resolve => { setTimeout(resolve, 3000); });
+            vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            throw new Error(`---UNKNOWN HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            
+        }
+
+        // debugger;
+
+        // get auth token and discover ATC services
         getAuthToken(host, username, password)
             .then( async token => {
 
@@ -25,27 +70,6 @@ export async function connectF5(device: string, password: string) {
                 
                 utils.setHostStatusBar(device);
                 // vscode.window.showInformationMessage(`Successfully connected to ${host}`);
-
-                /**
-                 * setup 
-                 * https://github.com/DumpySquare/vscode-f5-fast/issues/38
-                 * https://github.com/DumpySquare/vscode-f5-fast/issues/34
-                 */
-
-                const resp = await axios.request({
-                    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-                    method: 'GET',
-                    baseURL: `https://${host}`,
-                    url: '/mgmt/tm/auth/source',
-                    auth: { username, password }
-                    });
-
-                if (resp.status === 200) {
-                    // update the logonProvideName value
-                    ext.logonProviderName = resp.data.type;
-                }
-
-                debugger;
 
                 //********** Host info **********/
                 const hostInfo = await callHTTP(
