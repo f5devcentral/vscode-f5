@@ -16,9 +16,19 @@ import axios, { AxiosBasicCredentials } from 'axios';
 
 
 export async function connectF5(device: string, password: string) {
-        var [username, host] = device.split('@');
+    var [username, host] = device.split('@');
 
 
+    const progressPost = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Connecting to",
+        cancellable: true
+    }, async (progress, token) => {
+        token.onCancellationRequested(() => {
+            // this logs but doesn't actually cancel...
+            console.log("User canceled device connect");
+            return new Error(`User canceled device connect`);
+        });
         /**
          * setup logonProvider discovery
          * discover what logonProvider is configured, default=tmos
@@ -26,19 +36,42 @@ export async function connectF5(device: string, password: string) {
          * https://github.com/DumpySquare/vscode-f5-fast/issues/34
          */
 
+        progress.report({ message: `${host}`});
         const resp = await axios.request({
             httpsAgent: new https.Agent({ rejectUnauthorized: false }),
             method: 'GET',
             baseURL: `https://${host}`,
             url: '/mgmt/tm/auth/source',
-            auth: { username, password }
+            auth: { username, password },
+            timeout: 3000
+            // connectTimeout: 1000,
+            })
+            // .then( resp => {
+            //     console.log('AXIOS auth source response', resp);
+            //     Promise.resolve(resp);
+            //     return resp;
+            // })
+            .catch( err => {
+                console.log('AXIOS auth source err', err);
+                console.log('AXIOS auth source err', err.response);
+                // Promise.reject(err);
+                return err;
             });
+
+        console.log('=======  axResp', resp);
+
+        if(!resp) {
+            vscode.window.showErrorMessage(`Could not connect to ${host}`);
+            return;
+        }
+        
 
         // if req/resp successful
         if (resp.status === 200) {
             // if not default, update the logonProviderName value
             if(resp.data.type !== 'local'){
                 console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
+                progress.report({ message: ` ${resp.data.type} auth provider detected`});
                 // change default 'tmos' value to what is configured
                 ext.logonProviderName = resp.data.type;
             } else {
@@ -84,6 +117,8 @@ export async function connectF5(device: string, password: string) {
                     const tip = `TMOS: ${hostInfo.body.version}`;
                     utils.setHostnameBar(text, tip);
                 }
+
+                progress.report({ message: ` CONNECTED, checking installed ATC services...`});
 
                 //********** TS info **********/
                 const tsInfo = await callHTTP(
@@ -141,7 +176,8 @@ export async function connectF5(device: string, password: string) {
                 }
             }
         );
-    }
+    });
+}
 
 
 

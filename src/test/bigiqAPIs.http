@@ -34,6 +34,26 @@ X-F5-Auth-Token: {{authToken}}
 
 
 
+
+###   # 
+GET https://{{host}}/mgmt/tm/
+
+
+
+###   # get bigip auth token
+# @name loginA
+POST https://{{host}}/mgmt/shared/authn/login
+Content-Type: application/json
+
+{
+    "username": "{{user}}",
+    "password": "{{upass}}",
+}
+
+
+
+
+
 ###   # get as3 service info - WORKS
 GET https://{{host}}/mgmt/shared/appsvcs/info
 Content-Type: application/json
