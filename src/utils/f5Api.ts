@@ -2,9 +2,11 @@
 
 import * as vscode from 'vscode';
 // import { request } from 'https';
+var https = require('https');
 import * as utils from './utils';
 import { ext } from '../extensionVariables';
 import { getAuthToken, callHTTP } from './coreF5HTTPS';
+import axios, { AxiosBasicCredentials } from 'axios';
 
 
 /**
@@ -14,7 +16,85 @@ import { getAuthToken, callHTTP } from './coreF5HTTPS';
 
 
 export async function connectF5(device: string, password: string) {
-        var [username, host] = device.split('@');
+    var [username, host] = device.split('@');
+
+
+    const progressPost = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Connecting to",
+        cancellable: true
+    }, async (progress, token) => {
+        token.onCancellationRequested(() => {
+            // this logs but doesn't actually cancel...
+            console.log("User canceled device connect");
+            return new Error(`User canceled device connect`);
+        });
+        /**
+         * setup logonProvider discovery
+         * discover what logonProvider is configured, default=tmos
+         * https://github.com/DumpySquare/vscode-f5-fast/issues/38
+         * https://github.com/DumpySquare/vscode-f5-fast/issues/34
+         */
+
+        progress.report({ message: `${host}`});
+        const resp = await axios.request({
+            httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+            method: 'GET',
+            baseURL: `https://${host}`,
+            url: '/mgmt/tm/auth/source',
+            auth: { username, password },
+            timeout: 3000
+            // connectTimeout: 1000,
+            })
+            // .then( resp => {
+            //     console.log('AXIOS auth source response', resp);
+            //     Promise.resolve(resp);
+            //     return resp;
+            // })
+            .catch( err => {
+                console.log('AXIOS auth source err', err);
+                console.log('AXIOS auth source err', err.response);
+                // Promise.reject(err);
+                return err;
+            });
+
+        console.log('=======  axResp', resp);
+
+        if(!resp) {
+            vscode.window.showErrorMessage(`Could not connect to ${host}`);
+            return;
+        }
+        
+
+        // if req/resp successful
+        if (resp.status === 200) {
+            // if not default, update the logonProviderName value
+            if(resp.data.type !== 'local'){
+                console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
+                progress.report({ message: ` ${resp.data.type} auth provider detected`});
+                // change default 'tmos' value to what is configured
+                ext.logonProviderName = resp.data.type;
+            } else {
+                console.log(`TMOS local auth detected`);
+            }
+        } else if (resp.status === 401 && resp.data.message === "Authentication failed.") {
+            // clear cached password for this device
+            ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
+    
+            vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            throw new Error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        } else {
+            // await new Promise(resolve => { setTimeout(resolve, 3000); });
+            vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            throw new Error(`---UNKNOWN HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+            
+        }
+
+        // debugger;
+
+        // get auth token and discover ATC services
         getAuthToken(host, username, password)
             .then( async token => {
 
@@ -37,6 +117,8 @@ export async function connectF5(device: string, password: string) {
                     const tip = `TMOS: ${hostInfo.body.version}`;
                     utils.setHostnameBar(text, tip);
                 }
+
+                progress.report({ message: ` CONNECTED, checking installed ATC services...`});
 
                 //********** TS info **********/
                 const tsInfo = await callHTTP(
@@ -94,7 +176,8 @@ export async function connectF5(device: string, password: string) {
                 }
             }
         );
-    }
+    });
+}
 
 
 
