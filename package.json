@@ -47,10 +47,6 @@
 			{
 				"language": "json",
 				"path": "./snippets.json"
-			},
-			{
-				"language": "mustache",
-				"path": "./mst_snippets.json"
 			}
 		],
 		"jsonValidation": [
@@ -222,6 +218,11 @@
 			{
 				"command": "f5.openSettings",
 				"title": "Settings",
+				"category": "F5"
+			},
+			{
+				"command": "f5.installRPM",
+				"title": "Install/Update RPM",
 				"category": "F5"
 			},
 			{
@@ -426,7 +427,7 @@
 						"group": "F5-Fast"
 				},
 				{
-						"when": "f5.fastInstalled && resourceLangId == mustache",
+						"when": "f5.fastInstalled && resourceExtname == .mst",
 						"command": "f5-fast.postTemplate",
 						"group": "F5-Fast"
 				}

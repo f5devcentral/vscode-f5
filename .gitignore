@@ -1,5 +1,6 @@
 out
 node_modules
+atc_ilx_rpm_cache
 .vscode-test/
 *.vsix
 *.zip
