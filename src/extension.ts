@@ -11,7 +11,6 @@ import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider
 import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
 import * as utils from './utils/utils';
-import { test } from 'mocha';
 import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
 import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
@@ -19,8 +18,10 @@ import * as keyTarType from 'keytar';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import { getAuthToken, callHTTP } from './utils/coreF5HTTPS';
+import * as path from 'path';
+import * as fs from 'fs';
+
 const fast = require('@f5devcentral/f5-fast-core');
-var JSZip = require("jszip");
 
 // import { MemFS } from './treeViewsProviders/fileSystemProvider';
 // import { HttpResponseWebview } from './responseWebview';
@@ -487,27 +488,31 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplate', async () => {
-		// const device = ext.hostStatusBar.text;
-		// const password = await utils.getPassword(device);
-		// // const fast = ext.fastBar.text;
-		// const [username, host] = device.split('@');
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplate', async (sFile) => {
 
-		// const authToken = await getAuthToken(host, username, password);
-		
-		// get editor window
-		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	
-			return; // No open text editor
-		}
+		let text: string | Buffer;
 
-		// capture selected text or all text in editor
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
+		if(!sFile) {
+			// not right click from explorer view, so gather file details
+
+			// get editor window
+			var editor = vscode.window.activeTextEditor;
+			if (!editor) {	
+				return; // No open text editor
+			}
+
+			// capture selected text or all text in editor
+			if (editor.selection.isEmpty) {
+				text = editor.document.getText();	// entire editor/doc window
+			} else {
+				text = editor.document.getText(editor.selection);	// highlighted text
+			} 
 		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+			// right click from explorer view, so load file contents
+			const fileContents = fs.readFileSync(sFile.fsPath);
+			// convert from buffer to string
+			text = fileContents.toString('utf8');
+		}
 
 		await f5FastUtils.zipPostTemplate(text);
 
@@ -515,62 +520,75 @@ export function activate(context: vscode.ExtensionContext) {
 		fastTreeProvider.refresh();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async (sPath) => {
 
-		// get list of open workspaces
-		const workspaces: vscode.WorkspaceFolder[] | undefined= vscode.workspace.workspaceFolders;
-		console.log('workspaces', workspaces);
+		console.log('postTemplateSet selection', sPath);
+		let wkspPath;
+		let selectedFolder;
 		
-		// if no open workspace...
-		if(!workspaces) {
-			// Show message to select workspace
-			await vscode.window.showInformationMessage('See top bar to open a workspace with Fast Templates first');
-			// pop up to selecte a workspace
-			await vscode.window.showWorkspaceFolderPick();
-			// return to begining of function to try again
-			return vscode.commands.executeCommand('f5-fast.postTemplateSet');
-		}
-	
-		const folder1 = vscode.workspace.workspaceFolders![0]!.uri;
-		const wkspPath = folder1.fsPath;
-		const folder2 = await vscode.workspace.fs.readDirectory(folder1);
-	
-		// console.log('workspace', vscode.workspace);
-		console.log('workspace name', vscode.workspace.name);
+		if(!sPath) {
+			// didn't get a path passed in from right click, so we have to gather necessary details
 
-		/**
-		 * having problems typing the workspaces to a list for quick pick
-		 * todo: get the following working
-		 */
-		// let wkspc;
-		// if (workspaces.length > 1) {
-		// 	// if more than one workspace open, have user select the workspace
-		// 	wkspc = await vscode.window.showQuickPick(workspaces);
-		// } else {
-		// 	// else select the first workspace
-		// 	wkspc = workspaces[0];
-		// }
-		
-		let wFolders = [];
-		for (const [name, type] of await vscode.workspace.fs.readDirectory(folder1)) {
-
-			if (type === vscode.FileType.Directory){
-				console.log('---directory', name);
-				wFolders.push(name);
+			// get list of open workspaces
+			const workspaces: vscode.WorkspaceFolder[] | undefined= vscode.workspace.workspaceFolders;
+			console.log('workspaces', workspaces);
+			
+			// if no open workspace...
+			if(!workspaces) {
+				// Show message to select workspace
+				await vscode.window.showInformationMessage('See top bar to open a workspace with Fast Templates first');
+				// pop up to selecte a workspace
+				await vscode.window.showWorkspaceFolderPick();
+				// return to begining of function to try again
+				return vscode.commands.executeCommand('f5-fast.postTemplateSet');
 			}
-		};
+		
+			const folder1 = vscode.workspace.workspaceFolders![0]!.uri;
+			wkspPath = folder1.fsPath;
+			const folder2 = await vscode.workspace.fs.readDirectory(folder1);
+		
+			// console.log('workspace', vscode.workspace);
+			console.log('workspace name', vscode.workspace.name);
+			
+			/**
+			 * having problems typing the workspaces to a list for quick pick
+			 * todo: get the following working
+			 */
+			// let wkspc;
+			// if (workspaces.length > 1) {
+			// 	// if more than one workspace open, have user select the workspace
+			// 	wkspc = await vscode.window.showQuickPick(workspaces);
+			// } else {
+			// 	// else select the first workspace
+			// 	wkspc = workspaces[0];
+			// }
+			
+			let wFolders = [];
+			for (const [name, type] of await vscode.workspace.fs.readDirectory(folder1)) {
 
-		// have user select first level folder in workspace
-		const selectedFolder = await vscode.window.showQuickPick(wFolders);
+				if (type === vscode.FileType.Directory){
+					console.log('---directory', name);
+					wFolders.push(name);
+				}
+			};
 
-		if(!selectedFolder) {
-			// if user "escaped" folder selection window
-			return vscode.window.showInformationMessage('Must select a Fast Template Set folder');
+			// have user select first level folder in workspace
+			selectedFolder = await vscode.window.showQuickPick(wFolders);
+			
+			if(!selectedFolder) {
+				// if user "escaped" folder selection window
+				return vscode.window.showInformationMessage('Must select a Fast Template Set folder');
+			}
+			console.log('workspace path', wkspPath);
+			console.log('workspace folder', selectedFolder);
+			selectedFolder = path.join(wkspPath, selectedFolder);
+
+		} else {
+			console.log('caught selected path');
+			selectedFolder = sPath.fsPath;
 		}
 
-		// const fullSelectedFolderPath = `${wkspPath}\\${selectedFolder}`;
-
-		await f5FastUtils.zipPostTempSet(wkspPath, selectedFolder);
+		await f5FastUtils.zipPostTempSet(selectedFolder);
 
 		await new Promise(resolve => { setTimeout(resolve, 3000); });
 		fastTreeProvider.refresh();

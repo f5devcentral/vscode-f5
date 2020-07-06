@@ -47,7 +47,7 @@ export async function zipPostTemplate (doc: string) {
         //  potentially make this an input/select box to allow create a new folder or select existing
         const fastTemplateFolderName = await vscode.window.showInputBox({
             prompt: 'Destination FAST Templates Folder Name ---',
-            value: 'default'
+            value: 'test'
         });
         
         progress.report({ message: `Please provide a Template Name`});
@@ -155,14 +155,13 @@ export async function zipPostTemplate (doc: string) {
 }
 
 
-
 /**
  * fast template folder validate, zip, upload and import function
  * will detect what device is currently selected
- * @param basePath full file path to templates directory
  * @param folder 1st level folder name within basePath to package as template set
+ * or full folder path from explorer right click
  */
-export async function zipPostTempSet (basePath: string, folder: string) {
+export async function zipPostTempSet (folder: string) {
 
     const progressBar = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -173,11 +172,17 @@ export async function zipPostTempSet (basePath: string, folder: string) {
             console.log("User canceled the template set upload");
             return new Error(`User canceled the template set`);
         });
+
+        // const basePath = folder.match(/(.*)[\/\\]/)[0]||'';
+        // const basePath = folder.substring(0, folder.lastIndexOf('/'));
+        // const justFolderName = folder.substring((folder.lastIndexOf('/')+1));
+        const basePath = folder.substring(0, folder.lastIndexOf('\\'));
+        const justFolderName = folder.substring((folder.lastIndexOf('\\')+1));
         
-        const zipOut = path.join(basePath, `${folder}.zip`);
+        const zipOut = path.join(basePath, `${justFolderName}.zip`);
         // const zipOut = path.join(coreDir, 'dummy.txt');
         
-        console.log('fast Template Folder Name: ', folder);
+        console.log('fast Template Folder Name: ', justFolderName);
         // console.log('fast Template Name: ', fastTemplateName);
         console.log('base directory: ', basePath);
         // console.log('full Temp directory: ', fullTempDir);
@@ -187,7 +192,7 @@ export async function zipPostTempSet (basePath: string, folder: string) {
         progress.report({ message: `Verifing and Packaging Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
-        const zipedTemplates = await packageTemplateSet2(path.join(basePath, folder), zipOut);
+        const zipedTemplates = await packageTemplateSet2(folder, zipOut);
         console.log('zipedTempaltes', zipedTemplates);
         // debugger;
 
@@ -213,33 +218,17 @@ export async function zipPostTempSet (basePath: string, folder: string) {
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
         const importStatus = await callHTTP('POST', host, '/mgmt/shared/fast/templatesets', authToken,
             {
-                name: folder
+                name: justFolderName
             });
         console.log('template import status: ', importStatus);
         
-        progress.report({ message: `Deleting temporary files`});
-        console.log(`Pending Delete of Temporary zip`);
-        // if the temp directory is there, list contents, delete all files, then delete the directory
-        // if (fs.existsSync(fullTempDir)) {
-        //     const dirContents = fs.readdirSync(fullTempDir);
-        //     // debugger;
-        //     dirContents.map( item => {
-        //         const pathFile = path.join(fullTempDir, item);
-        //         console.log(`Deleting file: ${pathFile}`);
-        //         fs.unlinkSync(pathFile);
-        //     });
-            
-        //     console.log(`Deleting folder: ${fullTempDir}`);
-        //     fs.rmdirSync(fullTempDir, { recursive: true });
-        // }
-        // remove zip file
+        progress.report({ message: `${importStatus.status} - Removing Temporary Files...`});
         console.log(`Deleting zip: ${zipOut}`);
         fs.unlinkSync(zipOut);
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
     });
 }
-
 
 // https://github.com/zinkem/fast-docker/blob/master/templates/index.yaml
 

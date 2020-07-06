@@ -99,8 +99,7 @@
 				},
 				{
 					"id": "decExamples",
-					"name": "Declaration Examples",
-					"when": "f5.tsInstalled"
+					"name": "Declaration Examples"
 				}
 			]
 		},
@@ -420,6 +419,18 @@
 			}
 		],
 		"menus": {
+			"explorer/context": [
+				{
+						"when": "f5.fastInstalled && explorerResourceIsFolder",
+						"command": "f5-fast.postTemplateSet",
+						"group": "F5-Fast"
+				},
+				{
+						"when": "f5.fastInstalled && resourceLangId == mustache",
+						"command": "f5-fast.postTemplate",
+						"group": "F5-Fast"
+				}
+			],
 			"view/title": [
 				{
 					"command": "f5.addHost",
