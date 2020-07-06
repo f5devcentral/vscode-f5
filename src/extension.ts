@@ -17,6 +17,7 @@ import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
 import * as keyTarType from 'keytar';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
+import * as rpmMgmt from './utils/rpmMgmt';
 import { getAuthToken, callHTTP } from './utils/coreF5HTTPS';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -52,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// ext.f5Api = new F5Api;
 	// let webview = new HttpResponseWebview(context);
 
-	const zip = new JSZip();
+	// const zip = new JSZip();
 
 	// Setup keyTar global var
 	// type KeyTar = typeof keyTarType;
@@ -307,6 +308,42 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5.installRPM', async (selectedRPM) => {
+
+
+		if(selectedRPM) {
+			// set rpm path/location
+		} else {
+			// pick atc/tool/version picker/downloader
+			const rpm = await rpmMgmt.npmPicker();
+
+			console.log('local rpm location', rpm);
+			
+			// selectedRPM = await rpmMgmt.npmUpload(rpm);
+		}
+
+
+		/**
+		 * if rpmFromExplorer
+		 * 	- means user right-clicked an npm from a folder in the workspace
+		 * 	- return file location 
+		 * else
+		 * 	- start atc/tool/version picker/downloader function
+		 * 	- return file location once downloaded
+		 * 
+		 * --- npm picker function (no input)
+		 * 1. quickPick to select ATC service [fast, as3, do, ts]
+		 * 2. quickPick version [latest, v3.20.0, v3.19.2]
+		 * 3. download rpm and sha
+		 * 4. return file location
+		 * 
+		 * --- npm installer function -> input: string = <file_location>
+		 * 1. upload rpm
+		 * 2. install rpm
+		 * 3. reconnect to refresh everything
+		 */
+	}));
+
 
 
 	/**
@@ -516,7 +553,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		await f5FastUtils.zipPostTemplate(text);
 
-		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		await new Promise(resolve => { setTimeout(resolve, 1000); });
 		fastTreeProvider.refresh();
 	}));
 
@@ -607,7 +644,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	
 		// give a little time to finish
-		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		await new Promise(resolve => { setTimeout(resolve, 2000); });
 		fastTreeProvider.refresh();
 		as3TenantTree.refresh();
 	}));
@@ -615,30 +652,20 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastTempSet', async (tempSet) => {
 		
-		var device: string | undefined = ext.hostStatusBar.text;
+		var device: string = ext.hostStatusBar.text;
 		const password = await utils.getPassword(device);
 		const response = await f5FastApi.delTempSet(device, password, tempSet.label);
 
-		// if (ext.settings.previewResponseInUntitledDocument) {
-		// 	utils.displayJsonInEditor(response.body);
-		// } else {
-		// 	WebViewPanel.render(context.extensionPath, response.body);
-		// }
-		
 		vscode.window.showInformationMessage(`Fast Template Set Delete: ${response.body.message}`);
 
 		// give a little time to finish
-		await new Promise(resolve => { setTimeout(resolve, 2000); });
+		await new Promise(resolve => { setTimeout(resolve, 1000); });
 		fastTreeProvider.refresh();
 
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderYmlTemplate', async () => {
-		// var device: string | undefined = ext.hostStatusBar.text;
-		// if (!device) {device = await vscode.commands.executeCommand('f5.connectDevice');}
-		// if (device === undefined) {throw new Error('no hosts in configuration');}
-		// if(ext.fastBar.text === '') {return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');}
 
 		/**
 		 * this is working through the f5 fast template creating process
@@ -671,10 +698,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderHtmlPreview', async () => {
-		// var device: string | undefined = ext.hostStatusBar.text;
-		// if (!device) {device = await vscode.commands.executeCommand('f5.connectDevice');}
-		// if (device === undefined) {throw new Error('no hosts in configuration');}
-		// if(ext.fastBar.text === '') {return vscode.window.showErrorMessage('No FAST detected, install or connect to a device with fast');}
 
 		/**
 		 * this view is requested by zinke as part of the template authoring process
@@ -763,6 +786,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const password = await utils.getPassword(device);
 		const response = await f5Api.delAS3Tenant(device, password, tenant.label);
 
+		// TODO:  change following feedback to a simple pop up
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(response.body);
 		} else {

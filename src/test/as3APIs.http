@@ -18,6 +18,17 @@ Content-Type: application/json
     "logonProviderName": "provider"
 }
 
+
+###   # get bigip auth token
+# @name loginA
+POST https://{{host}}/mgmt/shared/authn/login
+Content-Type: application/json
+
+{
+    "username": "ted",
+    "password": "benrocks"
+}
+
 ###   # get as3 service info
 GET https://{{host}}/mgmt/shared/appsvcs/info
 Content-Type: application/json
