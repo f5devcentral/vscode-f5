@@ -37,65 +37,65 @@ export async function connectF5(device: string, password: string) {
          */
 
         progress.report({ message: `${host}`});
-        const resp = await axios.request({
-            httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-            method: 'GET',
-            baseURL: `https://${host}`,
-            url: '/mgmt/tm/auth/source',
-            auth: { username, password },
-            timeout: 3000
-            // connectTimeout: 1000,
-            })
-            // .then( resp => {
-            //     console.log('AXIOS auth source response', resp);
-            //     Promise.resolve(resp);
-            //     return resp;
-            // })
-            .catch( err => {
-                console.log('AXIOS auth source err', err);
-                console.log('AXIOS auth source err', err.response);
-                // Promise.reject(err);
-                return err;
-            });
+        // const resp = await axios.request({
+        //     httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        //     method: 'GET',
+        //     baseURL: `https://${host}`,
+        //     url: '/mgmt/tm/auth/source',
+        //     auth: { username, password },
+        //     timeout: 3000
+        //     // connectTimeout: 1000,
+        //     })
+        //     // .then( resp => {
+        //     //     console.log('AXIOS auth source response', resp);
+        //     //     Promise.resolve(resp);
+        //     //     return resp;
+        //     // })
+        //     .catch( err => {
+        //         console.log('AXIOS auth source err', err);
+        //         console.log('AXIOS auth source err', err.response);
+        //         // Promise.reject(err);
+        //         return err;
+        //     });
 
-        console.log('=======  axResp', resp);
+        // console.log('=======  axResp', resp);
 
-        if(!resp) {
-            vscode.window.showErrorMessage(`Could not connect to ${host}`);
-            return;
-        }
+        // if(!resp) {
+        //     vscode.window.showErrorMessage(`Could not connect to ${host}`);
+        //     return;
+        // }
         
 
-        // if req/resp successful
-        if (resp.status === 200) {
-            // if not default, update the logonProviderName value
-            if(resp.data.type !== 'local'){
-                console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
-                progress.report({ message: ` ${resp.data.type} auth provider detected`});
-                // change default 'tmos' value to what is configured
-                ext.logonProviderName = resp.data.type;
-            } else {
-                console.log(`TMOS local auth detected`);
-            }
-        } else if (resp.status === 401 && resp.data.message === "Authentication failed.") {
-            // clear cached password for this device
-            ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
+        // // if req/resp successful
+        // if (resp.status === 200) {
+        //     // if not default, update the logonProviderName value
+        //     if(resp.data.type !== 'local'){
+        //         console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
+        //         progress.report({ message: ` ${resp.data.type} auth provider detected`});
+        //         // change default 'tmos' value to what is configured
+        //         ext.logonProviderName = resp.data.type;
+        //     } else {
+        //         console.log(`TMOS local auth detected`);
+        //     }
+        // } else if (resp.status === 401 && resp.data.message === "Authentication failed.") {
+        //     // clear cached password for this device
+        //     ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
     
-            vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-            console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-            throw new Error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-        } else {
-            // await new Promise(resolve => { setTimeout(resolve, 3000); });
-            vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-            console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-            throw new Error(`---UNKNOWN HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        //     vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        //     console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        //     throw new Error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        // } else {
+        //     // await new Promise(resolve => { setTimeout(resolve, 3000); });
+        //     vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        //     console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+        //     throw new Error(`---UNKNOWN HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
             
-        }
+        // }
 
         // debugger;
 
         // get auth token and discover ATC services
-        getAuthToken(host, username, password)
+        const discovery = await getAuthToken(host, username, password)
             .then( async token => {
 
                 // cache password in keytar
@@ -103,6 +103,8 @@ export async function connectF5(device: string, password: string) {
                 
                 utils.setHostStatusBar(device);
                 // vscode.window.showInformationMessage(`Successfully connected to ${host}`);
+
+                let returnInfo: string[] = [];
 
                 //********** Host info **********/
                 const hostInfo = await callHTTP(
@@ -116,23 +118,10 @@ export async function connectF5(device: string, password: string) {
                     const text = `${hostInfo.body.hostname}`;
                     const tip = `TMOS: ${hostInfo.body.version}`;
                     utils.setHostnameBar(text, tip);
+                    returnInfo.push(text);
                 }
 
                 progress.report({ message: ` CONNECTED, checking installed ATC services...`});
-
-                //********** TS info **********/
-                const tsInfo = await callHTTP(
-                    'GET', 
-                    host, 
-                    '/mgmt/shared/telemetry/info', 
-                    token
-                );
-
-                if (tsInfo.status === 200) {
-                    const text = `TS(${tsInfo.body.version})`;
-                    const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `;
-                    utils.setTSBar(text, tip);
-                }
 
                 //********** FAST info **********/
                 const fastInfo = await callHTTP(
@@ -145,6 +134,7 @@ export async function connectF5(device: string, password: string) {
                 if (fastInfo.status === 200) {
                     const text = `FAST(${fastInfo.body.version})`;
                     utils.setFastBar(text);
+                    returnInfo.push(text);
                 }
                     
                 //********** AS3 info **********/
@@ -159,8 +149,10 @@ export async function connectF5(device: string, password: string) {
                     const text = `AS3(${as3Info.body.version})`;
                     const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `;
                     utils.setAS3Bar(text, tip);
+                    returnInfo.push(text);
                 }
-
+                
+                //********** DO info **********/
                 const doInfo = await callHTTP(
                     'GET', 
                     host, 
@@ -173,10 +165,30 @@ export async function connectF5(device: string, password: string) {
                     const text = `DO(${doInfo.body[0].version})`;
                     const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `;
                     utils.setDOBar(text, tip);
+                    returnInfo.push(text);
                 }
+
+                //********** TS info **********/
+                const tsInfo = await callHTTP(
+                    'GET', 
+                    host, 
+                    '/mgmt/shared/telemetry/info', 
+                    token
+                );
+
+                if (tsInfo.status === 200) {
+                    const text = `TS(${tsInfo.body.version})`;
+                    const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `;
+                    utils.setTSBar(text, tip);
+                    returnInfo.push(text);
+                }
+                // Promise.resolve(returnInfo);
+                return returnInfo;
             }
         );
+        return discovery;
     });
+    return progressPost;
 }
 
 

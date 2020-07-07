@@ -51,6 +51,10 @@ Content-Type: application/json
 }
 
 
+###   # 
+GET https://{{host}}/mgmt/shared/iapp/package-management-tasks/
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
 
 
 

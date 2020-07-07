@@ -18,7 +18,8 @@ import * as keyTarType from 'keytar';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
-import { getAuthToken, callHTTP } from './utils/coreF5HTTPS';
+import { MgmtClient } from './utils/f5DeviceClient';
+import { getAuthToken, callHTTP, makeRequestAX, makeReqAXnew } from './utils/coreF5HTTPS';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -88,11 +89,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
-		const bigipHosts: vscode.QuickPickItem[] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
 		
-		if (bigipHosts === undefined) {
-			throw new Error('no hosts in configuration');
-		}
+
 
 		// clear status bars before new connect
 		utils.setHostStatusBar();
@@ -103,6 +101,10 @@ export function activate(context: vscode.ExtensionContext) {
 		utils.setTSBar();	
 		
 		if (!device) {
+			const bigipHosts: string[] | undefined= await vscode.workspace.getConfiguration().get('f5.hosts');
+			if (bigipHosts === undefined) {
+				throw new Error('no hosts in configuration');
+			}
 			device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
 			if (!device) {
 				throw new Error('user exited device input');
@@ -110,8 +112,20 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 		const password: string = await utils.getPassword(device);
-		f5Api.connectF5(device, password);
-		return device;
+		const discovery = await f5Api.connectF5(device, password);
+		console.log(`F5 Connect Discovered ${JSON.stringify(discovery)}`);
+
+		var [user, host] = device.split('@');
+		var [host, port] = host.split(':');
+
+		const mgmtClient = new MgmtClient(device, {host, port, user, password});
+		const ben1 = await mgmtClient.login();
+		const ben2 = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
+		// const ben2 = await mgmtClient.provider();
+
+		// debugger;
+
+		// return device;
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', async () => {
@@ -139,11 +153,6 @@ export function activate(context: vscode.ExtensionContext) {
 		utils.setAS3Bar();
 		utils.setDOBar();
 		utils.setTSBar();
-
-		// refresh views to clear trees
-		// vscode.commands.executeCommand('f5-fast.refreshTemplates');
-		vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
-		vscode.commands.executeCommand('f5-as3.refreshTasksTree');
 
 		return vscode.window.showInformationMessage('clearing selected bigip and status bar details');
 	}));
@@ -202,7 +211,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
 		
 		vscode.window.showInputBox({
-			prompt: 'Update Device/BIG-IP/Host      ', 
+			prompt: 'Update Device/BIG-IP/Host', 
 			value: hostID.label
 		})
 		.then( input => {
@@ -226,9 +235,7 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showInformationMessage(`Updating ${input} device name.`);
 
 				// need to give the configuration a chance to save before refresing tree
-				setTimeout( () => {
-					hostsTreeProvider.refresh();
-				}, 300);
+				setTimeout( () => { hostsTreeProvider.refresh();}, 300);
 			} else {
 				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
 			}
@@ -266,6 +273,7 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
 			}
+			// debugger;
 		});
 
 	}));
@@ -312,16 +320,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 		if(selectedRPM) {
-			// set rpm path/location
+			// set rpm path/location from oject return in explorer tree
 		} else {
 			// pick atc/tool/version picker/downloader
-			const rpm = await rpmMgmt.npmPicker();
-
-			console.log('local rpm location', rpm);
-			
-			// selectedRPM = await rpmMgmt.npmUpload(rpm);
+			selectedRPM = await rpmMgmt.rpmPicker();
+			console.log('local rpm location', selectedRPM);
 		}
-
+		
+		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
+		console.log('installed rpm', installedRpm);
 
 		/**
 		 * if rpmFromExplorer
@@ -342,6 +349,31 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 2. install rpm
 		 * 3. reconnect to refresh everything
 		 */
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.unInstallRPM', async (selectedRPM) => {
+
+        const device = ext.hostStatusBar.text;
+        const password = await utils.getPassword(device);
+        const [username, host] = device.split('@');
+		const authToken = await getAuthToken(host, username, password);
+		
+		const iAppTasks = await callHTTP('GET', host, '/mgmt/shared/iapp/package-management-tasks', authToken);
+
+		// let query;
+		let installedRpms;
+		if(iAppTasks.status === 200) {
+			// find the first task whtat has 'queryResponse', which lists installed packages
+			const query = iAppTasks.body.items.find( item => item.queryResponse);
+			// isolate package names from all other details
+			installedRpms = query.queryResponse.map( item => item.packageName);
+		}
+
+		const rpm = await vscode.window.showQuickPick(installedRpms, {placeHolder: 'select rpm to remove'});
+
+		debugger;
+
+
 	}));
 
 
@@ -1250,6 +1282,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const mento1 = utils.getMementoW('key1');
 		vscode.window.showInformationMessage(`Memento! ${mento1}`);
+
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {

@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { getAuthToken, callHTTP, multiPartUploadSDK } from './coreF5HTTPS';
+import { getAuthToken, callHTTP, multiPartUploadSDK, makeReqAXnew } from './coreF5HTTPS';
 import { callHTTPS } from '../utils/externalAPIs';
 import axios from 'axios';
 import * as utils from './utils';
@@ -15,10 +15,12 @@ axios.defaults.headers.common['User-Agent'] = 'F5 VSCode FAST Extension';
 const fastReleases = 'https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases';
 const as3Releases = 'https://api.github.com/repos/F5Networks/f5-appsvcs-extension/releases';
 const doReleases = 'https://api.github.com/repos/F5Networks/f5-declarative-onboarding/releases';
-const tsReleases = 'https://api.github.com/repos/F5Networks/f5-declarative-onboarding/releases';
+const tsReleases = 'https://api.github.com/repos/F5Networks/f5-telemetry-streaming/releases';
 
 
-export async function npmPicker () {
+
+
+export async function rpmPicker () {
 
     /**
      * --- npm picker function (no input)
@@ -77,16 +79,108 @@ export async function npmPicker () {
         const rpmLoc = await getRPM(selectedAsset.asset);
         // console.log('rpmLoc', rpmLoc);
         
-
+        // Promise.resolve(rpmLoc);
         return rpmLoc;
+    });
+    // Promise.resolve(progressBar);
+    return progressBar;
+}
+
+
+
+
+/**
+ * uploads atc ilx to f5
+ * @param rpm local rpm location
+ */
+export async function rpmInstaller (rpm: string) {
+
+    // * --- npm installer function -> input: string = <file_location>
+    // * 1. upload rpm
+    // * 2. install rpm
+    // * 3. reconnect to refresh everything
+
+    const progressBar = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: 'ATC RPM Upload',
+        cancellable: true
+    }, async (progress, token) => {
+        token.onCancellationRequested(() => {
+            console.log("User canceled atc rpm upload");
+            return new Error(`User canceled atc rpm upload`);
+        });
+        
+        progress.report({ message: `... uploading ...`});
+
+        const device = ext.hostStatusBar.text;
+        const password = await utils.getPassword(device);
+        const [username, host] = device.split('@');
+        const authToken = await getAuthToken(host, username, password);
+
+        // get rpm name from full file path
+        const rpmName = path.basename(rpm);
+        
+        const instA = await multiPartUploadSDK(rpm, host, authToken);
+
+        console.log('uploaded', instA);
+
+        progress.report({ message: `... installing ...`});
+        // await new Promise(resolve => { setTimeout(resolve, 3000); });
+        
+
+        const installStart = await callHTTP('POST', host, '/mgmt/shared/iapp/package-management-tasks', authToken,
+        {
+                operation: 'INSTALL',
+                packageFilePath: `/var/config/rest/downloads/${rpmName}`
+        });
+        console.log('ilx import status: ', installStart.status, installStart.body.id, installStart);
+        progress.report({ message: `... ${installStart.body.status} ... `});
+
+        // wait for package to install
+        await new Promise(resolve => { setTimeout(resolve, 3000); });
+
+        let taskId;
+        if (installStart.status === 202) {
+            taskId = installStart.body.id; // get task ID from install job
+        }   // else return status(200)?
+
+        let i = 0;  // loop counter
+        // use taskId to control loop
+        while(taskId && i < 10) {
+            const installStatus = await callHTTP('GET', host, `/mgmt/shared/iapp/package-management-tasks/${taskId}`, authToken);
+
+            progress.report({ message: `... ... ...`});
+            console.log('task in progress', taskId, installStatus.status, installStatus.data.status);
+            
+            if(installStatus.data.status === 'FINISHED') {
+                return installStatus;
+            } else if (installStatus.data.status === 'FAILED') {
+                vscode.window.showWarningMessage('rpm install failed');
+                return Promise.reject('install failed');
+            }
+
+            i++;
+            await new Promise(resolve => { setTimeout(resolve, 3000); });
+        }
+
+
+        // debugger;
+        
+
+        return 'something';
     });
     return progressBar;
 }
 
+/**
+ * 
+ * @param assetUrl github asset url
+ *  example:  https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases/27113449
+ */
 async function getRPM(assetUrl: string) {
     // get release asset information
     const resp = await axios(assetUrl);
-    console.log('Getting asset details', resp);
+    console.log('Getting github asset details', resp);
     
     
     const extDir = ext.context.extensionPath; 
@@ -103,11 +197,11 @@ async function getRPM(assetUrl: string) {
     const assetSet = resp.data.assets.map( (item: { name: string; browser_download_url: string; }) => {
         return {name: item.name, browser_download_url: item.browser_download_url};
     });
-    console.log('assetSet', assetSet);
+    console.log('assetSet', JSON.stringify(assetSet));
     
 
     // download assets
-    assetSet.forEach ( item => {
+    await assetSet.forEach ( async item => {
         const destPath = path.join(rpmDir, item.name);
 
         // if item already exists
@@ -116,7 +210,7 @@ async function getRPM(assetUrl: string) {
             // return destPath;
         } else {
             console.log(`${item.name} not found in local cache, downloading...`);
-            npmGetter(item.browser_download_url, destPath);
+            await npmGetter(item.browser_download_url, destPath);
         }
     });
 

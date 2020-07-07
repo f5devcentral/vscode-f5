@@ -132,26 +132,26 @@ export async function multiPartUploadSDK(file: string, host: string, token: stri
 
 
 /**
- * Axios HTTPS agent 
+ * Axios HTTPS agent specific for bigip
  * modeled after f5-sdk-js implementation
  * Will probably become the new https method, but will need some refactoring
  * @param host hostname/IP
  * @param uri http uri path
  * @param options http options (method, port, body, headers, basicAuth)
  */
-async function makeRequestAX(host: string, uri: string, options: {
+export async function makeRequestAX(host: string, uri: string, options: {
     method?: any; 
     port?: number;
     body?: object;
     headers?: object;
-    // auth?: object;
-    // basicAuth?: object;
-    // advancedReturn?: boolean;
+    auth?: object;
+    basicAuth?: object;
+    advancedReturn?: boolean;
 }): Promise<object> {
     options = options || {};
 
     // logger.debug(`Making HTTP request: ${host} ${uri} ${JSON.stringify(options)}`);
-    console.log(`Making HTTP request: ${host} ${uri} ${JSON.stringify(options)}`);
+    console.log(`makeRequestAX: ${host} ${uri} ${JSON.stringify(options)}`);
 
     const httpResponse = await axios.request({
         httpsAgent: new https.Agent({
@@ -162,12 +162,125 @@ async function makeRequestAX(host: string, uri: string, options: {
         url: uri,
         headers: options['headers'] !== undefined ? options['headers'] : {},
         data: options['body'] || null,
-        // auth: options['basicAuth'] !== undefined ? {
-        //     username: options['basicAuth']['user'],
-        //     password: options['basicAuth']['password']
-        // } : undefined,
+        auth: options['basicAuth'] !== undefined ? {
+            username: options['basicAuth']['user'],
+            password: options['basicAuth']['password']
+        } : undefined,
         // validateStatus: null
+        // validateStatus: () => true
     });
+
+    // check for advanced return
+    if (options.advancedReturn) {
+        return {
+            statusCode: httpResponse.status,
+            body: httpResponse.data
+        };
+    }
+
+    // check for unsuccessful request
+    if (httpResponse.status > 400) {
+        return Promise.reject(new Error(
+            `makeRequestAX HTTP request failed: ${httpResponse.status} ${JSON.stringify(httpResponse.data)}`
+        ));
+    }
+
+    // return response body
+    console.log('makeRequestAX-response', httpResponse);
+    
+    return httpResponse;
+};
+
+
+
+
+
+
+
+/**
+ * Axios HTTPS agent specific for bigip
+ * modeled after f5-sdk-js implementation
+ * Will probably become the new https method, but will need some refactoring
+ * @param host hostname/IP
+ * @param uri http uri path
+ * @param options http options (method, port, body, headers, basicAuth)
+ */
+export async function makeReqAXnew(host: string, uri: string, options: {
+    method?: any; 
+    port?: number;
+    body?: object;
+    headers?: object;
+    auth?: object;
+    basicAuth?: object;
+    advancedReturn?: boolean;
+}): Promise<object> {
+    options = options || {};
+
+    // logger.debug(`Making HTTP request: ${host} ${uri} ${JSON.stringify(options)}`);
+    console.log(`makeReqAXnew-REQUEST: ${host} ${uri} ${JSON.stringify(options)}`);
+
+    const httpResponse: any = await axios.request({
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        }),
+        method: options['method'] || 'GET',
+        baseURL: `https://${host}:${options['port'] || 443}`,
+        url: uri,
+        headers: options['headers'] !== undefined ? options['headers'] : {},
+        data: options['body'] || null,
+        auth: options['basicAuth'] !== undefined ? {
+            username: options['basicAuth']['user'],
+            password: options['basicAuth']['password']
+        } : undefined,
+        // validateStatus: null
+        // validateStatus: () => true  // return ALL responses
+    })
+    .then( resp => {
+        // console.log(`makeReqAXnew-RESPONSE: ${httpResponse.statusText} ${httpResponse.status}`, httpResponse.data);
+        return resp;
+    })
+    .catch( error => {
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            // console.log('AX-HTTP-error.response', error.response.data);
+            // console.log('AX-HTTP-error.status', error.response.status);
+            // console.log('AX-HTTP-error.headers', error.response.headers);
+
+            const status = error.response.status;
+            const message = error.response.data?.message;
+
+            if(status === 401 && message === "Authentication failed.") {
+                console.error('401 - auth failed!!!!!!  ***setup clear password***');
+                // ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
+            } else if (status === 401 && message === undefined) {
+                // return 'bigiq-remote-auth-provider-needed';
+                Promise.resolve('bigiq-remote-auth-provider-needed');
+            }
+
+
+            vscode.window.showErrorMessage(`AX-HTTP FAILURE: ${status} - ${message}`);
+            console.error(`AX-HTTP FAILURE: ${status} - ${message} - ${JSON.stringify(error.response.data)}`);
+            throw new Error(`AX-HTTP FAILURE: ${status} - ${message}`);
+
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            vscode.window.showErrorMessage(`AX-HTTP-error.request: ${error.request}`);
+            console.error(`AX-HTTP-error.request: ${error.request}`);
+            throw new Error(`AX-HTTP-error.request: ${error.request}`);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('AX-HTTP-Setup-Error', error.message);
+          }
+          console.error(error.config);
+    });
+
+    // return response body
+    // console.log('makeReqAXnew-RESPONSE', httpResponse);
+
+    // console.log(`makeReqAXnew-RESPONSE - Data:`, httpResponse.data);
 
     // // check for advanced return
     // if (options.advancedReturn) {
@@ -177,15 +290,26 @@ async function makeRequestAX(host: string, uri: string, options: {
     //     };
     // }
 
-    // check for unsuccessful request
-    if (httpResponse.status > 300) {
-        return Promise.reject(new Error(
-            `HTTP request failed: ${httpResponse.status} ${JSON.stringify(httpResponse.data)}`
-        ));
-    }
-    // return response body
+    // // check for unsuccessful request
+    // if (httpResponse.status > 300) {
+    //     return Promise.reject(new Error(
+    //         `makeReqAXnew HTTP request failed: ${httpResponse.status} ${JSON.stringify(httpResponse.data)}`
+    //     ));
+    // }
+    
     return httpResponse;
-}
+};
+
+
+
+
+
+
+
+
+
+
+
 
 
 

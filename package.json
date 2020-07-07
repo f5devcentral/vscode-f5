@@ -223,7 +223,14 @@
 			{
 				"command": "f5.installRPM",
 				"title": "Install/Update RPM",
-				"category": "F5"
+				"category": "F5",
+				"enablement": "f5.device"
+			},
+			{
+				"command": "f5.unInstallRPM",
+				"title": "Un-Install RPM",
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.refreshHostsTree",
