@@ -219,6 +219,11 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     // logger.debug(`Making HTTP request: ${host} ${uri} ${JSON.stringify(options)}`);
     console.log(`makeReqAXnew-REQUEST: ${host} ${uri} ${JSON.stringify(options)}`);
 
+    /**
+     * todo:  move some of the parameter assignments above so they can be logged before execution
+     *  like http/method, base/url
+     */ 
+
     const httpResponse: any = await axios.request({
         httpsAgent: new https.Agent({
             rejectUnauthorized: false

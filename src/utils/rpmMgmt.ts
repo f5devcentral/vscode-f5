@@ -12,14 +12,128 @@ import * as fs from 'fs';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.headers.common['User-Agent'] = 'F5 VSCode FAST Extension';
 
-const fastReleases = 'https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases';
-const as3Releases = 'https://api.github.com/repos/F5Networks/f5-appsvcs-extension/releases';
-const doReleases = 'https://api.github.com/repos/F5Networks/f5-declarative-onboarding/releases';
-const tsReleases = 'https://api.github.com/repos/F5Networks/f5-telemetry-streaming/releases';
+const FAST_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases';
+const AS3_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-appsvcs-extension/releases';
+const DO_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-declarative-onboarding/releases';
+const TS_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-telemetry-streaming/releases';
+
+const PKG_MGMT_URI = '/mgmt/shared/iapp/package-management-tasks';
+
+/**
+ * get list of installed rpms on bigip
+ * @params ?
+ */
+export async function installedRPMs () {
+
+    const device = ext.hostStatusBar.text;
+    const password = await utils.getPassword(device);
+    const [username, host] = device.split('@');
+    const authToken = await getAuthToken(host, username, password);
+
+    /**
+     * like other ilx operations, to get installed rpms, 
+     *  start a job to gather the details, then query for the finished job
+     *  to get the details... should the following logic include error 
+     *  handling for all those steps (like posting a DO dec)or just assume 
+     *  things should go well since the operation should be so lightweight
+     *  to happen quickly... we'll see
+     * 
+     * So, in the following, we are assuming everything will go successfully and quick...
+     */
+    
+    const startQuery = await makeReqAXnew(host, PKG_MGMT_URI, {
+        method: 'POST',
+        headers: { 'X-F5-Auth-Token': authToken },
+        body: { operation: 'QUERY' },
+    });
+
+    await new Promise(resolve => { setTimeout(resolve, 1000); });
+    // query task to get installed rpms
+    const iAppTasks = await makeReqAXnew(host, `${PKG_MGMT_URI}/${startQuery.data.id}`, {
+        method: 'GET',
+        headers: { 'X-F5-Auth-Token': authToken }
+    });
+
+    // let query;
+    // let installedRpms;
+    if(iAppTasks.status === 200) {
+        // return just package names from list
+        return iAppTasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
+    } else {
+        // todo:  setup fail condition?
+        console.warn('installedRPMs failed', iAppTasks.status, iAppTasks.statusText);
+    }
+
+}
 
 
+/**
+ * un-install rpm on bigip
+ * @params rpm name
+ */
+export async function unInstallRpm (packageName: string) {
 
+    const device = ext.hostStatusBar.text;
+    const password = await utils.getPassword(device);
+    const [username, host] = device.split('@');
+    const authToken = await getAuthToken(host, username, password);
 
+    const progressBar = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `ATC RPM un-Installing:  ${packageName}`,
+        cancellable: true
+    }, async (progress, token) => {
+        token.onCancellationRequested(() => {
+            console.warn("User canceled atc rpm removal");
+            return new Error(`User canceled atc rpm removal`);
+        });
+        
+        // start unInstall job
+        const start = await makeReqAXnew(host, PKG_MGMT_URI, {
+            method: 'POST',
+            headers: {
+                'X-F5-Auth-Token': authToken
+            },
+            body: {
+                operation: 'UNINSTALL',
+                packageName
+            },
+        });
+
+        progress.report({ message: `--- ${start.statusText} ---`});
+        // progress.report({ message: `... ${start.data.status} ...`});
+
+        let taskId;
+        if (start.status === 202) {
+            taskId = start.data.id;
+        }   
+        
+        await new Promise(resolve => { setTimeout(resolve, 1000); });
+        let i = 0;  // loop counter
+        // use taskId to control loop
+        while(taskId && i < 10) {
+            const resp = await makeReqAXnew(host, `${PKG_MGMT_URI}/${taskId}`, {
+                headers: { 'X-F5-Auth-Token': authToken },
+            });
+
+            progress.report({ message: `--- ${resp.data.status} ---`});
+            console.log('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
+            
+            if(resp?.data?.status === 'FINISHED' || resp.data.status === 'FAILED') {
+                // return resp;
+                return resp.data.status;
+            }
+
+            i++;
+            await new Promise(resolve => { setTimeout(resolve, 3000); }); // todo: update for global timer
+        }
+    });
+    return progressBar;
+}
+
+/**
+ * assists users with selected atc/version to install
+ */
 export async function rpmPicker () {
 
     /**
@@ -52,19 +166,19 @@ export async function rpmPicker () {
         var rpmVersions;
         switch(atc) {
             case 'FAST': {
-                rpmVersions = await listReleases(fastReleases);
+                rpmVersions = await listGitReleases(FAST_GIT_RELEASES);
                 break;
             }
             case 'AS3': {
-                rpmVersions = await listReleases(as3Releases);
+                rpmVersions = await listGitReleases(AS3_GIT_RELEASES);
                  break;
             }
             case 'DO': {
-                rpmVersions = await listReleases(doReleases);
+                rpmVersions = await listGitReleases(DO_GIT_RELEASES);
                 break;
             }
             case 'TS': {
-                rpmVersions = await listReleases(tsReleases);
+                rpmVersions = await listGitReleases(TS_GIT_RELEASES);
                 break;
             }
         }
@@ -76,7 +190,7 @@ export async function rpmPicker () {
         // vscode.window.showInformationMessage(`Fetching ${atc} ${selectedAsset.label} from ${selectedAsset.asset}`);
         console.log(`selectedAsset: ${atc} ${selectedAsset.label} from ${selectedAsset.asset}`);
         
-        const rpmLoc = await getRPM(selectedAsset.asset);
+        const rpmLoc = await getRPMgit(selectedAsset.asset);
         // console.log('rpmLoc', rpmLoc);
         
         // Promise.resolve(rpmLoc);
@@ -173,11 +287,12 @@ export async function rpmInstaller (rpm: string) {
 }
 
 /**
- * 
+ * downloads selected atc/ilx assets
  * @param assetUrl github asset url
  *  example:  https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases/27113449
+ * @returns full path/file of rpm
  */
-async function getRPM(assetUrl: string) {
+async function getRPMgit(assetUrl: string) {
     // get release asset information
     const resp = await axios(assetUrl);
     console.log('Getting github asset details', resp);
@@ -210,7 +325,7 @@ async function getRPM(assetUrl: string) {
             // return destPath;
         } else {
             console.log(`${item.name} not found in local cache, downloading...`);
-            await npmGetter(item.browser_download_url, destPath);
+            await rpmDownload(item.browser_download_url, destPath);
         }
     });
 
@@ -228,11 +343,11 @@ async function getRPM(assetUrl: string) {
 }
 
 /**
- * 
+ * lists assests/releases of selected atc git
  * @param url atc github releases url
  * @returns asset name and download url as object
  */
-async function listReleases(url: string){
+async function listGitReleases(url: string){
     const resp = await axios.get(url);
     var mapEd;
     if(resp.status === 200) {
@@ -249,7 +364,7 @@ async function listReleases(url: string){
  * @param url to download file
  * @param destPath destination path/file
  */
-export async function npmGetter (url: string, destPath: string) {
+export async function rpmDownload (url: string, destPath: string) {
     // https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
     const writeFile = fs.createWriteStream(destPath);
     const resp = await axios.get(url, {responseType: 'stream'})

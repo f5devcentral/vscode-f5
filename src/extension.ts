@@ -352,26 +352,18 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.unInstallRPM', async (selectedRPM) => {
+		// get installed packages
+		const installedRPMs = await rpmMgmt.installedRPMs();
+		// have user select package
+		const rpm = await vscode.window.showQuickPick(installedRPMs, {placeHolder: 'select rpm to remove'});
 
-        const device = ext.hostStatusBar.text;
-        const password = await utils.getPassword(device);
-        const [username, host] = device.split('@');
-		const authToken = await getAuthToken(host, username, password);
-		
-		const iAppTasks = await callHTTP('GET', host, '/mgmt/shared/iapp/package-management-tasks', authToken);
-
-		// let query;
-		let installedRpms;
-		if(iAppTasks.status === 200) {
-			// find the first task whtat has 'queryResponse', which lists installed packages
-			const query = iAppTasks.body.items.find( item => item.queryResponse);
-			// isolate package names from all other details
-			installedRpms = query.queryResponse.map( item => item.packageName);
+		if(!rpm) {	// return error pop-up if quickPick escaped
+			return vscode.window.showWarningMessage('user exited - did not select rpm to un-install');
 		}
 
-		const rpm = await vscode.window.showQuickPick(installedRpms, {placeHolder: 'select rpm to remove'});
-
-		debugger;
+		const status = await rpmMgmt.unInstallRpm(rpm);
+		vscode.window.showInformationMessage(`rpm removal ${status}`);
+		// debugger;
 
 
 	}));
