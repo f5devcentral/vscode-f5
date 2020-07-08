@@ -123,7 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
 		 */
 		var [user, host] = device.split('@');
 		var [host, port] = host.split(':');
-		const mgmtClient = new MgmtClient(device, {host, port, user, password});
+		ext.mgmtClient = new MgmtClient(device, {host, port, user, password});
 		// const ben1 = await mgmtClient.login();
 		// const ben2 = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
 		// const ben2 = await mgmtClient.provider();
