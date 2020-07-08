@@ -115,12 +115,17 @@ export function activate(context: vscode.ExtensionContext) {
 		const discovery = await f5Api.connectF5(device, password);
 		console.log(`F5 Connect Discovered ${JSON.stringify(discovery)}`);
 
+
+		/**
+		 * following not really being used yet, but it the beginning of using a class
+		 * 	to manage host/port/user/password across all calls within the extension
+		 * This is taking heavy inspiration from the f5-sdk-js
+		 */
 		var [user, host] = device.split('@');
 		var [host, port] = host.split(':');
-
 		const mgmtClient = new MgmtClient(device, {host, port, user, password});
-		const ben1 = await mgmtClient.login();
-		const ben2 = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
+		// const ben1 = await mgmtClient.login();
+		// const ben2 = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
 		// const ben2 = await mgmtClient.provider();
 
 		// debugger;
@@ -321,10 +326,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if(selectedRPM) {
 			// set rpm path/location from oject return in explorer tree
+			selectedRPM = selectedRPM.fsPath;
+			console.log(`workspace selected rpm`, selectedRPM);
 		} else {
 			// pick atc/tool/version picker/downloader
 			selectedRPM = await rpmMgmt.rpmPicker();
-			console.log('local rpm location', selectedRPM);
+			console.log('downloaded rpm location', selectedRPM);
 		}
 		
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);

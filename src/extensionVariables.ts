@@ -6,8 +6,10 @@
 import { ExtensionContext, StatusBarItem, workspace, ViewColumn } from "vscode";
 import * as keyTarType from "keytar";
 // import { F5Api } from './utils/f5Api';
+import { MgmtClient } from './utils/f5DeviceClient';
 
 type KeyTar = typeof keyTarType;
+// type MgmtClient = typeof MgmtClient;
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -15,7 +17,8 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
-    export let logonProviderName: string = 'local';
+    export let mgmtClient: MgmtClient;
+    export let logonProviderName: string = 'local'; // todo: move this to mgmtClient
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;

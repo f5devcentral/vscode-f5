@@ -427,6 +427,11 @@
 		"menus": {
 			"explorer/context": [
 				{
+						"when": "f5.device && resourceExtname == .rpm",
+						"command": "f5.installRPM",
+						"group": "F5"
+				},
+				{
 						"when": "f5.fastInstalled && explorerResourceIsFolder",
 						"command": "f5-fast.postTemplateSet",
 						"group": "F5-Fast"
