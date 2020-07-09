@@ -37,7 +37,8 @@ export async function installedRPMs () {
      * 
      * So, in the following, we are assuming everything will go successfully and quick...
      * 
-     * todo: update to poll task till done
+     * todo: update to poll task till done and maybe add progress bar that information
+     *      is being gathered and waiting for user to select...
      */
     
     await ext.mgmtClient.token();   // refresh token
@@ -52,7 +53,7 @@ export async function installedRPMs () {
 
     // pause a moment for job to complete 
     //  - this should be rewritten to follow 202 till complete
-    await new Promise(resolve => { setTimeout(resolve, 500); });
+    await new Promise(resolve => { setTimeout(resolve, 1000); });
  
     // query task to get installed rpms
     const tasks = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`);
@@ -65,10 +66,13 @@ export async function installedRPMs () {
         }
 
         // return just package names from list
-        return tasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
+        const installed = tasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
+        console.log('installed rpms', JSON.stringify(installed));
+        
+        return installed;
     } else {
         // todo:  setup fail condition?
-        console.warn('installedRPMs failed', tasks.status, tasks.statusText);
+        console.warn('getting installedRPMs failed', tasks.status, tasks.statusText);
     }
 }
 

@@ -366,11 +366,17 @@ export function activate(context: vscode.ExtensionContext) {
 		 */
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.unInstallRPM', async () => {
-		// get installed packages
-		const installedRPMs = await rpmMgmt.installedRPMs();
-		// have user select package
-		const rpm = await vscode.window.showQuickPick(installedRPMs, {placeHolder: 'select rpm to remove'});
+	context.subscriptions.push(vscode.commands.registerCommand('f5.unInstallRPM', async (rpm) => {
+		
+		// if no rpm sent in from update command
+		if(!rpm) {
+			// get installed packages
+			const installedRPMs = await rpmMgmt.installedRPMs();
+			// have user select package
+			rpm = await vscode.window.showQuickPick(installedRPMs, {placeHolder: 'select rpm to remove'});
+		} else {
+			// rpm came from rpm update call...
+		}
 
 		if(!rpm) {	// return error pop-up if quickPick escaped
 			return vscode.window.showWarningMessage('user exited - did not select rpm to un-install');
@@ -379,6 +385,10 @@ export function activate(context: vscode.ExtensionContext) {
 		const status = await rpmMgmt.unInstallRpm(rpm);
 		vscode.window.showInformationMessage(`rpm ${rpm} removal ${status}`);
 		// debugger;
+
+		// used to pause between uninstalling and installing a new version of the same atc
+		//		should probably put this somewhere else
+		// await new Promise(resolve => { setTimeout(resolve, 2000); });
 
 	}));
 
