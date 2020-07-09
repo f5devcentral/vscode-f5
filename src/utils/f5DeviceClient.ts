@@ -8,7 +8,7 @@
 
 'use strict';
 
-import { makeReqAXnew } from './coreF5HTTPS';
+import { makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
 
 /**
  *
@@ -46,28 +46,18 @@ export class MgmtClient {
     }) {
         this.device = device;
         this.host = options['host'];
-        this.port = options['port'] || 443;
+        this.port = options['port'];
         this._user = options['user'];
         this._password = options['password'];
     }
 
-    // const user1 = device.split('@')[0];
-    // const device1 = device.split('@')[1];
-
-    // if(device.includes(':')) {
-    //     var [host, port] = opts.host.split(':');
-    //     opts.host = host;
-    //     opts.port = parseInt(port);
-    // }
-
-    // var [username, host] = device.split('@');
 
     /**
      * Login (using credentials provided during instantiation)
-     * 
+     * sets auth token
      * @returns void
      */
-    async login(): Promise<void> {
+    async token(): Promise<void> {
         const response = await makeReqAXnew(
             this.host,
             '/mgmt/shared/authn/login',
@@ -76,15 +66,34 @@ export class MgmtClient {
                 body: {
                     username: this._user,
                     password: this._password,
-                    loginProviderName: 'tmos'
+                    // loginProviderName: 'tmos'
                 },
-                basicAuth: {
-                    user: this._user,
-                    password: this._password
-                }
+                // basicAuth: {
+                //     user: this._user,
+                //     password: this._password
+                // }
             }
         );
         this._token = response.data['token']['token'];
+    }
+
+    /**
+     * setup connect function
+     * this could make other sub calls
+     *  - discover provider?
+     *  - service discovery
+     *  - set status bar stuff
+     */
+    async connect() {
+
+    }
+
+    /**
+     * setup multi part upload to f5 function
+     * @param file full path/file location
+     */
+    async upload(file: string) {
+        return await multiPartUploadSDK(file, this.host, this._token);
     }
 
     async provider() {
@@ -143,7 +152,7 @@ export class MgmtClient {
             uri,
             {
                 method: options.method || 'GET',
-                port: this.port,
+                port: this.port || 443,
                 headers: Object.assign(options.headers || {}, {
                     'X-F5-Auth-Token': this._token
                 }),

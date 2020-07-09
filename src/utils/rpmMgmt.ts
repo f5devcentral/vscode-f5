@@ -1,13 +1,14 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { getAuthToken, callHTTP, multiPartUploadSDK, makeReqAXnew } from './coreF5HTTPS';
+import { getAuthToken, callHTTP, multiPartUploadSDK, makeReqAXnew, downloadToFile } from './coreF5HTTPS';
 import { callHTTPS } from '../utils/externalAPIs';
 import axios from 'axios';
 import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
 import { MgmtClient } from './f5DeviceClient';
+import { emitWarning } from 'process';
 
 
 axios.defaults.headers.common['Content-Type'] = 'application/json';
@@ -26,11 +27,6 @@ const PKG_MGMT_URI = '/mgmt/shared/iapp/package-management-tasks';
  */
 export async function installedRPMs () {
 
-    // const device = ext.hostStatusBar.text;
-    // const password = await utils.getPassword(device);
-    // const [username, host] = device.split('@');
-    // const authToken = await getAuthToken(host, username, password);
-
     /**
      * like other ilx operations, to get installed rpms, 
      *  start a job to gather the details, then query for the finished job
@@ -44,49 +40,36 @@ export async function installedRPMs () {
      * todo: update to poll task till done
      */
     
-    // const startQuery = await makeReqAXnew(host, PKG_MGMT_URI, {
-    //     method: 'POST',
-    //     headers: { 'X-F5-Auth-Token': authToken },
-    //     body: { operation: 'QUERY' },
-    // });
-    
-    const ben1 = await ext.mgmtClient.login();   // gets a fresh token
-    const query = await ext.mgmtClient.makeRequest(
-        PKG_MGMT_URI, 
-        {
+    await ext.mgmtClient.token();   // refresh token
+    // start installed pkgs query
+    const query = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
-            body: 
-            { 
+            body: { 
                 operation: 'QUERY' 
             }
         }
     );
 
-    await new Promise(resolve => { setTimeout(resolve, 1000); });
+    // pause a moment for job to complete 
+    //  - this should be rewritten to follow 202 till complete
+    await new Promise(resolve => { setTimeout(resolve, 500); });
+ 
     // query task to get installed rpms
-    // const iAppTasks = await makeReqAXnew(host, `${PKG_MGMT_URI}/${startQuery.data.id}`, {
-    //     method: 'GET',
-    //     headers: { 'X-F5-Auth-Token': authToken }
-    // });
-    const tasks = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`)
+    const tasks = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`);
 
+    // not sure if this error logic is even needed...
     if(tasks.status === 200) {
+        // if not rpms installed we get an empty array
+        if(tasks.data.queryResponse.length < 1) {
+            throw new Error('no installed rpms');
+        }
+
         // return just package names from list
         return tasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
     } else {
         // todo:  setup fail condition?
         console.warn('installedRPMs failed', tasks.status, tasks.statusText);
     }
-    // let query;
-    // let installedRpms;
-    // if(iAppTasks.status === 200) {
-    //     // return just package names from list
-    //     return iAppTasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
-    // } else {
-    //     // todo:  setup fail condition?
-    //     console.warn('installedRPMs failed', iAppTasks.status, iAppTasks.statusText);
-    // }
-
 }
 
 
@@ -112,18 +95,15 @@ export async function unInstallRpm (packageName: string) {
         });
         
         // start unInstall job
-        const start = await makeReqAXnew(host, PKG_MGMT_URI, {
+        const start = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
-            headers: {
-                'X-F5-Auth-Token': authToken
-            },
             body: {
                 operation: 'UNINSTALL',
                 packageName
-            },
-        });
+            }
+        })
 
-        progress.report({ message: `--- ${start.statusText} ---`});
+        progress.report({ message: `${start.statusText}`});
         // progress.report({ message: `... ${start.data.status} ...`});
 
         let taskId;
@@ -135,11 +115,13 @@ export async function unInstallRpm (packageName: string) {
         let i = 0;  // loop counter
         // use taskId to control loop
         while(taskId && i < 10) {
-            const resp = await makeReqAXnew(host, `${PKG_MGMT_URI}/${taskId}`, {
-                headers: { 'X-F5-Auth-Token': authToken },
-            });
+            // const resp = await makeReqAXnew(host, `${PKG_MGMT_URI}/${taskId}`, {
+            //     headers: { 'X-F5-Auth-Token': authToken },
+            // });
 
-            progress.report({ message: `--- ${resp.data.status} ---`});
+            const resp = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
+
+            progress.report({ message: `${resp.data.status}`});
             console.log('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
             
             if(resp?.data?.status === 'FINISHED' || resp.data.status === 'FAILED') {
@@ -173,8 +155,8 @@ export async function rpmPicker () {
         cancellable: true
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
-            console.log("User canceled atc rpm mgmt");
-            return new Error(`User canceled atc rpm mgmt`);
+            console.log("User canceled atc rpm picker");
+            return new Error(`User canceled atc rpm picker`);
         });
         
         progress.report({ message: `Please select ATC`});
@@ -183,6 +165,10 @@ export async function rpmPicker () {
             ['FAST', 'AS3', 'DO', 'TS'], 
             {placeHolder: "Select ATC Service"}
             );
+        
+        if(!atc) {
+            return vscode.window.showInformationMessage('user escaped ATC choice');
+        }
             
         progress.report({ message: `Please select version`});
         
@@ -215,6 +201,8 @@ export async function rpmPicker () {
         
         const rpmLoc = await getRPMgit(selectedAsset.asset);
         // console.log('rpmLoc', rpmLoc);
+
+        await new Promise(resolve => { setTimeout(resolve, 2000); });
         
         // Promise.resolve(rpmLoc);
         return rpmLoc;
@@ -232,6 +220,9 @@ export async function rpmPicker () {
  */
 export async function rpmInstaller (rpm: string) {
 
+    console.log('rpmInstaller uploading', rpm);
+    
+
     // * --- npm installer function -> input: string = <file_location>
     // * 1. upload rpm
     // * 2. install rpm
@@ -247,64 +238,66 @@ export async function rpmInstaller (rpm: string) {
             return new Error(`User canceled atc rpm upload`);
         });
         
-        progress.report({ message: `... uploading ...`});
-
-        const device = ext.hostStatusBar.text;
-        const password = await utils.getPassword(device);
-        const [username, host] = device.split('@');
-        const authToken = await getAuthToken(host, username, password);
+        progress.report({ message: `uploading`});
 
         // get rpm name from full file path
         const rpmName = path.basename(rpm);
-        
-        const instA = await multiPartUploadSDK(rpm, host, authToken);
 
+
+        await ext.mgmtClient.token();   // refresh auth token
+        // let rpms finish downloading...
+        await new Promise(resolve => { setTimeout(resolve, 2000); });
+
+        // upload rpm to f5
+        const instA = await ext.mgmtClient.upload(rpm);
+        
         console.log('uploaded', instA);
-
-        progress.report({ message: `... installing ...`});
-        // await new Promise(resolve => { setTimeout(resolve, 3000); });
+        progress.report({ message: `installing`});
+        await new Promise(resolve => { setTimeout(resolve, 2000); });
         
-
-        const installStart = await callHTTP('POST', host, '/mgmt/shared/iapp/package-management-tasks', authToken,
-        {
+        // start rpm install
+        const installStart = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
+            method: 'POST',
+            body: {
                 operation: 'INSTALL',
                 packageFilePath: `/var/config/rest/downloads/${rpmName}`
+            }
         });
-        console.log('ilx import status: ', installStart.status, installStart.body.id, installStart);
-        progress.report({ message: `... ${installStart.body.status} ... `});
+
+        console.log('ilx import status: ', installStart.status, installStart.data.id);
+        progress.report({ message: `${installStart.data.status}`});
 
         // wait for package to install
-        await new Promise(resolve => { setTimeout(resolve, 3000); });
+        await new Promise(resolve => { setTimeout(resolve, 1000); });
 
         let taskId;
         if (installStart.status === 202) {
-            taskId = installStart.body.id; // get task ID from install job
-        }   // else return status(200)?
+            taskId = installStart.data.id;
+        }   
 
         let i = 0;  // loop counter
         // use taskId to control loop
         while(taskId && i < 10) {
-            const installStatus = await callHTTP('GET', host, `/mgmt/shared/iapp/package-management-tasks/${taskId}`, authToken);
+            // const installStatus = await callHTTP('GET', host, `/mgmt/shared/iapp/package-management-tasks/${taskId}`, authToken);
+            const resp = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
-            progress.report({ message: `... ... ...`});
-            console.log('task in progress', taskId, installStatus.status, installStatus.data.status);
+            // progress.report({ message: `... ... ...`});
+            console.log('task in progress', taskId, resp.status, resp.data.status);
             
-            if(installStatus.data.status === 'FINISHED') {
-                return installStatus;
-            } else if (installStatus.data.status === 'FAILED') {
-                vscode.window.showWarningMessage('rpm install failed');
-                return Promise.reject('install failed');
+            if(resp.data.status === 'FINISHED') {
+                vscode.window.showInformationMessage(`${rpmName} Install Complete!`);
+                return resp;
+            } else if (resp.data.status === 'FAILED') {
+                const msg = `rpm install FAILED: ${resp.data.errorMessage}`;
+                vscode.window.showWarningMessage(msg);
+                return Promise.reject(msg);
             }
 
             i++;
             await new Promise(resolve => { setTimeout(resolve, 3000); });
         }
 
-
-        // debugger;
-        
-
-        return 'something';
+        return 'complete';
     });
     return progressBar;
 }
@@ -328,6 +321,8 @@ async function getRPMgit(assetUrl: string) {
     if (!fs.existsSync(rpmDir)) {
         console.log('CREATING ATC ILX RPM CACHE DIRECTORY');
         fs.mkdirSync(rpmDir);
+    } else { 
+        console.log(`existing ${rpmDir} detected`);
     };
 
 
@@ -348,21 +343,20 @@ async function getRPMgit(assetUrl: string) {
             // return destPath;
         } else {
             console.log(`${item.name} not found in local cache, downloading...`);
-            await rpmDownload(item.browser_download_url, destPath);
+            // await rpmDownload(item.browser_download_url, destPath);
+            await downloadToFile(item.browser_download_url, destPath);
         }
     });
 
-    //return rpm file location
-    const assetLocation = assetSet.reduce( item => {
-        // console.log('assetSet item', item);
-        
-        if(item.name.endsWith(".rpm")) {
-            const destPath = path.join(rpmDir, item.name);
-            return destPath;
-        }
-    });
+    console.log('assets done downloading');
 
-    return assetLocation;
+    // get array item that has the installable rpm
+    const rpmAsset = assetSet.filter( el => el.name.endsWith('.rpm'));
+    const assetFpath = path.join(rpmDir, rpmAsset[0].name);
+
+    // return just rpm name
+
+    return assetFpath;
 }
 
 /**
@@ -401,6 +395,8 @@ export async function rpmDownload (url: string, destPath: string) {
         writeFile.on('error', reject);
       });
 }
+
+
 
 
 

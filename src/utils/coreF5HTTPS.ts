@@ -101,7 +101,7 @@ export async function multiPartUploadSDK(file: string, host: string, token: stri
     let uploadStat;
     while (end <= fileStats.size - 1 && start < end) {
 
-        uploadStat = await makeRequestAX( host, `/mgmt/shared/file-transfer/uploads/${fileName2}`, 
+        uploadStat = await makeReqAXnew( host, `/mgmt/shared/file-transfer/uploads/${fileName2}`, 
             {
                 method: 'POST',
                 headers: {
@@ -192,7 +192,30 @@ export async function makeRequestAX(host: string, uri: string, options: {
 };
 
 
-
+/**
+ * Download HTTP payload to file
+ *
+ * @param url  url
+ * @param file local file location where the downloaded contents should go
+ *
+ * @returns void
+ */
+export async function downloadToFile(url: string, file: string): Promise<void> {
+    await new Promise(((resolve) => {
+        axios({
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            }),
+            method: 'GET',
+            url,
+            responseType: 'stream'
+        })
+        .then(function (response) {
+            response.data.pipe(fs.createWriteStream(file))
+                .on('finish', resolve);
+        });
+    }));
+}
 
 
 
@@ -241,7 +264,9 @@ export async function makeReqAXnew(host: string, uri: string, options: {
         // validateStatus: () => true  // return ALL responses
     })
     .then( resp => {
-        // console.log(`makeReqAXnew-RESPONSE: ${httpResponse.statusText} ${httpResponse.status}`, httpResponse.data);
+        // the following log may cause some problems, mainly the resp.data,
+        //      if it's circular...
+        console.log(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText} - ${JSON.stringify(resp.data)}`);
         return resp;
     })
     .catch( error => {
@@ -259,6 +284,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
                 console.error('401 - auth failed!!!!!!  ***setup clear password***');
                 // ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
             } else if (status === 401 && message === undefined) {
+                // not sure what other error conditions might be needed
                 // return 'bigiq-remote-auth-provider-needed';
                 Promise.resolve('bigiq-remote-auth-provider-needed');
             }

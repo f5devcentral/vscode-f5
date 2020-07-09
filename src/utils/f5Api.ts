@@ -21,7 +21,7 @@ export async function connectF5(device: string, password: string) {
 
     const progressPost = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: "Connecting to",
+        title: `Connecting to ${host}`,
         cancellable: true
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
@@ -36,7 +36,7 @@ export async function connectF5(device: string, password: string) {
          * https://github.com/DumpySquare/vscode-f5-fast/issues/34
          */
 
-        progress.report({ message: `${host}`});
+        // progress.report({ message: `${host}`});
         // const resp = await axios.request({
         //     httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         //     method: 'GET',

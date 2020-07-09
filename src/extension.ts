@@ -36,17 +36,17 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.context = context;
 
 	// Create a status bar item
-	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 20);
+	ext.hostStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 15);
 	context.subscriptions.push(ext.hostStatusBar);
-	ext.hostNameBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 19);
+	ext.hostNameBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 14);
 	context.subscriptions.push(ext.hostNameBar);
-	ext.fastBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 18);
+	ext.fastBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 13);
 	context.subscriptions.push(ext.fastBar);
-	ext.as3Bar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 18);
+	ext.as3Bar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 12);
 	context.subscriptions.push(ext.as3Bar);
-	ext.doBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 17);
+	ext.doBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 11);
 	context.subscriptions.push(ext.doBar);
-	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 16);
+	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
 	context.subscriptions.push(ext.tsBar);
 	
 	// exploring classes to group all f5 api calls
@@ -124,13 +124,17 @@ export function activate(context: vscode.ExtensionContext) {
 		var [user, host] = device.split('@');
 		var [host, port] = host.split(':');
 		ext.mgmtClient = new MgmtClient(device, {host, port, user, password});
-		// const ben1 = await mgmtClient.login();
-		// const ben2 = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
-		// const ben2 = await mgmtClient.provider();
+		
+		/**
+		 * setup the following to replace the f5Api.connectF5
+		 * do all the service discovery
+		 * 
+		 * need to be able to call this after ilx install/un-install
+		 */
+		// await mgmtClient.login();
+		// await ext.mgmtClient.connect();
+		
 
-		// debugger;
-
-		// return device;
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', async () => {
@@ -333,6 +337,10 @@ export function activate(context: vscode.ExtensionContext) {
 			selectedRPM = await rpmMgmt.rpmPicker();
 			console.log('downloaded rpm location', selectedRPM);
 		}
+
+		if(!selectedRPM) {
+			debugger;
+		}
 		
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
 		console.log('installed rpm', installedRpm);
@@ -358,7 +366,7 @@ export function activate(context: vscode.ExtensionContext) {
 		 */
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.unInstallRPM', async (selectedRPM) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.unInstallRPM', async () => {
 		// get installed packages
 		const installedRPMs = await rpmMgmt.installedRPMs();
 		// have user select package
@@ -369,9 +377,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const status = await rpmMgmt.unInstallRpm(rpm);
-		vscode.window.showInformationMessage(`rpm removal ${status}`);
+		vscode.window.showInformationMessage(`rpm ${rpm} removal ${status}`);
 		// debugger;
-
 
 	}));
 
@@ -1286,9 +1293,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
 		chuckJoke1();
-		// const catPanel = CatCodingPanel.render(context.extensionPath);
-		// chuckJoke2();
-		// displayWebView({ name: 'inputing some info'});
 	}));
 
 }
