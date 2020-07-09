@@ -7,6 +7,7 @@ import axios from 'axios';
 import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
+import { MgmtClient } from './f5DeviceClient';
 
 
 axios.defaults.headers.common['Content-Type'] = 'application/json';
@@ -25,10 +26,10 @@ const PKG_MGMT_URI = '/mgmt/shared/iapp/package-management-tasks';
  */
 export async function installedRPMs () {
 
-    const device = ext.hostStatusBar.text;
-    const password = await utils.getPassword(device);
-    const [username, host] = device.split('@');
-    const authToken = await getAuthToken(host, username, password);
+    // const device = ext.hostStatusBar.text;
+    // const password = await utils.getPassword(device);
+    // const [username, host] = device.split('@');
+    // const authToken = await getAuthToken(host, username, password);
 
     /**
      * like other ilx operations, to get installed rpms, 
@@ -39,30 +40,52 @@ export async function installedRPMs () {
      *  to happen quickly... we'll see
      * 
      * So, in the following, we are assuming everything will go successfully and quick...
+     * 
+     * todo: update to poll task till done
      */
     
-    const startQuery = await makeReqAXnew(host, PKG_MGMT_URI, {
-        method: 'POST',
-        headers: { 'X-F5-Auth-Token': authToken },
-        body: { operation: 'QUERY' },
-    });
+    // const startQuery = await makeReqAXnew(host, PKG_MGMT_URI, {
+    //     method: 'POST',
+    //     headers: { 'X-F5-Auth-Token': authToken },
+    //     body: { operation: 'QUERY' },
+    // });
+    
+    const ben1 = await ext.mgmtClient.login();   // gets a fresh token
+    const query = await ext.mgmtClient.makeRequest(
+        PKG_MGMT_URI, 
+        {
+            method: 'POST',
+            body: 
+            { 
+                operation: 'QUERY' 
+            }
+        }
+    );
 
     await new Promise(resolve => { setTimeout(resolve, 1000); });
     // query task to get installed rpms
-    const iAppTasks = await makeReqAXnew(host, `${PKG_MGMT_URI}/${startQuery.data.id}`, {
-        method: 'GET',
-        headers: { 'X-F5-Auth-Token': authToken }
-    });
+    // const iAppTasks = await makeReqAXnew(host, `${PKG_MGMT_URI}/${startQuery.data.id}`, {
+    //     method: 'GET',
+    //     headers: { 'X-F5-Auth-Token': authToken }
+    // });
+    const tasks = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`)
 
-    // let query;
-    // let installedRpms;
-    if(iAppTasks.status === 200) {
+    if(tasks.status === 200) {
         // return just package names from list
-        return iAppTasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
+        return tasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
     } else {
         // todo:  setup fail condition?
-        console.warn('installedRPMs failed', iAppTasks.status, iAppTasks.statusText);
+        console.warn('installedRPMs failed', tasks.status, tasks.statusText);
     }
+    // let query;
+    // let installedRpms;
+    // if(iAppTasks.status === 200) {
+    //     // return just package names from list
+    //     return iAppTasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
+    // } else {
+    //     // todo:  setup fail condition?
+    //     console.warn('installedRPMs failed', iAppTasks.status, iAppTasks.statusText);
+    // }
 
 }
 
@@ -73,10 +96,10 @@ export async function installedRPMs () {
  */
 export async function unInstallRpm (packageName: string) {
 
-    const device = ext.hostStatusBar.text;
-    const password = await utils.getPassword(device);
-    const [username, host] = device.split('@');
-    const authToken = await getAuthToken(host, username, password);
+    // const device = ext.hostStatusBar.text;
+    // const password = await utils.getPassword(device);
+    // const [username, host] = device.split('@');
+    // const authToken = await getAuthToken(host, username, password);
 
     const progressBar = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
