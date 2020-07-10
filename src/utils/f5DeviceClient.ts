@@ -1,13 +1,6 @@
-/*
- * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
- * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
- * may copy and modify this software product for its internal business purposes.
- * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com.
- */
-
 'use strict';
 
+import * as vscode from 'vscode';
 import { makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
 
 /**
@@ -85,7 +78,30 @@ export class MgmtClient {
      *  - set status bar stuff
      */
     async connect() {
+        const progress = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Connecting to ${this.host}`,
+            cancellable: true
+        }, async (progress, token) => {
+            token.onCancellationRequested(() => {
+                // this logs but doesn't actually cancel...
+                console.log("User canceled device connect");
+                return new Error(`User canceled device connect`);
+            });
 
+            // do stuff
+            /**
+             * do connect
+             *  - make sure user/pass word
+             * try to discover logonProvider?
+             * do atc discovery
+             *  - fast/as3/do/ts
+             *  - add cloud failover (cs)
+             */
+            
+
+        return 'toProgress';
+        });
     }
 
     /**

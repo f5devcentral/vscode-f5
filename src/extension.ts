@@ -124,6 +124,14 @@ export function activate(context: vscode.ExtensionContext) {
 		var [user, host] = device.split('@');
 		var [host, port] = host.split(':');
 		ext.mgmtClient = new MgmtClient(device, {host, port, user, password});
+
+		/**
+		 * setup CVE-2020-5902 stuff?
+		 * 
+		 * - check running code version against patched versions
+		 * 		- alert if running old code
+		 * - 
+		 */
 		
 		/**
 		 * setup the following to replace the f5Api.connectF5
