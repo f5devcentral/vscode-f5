@@ -338,6 +338,24 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log('downloaded rpm location', selectedRPM);
 		}
 
+		const iRpms = await rpmMgmt.installedRPMs();
+		console.log('selected rpm', selectedRPM);
+		console.log('installed rpms', JSON.stringify(iRpms));
+
+		/**
+		 * todo:  work on setting up updating installed atc
+		 * 
+		 * now that we have the final rpm selected, let's see whats installed
+		 * 	- if selected version = an installed version -> exit messageBox
+		 * 	- if 
+		 * 
+		 * figure out which atc the selectedRPM and installed RPM are
+		 * -> then figure out if the selected RPM atc is already installed or not
+		 * 	->
+		 * 
+		 * function - list installed packages
+		 */
+
 		if(!selectedRPM) {
 			debugger;
 		}
