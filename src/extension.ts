@@ -1,8 +1,11 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as jsYaml from 'js-yaml';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as keyTarType from 'keytar';
 
-import { chuckJoke2, chuckJoke1 } from './chuckJoke';
 import { F5TreeProvider, F5Host } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
@@ -14,14 +17,12 @@ import * as utils from './utils/utils';
 import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
 import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
-import * as keyTarType from 'keytar';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
 import { getAuthToken, callHTTP, makeRequestAX, makeReqAXnew } from './utils/coreF5HTTPS';
-import * as path from 'path';
-import * as fs from 'fs';
+import { chuckJoke2, chuckJoke1 } from './chuckJoke';
 
 const fast = require('@f5devcentral/f5-fast-core');
 
@@ -171,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
 		utils.setDOBar();
 		utils.setTSBar();
 
-		return vscode.window.showInformationMessage('clearing selected bigip and status bar details');
+		// return vscode.window.showInformationMessage('clearing selected bigip and status bar details');
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.clearPasswords', async () => {
@@ -1302,6 +1303,59 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// register example delarations tree
 	vscode.window.registerTreeDataProvider('decExamples', new ExampleDecsProvider());
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.jsonYmlConvert', async () => {
+		
+		// command is only avaible via the editor window with text selected, so no need
+		// to check that stuff.  the editor? is there just to satify TS checking
+
+		// get current
+		const editor = vscode.window.activeTextEditor;
+		const selection = editor.selection;	
+		const text = editor.document.getText(editor.selection);	// highlighted text
+
+		if(!selection) {
+			return;		// not really needed, but to cover TS errors
+		}
+
+		// console.log('jsonYmlConverter', text);
+		
+		// const newA = jsYaml.safeLoad(selection);
+		
+		// debugger;
+		
+		let newText: string;
+		if (utils.isValidJson(text)) {
+			console.log('json =====', text);
+
+			// since it was valid json -> dump it to yaml
+			newText = jsYaml.safeDump(text, {indent: 4});
+
+			// const yaml = jsYaml.safeLoad(text);
+			// utils.displayMstInEditor(jsYaml.safeDump(yaml));
+			vscode.window.showInformationMessage('JSON!!!');
+		} else {
+			vscode.window.showInformationMessage('YAML!!!');
+			console.log('yaml ===== \r\n', text);
+			console.log('now json =====', jsYaml.safeLoad(text));
+			newText = JSON.stringify(text, undefined, 4);
+			// newText = jsYaml.safeLoad(text);
+			// try {
+			// 	// const newJson = jsYaml.safeLoad(text);
+			// 	// utils.displayMstInEditor(newJson);
+			// } catch (e) {
+			// 	console.log('yaml2Json error', e);
+			// }
+		}
+
+		editor.edit( editBuilder => {
+			editBuilder.replace(selection, newText);
+		});
+
+		console.log('done');
+
+	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('writeMemento', () => {

@@ -43,7 +43,7 @@ export async function installedRPMs () {
     
     await ext.mgmtClient.token();   // refresh token
     // start installed pkgs query
-    const query = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
+    const query: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
             body: { 
                 operation: 'QUERY' 
@@ -56,7 +56,7 @@ export async function installedRPMs () {
     await new Promise(resolve => { setTimeout(resolve, 1000); });
  
     // query task to get installed rpms
-    const tasks = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`);
+    const tasks: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`);
 
     // not sure if this error logic is even needed...
     if(tasks.status === 200) {
@@ -99,13 +99,13 @@ export async function unInstallRpm (packageName: string) {
         });
         
         // start unInstall job
-        const start = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
+        const start: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
             body: {
                 operation: 'UNINSTALL',
                 packageName
             }
-        })
+        });
 
         progress.report({ message: `${start.statusText}`});
         // progress.report({ message: `... ${start.data.status} ...`});
@@ -123,7 +123,7 @@ export async function unInstallRpm (packageName: string) {
             //     headers: { 'X-F5-Auth-Token': authToken },
             // });
 
-            const resp = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
+            const resp: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
             progress.report({ message: `${resp.data.status}`});
             console.log('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
@@ -196,7 +196,7 @@ export async function rpmPicker () {
             }
         }
 
-        const selectedAsset = await vscode.window.showQuickPick(rpmVersions, {placeHolder: 'Select Version'});
+        const selectedAsset: any = await vscode.window.showQuickPick(rpmVersions, {placeHolder: 'Select Version'});
 
         progress.report({ message: `Fetching ${atc} ${selectedAsset.label} from ${selectedAsset.asset}`});
 
@@ -260,7 +260,7 @@ export async function rpmInstaller (rpm: string) {
         await new Promise(resolve => { setTimeout(resolve, 2000); });
         
         // start rpm install
-        const installStart = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
+        const installStart: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
             body: {
                 operation: 'INSTALL',
@@ -283,7 +283,7 @@ export async function rpmInstaller (rpm: string) {
         // use taskId to control loop
         while(taskId && i < 10) {
             // const installStatus = await callHTTP('GET', host, `/mgmt/shared/iapp/package-management-tasks/${taskId}`, authToken);
-            const resp = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
+            const resp: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
             // progress.report({ message: `... ... ...`});
             console.log('task in progress', taskId, resp.status, resp.data.status);
@@ -338,7 +338,7 @@ async function getRPMgit(assetUrl: string) {
     
 
     // download assets
-    await assetSet.forEach ( async item => {
+    await assetSet.forEach ( async (item: { name: string; browser_download_url: string; }) => {
         const destPath = path.join(rpmDir, item.name);
 
         // if item already exists
@@ -355,7 +355,7 @@ async function getRPMgit(assetUrl: string) {
     console.log('assets done downloading');
 
     // get array item that has the installable rpm
-    const rpmAsset = assetSet.filter( el => el.name.endsWith('.rpm'));
+    const rpmAsset = assetSet.filter( (el: { name: string; }) => el.name.endsWith('.rpm'));
     const assetFpath = path.join(rpmDir, rpmAsset[0].name);
 
     // return just rpm name
@@ -388,7 +388,7 @@ async function listGitReleases(url: string){
 export async function rpmDownload (url: string, destPath: string) {
     // https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
     const writeFile = fs.createWriteStream(destPath);
-    const resp = await axios.get(url, {responseType: 'stream'})
+    const resp: any = await axios.get(url, {responseType: 'stream'})
     .catch( error => {
         console.log('npmGetter error', error);
     });

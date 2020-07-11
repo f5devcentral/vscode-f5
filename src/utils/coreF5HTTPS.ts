@@ -6,8 +6,7 @@ var https = require('https');
 import * as fs from 'fs';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
-// import https from 'https';
-import axios, { AxiosBasicCredentials } from 'axios';
+import axios from 'axios';
 
 
 // const { Writable } = require('stream');
@@ -145,7 +144,7 @@ export async function makeRequestAX(host: string, uri: string, options: {
     body?: object;
     headers?: object;
     auth?: object;
-    basicAuth?: object;
+    // basicAuth?: object;
     advancedReturn?: boolean;
 }): Promise<object> {
     options = options || {};
@@ -162,10 +161,10 @@ export async function makeRequestAX(host: string, uri: string, options: {
         url: uri,
         headers: options['headers'] !== undefined ? options['headers'] : {},
         data: options['body'] || null,
-        auth: options['basicAuth'] !== undefined ? {
-            username: options['basicAuth']['user'],
-            password: options['basicAuth']['password']
-        } : undefined,
+        // auth: options['basicAuth'] !== undefined ? {
+        //     username: options['basicAuth']['user'],
+        //     password: options['basicAuth']['password']
+        // } : undefined,
         // validateStatus: null
         // validateStatus: () => true
     });
@@ -234,7 +233,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     body?: object;
     headers?: object;
     auth?: object;
-    basicAuth?: object;
+    // basicAuth?: object;
     advancedReturn?: boolean;
 }): Promise<object> {
     options = options || {};
@@ -256,10 +255,10 @@ export async function makeReqAXnew(host: string, uri: string, options: {
         url: uri,
         headers: options['headers'] !== undefined ? options['headers'] : {},
         data: options['body'] || null,
-        auth: options['basicAuth'] !== undefined ? {
-            username: options['basicAuth']['user'],
-            password: options['basicAuth']['password']
-        } : undefined,
+        // auth: options['basicAuth'] !== undefined ? {
+        //     username: options['basicAuth']['user'],
+        //     password: options['basicAuth']['password']
+        // } : undefined,
         // validateStatus: null
         // validateStatus: () => true  // return ALL responses
     })

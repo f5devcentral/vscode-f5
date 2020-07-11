@@ -213,7 +213,8 @@
 			{
 				"command": "f5.remoteCommand",
 				"title": "Remote Command Execute",
-				"category": "F5"
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.openSettings",
@@ -223,12 +224,14 @@
 			{
 				"command": "f5.installRPM",
 				"title": "Install/Update RPM",
-				"category": "F5"
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.unInstallRPM",
 				"title": "Un-Install RPM",
-				"category": "F5"
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.refreshHostsTree",
@@ -272,27 +275,32 @@
 			{
 				"command": "f5-fast.deployApp",
 				"title": "Deploy Fast App",
-				"category": "F5-Fast"
+				"category": "F5-Fast",
+				"enablement": "f5.fastInstalled"
 			},
 			{
 				"command": "f5-fast.postTemplate",
 				"title": "Post Template",
-				"category": "F5-Fast"
+				"category": "F5-Fast",
+				"enablement": "f5.fastInstalled"
 			},
 			{
 				"command": "f5-fast.postTemplateSet",
 				"title": "Post Template Set",
-				"category": "F5-Fast"
+				"category": "F5-Fast",
+				"enablement": "f5.fastInstalled"
 			},
 			{
 				"command": "f5-fast.deleteFastApp",
 				"title": "Delete FAST App",
-				"category": "F5-Fast"
+				"category": "F5-Fast",
+				"enablement": "f5.fastInstalled"
 			},
 			{
 				"command": "f5-fast.deleteFastTempSet",
 				"title": "Delete FAST Template Set",
-				"category": "F5-Fast"
+				"category": "F5-Fast",
+				"enablement": "f5.fastInstalled"
 			},
 			{
 				"command": "f5-fast.renderYmlTemplate",
@@ -308,6 +316,7 @@
 				"command": "f5-fast.refreshTemplates",
 				"title": "Refresh",
 				"category": "F5",
+				"enablement": "f5.fastInstalled",
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
@@ -315,7 +324,7 @@
 			},
 			{
 				"command": "f5-as3.postDec",
-				"title": "Post Declaration",
+				"title": "Post as AS3 Declaration",
 				"category": "F5-AS3",
 				"enablement": "f5.as3Installed"
 			},
@@ -371,8 +380,9 @@
 			},
 			{
 				"command": "f5-do.postDec",
-				"title": "Post Declaration",
-				"category": "F5-DO"
+				"title": "Post as DO Declaration",
+				"category": "F5-DO",
+				"enablement": "f5.doInstalled"
 			},
 			{
 				"command": "f5-ts.info",
@@ -386,8 +396,9 @@
 			},
 			{
 				"command": "f5-ts.postDec",
-				"title": "Post Declaration",
-				"category": "F5-TS"
+				"title": "Post as TS Declaration",
+				"category": "F5-TS",
+				"enablement": "f5.doInstalled"
 			},
 			{
 				"command": "writeMemento",
@@ -419,27 +430,71 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.jsonYmlConvert",
+				"title": "Convert json<->yaml",
+				"category": "F5"
+			},
+			{
 				"command": "chuckJoke",
 				"title": "Chuck Joke",
 				"category": "F5"
 			}
 		],
 		"menus": {
+			"editor/context": [
+				{
+					"when": "editorHasSelection",
+					"command": "f5-fast.deployApp",
+					"group": "F5"
+				},
+				{
+					"when": "editorHasSelection",
+					"command": "f5-as3.postDec",
+					"group": "F5"
+				},
+				{
+					"when": "editorHasSelection",
+					"command": "f5-do.postDec",
+					"group": "F5"
+				},
+				{
+					"when": "editorHasSelection",
+					"command": "f5-ts.postDec",
+					"group": "F5"
+				},
+				{
+					"when": "editorHasSelection",
+					"command": "f5.jsonYmlConvert",
+					"group": "F5"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "f5-as3.postDec",
+					"group": "F5"
+				}
+			],
+			"editor/title/context": [
+				{
+					"command": "f5-do.postDec",
+					"group": "F5"
+				}
+			],
 			"explorer/context": [
 				{
-						"when": "f5.device && resourceExtname == .rpm",
-						"command": "f5.installRPM",
-						"group": "F5"
+					"when": "f5.device && resourceExtname == .rpm",
+					"command": "f5.installRPM",
+					"group": "F5"
 				},
 				{
-						"when": "f5.fastInstalled && explorerResourceIsFolder",
-						"command": "f5-fast.postTemplateSet",
-						"group": "F5-Fast"
+					"when": "f5.fastInstalled && explorerResourceIsFolder",
+					"command": "f5-fast.postTemplateSet",
+					"group": "F5-Fast"
 				},
 				{
-						"when": "f5.fastInstalled && resourceExtname == .mst",
-						"command": "f5-fast.postTemplate",
-						"group": "F5-Fast"
+					"when": "f5.fastInstalled && resourceExtname =~ /\\.(mst|ya?ml|fast)/",
+					"command": "f5-fast.postTemplate",
+					"group": "F5-Fast"
 				}
 			],
 			"view/title": [
@@ -660,12 +715,14 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.5.1",
 		"@types/highlight.js": "^9.12.4",
+		"@types/js-yaml": "^3.12.5",
 		"@types/jszip": "^3.4.1",
 		"axios": "^0.19.2",
 		"code-highlight-linenums": "^0.2.1",
 		"fs": "0.0.1-security",
 		"highlight.js": "^10.0.3",
 		"https": "^1.0.0",
+		"js-yaml": "^3.14.0",
 		"jszip": "^3.4.0",
 		"keytar": "^5.6.0",
 		"vsce": "^1.75.0"

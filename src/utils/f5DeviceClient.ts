@@ -24,7 +24,10 @@ export class MgmtClient {
     port: number;
     protected _user: string;
     protected _password: string;
-    protected _token: string | undefined;
+    protected _token: string = '1234';
+    // set above token to '1234' to get through TS typing
+    // at instaniation it will be empty but should get updated
+    // via code as calls are made
 
     /**
      * @param options function options
@@ -51,7 +54,7 @@ export class MgmtClient {
      * @returns void
      */
     async token(): Promise<void> {
-        const response = await makeReqAXnew(
+        const response: any = await makeReqAXnew(
             this.host,
             '/mgmt/shared/authn/login',
             {
@@ -112,6 +115,18 @@ export class MgmtClient {
         return await multiPartUploadSDK(file, this.host, this._token);
     }
 
+
+    /**
+     * work in progress - not used yet
+     * was starting to setup discovering logonProvider, but
+     * that requires basic auth and is only enable on bigip 
+     * by default.  
+     * Leaning toward manually setting it via new hosts tree 
+     * dataStucture, where the config is hosted in a json file
+     * instead of the default vscode config file
+     * This is needed to accomodate multi level json to hold more
+     * information about each device
+     */
     async provider() {
         const response = await makeReqAXnew(
             this.host,
@@ -122,11 +137,11 @@ export class MgmtClient {
                     username: this._user,
                     password: this._password,
                     loginProviderName: 'local'
-                },
-                basicAuth: {
-                    user: this._user,
-                    password: this._password
                 }
+                // basicAuth: {
+                //     user: this._user,
+                //     password: this._password
+                // }
             }
         )
         .then( resp => {
@@ -146,8 +161,12 @@ export class MgmtClient {
         return response;
     }
 
+
+
     /**
      * Make HTTP request
+     * - utilizes device details/user/pass/token
+     * set within the class
      * 
      * @param uri     request URI
      * @param options function options
@@ -168,7 +187,7 @@ export class MgmtClient {
             uri,
             {
                 method: options.method || 'GET',
-                port: this.port || 443,
+                port: this.port,
                 headers: Object.assign(options.headers || {}, {
                     'X-F5-Auth-Token': this._token
                 }),
