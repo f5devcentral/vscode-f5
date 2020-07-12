@@ -1357,6 +1357,26 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5.b64Encode', async () => {
+		
+		const editor = vscode.window.activeTextEditor;
+		const selection = editor.selection;	
+		const text = editor.document.getText(editor.selection);	// highlighted text
+
+		if(!selection || !editor) {
+			return;		// not really needed, but to cover TS errors
+		}
+		
+		const netText = ;
+
+		editor.edit( editBuilder => {
+			editBuilder.replace(selection, newText);
+		});
+
+		// console.log('done');
+
+	}));
+
 
 	context.subscriptions.push(vscode.commands.registerCommand('writeMemento', () => {
 		// console.log('placeholder for testing commands');
