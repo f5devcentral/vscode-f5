@@ -54,12 +54,6 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 			}
 
 		} else {
-			// no element/item, so returning parent tenants
-			// default/empty "All-Tenants" Parent item
-			treeItems.push(
-				new AS3TenantItem('Get-All-Tenants', '', '', vscode.TreeItemCollapsibleState.None, 
-						{ command: 'f5-as3.getDecs', title: '', arguments: [''] })
-			);
 
 			for ( const tenant in tenantsFull.body) {
 				if(isObject(tenantsFull.body[tenant])) {

@@ -329,6 +329,12 @@
 				"enablement": "f5.as3Installed"
 			},
 			{
+				"command": "f5-as3.getDecs",
+				"title": "All Tenants",
+				"category": "F5-AS3",
+				"enablement": "view == as3Tenants"
+			},
+			{
 				"command": "f5-as3.fullTenant",
 				"title": "Full Tenant",
 				"category": "F5-AS3",
@@ -526,6 +532,11 @@
 				{
 					"command": "f5.refreshHostsTree",
 					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5-as3.getDecs",
+					"when": "view == as3Tenants",
 					"group": "navigation"
 				},
 				{
