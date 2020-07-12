@@ -297,9 +297,9 @@ export async function makeReqAXnew(host: string, uri: string, options: {
             // The request was made but no response was received
             // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
             // http.ClientRequest in node.js
-            vscode.window.showErrorMessage(`AX-HTTP-error.request: ${error.request}`);
-            console.error(`AX-HTTP-error.request: ${error.request}`);
-            throw new Error(`AX-HTTP-error.request: ${error.request}`);
+            vscode.window.showErrorMessage(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
+            console.error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
+            throw new Error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
           } else {
             // Something happened in setting up the request that triggered an Error
             console.error('AX-HTTP-Setup-Error', error.message);
