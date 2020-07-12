@@ -1151,9 +1151,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
 
+		const gitIssueUrl = 'https://github.com/F5Networks/f5-appsvcs-extension/issues/280';
+
 		if(decUrl === 'tempAS3') {
 			// remove once as3 examples are available
-			return vscode.env.openExternal(vscode.Uri.parse('https://github.com/F5Networks/f5-appsvcs-extension/issues/280'));
+			return vscode.env.openExternal(vscode.Uri.parse(gitIssueUrl));
 		}
 
 		decUrl = vscode.Uri.parse(decUrl);
@@ -1306,75 +1308,52 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.jsonYmlConvert', async () => {
-		
-		// command is only avaible via the editor window with text selected, so no need
-		// to check that stuff.  the editor? is there just to satify TS checking
-
-		// get current
 		const editor = vscode.window.activeTextEditor;
+		if(!editor) {
+			return;
+		}
 		const selection = editor.selection;	
 		const text = editor.document.getText(editor.selection);	// highlighted text
 
-		if(!selection || !editor) {
-			return;		// not really needed, but to cover TS errors
-		}
-
-		// console.log('jsonYmlConverter', text);
-		// const newA = jsYaml.safeLoad(selection);
-		// debugger;
 		
 		let newText: string;
 		if (utils.isValidJson(text)) {
 			console.log('converting json -> yaml');
-
 			// since it was valid json -> dump it to yaml
 			newText = jsYaml.safeDump(JSON.parse(text), {indent: 4});
-			// newText = jsYaml.safeDump(text);
-
-			// const yaml = jsYaml.safeLoad(text);
-			// utils.displayMstInEditor(jsYaml.safeDump(yaml));
-			// vscode.window.showInformationMessage('JSON!!!');
 		} else {
-			// vscode.window.showInformationMessage('YAML!!!');
 			console.log('converting yaml -> json');
 			newText = JSON.stringify(jsYaml.safeLoad(text), undefined, 4);
-			// console.log('now json =====', newText);
-			// newText = JSON.stringify(text, undefined, 4);
-			// newText = jsYaml.safeLoad(text);
-			// try {
-			// 	// const newJson = jsYaml.safeLoad(text);
-			// 	// utils.displayMstInEditor(newJson);
-			// } catch (e) {
-			// 	console.log('yaml2Json error', e);
-			// }
 		}
 
 		editor.edit( editBuilder => {
 			editBuilder.replace(selection, newText);
 		});
-
-		// console.log('done');
-
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.b64Encode', async () => {
-		
+	context.subscriptions.push(vscode.commands.registerCommand('f5.b64Encode', () => {
 		const editor = vscode.window.activeTextEditor;
-		const selection = editor.selection;	
-		const text = editor.document.getText(editor.selection);	// highlighted text
-
-		if(!selection || !editor) {
-			return;		// not really needed, but to cover TS errors
+		if(!editor){
+			return;
 		}
-		
-		const netText = ;
-
+		const text = editor.document.getText(editor.selection);	// highlighted text
+		const encoded = Buffer.from(text).toString('base64');
 		editor.edit( editBuilder => {
-			editBuilder.replace(selection, newText);
+			editBuilder.replace(editor.selection, encoded);
 		});
+	}));
 
-		// console.log('done');
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5.b64Decode', () => {
+		const editor = vscode.window.activeTextEditor;
+		if(!editor){
+			return;
+		}
+		const text = editor.document.getText(editor.selection);	// highlighted text
+		const decoded = Buffer.from(text, 'base64').toString('ascii');
+		editor.edit( editBuilder => {
+			editBuilder.replace(editor.selection, decoded);
+		});
 	}));
 
 

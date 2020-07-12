@@ -435,6 +435,16 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.b64Encode",
+				"title": "base64 Encode",
+				"category": "F5"
+			},
+			{
+				"command": "f5.b64Decode",
+				"title": "base64 Decode",
+				"category": "F5"
+			},
+			{
 				"command": "chuckJoke",
 				"title": "Chuck Joke",
 				"category": "F5"
@@ -465,6 +475,16 @@
 				{
 					"when": "editorHasSelection",
 					"command": "f5.jsonYmlConvert",
+					"group": "F5"
+				},
+				{
+					"when": "editorHasSelection",
+					"command": "f5.b64Encode",
+					"group": "F5"
+				},
+				{
+					"when": "editorHasSelection",
+					"command": "f5.b64Decode",
 					"group": "F5"
 				}
 			],
