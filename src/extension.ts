@@ -1315,31 +1315,31 @@ export function activate(context: vscode.ExtensionContext) {
 		const selection = editor.selection;	
 		const text = editor.document.getText(editor.selection);	// highlighted text
 
-		if(!selection) {
+		if(!selection || !editor) {
 			return;		// not really needed, but to cover TS errors
 		}
 
 		// console.log('jsonYmlConverter', text);
-		
 		// const newA = jsYaml.safeLoad(selection);
-		
 		// debugger;
 		
 		let newText: string;
 		if (utils.isValidJson(text)) {
-			console.log('json =====', text);
+			console.log('converting json -> yaml');
 
 			// since it was valid json -> dump it to yaml
-			newText = jsYaml.safeDump(text, {indent: 4});
+			newText = jsYaml.safeDump(JSON.parse(text), {indent: 4});
+			// newText = jsYaml.safeDump(text);
 
 			// const yaml = jsYaml.safeLoad(text);
 			// utils.displayMstInEditor(jsYaml.safeDump(yaml));
-			vscode.window.showInformationMessage('JSON!!!');
+			// vscode.window.showInformationMessage('JSON!!!');
 		} else {
-			vscode.window.showInformationMessage('YAML!!!');
-			console.log('yaml ===== \r\n', text);
-			console.log('now json =====', jsYaml.safeLoad(text));
-			newText = JSON.stringify(text, undefined, 4);
+			// vscode.window.showInformationMessage('YAML!!!');
+			console.log('converting yaml -> json');
+			newText = JSON.stringify(jsYaml.safeLoad(text), undefined, 4);
+			// console.log('now json =====', newText);
+			// newText = JSON.stringify(text, undefined, 4);
 			// newText = jsYaml.safeLoad(text);
 			// try {
 			// 	// const newJson = jsYaml.safeLoad(text);
@@ -1353,7 +1353,7 @@ export function activate(context: vscode.ExtensionContext) {
 			editBuilder.replace(selection, newText);
 		});
 
-		console.log('done');
+		// console.log('done');
 
 	}));
 
