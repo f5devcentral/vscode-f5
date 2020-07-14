@@ -83,9 +83,9 @@ export const callHTTP = (method: string, host: string, path: string, token: stri
  * @param token aut token
  */
 
-export async function multiPartUploadSDK(file: string, host: string, token: string) {
+export async function multiPartUploadSDK(file: string, host: string, port: number, token: string) {
 
-    console.log('MULTI-PART-UPLOAD-SDK', file, host, token);
+    console.log('MULTI-PART-UPLOAD-SDK', file, host, port, token);
 
     // TODO:  move the following filename extraction back up one level to f5FastUtils
     //      and pass in as parameter?
@@ -103,6 +103,7 @@ export async function multiPartUploadSDK(file: string, host: string, token: stri
         uploadStat = await makeReqAXnew( host, `/mgmt/shared/file-transfer/uploads/${fileName2}`, 
             {
                 method: 'POST',
+                port,
                 headers: {
                     'X-F5-Auth-Token': token,
                     'Content-Type': 'application/octet-stream',

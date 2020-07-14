@@ -115,6 +115,50 @@
 						],
 						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format"
 					},
+					"f5.hosts_2": {
+						"type": "array",
+						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format - CONX 3",
+						"items": {
+							"type": "object",
+							"properties": {
+								"device": {
+									"type": "string",
+									"description": "MAIN DEVICE NAME",
+									"default": "admin@192.168.1.254"
+								},
+								"provider": {
+									"type": "string",
+									"description": "logonProviderName",
+									"default": "local"
+								}
+							}
+						}
+					},
+					"f5.hosts_3": {
+						"type": "array",
+						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format - CONX 3",
+						"items": {
+							"propertyNames": {
+								"pattern": "^[A-Za-z][0-9A-Za-z_.-]*$",
+								"maxLength": 190
+							},
+							"additionalProperties": {
+								"type": "object",
+								"properties": {
+									"device": {
+										"type": "string",
+										"description": "MAIN DEVICE NAME",
+										"default": "admin@192.168.1.254"
+									},
+									"provider": {
+										"type": "string",
+										"description": "logonProviderName",
+										"default": "local"
+									}
+								}
+							}
+						}
+					},
 					"f5.as3Post.async": {
 						"type": "boolean",
 						"default": true,

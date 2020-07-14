@@ -1,7 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { getAuthToken, callHTTP, multiPartUploadSDK } from './coreF5HTTPS';
 import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -94,7 +93,6 @@ export async function zipPostTemplate (doc: string) {
         // console.log(fs.readdirSync(fullTempDir));
 
         fs.writeFileSync(path.join(fullTempDir, `${fastTemplateName}.mst`), doc);
-        // fs.writeFileSync(path.join(coreDir, 'testFile.txt'), 'testttties!!!');
         
         // debugger;
         // const tempZip = packageTemplateSet(fullTempDir);
@@ -102,33 +100,25 @@ export async function zipPostTemplate (doc: string) {
         // console.log(package1);
         // console.log('zipOut', zipOut);
 
-
-        /**
-         * if we have gotten this far, it's time to get ready for POST
-         */
-
-        const device = ext.hostStatusBar.text;
-        const password = await utils.getPassword(device);
-        const [username, host] = device.split('@');
-        const authToken = await getAuthToken(host, username, password);
+        await ext.mgmtClient.token();
 
         //f5-sdk-js version
         progress.report({ message: `Uploading Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
-        const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+        // const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+        const uploadStatus = await ext.mgmtClient.upload(zipOut);
         console.log('sdk upload response', uploadStatus);
         
-        // icontrollx-dev-kit version
-        // const deploy = await deployToBigIp({host, user: username, password}, zipOut);
-        // console.log('ilx upload response', deploy);
 
-        // debugger;
         progress.report({ message: `Installing Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
-        const importStatus = await callHTTP('POST', host, '/mgmt/shared/fast/templatesets', authToken,
-            {
+
+        const importStatus = await ext.mgmtClient.makeRequest('/mgmt/shared/fast/templatesets', {
+            method: 'POST',
+            body: {
                 name: fastTemplateFolderName
-            });
+            }
+        });
         console.log('template import status: ', importStatus);
         
         progress.report({ message: `Deleting temporary files`});
@@ -200,15 +190,18 @@ export async function zipPostTempSet (folder: string) {
          * if we have gotten this far, it's time to get ready for POST
          */
 
-        const device = ext.hostStatusBar.text;
-        const password = await utils.getPassword(device);
-        const [username, host] = device.split('@');
-        const authToken = await getAuthToken(host, username, password);
+        // const device = ext.hostStatusBar.text;
+        // const password = await utils.getPassword(device);
+        // const [username, host] = device.split('@');
+        // const authToken = await getAuthToken(host, username, password);
+
+        await ext.mgmtClient.token();
 
         // //f5-sdk-js version
         progress.report({ message: `Uploading Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
-        const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+        // const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+        const uploadStatus = await ext.mgmtClient.upload(zipOut);
         console.log('sdk upload response', uploadStatus);
         
 
@@ -216,16 +209,19 @@ export async function zipPostTempSet (folder: string) {
         // debugger;
         progress.report({ message: `Installing Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
-        const importStatus = await callHTTP('POST', host, '/mgmt/shared/fast/templatesets', authToken,
-            {
+
+        const importStatus: any = await ext.mgmtClient.makeRequest('/mgmt/shared/fast/templatesets', {
+            method: 'POST',
+            body: {
                 name: justFolderName
-            });
+            }
+        });
         console.log('template import status: ', importStatus);
         
-        progress.report({ message: `${importStatus.status} - Removing Temporary Files...`});
+        progress.report({ message: `${importStatus.statusText} - Removing Temporary Files...`});
         console.log(`Deleting zip: ${zipOut}`);
         fs.unlinkSync(zipOut);
-        await new Promise(resolve => { setTimeout(resolve, (1000)); });
+        await new Promise(resolve => { setTimeout(resolve, (3000)); });
 
     });
 }
@@ -310,34 +306,5 @@ async function validateTemplateSet (tsPath: string) {
             vscode.window.showWarningMessage(`Template set "${tsName}" failed validation:\n${e.stack}`);
             console.error(`Template set "${tsName}" failed validation:\n${e.stack}`);
             return Promise.reject('Template set "${tsName}" failed validation');
-            // process.exit(1);
         });
 };
-
-
-// /**
-//  *  NOT WORKING
-//  * f5-fast-core package template set function 
-//  * @param tsPath 
-//  * @param dst 
-//  */
-// function packageTemplateSet(tsPath: string, dst?: string) {
-//     console.log('packagingTemplateSet, path: ', tsPath, dst);
-    
-//     // validateTemplateSet(tsPath)
-//     // .then(() => {
-//     //     const tsName = path.basename(tsPath);
-//     //     const tsDir = path.dirname(tsPath);
-//     //     const provider = new fast.FsTemplateProvider(tsDir, [tsName]);
-//     //     console.log('provider', provider);
-
-//     //     dst = dst || `./${tsName}.zip`;
-//     //     console.log('dest file name', dst);
-        
-
-//     //     return provider.buildPackage(tsName, dst)
-//     //         .then(() => {
-//     //             console.log(`Template set "${tsName}" packaged as ${dst}`);
-//     //         });
-//     // });
-// };

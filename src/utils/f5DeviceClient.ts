@@ -58,6 +58,7 @@ export class MgmtClient {
             this.host,
             '/mgmt/shared/authn/login',
             {
+                port: this.port,
                 method: 'POST',
                 body: {
                     username: this._user,
@@ -112,7 +113,7 @@ export class MgmtClient {
      * @param file full path/file location
      */
     async upload(file: string) {
-        return await multiPartUploadSDK(file, this.host, this._token);
+        return await multiPartUploadSDK(file, this.host, this.port, this._token);
     }
 
 

@@ -1,12 +1,11 @@
 'use strict';
 
 import * as vscode from 'vscode';
-// import { request } from 'https';
 var https = require('https');
 import * as utils from './utils';
 import { ext } from '../extensionVariables';
 import { getAuthToken, callHTTP } from './coreF5HTTPS';
-import axios, { AxiosBasicCredentials } from 'axios';
+import { memoryUsage } from 'process';
 
 
 /**
@@ -528,17 +527,21 @@ export async function getAS3Decs(device: string, password: string, tenant: strin
  * @param password User Password
  * @param tenant tenant
  */
-export async function delAS3Tenant(device: string, password: string, tenant: string) {
-    var [username, host] = device.split('@');
-    const authToken = await getAuthToken(host, username, password);
-    const progressDelete = await vscode.window.withProgress({
+export async function delAS3Tenant(tenant: string) {
+    // var [username, host] = device.split('@');
+    // const authToken = await getAuthToken(host, username, password);
+    
+    const progress = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `Deleting ${tenant} Tenant`
     }, async () => {
-        let response = await callHTTP('DELETE', host, `/mgmt/shared/appsvcs/declare/${tenant}`, authToken);
-        return response;
+        await ext.mgmtClient.token();
+        const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`, {
+            method: 'DELETE'
+        });
+        return resp;
     });
-    return progressDelete;
+    return progress;
 }
 
 
@@ -568,52 +571,19 @@ export async function getAS3Tasks(device: string, password: string) {
  * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
  * @param password User Password
  */
-export async function getAS3Task(device: string, password: string, id: string) {
-    var [username, host] = device.split('@');
-    const authToken = await getAuthToken(host, username, password);
-    const responseA = await vscode.window.withProgress({
+export async function getAS3Task(id: string) {
+
+    const progress = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `Getting AS3 Task`
     }, async () => {
-        let responseB = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${id}`, authToken);
-        return responseB;
+        await ext.mgmtClient.token();
+        const resp = ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
+        // const responseB = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${id}`, authToken);
+        return resp;
     });
-    return responseA;
-
-    // var [username, host] = device.split('@');
-    // return getAuthToken(host, username, password)
-    //     .then( token=> {
-    //         return callHTTP(
-    //             'GET', 
-    //             host,
-    //             `/mgmt/shared/appsvcs/task/${id}`, 
-    //             token,
-    //         );
-    //     }
-    // );
+    return progress;
 }
-
-
-
-/**
- * Get Fast Info - fast service version/details
- * @param device BIG-IP/Host/Device in <user>&#64;<host/ip> format
- * @param password User Password
- */
-export async function getF5FastInfo(device: string, password: string) {
-    var [username, host] = device.split('@');
-    return getAuthToken(host, username, password)
-        .then( token => {
-            return callHTTP(
-                'GET', 
-                host, 
-                `/mgmt/shared/fast/info`, 
-                token,
-            );
-        }
-    );
-};
-
 
 
 /**
@@ -623,225 +593,73 @@ export async function getF5FastInfo(device: string, password: string) {
  * @param postParam 
  * @param dec Delcaration
  */
-export async function postAS3Dec(device: string, password: string, postParam: string = '', dec: object) {
-        const [username, host] = device.split('@');
+export async function postAS3Dec(postParam: string = '', dec: object) {
 
-        const authToken = await getAuthToken(host, username, password);
-        const progressPost = await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: "Posting Declaration",
-            cancellable: true
-        }, async (progress, token) => {
-            token.onCancellationRequested(() => {
-                // this logs but doesn't actually cancel...
-                console.log("User canceled the async post");
-                return new Error(`User canceled the async post`);
-            });
-
-            // post initial dec
-            let response = await callHTTP('POST', host, `/mgmt/shared/appsvcs/declare?${postParam}`, authToken, dec);
-
-            // if bad dec, return response
-            if(response.status === 422) {
-                return response;
-            }
-
-            // if post has multiple decs it will return with an array of status's for each
-            //      so we just stick with "processing"
-            if(response.body.hasOwnProperty('items')){
-                progress.report({ message: `  processing multiple declarations...`});
-                await new Promise(resolve => { setTimeout(resolve, 1000); });
-            } else {
-                // single dec detected...
-                progress.report({ message: `${response.body.results[0].message}`});
-                await new Promise(resolve => { setTimeout(resolve, 1000); });
-            }
-
-        
-            let taskId: string | undefined;
-            if(response.status === 202) {
-                taskId = response.body.id;
-
-                // get got a 202 and a taskId (single dec), check task status till complete
-                while(taskId) {
-                    response = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${taskId}`, authToken);
-
-                    // if not 'in progress', its done, clear taskId to break loop
-                    if(response.body.results[0].message !== 'in progress'){
-                        taskId = undefined;
-                        return response;
-                    }
-
-                    progress.report({ message: `${response.body.results[0].message}`});
-                    await new Promise(resolve => { setTimeout(resolve, (ext.settings.asyncInterval * 1000)); });
-
-                }
-                // return response from successful async
-                // return response;
-
-                progress.report({ message: `Found multiple decs, check tasks view for details`});
-                await new Promise(resolve => { setTimeout(resolve, 3000); });
-                
-                progress.report({ message: `refreshing as3 tree views...`});
-                await new Promise(resolve => { setTimeout(resolve, 3000); });
-            }
-            // return response from regular post
-            return response;
+    const progressPost = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Posting Declaration",
+        cancellable: true
+    }, async (progress, token) => {
+        token.onCancellationRequested(() => {
+            // this logs but doesn't actually cancel...
+            console.log("User canceled the async post");
+            return new Error(`User canceled the async post`);
         });
-        return progressPost;
-    }
-// };
 
+        // post initial dec
+        await ext.mgmtClient.token();
+        let resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare?${postParam}`, {
+            method: 'POST',
+            body: dec
+        });
 
-// interface OptsObject {
-//     host: string,
-//     port?: number,
-//     path: string,
-//     method?: string,
-//     headers?: object,
-// }
+        // if bad dec, return response
+        if(resp.status === 422) {
+            return resp;
+        }
 
-// /**
-//  * Core HTTPs request
-//  * @param opts https call options
-//  * @param payload http call payload
-//  */
-// function makeRequest(opts: OptsObject, payload: object = {}): Promise<any> {
+        // if post has multiple decs it will return with an array of status's for each
+        //      so we just stick with "processing"
+        if(resp.data.hasOwnProperty('items')){
+            progress.report({ message: `  processing multiple declarations...`});
+            await new Promise(resolve => { setTimeout(resolve, 1000); });
+        } else {
+            // single dec detected...
+            progress.report({ message: `${resp.data.results[0].message}`});
+            await new Promise(resolve => { setTimeout(resolve, 1000); });
+        }
 
-//     const defaultOpts = {
-//         port: 443,
-//         method: 'GET',
-//         rejectUnauthorized: false,
-//         headers: {
-//             'Content-Type': 'application/json'
-//         }
-//     };
+    
+        let taskId: string | undefined;
+        if(resp.status === 202) {
+            taskId = resp.data.id;
 
-//     if(opts.host.includes(':')) {
-//         var [host, port] = opts.host.split(':');
-//         opts.host = host;
-//         opts.port = parseInt(port);
-//     }
+            // get got a 202 and a taskId (single dec), check task status till complete
+            while(taskId) {
+                // resp = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${taskId}`, authToken);
+                resp = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${taskId}`);
 
-//     // combine defaults with passed in options
-//     const combOpts = Object.assign({}, defaultOpts, opts);
+                // if not 'in progress', its done, clear taskId to break loop
+                if(resp.data.results[0].message !== 'in progress'){
+                    taskId = undefined;
+                    return resp;
+                }
 
-//     console.log(`HTTP-REQUEST: ${combOpts.host} - ${combOpts.method} - ${combOpts.path}`);
-//     console.log(combOpts);
+                progress.report({ message: `${resp.data.results[0].message}`});
+                await new Promise(resolve => { setTimeout(resolve, (ext.settings.asyncInterval * 1000)); });
 
-//     return new Promise((resolve, reject) => {
-//         const req = request(combOpts, (res) => {
-//             const buffer: any = [];
-//             res.setEncoding('utf8');
-//             res.on('data', (data) => {
-//                 buffer.push(data);
-//             });
-//             res.on('end', () => {
-//                 let body = buffer.join('');
-//                 body = body || '{}';
+            }
+            // return response from successful async
+            // return response;
 
-//                 try {
-//                     body = JSON.parse(body);
-//                 } catch (e) {
-//                     console.log(combOpts);
-//                     console.log(e);
-//                     return reject(new Error(`Invalid response object ${combOpts}`));
-//                 };
-                
-//                 // // TODO: configure global logging system
-//                 // console.log('makeRequest***STATUS: ' + res.statusCode);
-//                 // console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
-//                 // console.log('makeRequest***BODY: ' + JSON.stringify(body));
-
-//                 console.log(`HTTP-RESPONSE: ${res.statusCode}`);
-//                 console.log({
-//                     status: res.statusCode,
-//                     headers: res.headers,
-//                     body
-//                 });
-
-                
-//                 const goodResp: Array<number> = [200, 201, 202];
-//                 // was trying to check against array above with arr.includes or arr.indexOf
-//                 /**
-//                  * Opening this up to any response code, to handle errors higher in logic
-//                  * might need to key off 500s and more 400s when waitng for DO
-//                  */
-//                 // if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404 || res.statusCode === 422) {
-//                     if (res.statusCode) {
-//                     return resolve({
-//                         status: res.statusCode,
-//                         headers: res.headers,
-//                         body
-//                     });
-//                 } else {
-//                     vscode.window.showErrorMessage(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
-//                     console.error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
-//                     return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
-//                 }
-
-//             });
-//         });
-
-//         req.on('error', (e) => {
-//             // might need to stringify combOpts for proper log output
-//             reject(new Error(`${combOpts}:${e.message}`));
-//         });
-
-//         // if a payload was passed in, post it!
-//         if (payload) {
-//             req.write(JSON.stringify(payload));
-//         }
-//         req.end();
-//     });
-// };
-
-
-// /**
-//  * Get tmos auth token
-//  * @param host fqdn or IP address of destination
-//  * @param username 
-//  * @param password 
-//  */
-// const getAuthToken = async (host: string, username: string, password: string) => makeRequest(
-// {
-//     host,
-//     path: '/mgmt/shared/authn/login',
-//     method: 'POST',
-// }, 
-// { 
-//     username,
-//     password
-// })
-// .then( async res => {
-//     if (res.status === 200) {
-//         return res.body.token.token;
-//     } else if (res.status === 401 && res.body.message === "Authentication failed.") {
-//         // clear cached password for this device
-//         ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
-
-//         vscode.window.showErrorMessage(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//         console.error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//         throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//     } else {
-//         // await new Promise(resolve => { setTimeout(resolve, 3000); });
-//         throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-        
-//     }
-// });
-
-// const callHTTP = (method: string, host: string, path: string, token: string, payload: object = {}) => makeRequest(
-//     {
-//         method,
-//         host,
-//         path,
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-F5-Auth-Token': token
-//         }
-//     },
-//     payload
-// )
-// .then( response => {
-//     return response;
-// });
+            progress.report({ message: `Found multiple decs, check tasks view for details`});
+            await new Promise(resolve => { setTimeout(resolve, 3000); });
+            
+            progress.report({ message: `refreshing as3 tree views...`});
+            await new Promise(resolve => { setTimeout(resolve, 3000); });
+        }
+        // return response from regular post
+        return resp;
+    });
+    return progressPost;
+}

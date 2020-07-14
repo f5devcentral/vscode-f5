@@ -1,0 +1,84 @@
+
+
+@hostQ = 10.200.244.15
+@hostR = 192.168.200.131
+#@host = 10.200.244.5
+
+@user = admin
+@upass = benrocks
+@authToken = {{loginA.response.body.token.token}}
+
+###   # get auth token
+# @name loginA
+POST https://{{hostR}}/mgmt/shared/authn/login
+Content-Type: application/json
+
+{
+    "username": "{{user}}",
+    "password": "{{upass}}"
+}
+
+
+###   # get auth token
+# @name loginA
+POST https://{{hostR}}/mgmt/tm/auth/source
+Content-Type: application/json
+
+{
+    "username": "{{user}}",
+    "password": "{{upass}}",
+    "logonProviderName": "local"
+}
+
+
+
+
+###   # get device info
+GET https://{{hostR}}/mgmt/tm/auth/source
+Content-Type: application/json
+Authorization: Basic admin:benrocks
+
+
+###   # get f5 host info
+GET https://{{host}}/mgmt/shared/identified-devices/config/device-info
+  #?$select=hostname,managementAddress,version,product,platformMarketingName
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+
+
+###   # get bigip auth token
+# @name loginA
+POST https://{{host}}/mgmt/shared/authn/login
+Content-Type: application/json
+
+{
+    "username": "{{user}}",
+    "password": "{{upass}}",
+}
+
+
+###   # 
+GET https://{{host}}/mgmt/shared/iapp/package-management-tasks/
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+
+
+
+
+###   # get bigip device list
+@authToken = {{loginA.response.body.token.token}}
+GET https://{{host}}/mgmt/shared/resolver/device-groups/cm-bigip-allDevices/devices
+  ?$select=hostname,managementAddress,uuid
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
+
+
+					"f5.hosts_4": {
+						"type":"object",
+						"propertyNames": true,
+						"additionalProperties": true
+					},

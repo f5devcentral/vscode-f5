@@ -21,7 +21,6 @@ import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
-import { getAuthToken, callHTTP, makeRequestAX, makeReqAXnew } from './utils/coreF5HTTPS';
 import { chuckJoke2, chuckJoke1 } from './chuckJoke';
 
 const fast = require('@f5devcentral/f5-fast-core');
@@ -124,6 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
 		 */
 		var [user, host] = device.split('@');
 		var [host, port] = host.split(':');
+		const provider = 'local';
 		ext.mgmtClient = new MgmtClient(device, {host, port, user, password});
 
 		/**
@@ -347,9 +347,9 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log('downloaded rpm location', selectedRPM);
 		}
 
-		const iRpms = await rpmMgmt.installedRPMs();
+		// const iRpms = await rpmMgmt.installedRPMs();
 		console.log('selected rpm', selectedRPM);
-		console.log('installed rpms', JSON.stringify(iRpms));
+		// console.log('installed rpms', JSON.stringify(iRpms));
 
 		/**
 		 * todo:  work on setting up updating installed atc
@@ -367,6 +367,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if(!selectedRPM) {
 			debugger;
+			// probably need to setup error handling for this situation
 		}
 		
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
@@ -440,31 +441,31 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => fastTreeProvider.refresh());
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
-		var device: string | undefined = ext.hostStatusBar.text;
+		// var device: string | undefined = ext.hostStatusBar.text;
 		
-		if (!device) {
-			device = await vscode.commands.executeCommand('f5.connectDevice');
-		}
+		// if (!device) {
+		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
+		// }
 
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
-		}
+		// if (device === undefined) {
+		// 	throw new Error('no hosts in configuration');
+		// }
 
-		const password = await utils.getPassword(device);
-		const response = await f5Api.getF5FastInfo(device, password);
+		// const password = await utils.getPassword(device);
+		// const resp = await f5Api.getF5FastInfo(device, password);
+
+		await ext.mgmtClient.token();
+		const resp = ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
+
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
+			utils.displayJsonInEditor(resp.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
+			WebViewPanel.render(context.extensionPath, resp.data);
 		}
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deployApp', async () => {
-		const device = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		// const fast = ext.fastBar.text;
-		const [username, host] = device.split('@');
 
 		// get editor window
 		var editor = vscode.window.activeTextEditor;
@@ -489,12 +490,12 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		
-		const response = await f5FastApi.deployFastApp(device, password, '', jsonText);
+		const response = await f5FastApi.deployFastApp(jsonText);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
+			utils.displayJsonInEditor(response.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
+			WebViewPanel.render(context.extensionPath, response.data);
 		}
 
 		// give a little time to finish before refreshing trees
@@ -505,66 +506,53 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApp', async (tenApp) => {
-		const device = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		// const fast = ext.fastBar.text;
-		const [username, host] = device.split('@');
-		
-		const authToken = await getAuthToken(host, username, password);
-		const task = await callHTTP('GET', host, `/mgmt/shared/fast/applications/${tenApp}`, authToken);
+
+		await ext.mgmtClient.token();
+		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(task.body);
+			utils.displayJsonInEditor(task.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, task.body);
+			WebViewPanel.render(context.extensionPath, task.data);
 		}
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTask', async (taskId) => {
-		const device = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		const [username, host] = device.split('@');
-		
-		const authToken = await getAuthToken(host, username, password);
-		const task = await callHTTP('GET', host, `/mgmt/shared/fast/tasks/${taskId}`, authToken);
+
+		await ext.mgmtClient.token();
+		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(task.body);
+			utils.displayJsonInEditor(task.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, task.body);
+			WebViewPanel.render(context.extensionPath, task.data);
 		}
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplate', async (template) => {
-		const device = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		const [username, host] = device.split('@');
-		
-		const authToken = await getAuthToken(host, username, password);
-		const fTemp = await callHTTP('GET', host, `/mgmt/shared/fast/templates/${template}`, authToken);
+
+		await ext.mgmtClient.token();
+		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templates/${template}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(fTemp.body);
+			utils.displayJsonInEditor(resp.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, fTemp.body);
+			WebViewPanel.render(context.extensionPath, resp.data);
 		}
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
-		const device = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		const [username, host] = device.split('@');
-		
-		const authToken = await getAuthToken(host, username, password);
-		const fTempSet = await callHTTP('GET', host, `/mgmt/shared/fast/templatesets/${set}`, authToken);
+
+		await ext.mgmtClient.token();
+		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(fTempSet.body);
+			utils.displayJsonInEditor(resp.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, fTempSet.body);
+			WebViewPanel.render(context.extensionPath, resp.data);
 		}
 
 	}));
@@ -708,14 +696,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {
 		
-		var device: string | undefined = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		const response = await f5FastApi.delTenApp(device, password, tenApp.label);
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// const password = await utils.getPassword(device);
+		const response = await f5FastApi.delTenApp(tenApp.label);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
+			utils.displayJsonInEditor(response.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
+			WebViewPanel.render(context.extensionPath, response.data);
 		}
 	
 		// give a little time to finish
@@ -726,17 +714,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deleteFastTempSet', async (tempSet) => {
-		
-		var device: string = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		const response = await f5FastApi.delTempSet(device, password, tempSet.label);
 
-		vscode.window.showInformationMessage(`Fast Template Set Delete: ${response.body.message}`);
+		const resp = await f5FastApi.delTempSet(tempSet.label);
+
+		vscode.window.showInformationMessage(`Fast Template Set Delete: ${resp.data.message}`);
 
 		// give a little time to finish
 		await new Promise(resolve => { setTimeout(resolve, 1000); });
 		fastTreeProvider.refresh();
-
 	}));
 
 
@@ -859,7 +844,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		var device: string | undefined = ext.hostStatusBar.text;
 		const password = await utils.getPassword(device);
-		const response = await f5Api.delAS3Tenant(device, password, tenant.label);
+		const response = await f5Api.delAS3Tenant(tenant.label);
 
 		// TODO:  change following feedback to a simple pop up
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -876,42 +861,22 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
-		var device: string | undefined = ext.hostStatusBar.text;
-		if (!device) {
-			device = await vscode.commands.executeCommand('f5.connectDevice');
-		}
 		
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
-		}
-		
-		const password = await utils.getPassword(device);
-		const response = await f5Api.getAS3Task(device, password, id);
+		const resp: any = await f5Api.getAS3Task(id);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
+			utils.displayJsonInEditor(resp.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
+			WebViewPanel.render(context.extensionPath, resp.data);
 		}
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', async () => {
 
-		var device: string | undefined = ext.hostStatusBar.text;
+		// var device: string | undefined = ext.hostStatusBar.text;
 		ext.as3AsyncPost = vscode.workspace.getConfiguration().get('f5.as3Post.async');
 		// const postParam: string | undefined = vscode.workspace.getConfiguration().get('f5.as3Post.async');
-
-		if (!device) {
-			device = await vscode.commands.executeCommand('f5.connectDevice');
-		}
-		
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
-		}
-		
-		const password = await utils.getPassword(device);
-		// if selected text, capture that, if not, capture entire document
 
 		let postParam;
 		if(ext.as3AsyncPost) {
@@ -938,15 +903,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// use the following logic to implement robust async
 		// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/as3.sh
-		const response = await f5Api.postAS3Dec(device, password, postParam, JSON.parse(text));
+		const resp = await f5Api.postAS3Dec(postParam, JSON.parse(text));
 
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
+			utils.displayJsonInEditor(resp.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
+			WebViewPanel.render(context.extensionPath, resp.data);
 		}
 		as3TenantTree.refresh();
-		as3Tree.refresh();		
+		as3Tree.refresh();
 	}));
 
 
@@ -1331,6 +1296,27 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}));
 
+	/**
+	 * refactor the json<->yaml/base64-encode/decode stuff to follow the following logic
+	 * based off of the vscode-extension-examples document-editing-sample
+	 */
+	// let disposable = vscode.commands.registerCommand('extension.reverseWord', function () {
+	// 	// Get the active text editor
+	// 	let editor = vscode.window.activeTextEditor;
+
+	// 	if (editor) {
+	// 		let document = editor.document;
+	// 		let selection = editor.selection;
+
+	// 		// Get the word within the selection
+	// 		let word = document.getText(selection);
+	// 		let reversed = word.split('').reverse().join('');
+	// 		editor.edit(editBuilder => {
+	// 			editBuilder.replace(selection, reversed);
+	// 		});
+	// 	}
+	// });
+
 	context.subscriptions.push(vscode.commands.registerCommand('f5.b64Encode', () => {
 		const editor = vscode.window.activeTextEditor;
 		if(!editor){
@@ -1381,7 +1367,10 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
-		chuckJoke1();
+		// chuckJoke1();
+
+		const var1 = vscode.workspace.getConfiguration().get('f5.hosts_3');
+		console.log('var1', var1);
 	}));
 
 }

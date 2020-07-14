@@ -6,10 +6,35 @@ All notable changes to the "vscode-f5-fast" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+---
+
+## [1.1.0] - (7-20-2020)
+
+## Added
+- ATC rpm install/un-install/upgrade
+  - will download and cache rpm from official github repo
+- json <-> yaml conversion
+- base64 encode/decode
+- right-click template/folder to upload FAST template/template Set
+- support remote authentication via logonProvider - PENDING
+
+## Modified
+- Provided feedback and cancellation when connecting to devices
+- Updated examples to include DO github examples
+  - Added placeholder for AS3 and linked to AS3 repo issue with pending "examples" folder
+
+Created a git repo for documenting the building of fast templates and a bunch of other things for demo'ing the extension
+
+> https://github.com/DumpySquare/f5-fasting
+
+---
+
 ## [1.0.1-2] - (6-23-2020)
 
 ### Changed
 - Documentation tweaks
+
+---
 
 ## [1.0.0] - (6-23-2020)
 
@@ -39,6 +64,7 @@ Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/
   - DO
   - AS3 - PENDING AS3 examples release
 
+---
 
 ## [0.1.11] - (6-4-2020)
 
@@ -50,6 +76,8 @@ Vulnerable versions: < 0.2.1
 Patched version: 0.2.1
 minimist before 1.2.2 could be tricked into adding or modifying properties of Object.prototype using a "constructor" or "proto" payload.
 ```
+
+---
 
 ## [0.1.10] - (6-4-2020)
 
@@ -72,6 +100,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 - FAST: "Render HTML View" command
   - takes selected template view yml and presents rendered HTML view the user will see
 
+---
 
 ## [0.1.9] - (5-31-2020)
 
@@ -101,6 +130,8 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 
 - Added warning when posting syncronous DO declaration, that recommends "async" posting
 
+---
+
 ## [0.1.8] - (5-25-2020)
 
 ### Modified
@@ -119,12 +150,16 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
   - Provides "progress bar" with details about dec post status
 - DO async post
 
+---
+
 ## [0.1.7] - (5-20-2020)
 
 ### Modified
 - More work to allow port specification on device item: user@device.domain.net:8443
 - Added more feedback (warning pop up) for failed api calls
 - Documentation on client side logging and BIG-IQ usage
+
+---
 
 ## [0.1.6] - (5-19-2020)
 
@@ -133,12 +168,16 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
   - Relaxed regex to allow :port for single nic ve
   - [issue #5] https://github.com/DumpySquare/vscode-f5-fast/issues/5
 
+---
+
 ## [0.1.5] - (5-18-2020)
 
 ### Added
 - AS3 Delete Tenant command - Right click tenant item in tree
 - auto refresh AS3 trees when AS3 service detected
 - Documentation in README, including demo gifs of workflows
+
+---
 
 ## [0.1.4] - (5-15-2020)
 
@@ -147,6 +186,8 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
   - two level tree hiarchy representing deployed tenant and apps for each tenant
   - click to get 'Get-All-Tenants' to get ALL declarations
   - click tenant to get declaration for that tenant
+
+---
 
 ## [0.1.3] - (5-13-2020)
 
@@ -160,12 +201,16 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 - Fast/version status bar
 - AS3 Tasks view
 
+---
+
 ## [0.1.2] - (5-10-2020)
 
 ### Added
 - AS3/DO/TS service checking - display in tool bar with version if installed
 - GET/POST TS declaration
 - Execute BASH command on device
+
+---
 
 ## [0.1.1] - (5-8-2020)
 
@@ -178,6 +223,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 - load sample as3 declaration
 - post as3 declaration to connected F5
 
+---
 
 ## [0.0.4] - (5-4-2020)
 
@@ -187,11 +233,15 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
   - Remove entry
   - Add entry
 
+---
+
 ## [0.0.3] - (4-26-2020)
 
 ### Added
 - BIG-IP authentication via auth token
 - Device tree refresh button
+
+---
 
 ## [0.0.2] - (4-26-2020)
 
@@ -200,6 +250,8 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
     - list configured devices from config file
     - testing with carTreeView and depenencyTreeView
 - Status bar information about connected device
+
+---
 
 ## [0.0.1] - (4-24-2020)
 
