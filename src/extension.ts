@@ -91,6 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
 		
 
+		console.log('selected device', device);
 
 		// clear status bars before new connect
 		utils.setHostStatusBar();
@@ -111,8 +112,12 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 		
-		const password: string = await utils.getPassword(device);
-		const discovery = await f5Api.connectF5(device, password);
+		let fullDevice = `${device.user}@${device.host}`;
+		if(device.hasOwnProperty('port')) {
+			fullDevice = `${device}:${device.port}`;
+		}
+		const password: string = await utils.getPassword(fullDevice);
+		const discovery = await f5Api.connectF5(fullDevice, password);
 		console.log(`F5 Connect Discovered ${JSON.stringify(discovery)}`);
 
 
@@ -121,10 +126,17 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 	to manage host/port/user/password across all calls within the extension
 		 * This is taking heavy inspiration from the f5-sdk-js
 		 */
-		var [user, host] = device.split('@');
-		var [host, port] = host.split(':');
-		const provider = 'local';
-		ext.mgmtClient = new MgmtClient(device, {host, port, user, password});
+		// var [user, host] = device.split('@');
+		// var [host, port] = host.split(':');
+		// const provider = 'local';
+
+		ext.mgmtClient = new MgmtClient(
+			device.host,
+			device.user,
+			device.port,
+			device.provider,
+			password
+		);
 
 		/**
 		 * setup CVE-2020-5902 stuff?
@@ -455,7 +467,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// const resp = await f5Api.getF5FastInfo(device, password);
 
 		await ext.mgmtClient.token();
-		const resp = ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
+		const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(resp.data);
@@ -1369,8 +1381,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
 		// chuckJoke1();
 
-		const var1 = vscode.workspace.getConfiguration().get('f5.hosts_3');
-		console.log('var1', var1);
+		const var1 = vscode.workspace.getConfiguration().get('f5.hosts_2');
+		console.log('f5.hosts_2-var1', var1);
+
+		const var2 = vscode.workspace.getConfiguration().get('f5.hosts_3');
+		console.log('f5.hosts_3-var2', var2);
 	}));
 
 }

@@ -18,31 +18,51 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	getChildren(element?: F5Host): Thenable<F5Host[]> {
         
-        const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+        const bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts_2');
+		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
 		
 		if ( bigipHosts === undefined) {
 			throw new Error('No configured hosts - from hostTreeProvider');
 		}
+
+		const treeItems = bigipHosts.map( (item: { 
+			user: string;
+			host: string;
+			port: string;
+			provider: string;
+		}) => {
+
+			let device = `${item.user}@${item.host}`;
+			if(item.hasOwnProperty('port')) {
+				device = `${device}:${item.port}`;
+			}
+			console.log('built item', device);
+			const treeItem = new F5Host(device, item.provider, vscode.TreeItemCollapsibleState.None, {
+				        command: 'f5.connectDevice',
+				        title: 'hostTitle',
+				        arguments: [item]
+			});
+			return treeItem;
+		});
    
-        // takes individual host item and creates a tree item
-        const treeHosts = (name: string): F5Host => {
-            const treeItem = new F5Host(name, vscode.TreeItemCollapsibleState.None, {
-                command: 'f5.connectDevice',
-                title: 'hostTitle',
-                arguments: [name]
-            });
-            // console.log(`treeItem: ${JSON.stringify(treeItem)}`);
-            return treeItem;
-        };
+        // // takes individual host item and creates a tree item
+        // const treeHosts = (name: string): F5Host => {
+        //     const treeItem = new F5Host(name, vscode.TreeItemCollapsibleState.None, {
+        //         command: 'f5.connectDevice',
+        //         title: 'hostTitle',
+        //         arguments: [name]
+        //     });
+        //     // console.log(`treeItem: ${JSON.stringify(treeItem)}`);
+        //     return treeItem;
+        // };
 
-		// takes list of bigip hosts from the workspace config file, in the variable "bigipHosts"
-		//		for each item in list assign item to "host", feed "host" to the function treeHosts
-		//		treeHosts return a treeItem, that gets returned as a list of treeItems in the promise.resolve
-		// basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
-        const treeItems = bigipHosts.map(host => treeHosts(host));
+		// // takes list of bigip hosts from the workspace config file, in the variable "bigipHosts"
+		// //		for each item in list assign item to "host", feed "host" to the function treeHosts
+		// //		treeHosts return a treeItem, that gets returned as a list of treeItems in the promise.resolve
+		// // basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
+        // const treeItems = bigipHosts.map(host => treeHosts(host));
 
-        // console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
+        console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
 
         return Promise.resolve(treeItems);
 	}
@@ -53,7 +73,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 export class F5Host extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		// private version: string,
+		private version: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
@@ -64,9 +84,9 @@ export class F5Host extends vscode.TreeItem {
 		return `Connect`;
 	}
 
-	// get description(): string {
-	// 	return 'descLoc';
-	// }
+	get description(): string {
+		return this.version;
+	}
 
 	// iconPath = {
 	// 	light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),

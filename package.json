@@ -117,45 +117,68 @@
 					},
 					"f5.hosts_2": {
 						"type": "array",
-						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format - CONX 3",
+						"description": "F5 FAST extension device details",
 						"items": {
 							"type": "object",
 							"properties": {
-								"device": {
+								"host": {
 									"type": "string",
-									"description": "MAIN DEVICE NAME",
-									"default": "admin@192.168.1.254"
+									"description": "BIG-IP/FAST hosts",
+									"pattern": "^[a-zA-Z0-9.-]+$",
+									"examples": ["192.168.1.254", "10.40.40.20", "dev.test.net"]
 								},
+								"user": {
+									"type":"string",
+									"description": "username to logon to specified device",
+									"default": "admin"
+								},
+								"port": {
+									"type":"integer",
+									"description": "Mgmt port number, default 443, single nic VE = 8443, or custome",
+									"examples": ["443","8443"]
+								},
+								"provider": {
+									"type": "string",
+									"description": "logonProviderName to define remote auth service",
+									"default": "local",
+									"examples": ["local", "radius", "TACACS", "ldap", "custom"]
+								}
+							},
+							"required": ["host", "user", "provider"]
+						},
+						"default": [
+							{
+								"device": "admin@192.168.1.254",
+								"provider": "local"
+							}
+						]
+					},
+					"f5.hosts_3": {
+						"type": "object",
+						"description": "testing configuration for name device objects",
+						"propertyNames": {
+							"type": "string",
+							"description": "BIG-IP/Device/Host",
+							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
+						},
+						"patternProperties": {
+							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
+						},
+						"additionalProperties": {
+							"type": "object",
+							"description": "named object device details",
+							"Properties": {
 								"provider": {
 									"type": "string",
 									"description": "logonProviderName",
 									"default": "local"
 								}
-							}
-						}
-					},
-					"f5.hosts_3": {
-						"type": "array",
-						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format - CONX 3",
-						"items": {
-							"propertyNames": {
-								"pattern": "^[A-Za-z][0-9A-Za-z_.-]*$",
-								"maxLength": 190
 							},
-							"additionalProperties": {
-								"type": "object",
-								"properties": {
-									"device": {
-										"type": "string",
-										"description": "MAIN DEVICE NAME",
-										"default": "admin@192.168.1.254"
-									},
-									"provider": {
-										"type": "string",
-										"description": "logonProviderName",
-										"default": "local"
-									}
-								}
+							"required": ["provider"]
+						},
+						"default": {
+							"admin@192.168.1.254": {
+								"provider": "local"
 							}
 						}
 					},
