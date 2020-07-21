@@ -33,7 +33,7 @@ export async function setHostStatusBar(host: string = '') {
  * @param text text to display in status bar
  * @param tip text to display when hover
  */
-export async function setHostnameBar(text: string = '', tip: string = '') {
+export async function setHostnameBar(text?: string, tip?: string) {
 
     ext.hostNameBar.command = 'f5.getF5HostInfo';
     ext.hostNameBar.text = text ? text || '' : '';

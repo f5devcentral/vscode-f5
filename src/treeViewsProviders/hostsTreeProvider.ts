@@ -18,7 +18,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	getChildren(element?: F5Host): Thenable<F5Host[]> {
         
-        const bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts_2');
+        const bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
 		
 		if ( bigipHosts === undefined) {
@@ -26,18 +26,25 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		}
 
 		const treeItems = bigipHosts.map( (item: { 
-			user: string;
-			host: string;
-			port: string;
+			device: string;
 			provider: string;
 		}) => {
 
-			let device = `${item.user}@${item.host}`;
-			if(item.hasOwnProperty('port')) {
-				device = `${device}:${item.port}`;
+			// build device string to display
+			// let device = `${item.user}@${item.host}`;
+
+			// add port if it's defined - non default 443
+			// if(item.hasOwnProperty('port')) {
+			// 	device = `${device}:${item.port}`;
+			// }
+
+			// add default provider=local if not defined
+			if(!item.hasOwnProperty('provider')){
+				item['provider'] = 'local';
 			}
-			console.log('built item', device);
-			const treeItem = new F5Host(device, item.provider, vscode.TreeItemCollapsibleState.None, {
+
+			// console.log('built item', device);
+			const treeItem = new F5Host(item.device, item.provider, vscode.TreeItemCollapsibleState.None, {
 				        command: 'f5.connectDevice',
 				        title: 'hostTitle',
 				        arguments: [item]

@@ -5,7 +5,7 @@ var https = require('https');
 import * as utils from './utils';
 import { ext } from '../extensionVariables';
 import { getAuthToken, callHTTP } from './coreF5HTTPS';
-import { memoryUsage } from 'process';
+// import { memoryUsage } from 'process';
 
 
 /**
@@ -14,181 +14,181 @@ import { memoryUsage } from 'process';
 // export class F5Api {
 
 
-export async function connectF5(device: string, password: string) {
-    var [username, host] = device.split('@');
+// export async function connectF5(device: string, password: string) {
+//     var [username, host] = device.split('@');
 
 
-    const progressPost = await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        title: `Connecting to ${host}`,
-        cancellable: true
-    }, async (progress, token) => {
-        token.onCancellationRequested(() => {
-            // this logs but doesn't actually cancel...
-            console.log("User canceled device connect");
-            return new Error(`User canceled device connect`);
-        });
-        /**
-         * setup logonProvider discovery
-         * discover what logonProvider is configured, default=tmos
-         * https://github.com/DumpySquare/vscode-f5-fast/issues/38
-         * https://github.com/DumpySquare/vscode-f5-fast/issues/34
-         */
+//     const progressPost = await vscode.window.withProgress({
+//         location: vscode.ProgressLocation.Notification,
+//         title: `Connecting to ${host}`,
+//         cancellable: true
+//     }, async (progress, token) => {
+//         token.onCancellationRequested(() => {
+//             // this logs but doesn't actually cancel...
+//             console.log("User canceled device connect");
+//             return new Error(`User canceled device connect`);
+//         });
+//         /**
+//          * setup logonProvider discovery
+//          * discover what logonProvider is configured, default=tmos
+//          * https://github.com/DumpySquare/vscode-f5-fast/issues/38
+//          * https://github.com/DumpySquare/vscode-f5-fast/issues/34
+//          */
 
-        // progress.report({ message: `${host}`});
-        // const resp = await axios.request({
-        //     httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-        //     method: 'GET',
-        //     baseURL: `https://${host}`,
-        //     url: '/mgmt/tm/auth/source',
-        //     auth: { username, password },
-        //     timeout: 3000
-        //     // connectTimeout: 1000,
-        //     })
-        //     // .then( resp => {
-        //     //     console.log('AXIOS auth source response', resp);
-        //     //     Promise.resolve(resp);
-        //     //     return resp;
-        //     // })
-        //     .catch( err => {
-        //         console.log('AXIOS auth source err', err);
-        //         console.log('AXIOS auth source err', err.response);
-        //         // Promise.reject(err);
-        //         return err;
-        //     });
+//         // progress.report({ message: `${host}`});
+//         // const resp = await axios.request({
+//         //     httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+//         //     method: 'GET',
+//         //     baseURL: `https://${host}`,
+//         //     url: '/mgmt/tm/auth/source',
+//         //     auth: { username, password },
+//         //     timeout: 3000
+//         //     // connectTimeout: 1000,
+//         //     })
+//         //     // .then( resp => {
+//         //     //     console.log('AXIOS auth source response', resp);
+//         //     //     Promise.resolve(resp);
+//         //     //     return resp;
+//         //     // })
+//         //     .catch( err => {
+//         //         console.log('AXIOS auth source err', err);
+//         //         console.log('AXIOS auth source err', err.response);
+//         //         // Promise.reject(err);
+//         //         return err;
+//         //     });
 
-        // console.log('=======  axResp', resp);
+//         // console.log('=======  axResp', resp);
 
-        // if(!resp) {
-        //     vscode.window.showErrorMessage(`Could not connect to ${host}`);
-        //     return;
-        // }
+//         // if(!resp) {
+//         //     vscode.window.showErrorMessage(`Could not connect to ${host}`);
+//         //     return;
+//         // }
         
 
-        // // if req/resp successful
-        // if (resp.status === 200) {
-        //     // if not default, update the logonProviderName value
-        //     if(resp.data.type !== 'local'){
-        //         console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
-        //         progress.report({ message: ` ${resp.data.type} auth provider detected`});
-        //         // change default 'tmos' value to what is configured
-        //         ext.logonProviderName = resp.data.type;
-        //     } else {
-        //         console.log(`TMOS local auth detected`);
-        //     }
-        // } else if (resp.status === 401 && resp.data.message === "Authentication failed.") {
-        //     // clear cached password for this device
-        //     ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
+//         // // if req/resp successful
+//         // if (resp.status === 200) {
+//         //     // if not default, update the logonProviderName value
+//         //     if(resp.data.type !== 'local'){
+//         //         console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
+//         //         progress.report({ message: ` ${resp.data.type} auth provider detected`});
+//         //         // change default 'tmos' value to what is configured
+//         //         ext.logonProviderName = resp.data.type;
+//         //     } else {
+//         //         console.log(`TMOS local auth detected`);
+//         //     }
+//         // } else if (resp.status === 401 && resp.data.message === "Authentication failed.") {
+//         //     // clear cached password for this device
+//         //     ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
     
-        //     vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-        //     console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-        //     throw new Error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-        // } else {
-        //     // await new Promise(resolve => { setTimeout(resolve, 3000); });
-        //     vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-        //     console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
-        //     throw new Error(`---UNKNOWN HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+//         //     vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+//         //     console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+//         //     throw new Error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+//         // } else {
+//         //     // await new Promise(resolve => { setTimeout(resolve, 3000); });
+//         //     vscode.window.showErrorMessage(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+//         //     console.error(`---HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
+//         //     throw new Error(`---UNKNOWN HTTP FAILURE--- ${resp.status} - ${resp.data.message}`);
             
-        // }
+//         // }
 
-        // debugger;
+//         // debugger;
 
-        // get auth token and discover ATC services
-        const discovery = await getAuthToken(host, username, password)
-            .then( async token => {
+//         // get auth token and discover ATC services
+//         const discovery = await getAuthToken(host, username, password)
+//             .then( async token => {
 
-                // cache password in keytar
-                ext.keyTar.setPassword('f5Hosts', device, password);
+//                 // cache password in keytar
+//                 ext.keyTar.setPassword('f5Hosts', device, password);
                 
-                utils.setHostStatusBar(device);
-                // vscode.window.showInformationMessage(`Successfully connected to ${host}`);
+//                 utils.setHostStatusBar(device);
+//                 // vscode.window.showInformationMessage(`Successfully connected to ${host}`);
 
-                let returnInfo: string[] = [];
+//                 let returnInfo: string[] = [];
 
-                //********** Host info **********/
-                const hostInfo = await callHTTP(
-                    'GET', 
-                    host, 
-                    '/mgmt/shared/identified-devices/config/device-info', 
-                    token
-                );
+//                 //********** Host info **********/
+//                 const hostInfo = await callHTTP(
+//                     'GET', 
+//                     host, 
+//                     '/mgmt/shared/identified-devices/config/device-info', 
+//                     token
+//                 );
 
-                if (hostInfo.status === 200) {
-                    const text = `${hostInfo.body.hostname}`;
-                    const tip = `TMOS: ${hostInfo.body.version}`;
-                    utils.setHostnameBar(text, tip);
-                    returnInfo.push(text);
-                }
+//                 if (hostInfo.status === 200) {
+//                     const text = `${hostInfo.body.hostname}`;
+//                     const tip = `TMOS: ${hostInfo.body.version}`;
+//                     utils.setHostnameBar(text, tip);
+//                     returnInfo.push(text);
+//                 }
 
-                progress.report({ message: ` CONNECTED, checking installed ATC services...`});
+//                 progress.report({ message: ` CONNECTED, checking installed ATC services...`});
 
-                //********** FAST info **********/
-                const fastInfo = await callHTTP(
-                    'GET', 
-                    host, 
-                    '/mgmt/shared/fast/info', 
-                    token
-                );
+//                 //********** FAST info **********/
+//                 const fastInfo = await callHTTP(
+//                     'GET', 
+//                     host, 
+//                     '/mgmt/shared/fast/info', 
+//                     token
+//                 );
                     
-                if (fastInfo.status === 200) {
-                    const text = `FAST(${fastInfo.body.version})`;
-                    utils.setFastBar(text);
-                    returnInfo.push(text);
-                }
+//                 if (fastInfo.status === 200) {
+//                     const text = `FAST(${fastInfo.body.version})`;
+//                     utils.setFastBar(text);
+//                     returnInfo.push(text);
+//                 }
                     
-                //********** AS3 info **********/
-                const as3Info = await callHTTP(
-                    'GET', 
-                    host, 
-                    '/mgmt/shared/appsvcs/info', 
-                    token
-                );
+//                 //********** AS3 info **********/
+//                 const as3Info = await callHTTP(
+//                     'GET', 
+//                     host, 
+//                     '/mgmt/shared/appsvcs/info', 
+//                     token
+//                 );
 
-                if (as3Info.status === 200) {
-                    const text = `AS3(${as3Info.body.version})`;
-                    const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `;
-                    utils.setAS3Bar(text, tip);
-                    returnInfo.push(text);
-                }
+//                 if (as3Info.status === 200) {
+//                     const text = `AS3(${as3Info.body.version})`;
+//                     const tip = `schemaCurrent: ${as3Info.body.schemaCurrent} `;
+//                     utils.setAS3Bar(text, tip);
+//                     returnInfo.push(text);
+//                 }
                 
-                //********** DO info **********/
-                const doInfo = await callHTTP(
-                    'GET', 
-                    host, 
-                    '/mgmt/shared/declarative-onboarding/info', 
-                    token
-                );
+//                 //********** DO info **********/
+//                 const doInfo = await callHTTP(
+//                     'GET', 
+//                     host, 
+//                     '/mgmt/shared/declarative-onboarding/info', 
+//                     token
+//                 );
 
-                if (doInfo.status === 200) {
-                    // for some reason DO responds with a list for version info...
-                    const text = `DO(${doInfo.body[0].version})`;
-                    const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `;
-                    utils.setDOBar(text, tip);
-                    returnInfo.push(text);
-                }
+//                 if (doInfo.status === 200) {
+//                     // for some reason DO responds with a list for version info...
+//                     const text = `DO(${doInfo.body[0].version})`;
+//                     const tip = `schemaCurrent: ${doInfo.body[0].schemaCurrent} `;
+//                     utils.setDOBar(text, tip);
+//                     returnInfo.push(text);
+//                 }
 
-                //********** TS info **********/
-                const tsInfo = await callHTTP(
-                    'GET', 
-                    host, 
-                    '/mgmt/shared/telemetry/info', 
-                    token
-                );
+//                 //********** TS info **********/
+//                 const tsInfo = await callHTTP(
+//                     'GET', 
+//                     host, 
+//                     '/mgmt/shared/telemetry/info', 
+//                     token
+//                 );
 
-                if (tsInfo.status === 200) {
-                    const text = `TS(${tsInfo.body.version})`;
-                    const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `;
-                    utils.setTSBar(text, tip);
-                    returnInfo.push(text);
-                }
-                // Promise.resolve(returnInfo);
-                return returnInfo;
-            }
-        );
-        return discovery;
-    });
-    return progressPost;
-}
+//                 if (tsInfo.status === 200) {
+//                     const text = `TS(${tsInfo.body.version})`;
+//                     const tip = `nodeVersion: ${tsInfo.body.nodeVersion}\r\nschemaCurrent: ${tsInfo.body.schemaCurrent} `;
+//                     utils.setTSBar(text, tip);
+//                     returnInfo.push(text);
+//                 }
+//                 // Promise.resolve(returnInfo);
+//                 return returnInfo;
+//             }
+//         );
+//         return discovery;
+//     });
+//     return progressPost;
+// }
 
 
 
@@ -235,22 +235,6 @@ export async function issueBash(device: string, password: string, cmd: string) {
         return responseB;
     });
     return responseA;
-
-    // var [username, host] = device.split('@');
-    // return getAuthToken(host, username, password)
-    //     .then( token=> {
-    //         return callHTTP(
-    //             'POST', 
-    //             host,
-    //             '/mgmt/tm/util/bash', 
-    //             token,
-    //             {
-    //                 command: 'run',
-    //                 utilCmdArgs: `-c '${cmd}'`
-    //             }
-    //         );
-    //     }
-    // );
 }
 
 
@@ -450,18 +434,6 @@ export async function doInspect(device: string, password: string) {
         return responseB;
     });
     return responseA;
-
-    // var [username, host] = device.split('@');
-    // return getAuthToken(host, username, password)
-    //     .then( token=> {
-    //         return callHTTP(
-    //             'GET', 
-    //             host,
-    //             '/mgmt/shared/declarative-onboarding/inspect', 
-    //             token,
-    //         );
-    //     }
-    // );
 }
 
 
@@ -482,18 +454,6 @@ export async function doTasks(device: string, password: string) {
         return responseB;
     });
     return responseA;
-
-    // var [username, host] = device.split('@');
-    // return getAuthToken(host, username, password)
-    //     .then( token=> {
-    //         return callHTTP(
-    //             'GET', 
-    //             host,
-    //             '/mgmt/shared/declarative-onboarding/task', 
-    //             token,
-    //         );
-    //     }
-    // );
 }
 
 
@@ -535,7 +495,7 @@ export async function delAS3Tenant(tenant: string) {
         location: vscode.ProgressLocation.Notification,
         title: `Deleting ${tenant} Tenant`
     }, async () => {
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
         const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`, {
             method: 'DELETE'
         });
@@ -577,7 +537,7 @@ export async function getAS3Task(id: string) {
         location: vscode.ProgressLocation.Notification,
         title: `Getting AS3 Task`
     }, async () => {
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
         const resp = ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
         // const responseB = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${id}`, authToken);
         return resp;
@@ -607,7 +567,7 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
         });
 
         // post initial dec
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
         let resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare?${postParam}`, {
             method: 'POST',
             body: dec

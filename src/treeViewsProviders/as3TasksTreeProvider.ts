@@ -28,7 +28,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3Item> {
 		}
 
 		// await ext.mgmtClient.token();
-		await ext.mgmtClient.token();
+		const rp = await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/`);
 
 		const taskItems = resp.data.items.map((item:any) => {

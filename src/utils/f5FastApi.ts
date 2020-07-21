@@ -24,7 +24,7 @@ export async function deployFastApp(dec: object) {
             return new Error(`User canceled the async post`);
         });
 
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
         // post initial dec
         let response: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/applications`, {
             method: 'POST',
@@ -80,7 +80,7 @@ export async function delTenApp(tenApp: string) {
         title: `Deleting FAST App: ${tenApp}`
     }, async (progress) => {
 
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
         let response: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`, {
             method: 'DELETE'
         });
@@ -125,7 +125,7 @@ export async function delTempSet(tempSet: string) {
         title: `Deleting FAST Template Set: ${tempSet}`
     }, async (progress) => {
 
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
         let response: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templatesets/${tempSet}`, {
             method: 'DELETE'
         });

@@ -100,7 +100,7 @@ export async function zipPostTemplate (doc: string) {
         // console.log(package1);
         // console.log('zipOut', zipOut);
 
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
 
         //f5-sdk-js version
         progress.report({ message: `Uploading Template`});
@@ -195,7 +195,7 @@ export async function zipPostTempSet (folder: string) {
         // const [username, host] = device.split('@');
         // const authToken = await getAuthToken(host, username, password);
 
-        await ext.mgmtClient.token();
+        await ext.mgmtClient.getToken();
 
         // //f5-sdk-js version
         progress.report({ message: `Uploading Template set`});

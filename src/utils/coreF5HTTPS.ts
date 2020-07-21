@@ -261,7 +261,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
         //     password: options['basicAuth']['password']
         // } : undefined,
         // validateStatus: null
-        // validateStatus: () => true  // return ALL responses
+        validateStatus: () => true  // return ALL responses
     })
     .then( resp => {
         // the following log may cause some problems, mainly the resp.data,

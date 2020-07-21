@@ -100,25 +100,70 @@ export function activate(context: vscode.ExtensionContext) {
 		utils.setAS3Bar();
 		utils.setDOBar();
 		utils.setTSBar();	
+
+		type devObj = {
+			device: string,
+			provider: string
+		};
 		
 		if (!device) {
-			const bigipHosts: string[] | undefined= await vscode.workspace.getConfiguration().get('f5.hosts');
+			const bigipHosts: Array<devObj> | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
+
 			if (bigipHosts === undefined) {
 				throw new Error('no hosts in configuration');
 			}
-			device = await vscode.window.showQuickPick(bigipHosts, {placeHolder: 'Select Device'});
+
+			/**
+			 * loop through config array of objects and build quickPick list appropriate labels
+			 * [ {label: admin@192.168.1.254:8443, target: { host: 192.168.1.254, user: admin, ...}}, ...]
+			 */
+			const qPickHostList = bigipHosts.map( item => {
+				// let fullDevice = `${item.user}@${item.host}`;
+				// if(item.hasOwnProperty('port')) {
+				// 	fullDevice = `${fullDevice}:${item.port}`;
+				// }
+				return { label: item.device, target: item };
+			});
+
+			device = await vscode.window.showQuickPick(qPickHostList, {placeHolder: 'Select Device'});
 			if (!device) {
 				throw new Error('user exited device input');
+			} else {
+				// now that we made it through quickPick drop the label/object wrapper for list and just return device object
+				device = device.target;
 			}
 		}
 		
-		let fullDevice = `${device.user}@${device.host}`;
-		if(device.hasOwnProperty('port')) {
-			fullDevice = `${device}:${device.port}`;
-		}
-		const password: string = await utils.getPassword(fullDevice);
-		const discovery = await f5Api.connectF5(fullDevice, password);
-		console.log(`F5 Connect Discovered ${JSON.stringify(discovery)}`);
+		// let fullDevice = `${device.user}@${device.host}`;
+		// if(device.hasOwnProperty('port')) {
+		// 	fullDevice = `${device}:${device.port}`;
+		// }
+
+		console.log('device-connect', device);
+
+		var [user, host] = device.device.split('@');
+		var [host, port] = host.split(':');
+
+		ext.logonProviderName = device.provider;
+
+		const password: string = await utils.getPassword(device.device);
+
+		ext.mgmtClient = new MgmtClient( device.device, {
+			host,
+			port,
+			user,
+			provider: device.provider,
+			password
+		});
+
+		await ext.mgmtClient.getToken();
+		const connect = await ext.mgmtClient.connect();
+		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
+
+
+
+		// const discovery = await f5Api.connectF5(device.device, password);
+		// console.log(`F5 Connect Discovered ${JSON.stringify(discovery)}`);
 
 
 		/**
@@ -126,17 +171,13 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 	to manage host/port/user/password across all calls within the extension
 		 * This is taking heavy inspiration from the f5-sdk-js
 		 */
-		// var [user, host] = device.split('@');
-		// var [host, port] = host.split(':');
+
 		// const provider = 'local';
 
-		ext.mgmtClient = new MgmtClient(
-			device.host,
-			device.user,
-			device.port,
-			device.provider,
-			password
-		);
+		// add password to device object
+		// device['password'] = password;
+
+
 
 		/**
 		 * setup CVE-2020-5902 stuff?
@@ -152,8 +193,6 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 
 		 * need to be able to call this after ilx install/un-install
 		 */
-		// await mgmtClient.login();
-		// await ext.mgmtClient.connect();
 		
 
 	}));
@@ -254,7 +293,7 @@ export function activate(context: vscode.ExtensionContext) {
 			if (!bigipHosts.includes(input) && deviceRex.test(input)) {
 
 				const newBigipHosts = bigipHosts.map( item => {
-					if (item === hostID.label) {
+					if (item.host === hostID.label) {
 						return input;
 					} else {
 						return item;
@@ -275,7 +314,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.openSettings', () => {
-		// not sure where this would return anything to...
 		return vscode.commands.executeCommand("workbench.action.openSettings", "f5");
 	}));
 
@@ -466,7 +504,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// const password = await utils.getPassword(device);
 		// const resp = await f5Api.getF5FastInfo(device, password);
 
-		await ext.mgmtClient.token();
+		await ext.mgmtClient.getToken();
 		const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -519,7 +557,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApp', async (tenApp) => {
 
-		await ext.mgmtClient.token();
+		await ext.mgmtClient.getToken();
 		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -532,7 +570,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTask', async (taskId) => {
 
-		await ext.mgmtClient.token();
+		await ext.mgmtClient.getToken();
 		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -545,7 +583,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplate', async (template) => {
 
-		await ext.mgmtClient.token();
+		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templates/${template}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -558,7 +596,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
 
-		await ext.mgmtClient.token();
+		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -860,9 +898,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// TODO:  change following feedback to a simple pop up
 		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
+			utils.displayJsonInEditor(response.data);
 		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
+			WebViewPanel.render(context.extensionPath, response.data);
 		}
 	
 		// give a little time to finish

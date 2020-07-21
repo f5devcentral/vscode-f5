@@ -2,6 +2,8 @@
 
 import * as vscode from 'vscode';
 import { makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
+import { ext } from '../extensionVariables';
+import * as utils from './utils';
 
 /**
  *
@@ -21,10 +23,11 @@ import { makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
 export class MgmtClient {
     device: string;
     host: string;
-    port: number;
+    port: number | 443;
+    provider: string;
     protected _user: string;
     protected _password: string;
-    protected _token: string = '1234';
+    protected _token!: string | '1234';
     // set above token to '1234' to get through TS typing
     // at instaniation it will be empty but should get updated
     // via code as calls are made
@@ -32,17 +35,19 @@ export class MgmtClient {
     /**
      * @param options function options
      */
-    constructor(device: string,
+    constructor(
+        device: string,
         options: {
-        // device: string;
         host: string;
         port: number;
         user: string;
+        provider: string;
         password: string;
     }) {
         this.device = device;
         this.host = options['host'];
-        this.port = options['port'];
+        this.port = options['port'] | 443;
+        this.provider = options['provider'];
         this._user = options['user'];
         this._password = options['password'];
     }
@@ -53,7 +58,7 @@ export class MgmtClient {
      * sets auth token
      * @returns void
      */
-    async token(): Promise<void> {
+    async getToken(): Promise<void> {
         const response: any = await makeReqAXnew(
             this.host,
             '/mgmt/shared/authn/login',
@@ -63,7 +68,7 @@ export class MgmtClient {
                 body: {
                     username: this._user,
                     password: this._password,
-                    // loginProviderName: 'tmos'
+                    logonProviderName: this.provider
                 },
                 // basicAuth: {
                 //     user: this._user,
@@ -92,20 +97,74 @@ export class MgmtClient {
                 console.log("User canceled device connect");
                 return new Error(`User canceled device connect`);
             });
-
-            // do stuff
-            /**
-             * do connect
-             *  - make sure user/pass word
-             * try to discover logonProvider?
-             * do atc discovery
-             *  - fast/as3/do/ts
-             *  - add cloud failover (cs)
-             */
             
+            
+            // await ext.mgmtClient.getToken();
+            
+            let returnInfo: string[] = [];
+            /**
+             * clear "connect" status bar
+             * set "connected" status bar
+             * 
+             */
 
-        return 'toProgress';
+            // cache password in keytar
+            ext.keyTar.setPassword('f5Hosts', this.device, this._password);
+
+            utils.setHostStatusBar(this.device);
+            
+            //********** Host info **********/
+            const hostInfo: any = await this.makeRequest('/mgmt/shared/identified-devices/config/device-info');
+            if (hostInfo.status === 200) {
+                const text = `${hostInfo.data.hostname}`;
+                const tip = `TMOS: ${hostInfo.data.version}`;
+                utils.setHostnameBar(text, tip);
+                returnInfo.push(text);
+            }
+
+            progress.report({ message: `CONNECTED, checking installed ATC services...`});
+
+
+            //********** FAST info **********/
+            const fastInfo: any = await this.makeRequest('/mgmt/shared/fast/info');
+            if (fastInfo.status === 200) {
+                const text = `FAST(${fastInfo.data.version})`;
+                utils.setFastBar(text);
+                returnInfo.push(text);
+            }
+
+            //********** AS3 info **********/
+            const as3Info: any = await this.makeRequest('/mgmt/shared/appsvcs/info');
+
+            if (as3Info.status === 200) {
+                const text = `AS3(${as3Info.data.version})`;
+                const tip = `schemaCurrent: ${as3Info.data.schemaCurrent} `;
+                utils.setAS3Bar(text, tip);
+                returnInfo.push(text);
+            }
+            
+            //********** DO info **********/
+            const doInfo: any = await this.makeRequest('/mgmt/shared/declarative-onboarding/info');
+
+            if (doInfo.status === 200) {
+                // for some reason DO responds with a list for version info...
+                const text = `DO(${doInfo.data[0].version})`;
+                const tip = `schemaCurrent: ${doInfo.data[0].schemaCurrent} `;
+                utils.setDOBar(text, tip);
+                returnInfo.push(text);
+            }
+
+            //********** TS info **********/
+            const tsInfo: any = await this.makeRequest('/mgmt/shared/telemetry/info');
+            if (tsInfo.status === 200) {
+                const text = `TS(${tsInfo.data.version})`;
+                const tip = `nodeVersion: ${tsInfo.data.nodeVersion}\r\nschemaCurrent: ${tsInfo.data.schemaCurrent} `;
+                utils.setTSBar(text, tip);
+                returnInfo.push(text);
+            }
+            return returnInfo;
         });
+        return progress;
     }
 
     /**
@@ -117,50 +176,6 @@ export class MgmtClient {
     }
 
 
-    /**
-     * work in progress - not used yet
-     * was starting to setup discovering logonProvider, but
-     * that requires basic auth and is only enable on bigip 
-     * by default.  
-     * Leaning toward manually setting it via new hosts tree 
-     * dataStucture, where the config is hosted in a json file
-     * instead of the default vscode config file
-     * This is needed to accomodate multi level json to hold more
-     * information about each device
-     */
-    async provider() {
-        const response = await makeReqAXnew(
-            this.host,
-            '/mgmt/tm/auth/source',
-            {
-                method: 'POST',
-                body: {
-                    username: this._user,
-                    password: this._password,
-                    loginProviderName: 'local'
-                }
-                // basicAuth: {
-                //     user: this._user,
-                //     password: this._password
-                // }
-            }
-        )
-        .then( resp => {
-            console.log('provider-resp', resp);
-            return resp;
-        })
-        .then( undefined, err => {
-            console.log('provider-errorrrrrr', err);
-            return 'broken';
-        });
-        // .catch( error => {
-        //     console.log('provider-error', error);
-        // })
-        // this._token = response.data['token']['token'];
-
-        // debugger;
-        return response;
-    }
 
 
 

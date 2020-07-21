@@ -41,7 +41,7 @@ export async function installedRPMs () {
      *      is being gathered and waiting for user to select...
      */
     
-    await ext.mgmtClient.token();   // refresh token
+    await ext.mgmtClient.getToken();   // refresh token
     // start installed pkgs query
     const query: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
@@ -119,16 +119,19 @@ export async function unInstallRpm (packageName: string) {
         let i = 0;  // loop counter
         // use taskId to control loop
         while(taskId && i < 10) {
-            // const resp = await makeReqAXnew(host, `${PKG_MGMT_URI}/${taskId}`, {
-            //     headers: { 'X-F5-Auth-Token': authToken },
-            // });
 
             const resp: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
             progress.report({ message: `${resp.data.status}`});
             console.log('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
             
-            if(resp?.data?.status === 'FINISHED' || resp.data.status === 'FAILED') {
+
+            // todo: break out the successful and failed results, only refresh statusBars on successful
+            if(resp.data.status === 'FINISHED' || resp.data.status === 'FAILED') {
+                vscode.window.showInformationMessage(`ilx rpm un-install - ${resp.data.status}`);
+                progress.report({ message: `task complete, waiting for node to restart before refreshing status bars...`});
+                await new Promise(resolve => { setTimeout(resolve, 20000); }); // 20 seconds
+                ext.mgmtClient.connect(); // refresh connect/status bars
                 // return resp;
                 return resp.data.status;
             }
@@ -248,7 +251,7 @@ export async function rpmInstaller (rpm: string) {
         const rpmName = path.basename(rpm);
 
 
-        await ext.mgmtClient.token();   // refresh auth token
+        await ext.mgmtClient.getToken();   // refresh auth token
         // let rpms finish downloading...
         await new Promise(resolve => { setTimeout(resolve, 2000); });
 
@@ -290,6 +293,11 @@ export async function rpmInstaller (rpm: string) {
             
             if(resp.data.status === 'FINISHED') {
                 vscode.window.showInformationMessage(`${rpmName} Install Complete!`);
+                progress.report({ message: `Waiting for node services to restart before refreshing status bars...`});
+                // todo: watch node service restart before refreshing status bars
+                await new Promise(resolve => { setTimeout(resolve, 10000); }); // pause a moment
+                ext.mgmtClient.connect();   // refresh connect/status bars
+
                 return resp;
             } else if (resp.data.status === 'FAILED') {
                 const msg = `rpm install FAILED: ${resp.data.errorMessage}`;
@@ -298,6 +306,7 @@ export async function rpmInstaller (rpm: string) {
             }
 
             i++;
+            // todo: update to global async interval
             await new Promise(resolve => { setTimeout(resolve, 3000); });
         }
 
