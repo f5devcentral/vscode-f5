@@ -156,7 +156,7 @@ export function activate(context: vscode.ExtensionContext) {
 			password
 		});
 
-		await ext.mgmtClient.getToken();
+		// await ext.mgmtClient.getToken();
 		const connect = await ext.mgmtClient.connect();
 		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
 
@@ -208,9 +208,13 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 
-		const password: string = await utils.getPassword(device);
-		const hostInfo  = await f5Api.getF5HostInfo(device, password);
-		utils.displayJsonInEditor(hostInfo.body);
+		await ext.mgmtClient.getToken();
+		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/shared/identified-devices/config/device-info');
+
+		// const password: string = await utils.getPassword(device);
+		// const hostInfo  = await f5Api.getF5HostInfo(device, password);
+
+		utils.displayJsonInEditor(resp.data);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
@@ -353,7 +357,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const host = ext.hostStatusBar.text;
 
 		if (host) {
-			const password = await utils.getPassword(host);
+			// const password = await utils.getPassword(host);
 			const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' });
 			// const cmd = await vscode.window.showInputBox({ content: 'Bash Command to Execute?' })
 			
@@ -362,11 +366,20 @@ export function activate(context: vscode.ExtensionContext) {
 				throw new Error('Remote Command inputBox cancelled');
 			}
 
-			const bashResp = await f5Api.issueBash(host, password, cmd);
+			// const bashResp = await f5Api.issueBash(host, password, cmd);
+
+			await ext.mgmtClient.getToken();
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
+				method: 'POST',
+				body: {
+					command: 'run',
+					utilCmdArgs: `-c '${cmd}'`
+				}
+			});
 
 			vscode.workspace.openTextDocument({ 
 				language: 'text', 
-				content: bashResp.body.commandResult
+				content: resp.data.commandResult
 			})
 			.then( doc => 
 				vscode.window.showTextDocument(
@@ -870,15 +883,22 @@ export function activate(context: vscode.ExtensionContext) {
 		// this command is not exposed through the package.json
 		// the only way this gets called, is by the as3 tenants tree, 
 		//		which means a device has to be selected to populate the tree
-		var device: string | undefined = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		const response = await f5Api.getAS3Decs(device, password, tenant);
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// const password = await utils.getPassword(device);
+		// const response = await f5Api.getAS3Decs(device, password, tenant);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(response.body);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, response.body);
+		// }
 
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
-		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
-		}
+		// set blank value if not defined -> get all tenants dec
+		tenant = tenant ? tenant : '';
+
+		await ext.mgmtClient.getToken();
+		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
+		utils.displayJsonInEditor(resp.data);
+
 	}));
 
 
@@ -892,33 +912,62 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
 		
-		var device: string | undefined = ext.hostStatusBar.text;
-		const password = await utils.getPassword(device);
-		const response = await f5Api.delAS3Tenant(tenant.label);
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// const password = await utils.getPassword(device);
+		// const response = await f5Api.delAS3Tenant(tenant.label);
 
-		// TODO:  change following feedback to a simple pop up
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, response.data);
-		}
-	
+		// // TODO:  change following feedback to a simple pop up
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(response.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, response.data);
+		// }
+	    const progress = await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: `Deleting ${tenant.label} Tenant`
+		}, async (progress) => {
+			await ext.mgmtClient.getToken();
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant.label}`, {
+				method: 'DELETE'
+			});
+			// await new Promise(resolve => { setTimeout(resolve, 3000); });
+			
+			// todo: change following to just pop up a message box giving status
+			// utils.displayJsonInEditor(resp.data);
+			const resp2 = resp.data.results;
+			// const resp3 = `Delete Task: ${resp.code}-${resp.message}`;
+			
+			// vscode.window.showInformationMessage(resp);
+			progress.report({message: `${resp2.code}-${resp2.message}`});
+			await new Promise(resolve => { setTimeout(resolve, 3000); });
+
+
+		});
+
 		// give a little time to finish
-		await new Promise(resolve => { setTimeout(resolve, 3000); });
+		// await new Promise(resolve => { setTimeout(resolve, 3000); });
 		as3TenantTree.refresh();
 		as3Tree.refresh();
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
-		
-		const resp: any = await f5Api.getAS3Task(id);
+		// const resp: any = await f5Api.getAS3Task(id);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(resp.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, resp.data);
+		// }
 
-		if (ext.settings.previewResponseInUntitledDocument) {
+		const progress = await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: `Getting AS3 Task`
+		}, async () => {
+			await ext.mgmtClient.getToken();
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
 			utils.displayJsonInEditor(resp.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, resp.data);
-		}
+		});
+
 
 	}));
 
@@ -1093,75 +1142,117 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
-		const host = ext.hostStatusBar.text;
-		if (host) {
-			const password = await utils.getPassword(host);
-			const tsInfo = await f5Api.getTsInfo(host, password);
 
-			if ( tsInfo === undefined ) {
-				throw new Error('getTsInfo failed');
-			};
+		await ext.mgmtClient.getToken();
+		const resp: any = ext.mgmtClient.makeRequest('/mgmt/shared/telemetry/info');
 
-			utils.displayJsonInEditor(tsInfo);
-		};
+		utils.displayJsonInEditor(resp.data);
+
+
+		// const host = ext.hostStatusBar.text;
+		// if (host) {
+		// 	const password = await utils.getPassword(host);
+		// 	const tsInfo = await f5Api.getTsInfo(host, password);
+
+		// 	if ( tsInfo === undefined ) {
+		// 		throw new Error('getTsInfo failed');
+		// 	};
+
+		// 	utils.displayJsonInEditor(tsInfo);
+		// };
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getDec', async () => {
-		
-		var device: string | undefined = ext.hostStatusBar.text;
-		
-		if (!device) {
-			device = await vscode.commands.executeCommand('f5.connectDevice');
-		}
-		
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
-		}
 
-		const password = await utils.getPassword(device);
-		const dec = await f5Api.getTSDec(device, password);
-		utils.displayJsonInEditor(dec.body.declaration);
+		await ext.mgmtClient.getToken();
+		
+		await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: `Getting TS Dec`
+		}, async () => {
+
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`);
+
+			utils.displayJsonInEditor(resp.data.declaration);
+		});
+
+
+		// var device: string | undefined = ext.hostStatusBar.text;
+		
+		// if (!device) {
+		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
+		// }
+		
+		// if (device === undefined) {
+		// 	throw new Error('no hosts in configuration');
+		// }
+
+		// const password = await utils.getPassword(device);
+		// const dec = await f5Api.getTSDec(device, password);
+		// utils.displayJsonInEditor(dec.body.declaration);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.postDec', async () => {
 
-		const device = ext.hostStatusBar.text;
-		var tsDecResponse = {};
+		// const device = ext.hostStatusBar.text;
+		// var tsDecResponse = {};
 
-		if (!device) {
-			throw new Error('Connect to device first');
-		}
+		// if (!device) {
+		// 	throw new Error('Connect to device first');
+		// }
 
-		const password = await utils.getPassword(device);
+		// const password = await utils.getPassword(device);
 
+
+		
 		// if selected text, capture that, if not, capture entire document
 		var editor = vscode.window.activeTextEditor;
-		if (!editor) {
-			return; // No open text editor
+		let text: string;
+		if(editor) {
+			if (editor.selection.isEmpty) {
+				text = editor.document.getText();	// entire editor/doc window
+			} else {
+				text = editor.document.getText(editor.selection);	// highlighted text
+			} 
+
+			if (!utils.isValidJson(text)) {
+				return vscode.window.showErrorMessage('Not valid JSON object');
+			}
 		}
+
+
+
+		const progress = await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: `Posting TS Dec`
+		}, async () => {
+			await ext.mgmtClient.getToken();
+			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`, {
+				method: 'POST',
+				body: JSON.parse(text)
+			});
+			utils.displayJsonInEditor(resp.data);
+		});
+
+
+
+		// if (!editor) {
+		// 	return; // No open text editor
+		// }
 
 		// TODO clean up following logic to look like other posts
 		//		and have it only display body
 
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
-		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
 
-		if (!utils.isValidJson(text)) {
-			return vscode.window.showErrorMessage('Not valid JSON object');
-		}
 
-		const response = await f5Api.postTSDec(device, password, JSON.parse(text));
 
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.body);
-		} else {
-			WebViewPanel.render(context.extensionPath, response.body);
-		}
+		// const response = await f5Api.postTSDec(device, password, JSON.parse(text));
+
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, response.body);
+		// }
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
@@ -1207,38 +1298,44 @@ export function activate(context: vscode.ExtensionContext) {
  */
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.getDec', async () => {
-		var device: string | undefined = ext.hostStatusBar.text;
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// if (!device) {
+		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
+		// }
+		// if (device === undefined) {
+		// 	throw new Error('no hosts in configuration');
+		// }
+		// const password = await utils.getPassword(device);
+		// const resp = await f5Api.getDoDec(device, password);
+		// if (resp.body === []) {
+		// 	vscode.window.showInformationMessage(`No declaration detected on device`);
+		// 	return;
+		// } else {
+		// 	return utils.displayJsonInEditor(resp.body.declaration);
+		// }
 
-		if (!device) {
-			device = await vscode.commands.executeCommand('f5.connectDevice');
-		}
-		
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
-		}
-		
-		const password = await utils.getPassword(device);
-		const resp = await f5Api.getDoDec(device, password);
+		const responseA = await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: `Getting DO Dec`
+		}, async () => {
+			await ext.mgmtClient.getToken();
+			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`);
+			utils.displayJsonInEditor(resp.data);
+		});
 
-		if (resp.body === []) {
-			vscode.window.showInformationMessage(`No declaration detected on device`);
-			return;
-		} else {
-			return utils.displayJsonInEditor(resp.body.declaration);
-		}
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.postDec', async () => {
 
-		const device = ext.hostStatusBar.text;
-		var doDecResponse = {};
+		// const device = ext.hostStatusBar.text;
+		// var doDecResponse = {};
 
-		if (!device) {
-			throw new Error('Connect to device first');
-		}
+		// if (!device) {
+		// 	throw new Error('Connect to device first');
+		// }
 
-		const password = await utils.getPassword(device);
+		// const password = await utils.getPassword(device);
 
 		// if selected text, capture that, if not, capture entire document
 
@@ -1258,46 +1355,60 @@ export function activate(context: vscode.ExtensionContext) {
 			return vscode.window.showErrorMessage('Not valid JSON object');
 		}
 
-		const response = await f5Api.postDoDec(device, password, JSON.parse(text));
-		utils.displayJsonInEditor(response.body);
+		const response = await f5Api.postDoDec(JSON.parse(text));
+		utils.displayJsonInEditor(response.data);
 
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.inspect', async () => {
-		var device: string | undefined = ext.hostStatusBar.text;
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// if (!device) {
+		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
+		// }
+		// if (device === undefined) {
+		// 	throw new Error('no hosts in configuration');
+		// }
+		// const password = await utils.getPassword(device);
+		// const resp = await f5Api.doInspect(device, password);
+		// utils.displayJsonInEditor(resp.body);
 
-		if (!device) {
-			device = await vscode.commands.executeCommand('f5.connectDevice');
-		}
-		
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
-		}
-		
-		const password = await utils.getPassword(device);
-		const resp = await f5Api.doInspect(device, password);
+		// not ever if this is even needed...
+		const responseA = await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: `Getting DO Inspect`
+		}, async () => {
+			await ext.mgmtClient.getToken();
+			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
+			utils.displayJsonInEditor(resp.data);
+		}); 
 
-		utils.displayJsonInEditor(resp.body);
 	}));
 
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.getTasks', async () => {
-		var device: string | undefined = ext.hostStatusBar.text;
+		// var device: string | undefined = ext.hostStatusBar.text;
+		// if (!device) {
+		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
+		// }
+		// if (device === undefined) {
+		// 	throw new Error('no hosts in configuration');
+		// }
+		// const password = await utils.getPassword(device);
+		// const resp = await f5Api.doTasks(device, password);
+		// utils.displayJsonInEditor(resp.body);
 
-		if (!device) {
-			device = await vscode.commands.executeCommand('f5.connectDevice');
-		}
-		
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
-		}
-		
-		const password = await utils.getPassword(device);
-		const resp = await f5Api.doTasks(device, password);
 
-		utils.displayJsonInEditor(resp.body);
+		// not ever if this is even needed... 
+		const responseA = await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: `Getting DO Tasks`
+		}, async () => {
+			await ext.mgmtClient.getToken();
+			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
+			utils.displayJsonInEditor(resp.data);
+		});
 	}));
 
 

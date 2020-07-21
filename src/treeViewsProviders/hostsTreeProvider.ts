@@ -19,7 +19,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	getChildren(element?: F5Host): Thenable<F5Host[]> {
         
         const bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
 		
 		if ( bigipHosts === undefined) {
 			throw new Error('No configured hosts - from hostTreeProvider');
@@ -69,7 +69,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		// // basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
         // const treeItems = bigipHosts.map(host => treeHosts(host));
 
-        console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
+        // console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
 
         return Promise.resolve(treeItems);
 	}

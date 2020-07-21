@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import * as f5FastApi from '../utils/f5FastApi';
-import { getAuthToken, callHTTP } from '../utils/coreF5HTTPS';
+// import { getAuthToken, callHTTP } from '../utils/coreF5HTTPS';
 import * as utils from '../utils/utils';
 // import * as f5FastUtils from './utils/f5FastUtils';
 
@@ -39,21 +39,27 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 		if(element) {
 			// parent element selected, so return necessary children items
 			if(element.label === 'Deployed Applications') {
-				const authToken = await getAuthToken(host, username, password);
-				const apps = await callHTTP('GET', host, '/mgmt/shared/fast/applications', authToken);
+				// const authToken = await getAuthToken(host, username, password);
+				// const apps = await callHTTP('GET', host, '/mgmt/shared/fast/applications', authToken);
 
-				apps.body.forEach( (item: { tenant?: string; name?: string; }) => {
+				await ext.mgmtClient.getToken();
+				const apps: any = await ext.mgmtClient.makeRequest('/mgmt/shared/fast/applications');
+
+				apps.data.forEach( (item: { tenant?: string; name?: string; }) => {
 					treeItems.push(new FastTreeItem(`${item.tenant}/${item.name}`, '', '', 'fastApp', vscode.TreeItemCollapsibleState.None,
 					{ command: 'f5-fast.getApp', title: '', arguments: [`${item.tenant}/${item.name}`] } ));
 				});
 
 
 			} else if (element.label === 'Tasks') {
-				const authToken = await getAuthToken(host, username, password);
-				const tasks = await callHTTP('GET', host, '/mgmt/shared/fast/tasks', authToken);
+				// const authToken = await getAuthToken(host, username, password);
+				// const tasks = await callHTTP('GET', host, '/mgmt/shared/fast/tasks', authToken);
+
+				await ext.mgmtClient.getToken();
+				const tasks: any = await ext.mgmtClient.makeRequest('/mgmt/shared/fast/tasks');
 
 				var subTitle: string;
-				tasks.body.slice(0, 5).map( (item: { id: string; code: number; tenant?: any; application?: any; message: string; }) => {
+				tasks.data.slice(0, 5).map( (item: { id: string; code: number; tenant?: any; application?: any; message: string; }) => {
 					const shortId = item.id.split('-').pop();
 
 					if(item.code === 200) {
@@ -67,19 +73,25 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 				});
 
 			} else if (element.label === 'Templates') {
-				const authToken = await getAuthToken(host, username, password);
-				const templates = await callHTTP('GET', host, '/mgmt/shared/fast/templates', authToken);
+				// const authToken = await getAuthToken(host, username, password);
+				// const templates = await callHTTP('GET', host, '/mgmt/shared/fast/templates', authToken);
 
-				templates.body.map( (item: any) => {
+				await ext.mgmtClient.getToken();
+				const templates: any = await ext.mgmtClient.makeRequest('/mgmt/shared/fast/templates');
+
+				templates.data.map( (item: any) => {
 					treeItems.push(new FastTreeItem(`${item}`, '', '', 'fastTemplate', vscode.TreeItemCollapsibleState.None,
 					{ command: 'f5-fast.getTemplate', title: '', arguments: [item] } ));
 				});
 
 			} else if (element.label === 'Template Sets') {
-				const authToken = await getAuthToken(host, username, password);
-				const tSets = await callHTTP('GET', host, '/mgmt/shared/fast/templatesets', authToken);
+				// const authToken = await getAuthToken(host, username, password);
+				// const tSets = await callHTTP('GET', host, '/mgmt/shared/fast/templatesets', authToken);
 
-				tSets.body.map( (item: any) => {
+				await ext.mgmtClient.getToken();
+				const tSets: any = await ext.mgmtClient.makeRequest('/mgmt/shared/fast/templatesets');
+
+				tSets.data.map( (item: any) => {
 					treeItems.push(new FastTreeItem(`${item.name}`, '', '', 'fastTemplateSet', vscode.TreeItemCollapsibleState.None,
 					{ command: 'f5-fast.getTemplateSets', title: '', arguments: [item.name] } ));
 				});

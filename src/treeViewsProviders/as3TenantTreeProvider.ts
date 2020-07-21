@@ -37,16 +37,18 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 		 */
 
 		 // get memento data, parse and make tree as needed
-		const password = await getPassword(device);
-		const tenantsFull = await f5Api.getAS3Decs(device, password);
+		// const password = await getPassword(device);
+		// const tenantsFull = await f5Api.getAS3Decs(device, password);
 		// const bodyKeys = Object.keys(tenantsFull.body);
+
+		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/`);
 
 		var treeItems = [];
 		if (element) {
 			// get children for the provided element/tenant
 			//		element comes from selectinga  parent tree member
-			for ( const app in tenantsFull.body[element.label]) {
-				if(isObject(tenantsFull.body[element.label][app])) {
+			for ( const app in resp.data[element.label]) {
+				if(isObject(resp.data[element.label][app])) {
 					// console.log(`TENANT-APP!!!!  ${element.label}-${app}`);
 					treeItems.push(new AS3TenantItem(app, '', '', vscode.TreeItemCollapsibleState.None, 
 						{ command: '', title: '', arguments: ['none'] }));
@@ -55,8 +57,8 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3TenantI
 
 		} else {
 
-			for ( const tenant in tenantsFull.body) {
-				if(isObject(tenantsFull.body[tenant])) {
+			for ( const tenant in resp.data) {
+				if(isObject(resp.data[tenant])) {
 					if(tenant !== 'controls') {
 						treeItems.push(new AS3TenantItem(tenant, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 						{ command: 'f5-as3.getDecs', title: '', arguments: [tenant] }));

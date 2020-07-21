@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
+import { makeAuth, makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
 import { ext } from '../extensionVariables';
 import * as utils from './utils';
 
@@ -59,24 +59,48 @@ export class MgmtClient {
      * @returns void
      */
     async getToken(): Promise<void> {
-        const response: any = await makeReqAXnew(
-            this.host,
-            '/mgmt/shared/authn/login',
-            {
-                port: this.port,
-                method: 'POST',
-                body: {
-                    username: this._user,
-                    password: this._password,
-                    logonProviderName: this.provider
-                },
-                // basicAuth: {
-                //     user: this._user,
-                //     password: this._password
-                // }
-            }
-        );
-        this._token = response.data['token']['token'];
+
+        console.log('reFreshing auth token', `${this.host}:${this.port}`);
+
+        const resp: any = await makeAuth(`${this.host}:${this.port}`, {
+            username: this._user,
+            password: this._password,
+            logonProviderName: this.provider
+        });
+
+        if(resp.status === 200){
+            // assign token and exit sucessfully
+            this._token = resp.data['token']['token'];
+            console.log('newToken', this._token);
+            return;
+
+        } else {
+            const status = resp.status;
+            const message = resp.data.message;
+
+            // if user/pass failed - clear cached password
+            if(message === "Authentication failed.") {
+                console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
+                vscode.window.showErrorMessage('Authentication Failed - clearing password');
+                // clear cached password
+                ext.keyTar.deletePassword('f5Hosts', `${this._user}@${this.host}`);
+            } 
+
+            vscode.window.showErrorMessage(`HTTP Auth FAILURE: ${status} - ${message}`);
+            console.error(`HTTP Auth FAILURE: ${status} - ${message} - ${JSON.stringify(resp.data)}`);
+            throw new Error(`HTTP Auth FAILURE: ${status} - ${message}`);
+        }
+        // switch(resp.status){
+        //     case 200: {
+
+        //     }
+        //     case 401: {
+
+        //     }
+        //     default: {
+        //         console.error('getAuthToken unExpected response', resp);
+        //     }
+        // }
     }
 
     /**
@@ -99,7 +123,7 @@ export class MgmtClient {
             });
             
             
-            // await ext.mgmtClient.getToken();
+            await this.getToken();
             
             let returnInfo: string[] = [];
             /**
@@ -213,3 +237,4 @@ export class MgmtClient {
         );
     }
 }
+

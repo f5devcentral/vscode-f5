@@ -1,14 +1,14 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { getAuthToken, callHTTP, multiPartUploadSDK, makeReqAXnew, downloadToFile } from './coreF5HTTPS';
-import { callHTTPS } from '../utils/externalAPIs';
+import { downloadToFile } from './coreF5HTTPS';
+// import { callHTTPS } from '../utils/externalAPIs';
 import axios from 'axios';
-import * as utils from './utils';
+// import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
-import { MgmtClient } from './f5DeviceClient';
-import { emitWarning } from 'process';
+// import { MgmtClient } from './f5DeviceClient';
+// import { emitWarning } from 'process';
 
 
 axios.defaults.headers.common['Content-Type'] = 'application/json';
