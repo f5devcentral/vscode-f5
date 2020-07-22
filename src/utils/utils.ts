@@ -92,7 +92,7 @@ export async function setAS3Bar(text: string = '', tip: string = '') {
         
         // refresh trees
         vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
-        vscode.commands.executeCommand('f5-as3.refreshTasksTree');
+        // vscode.commands.executeCommand('f5-as3.refreshTasksTree');
     } else {
         ext.as3Bar.hide();
         vscode.commands.executeCommand('setContext', 'f5.as3Installed', false);

@@ -241,10 +241,6 @@ export function activate(context: vscode.ExtensionContext) {
 		utils.setDOBar();
 		utils.setTSBar();
 
-		// refresh views to clear trees
-		vscode.commands.executeCommand('f5-as3.refreshTenantsTree');
-		vscode.commands.executeCommand('f5-as3.refreshTasksTree');
-
 		// get list of items in keytar for the 'f5Hosts' service
 		await ext.keyTar.findCredentials('f5Hosts').then( list => {
 			// map through and delete all
@@ -518,7 +514,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// const resp = await f5Api.getF5FastInfo(device, password);
 
 		await ext.mgmtClient.getToken();
-		const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
+		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(resp.data);
@@ -874,23 +870,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('as3Tenants', as3TenantTree);
 	vscode.commands.registerCommand('f5-as3.refreshTenantsTree', () => as3TenantTree.refresh());
 	
-	// setting up as3 tree
-	const as3Tree = new AS3TreeProvider('');
-	vscode.window.registerTreeDataProvider('as3Tasks', as3Tree);
-	vscode.commands.registerCommand('f5-as3.refreshTasksTree', () => as3Tree.refresh());
-
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getDecs', async (tenant) => {
-		// this command is not exposed through the package.json
-		// the only way this gets called, is by the as3 tenants tree, 
-		//		which means a device has to be selected to populate the tree
-		// var device: string | undefined = ext.hostStatusBar.text;
-		// const password = await utils.getPassword(device);
-		// const response = await f5Api.getAS3Decs(device, password, tenant);
-		// if (ext.settings.previewResponseInUntitledDocument) {
-		// 	utils.displayJsonInEditor(response.body);
-		// } else {
-		// 	WebViewPanel.render(context.extensionPath, response.body);
-		// }
 
 		// set blank value if not defined -> get all tenants dec
 		tenant = tenant ? tenant : '';
@@ -947,17 +927,11 @@ export function activate(context: vscode.ExtensionContext) {
 		// give a little time to finish
 		// await new Promise(resolve => { setTimeout(resolve, 3000); });
 		as3TenantTree.refresh();
-		as3Tree.refresh();
+		// as3Tree.refresh();
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
-		// const resp: any = await f5Api.getAS3Task(id);
-		// if (ext.settings.previewResponseInUntitledDocument) {
-		// 	utils.displayJsonInEditor(resp.data);
-		// } else {
-		// 	WebViewPanel.render(context.extensionPath, resp.data);
-		// }
 
 		const progress = await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
@@ -1010,7 +984,7 @@ export function activate(context: vscode.ExtensionContext) {
 			WebViewPanel.render(context.extensionPath, resp.data);
 		}
 		as3TenantTree.refresh();
-		as3Tree.refresh();
+		// as3Tree.refresh();
 	}));
 
 
@@ -1144,7 +1118,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
 
 		await ext.mgmtClient.getToken();
-		const resp: any = ext.mgmtClient.makeRequest('/mgmt/shared/telemetry/info');
+		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/shared/telemetry/info');
 
 		utils.displayJsonInEditor(resp.data);
 
@@ -1228,7 +1202,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Posting TS Dec`
 		}, async () => {
 			await ext.mgmtClient.getToken();
-			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`, {
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`, {
 				method: 'POST',
 				body: JSON.parse(text)
 			});
@@ -1319,7 +1293,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Dec`
 		}, async () => {
 			await ext.mgmtClient.getToken();
-			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`);
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`);
 			utils.displayJsonInEditor(resp.data);
 		});
 
@@ -1355,8 +1329,8 @@ export function activate(context: vscode.ExtensionContext) {
 			return vscode.window.showErrorMessage('Not valid JSON object');
 		}
 
-		const response = await f5Api.postDoDec(JSON.parse(text));
-		utils.displayJsonInEditor(response.data);
+		const resp = await f5Api.postDoDec(JSON.parse(text));
+		utils.displayJsonInEditor(resp.data);
 
 	}));
 
@@ -1379,7 +1353,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Inspect`
 		}, async () => {
 			await ext.mgmtClient.getToken();
-			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
 			utils.displayJsonInEditor(resp.data);
 		}); 
 
@@ -1406,7 +1380,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Tasks`
 		}, async () => {
 			await ext.mgmtClient.getToken();
-			const resp: any = ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
 			utils.displayJsonInEditor(resp.data);
 		});
 	}));

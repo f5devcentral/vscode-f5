@@ -59,7 +59,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 				const tasks: any = await ext.mgmtClient.makeRequest('/mgmt/shared/fast/tasks');
 
 				var subTitle: string;
-				tasks.data.slice(0, 5).map( (item: { id: string; code: number; tenant?: any; application?: any; message: string; }) => {
+				tasks.data.slice(0, 10).map( (item: { id: string; code: number; tenant?: any; application?: any; message: string; }) => {
 					const shortId = item.id.split('-').pop();
 
 					if(item.code === 200) {
@@ -107,7 +107,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 				{ command: 'f5-fast.getApps', title: '', arguments: ['none'] })
 		);
 		treeItems.push(
-			new FastTreeItem('Tasks', 'Last 5', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+			new FastTreeItem('Tasks', 'Last 10', '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 				{ command: 'f5-fast.listTasks', title: '', arguments: ['none'] })
 		);
 		treeItems.push(

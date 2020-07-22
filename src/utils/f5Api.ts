@@ -395,23 +395,23 @@ export async function postDoDec(dec: Dec) {
             return resp;
         }
 
-        progress.report({ message: `${resp.body.result.message}`});
+        progress.report({ message: `${resp.data.result.message}`});
         await new Promise(resolve => { setTimeout(resolve, 1000); });
 
         let taskId: string | undefined;
         if(resp.status === 202) {
-            taskId = resp.body.id;
+            taskId = resp.data.id;
 
             // get got a 202 and a taskId (single dec), check task status till complete
             while(taskId) {
                 resp = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/task/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
-                if(resp.body.result.status === 'FINISHED' || resp.body.result.status === 'ERROR' || resp.body.result.status === 'OK'){
+                if(resp.data.result.status === 'FINISHED' || resp.data.result.status === 'ERROR' || resp.data.result.status === 'OK'){
                     taskId = undefined;
                     return resp;
                 }
-                progress.report({ message: `${resp.body.result.message}`});
+                progress.report({ message: `${resp.data.result.message}`});
                 await new Promise(resolve => { setTimeout(resolve, (ext.settings.asyncInterval * 1000)); });
             }
         }

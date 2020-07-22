@@ -85,12 +85,7 @@
 				},
 				{
 					"id": "as3Tenants",
-					"name": "AS3 Tenants",
-					"when": "f5.as3Installed"
-				},
-				{
-					"id": "as3Tasks",
-					"name": "AS3 Tasks",
+					"name": "AS3",
 					"when": "f5.as3Installed"
 				},
 				{
@@ -379,12 +374,6 @@
 				"enablement": "f5.as3Installed"
 			},
 			{
-				"command": "f5-as3.getDecs",
-				"title": "All Tenants",
-				"category": "F5-AS3",
-				"enablement": "view == as3Tenants"
-			},
-			{
 				"command": "f5-as3.fullTenant",
 				"title": "Full Tenant",
 				"category": "F5-AS3",
@@ -404,15 +393,6 @@
 			{
 				"command": "f5-as3.refreshTenantsTree",
 				"title": "Refresh Tenants Tree",
-				"category": "F5-AS3",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "f5-as3.refreshTasksTree",
-				"title": "Refresh Tasks Tree",
 				"category": "F5-AS3",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -585,18 +565,8 @@
 					"group": "navigation"
 				},
 				{
-					"command": "f5-as3.getDecs",
-					"when": "view == as3Tenants",
-					"group": "navigation"
-				},
-				{
 					"command": "f5-as3.refreshTenantsTree",
 					"when": "view == as3Tenants",
-					"group": "navigation"
-				},
-				{
-					"command": "f5-as3.refreshTasksTree",
-					"when": "view == as3Tasks",
 					"group": "navigation"
 				},
 				{
@@ -696,10 +666,6 @@
 				},
 				{
 					"command": "f5-as3.refreshTenantsTree",
-					"when": "none"
-				},
-				{
-					"command": "f5-as3.refreshTasksTree",
 					"when": "none"
 				},
 				{

@@ -229,7 +229,8 @@ export class MgmtClient {
                 method: options.method || 'GET',
                 port: this.port,
                 headers: Object.assign(options.headers || {}, {
-                    'X-F5-Auth-Token': this._token
+                    'X-F5-Auth-Token': this._token,
+                    'Content-Type': 'application/json'
                 }),
                 body: options.body || undefined,
                 advancedReturn: options.advancedReturn || false
