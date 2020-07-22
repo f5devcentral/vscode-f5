@@ -83,11 +83,6 @@ export async function installedRPMs () {
  */
 export async function unInstallRpm (packageName: string) {
 
-    // const device = ext.hostStatusBar.text;
-    // const password = await utils.getPassword(device);
-    // const [username, host] = device.split('@');
-    // const authToken = await getAuthToken(host, username, password);
-
     const progressBar = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `ATC RPM un-Installing:  ${packageName}`,

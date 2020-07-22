@@ -456,6 +456,11 @@
 				}
 			},
 			{
+				"command": "f5.editDeviceProvider",
+				"title": "Edit Logon Provider",
+				"category": "F5"
+			},
+			{
 				"command": "f5.removeHost",
 				"title": "Delete",
 				"category": "F5"
@@ -593,6 +598,10 @@
 					"when": "none"
 				},
 				{
+					"command": "f5.editDeviceProvider",
+					"when": "none"
+				},
+				{
 					"command": "f5.installRPM",
 					"when": "f5.device"
 				},
@@ -705,6 +714,10 @@
 				},
 				{
 					"command": "f5.editHost",
+					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5.editDeviceProvider",
 					"when": "view == f5Hosts"
 				},
 				{

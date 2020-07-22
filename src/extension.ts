@@ -49,15 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
 	context.subscriptions.push(ext.tsBar);
 	
-	// exploring classes to group all f5 api calls
-	// const f5API = new f5Api();
-	// ext.f5Api = new F5Api;
-	// let webview = new HttpResponseWebview(context);
 
-	// const zip = new JSZip();
-
-	// Setup keyTar global var
-	// type KeyTar = typeof keyTarType;
 	ext.keyTar = keyTarType;
 
 	// keep an eye on this for different user install scenarios, like slim docker containers that don't have the supporting librarys
@@ -253,15 +245,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.removeHost', async (hostID) => {
 		console.log(`Remove Host command: ${JSON.stringify(hostID)}`);
-
 		
-		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
+		let bigipHosts: {device: string} [] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		// console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
 		
-		if ( bigipHosts === undefined ) {
-			throw new Error('Add device inputBox cancelled');
+		if ( !bigipHosts || !hostID) {
+			throw new Error('device delete, no devices in config or no selected host to delete');
 		}
-		const newBigipHosts = bigipHosts.filter( item => item !== hostID.label);
+		const newBigipHosts = bigipHosts.filter( item => item.device !== hostID.label);
 		// console.log(`less bigipHosts: ${JSON.stringify(newBigipHosts)}`)
 		
 		vscode.window.showInformationMessage(`${JSON.stringify(hostID.label)} removed!!!`);
@@ -271,13 +262,10 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.editHost', async (hostID) => {
 		
-		// TODO: if hostID === undefined => quickSelect device list
+		console.log(`Edit Host command: ${JSON.stringify(hostID)}`);
 		
-		// console.log(`Edit Host command: ${JSON.stringify(hostID)}`)
-		// vscode.window.showInformationMessage(`Editing ${JSON.stringify(hostID.label)} host!!!`);
-		
-		const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		// console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
+		let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
+		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
 		
 		vscode.window.showInputBox({
 			prompt: 'Update Device/BIG-IP/Host', 
@@ -285,35 +273,74 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 		.then( input => {
 
+			console.log('user input', input);
+
 			if (input === undefined || bigipHosts === undefined) {
 				throw new Error('Update device inputBox cancelled');
 			}
 
 			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
-			if (!bigipHosts.includes(input) && deviceRex.test(input)) {
+			const devicesString = JSON.stringify(bigipHosts);
+			
+			if (!devicesString.includes(`\"${input}\"`) && deviceRex.test(input)) {
 
-				const newBigipHosts = bigipHosts.map( item => {
-					if (item.host === hostID.label) {
-						return input;
-					} else {
-						return item;
+				bigipHosts.forEach( (item: { device: string; }) => {
+					if(item.device === hostID.label) {
+						item.device = input;
 					}
-				});				
+				});
 				
-				vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
 				vscode.window.showInformationMessage(`Updating ${input} device name.`);
+				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
 
 				// need to give the configuration a chance to save before refresing tree
 				setTimeout( () => { hostsTreeProvider.refresh();}, 300);
 			} else {
-				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
+		
+				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>:<port>');
 			}
 		});
 		
 	}));
 
 
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.editDeviceProvider', async (hostID) => {
+		
+		console.log(`EditDeviceProvider command: ${JSON.stringify(hostID)}`);
+		
+		let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
+		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
+		
+		vscode.window.showInputBox({
+			prompt: 'Update Logon Provider', 
+			value: hostID.version
+		})
+		.then( input => {
+
+			console.log('user input', input);
+
+			if (input === undefined || bigipHosts === undefined) {
+				throw new Error('Update device inputBox cancelled');
+			}
+
+			bigipHosts.forEach( (item: { device: string; provider?: string; }) => {
+				if(item.device === hostID.label) {
+					item.provider = input;
+				}
+			});
+			
+			vscode.window.showInformationMessage(`Updating ${input} device name.`);
+			vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
+
+			setTimeout( () => { hostsTreeProvider.refresh();}, 300);
+		});
+		
+	}));
+
+
 	context.subscriptions.push(vscode.commands.registerCommand('f5.openSettings', () => {
+		//	open settings window and bring the user to the F5 section
 		return vscode.commands.executeCommand("workbench.action.openSettings", "f5");
 	}));
 
@@ -322,19 +349,17 @@ export function activate(context: vscode.ExtensionContext) {
 
 		vscode.window.showInputBox({prompt: 'Device/BIG-IP/Host', placeHolder: '<user>@<host/ip>'})
 		.then(newHost => {
-			const bigipHosts: Array<string> | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
+			let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
 
 			if (newHost === undefined || bigipHosts === undefined) {
 				throw new Error('Add device inputBox cancelled');
 			}
 
-			// const deviceRex = /^[a-zA-Z]+\d*@\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/		// matches only if host is IP
 			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
-			// console.log(`Match RegEx? ${deviceRex.test(newHost)}`)	// does it match regex pattern?
-			// console.log(`Existing? ${bigipHosts?.includes(newHost)}`)	// it it already in the list?
+			const devicesString = JSON.stringify(bigipHosts);
 
-			if (!bigipHosts.includes(newHost) && deviceRex.test(newHost)){
-				bigipHosts.push(newHost);
+			if (!devicesString.includes(`\"${newHost}\"`) && deviceRex.test(newHost)){
+				bigipHosts.push({device: newHost});
 				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
 				vscode.window.showInformationMessage(`Adding ${newHost} to list!`);
 				hostsTreeProvider.refresh();
@@ -350,44 +375,34 @@ export function activate(context: vscode.ExtensionContext) {
 	//original way the example extension structured the command
 	let disposable = vscode.commands.registerCommand('f5.remoteCommand', async () => {
 	
-		const host = ext.hostStatusBar.text;
-
-		if (host) {
-			// const password = await utils.getPassword(host);
-			const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' });
-			// const cmd = await vscode.window.showInputBox({ content: 'Bash Command to Execute?' })
-			
-			if ( cmd === undefined ) {
-				// maybe just showInformationMessage and exit instead of error?
-				throw new Error('Remote Command inputBox cancelled');
-			}
-
-			// const bashResp = await f5Api.issueBash(host, password, cmd);
-
-			await ext.mgmtClient.getToken();
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
-				method: 'POST',
-				body: {
-					command: 'run',
-					utilCmdArgs: `-c '${cmd}'`
-				}
-			});
-
-			vscode.workspace.openTextDocument({ 
-				language: 'text', 
-				content: resp.data.commandResult
-			})
-			.then( doc => 
-				vscode.window.showTextDocument(
-					doc, 
-					{ 
-						preview: false 
-					}
-				)
-			);
-		}
+		const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' });
 		
-		// return vscode.window.showInformationMessage('placeholder to execute command on bigip...')
+		if ( cmd === undefined ) {
+			// maybe just showInformationMessage and exit instead of error?
+			throw new Error('Remote Command inputBox cancelled');
+		}
+
+		await ext.mgmtClient.getToken();
+		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
+			method: 'POST',
+			body: {
+				command: 'run',
+				utilCmdArgs: `-c '${cmd}'`
+			}
+		});
+
+		vscode.workspace.openTextDocument({ 
+			language: 'text', 
+			content: resp.data.commandResult
+		})
+		.then( doc => 
+			vscode.window.showTextDocument(
+				doc, 
+				{ 
+					preview: false 
+				}
+			)
+		);
 	});	
 	context.subscriptions.push(disposable);
 
@@ -892,16 +907,6 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
 		
-		// var device: string | undefined = ext.hostStatusBar.text;
-		// const password = await utils.getPassword(device);
-		// const response = await f5Api.delAS3Tenant(tenant.label);
-
-		// // TODO:  change following feedback to a simple pop up
-		// if (ext.settings.previewResponseInUntitledDocument) {
-		// 	utils.displayJsonInEditor(response.data);
-		// } else {
-		// 	WebViewPanel.render(context.extensionPath, response.data);
-		// }
 	    const progress = await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Deleting ${tenant.label} Tenant`
@@ -910,30 +915,18 @@ export function activate(context: vscode.ExtensionContext) {
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant.label}`, {
 				method: 'DELETE'
 			});
-			// await new Promise(resolve => { setTimeout(resolve, 3000); });
-			
-			// todo: change following to just pop up a message box giving status
-			// utils.displayJsonInEditor(resp.data);
-			const resp2 = resp.data.results;
-			// const resp3 = `Delete Task: ${resp.code}-${resp.message}`;
-			
-			// vscode.window.showInformationMessage(resp);
-			progress.report({message: `${resp2.code}-${resp2.message}`});
-			await new Promise(resolve => { setTimeout(resolve, 3000); });
-
-
+			const resp2 = resp.data.results[0];
+			progress.report({message: `${resp2.code} - ${resp2.message}`});
+			// hold the status box for user and let things finish before refresh
+			await new Promise(resolve => { setTimeout(resolve, 5000); });
 		});
 
-		// give a little time to finish
-		// await new Promise(resolve => { setTimeout(resolve, 3000); });
 		as3TenantTree.refresh();
-		// as3Tree.refresh();
-
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', async (id) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', (id) => {
 
-		const progress = await vscode.window.withProgress({
+		vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting AS3 Task`
 		}, async () => {
@@ -941,7 +934,6 @@ export function activate(context: vscode.ExtensionContext) {
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
 			utils.displayJsonInEditor(resp.data);
 		});
-
 
 	}));
 
@@ -1116,69 +1108,24 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
-
 		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/shared/telemetry/info');
-
 		utils.displayJsonInEditor(resp.data);
-
-
-		// const host = ext.hostStatusBar.text;
-		// if (host) {
-		// 	const password = await utils.getPassword(host);
-		// 	const tsInfo = await f5Api.getTsInfo(host, password);
-
-		// 	if ( tsInfo === undefined ) {
-		// 		throw new Error('getTsInfo failed');
-		// 	};
-
-		// 	utils.displayJsonInEditor(tsInfo);
-		// };
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getDec', async () => {
-
 		await ext.mgmtClient.getToken();
-		
 		await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting TS Dec`
 		}, async () => {
-
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`);
-
 			utils.displayJsonInEditor(resp.data.declaration);
 		});
-
-
-		// var device: string | undefined = ext.hostStatusBar.text;
-		
-		// if (!device) {
-		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
-		// }
-		
-		// if (device === undefined) {
-		// 	throw new Error('no hosts in configuration');
-		// }
-
-		// const password = await utils.getPassword(device);
-		// const dec = await f5Api.getTSDec(device, password);
-		// utils.displayJsonInEditor(dec.body.declaration);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.postDec', async () => {
-
-		// const device = ext.hostStatusBar.text;
-		// var tsDecResponse = {};
-
-		// if (!device) {
-		// 	throw new Error('Connect to device first');
-		// }
-
-		// const password = await utils.getPassword(device);
-
-
 		
 		// if selected text, capture that, if not, capture entire document
 		var editor = vscode.window.activeTextEditor;
@@ -1195,8 +1142,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 
-
-
 		const progress = await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Posting TS Dec`
@@ -1208,25 +1153,6 @@ export function activate(context: vscode.ExtensionContext) {
 			});
 			utils.displayJsonInEditor(resp.data);
 		});
-
-
-
-		// if (!editor) {
-		// 	return; // No open text editor
-		// }
-
-		// TODO clean up following logic to look like other posts
-		//		and have it only display body
-
-
-
-
-		// const response = await f5Api.postTSDec(device, password, JSON.parse(text));
-
-		// if (ext.settings.previewResponseInUntitledDocument) {
-		// } else {
-		// 	WebViewPanel.render(context.extensionPath, response.body);
-		// }
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
@@ -1272,46 +1198,20 @@ export function activate(context: vscode.ExtensionContext) {
  */
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.getDec', async () => {
-		// var device: string | undefined = ext.hostStatusBar.text;
-		// if (!device) {
-		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
-		// }
-		// if (device === undefined) {
-		// 	throw new Error('no hosts in configuration');
-		// }
-		// const password = await utils.getPassword(device);
-		// const resp = await f5Api.getDoDec(device, password);
-		// if (resp.body === []) {
-		// 	vscode.window.showInformationMessage(`No declaration detected on device`);
-		// 	return;
-		// } else {
-		// 	return utils.displayJsonInEditor(resp.body.declaration);
-		// }
 
-		const responseA = await vscode.window.withProgress({
+		await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Dec`
 		}, async () => {
 			await ext.mgmtClient.getToken();
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`);
-			utils.displayJsonInEditor(resp.data);
+			utils.displayJsonInEditor(resp.data.declaration);
 		});
 
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.postDec', async () => {
-
-		// const device = ext.hostStatusBar.text;
-		// var doDecResponse = {};
-
-		// if (!device) {
-		// 	throw new Error('Connect to device first');
-		// }
-
-		// const password = await utils.getPassword(device);
-
-		// if selected text, capture that, if not, capture entire document
 
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
@@ -1336,19 +1236,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.inspect', async () => {
-		// var device: string | undefined = ext.hostStatusBar.text;
-		// if (!device) {
-		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
-		// }
-		// if (device === undefined) {
-		// 	throw new Error('no hosts in configuration');
-		// }
-		// const password = await utils.getPassword(device);
-		// const resp = await f5Api.doInspect(device, password);
-		// utils.displayJsonInEditor(resp.body);
 
-		// not ever if this is even needed...
-		const responseA = await vscode.window.withProgress({
+		await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Inspect`
 		}, async () => {
@@ -1362,20 +1251,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-do.getTasks', async () => {
-		// var device: string | undefined = ext.hostStatusBar.text;
-		// if (!device) {
-		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
-		// }
-		// if (device === undefined) {
-		// 	throw new Error('no hosts in configuration');
-		// }
-		// const password = await utils.getPassword(device);
-		// const resp = await f5Api.doTasks(device, password);
-		// utils.displayJsonInEditor(resp.body);
 
-
-		// not ever if this is even needed... 
-		const responseA = await vscode.window.withProgress({
+		await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Tasks`
 		}, async () => {
@@ -1478,37 +1355,8 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('writeMemento', () => {
-		// console.log('placeholder for testing commands');
-		
-		vscode.window.showInputBox({
-			prompt: 'give me something to store!', 
-		})
-		.then( value => {
-
-			if (value === undefined) {
-				throw new Error('write memeto inputBox cancelled');
-			}
-			utils.setMementoW('key1', value);
-		});
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('readMemento', async () => {
-		// console.log('placeholder for testing commands - 2');
-		
-		const mento1 = utils.getMementoW('key1');
-		vscode.window.showInformationMessage(`Memento! ${mento1}`);
-
-	}));
-
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
-		// chuckJoke1();
-
-		const var1 = vscode.workspace.getConfiguration().get('f5.hosts_2');
-		console.log('f5.hosts_2-var1', var1);
-
-		const var2 = vscode.workspace.getConfiguration().get('f5.hosts_3');
-		console.log('f5.hosts_3-var2', var2);
+		chuckJoke1();
 	}));
 
 }
