@@ -108,15 +108,27 @@
 									"type": "string",
 									"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format",
 									"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$",
-									"examples": ["admin@192.168.1.254", "usr1@10.40.40.20:8443", "abc4312@dev.test.net"]
+									"examples": [
+										"admin@192.168.1.254",
+										"usr1@10.40.40.20:8443",
+										"abc4312@dev.test.net"
+									]
 								},
 								"provider": {
 									"type": "string",
 									"description": "logonProviderName to define remote auth service - ONLY NEEDED IF NOT DEFAULT 'local'",
-									"examples": ["local", "radius", "TACACS", "ldap", "custom"]
+									"examples": [
+										"local",
+										"radius",
+										"TACACS",
+										"ldap",
+										"custom"
+									]
 								}
 							},
-							"required": ["device"]
+							"required": [
+								"device"
+							]
 						}
 					},
 					"f5.hosts_2": {
@@ -152,7 +164,9 @@
 									"default": "local"
 								}
 							},
-							"required": ["provider"]
+							"required": [
+								"provider"
+							]
 						},
 						"default": {
 							"admin@192.168.1.254": {

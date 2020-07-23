@@ -126,7 +126,7 @@ export async function unInstallRpm (packageName: string) {
                 vscode.window.showInformationMessage(`ilx rpm un-install - ${resp.data.status}`);
                 progress.report({ message: `task complete, waiting for node to restart before refreshing status bars...`});
                 await new Promise(resolve => { setTimeout(resolve, 20000); }); // 20 seconds
-                ext.mgmtClient.connect(); // refresh connect/status bars
+                
                 // return resp;
                 return resp.data.status;
             }
@@ -291,7 +291,7 @@ export async function rpmInstaller (rpm: string) {
                 progress.report({ message: `Waiting for node services to restart before refreshing status bars...`});
                 // todo: watch node service restart before refreshing status bars
                 await new Promise(resolve => { setTimeout(resolve, 10000); }); // pause a moment
-                ext.mgmtClient.connect();   // refresh connect/status bars
+                // ext.mgmtClient.connect();   // refresh connect/status bars
 
                 return resp;
             } else if (resp.data.status === 'FAILED') {

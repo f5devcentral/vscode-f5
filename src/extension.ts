@@ -403,6 +403,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
 		console.log('installed rpm', installedRpm);
+		ext.mgmtClient.connect(); // refresh connect/status bars
 
 	}));
 
@@ -425,10 +426,11 @@ export function activate(context: vscode.ExtensionContext) {
 		const status = await rpmMgmt.unInstallRpm(rpm);
 		vscode.window.showInformationMessage(`rpm ${rpm} removal ${status}`);
 		// debugger;
-
+		
 		// used to pause between uninstalling and installing a new version of the same atc
 		//		should probably put this somewhere else
-		// await new Promise(resolve => { setTimeout(resolve, 2000); });
+		await new Promise(resolve => { setTimeout(resolve, 2000); });
+		ext.mgmtClient.connect(); // refresh connect/status bars
 
 	}));
 
