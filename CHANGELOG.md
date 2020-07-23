@@ -10,15 +10,21 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [1.1.0] - (7-20-2020)
 
-## Added
+### Added
 - ATC rpm install/un-install/upgrade
   - will download and cache rpm from official github repo
-- json <-> yaml conversion
-- base64 encode/decode
+  - Also right click rpm in folder to install
+- json <-> yaml conversion (highlight -> right-click)
+- base64 encode/decode (highlight -> right-click)
 - right-click template/folder to upload FAST template/template Set
 - support remote authentication via logonProvider - PENDING
+- Added 'F5-FAST -> Connect!' status bar to provide another way to connect
+  - This is especially useful when working in a repo, which is outside the main F5-Fast extension view
 
-## Modified
+### Modified
+- Combined AS3 Tenant and Tasks views
+  - This should provider a cleaner and more efficient interface
+  - Now showing number of configured tenants
 - Provided feedback and cancellation when connecting to devices
 - Updated examples to include DO github examples
   - Added placeholder for AS3 and linked to AS3 repo issue with pending "examples" folder

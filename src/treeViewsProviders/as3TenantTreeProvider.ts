@@ -7,8 +7,8 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3item> {
 	private _onDidChangeTreeData: vscode.EventEmitter<AS3item | undefined> = new vscode.EventEmitter<AS3item | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<AS3item | undefined> = this._onDidChangeTreeData.event;
 
-	// private _as3TenCount: number = 0;  
 	private _tenants: string[] = [];  
+	private _tasks: string[] = [];
 
 	constructor(private workspaceRoot: string) {
 	}
@@ -21,45 +21,46 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3item> {
 		return element;
 	}
 
-	async getChildren(element?: AS3item): Promise<AS3item[]> {
-		let treeItems = [];
+	async getChildren(element?: AS3item) {
+		let treeItems: any[] = [];
 		
-		await ext.mgmtClient.getToken();
-		await this.getTenants(); // refresh tenant information
+
 
 		if (element) {
 			
 			if(element.label === 'Tenants'){
 				
 				treeItems = this._tenants.map( tenant => {
-					return new AS3item(tenant, '', '', vscode.TreeItemCollapsibleState.None, 
+					return new AS3item(tenant, '', '', 'as3Tenant', vscode.TreeItemCollapsibleState.None, 
 						{ command: 'f5-as3.getDecs', title: 'Get Tenant Declaration', arguments: [tenant] });
 				});
 				
 			} else if (element.label === 'Tasks'){
-				const tasks: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/`);
-
-				treeItems = tasks.data.items.map((item:any) => {
-					// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
-
-					const timeStamp = item.declaration.hasOwnProperty('controls') ? item.declaration.controls.archiveTimestamp : '';
-					
-					return new AS3item(item.id.split('-').pop(), timeStamp, '', vscode.TreeItemCollapsibleState.None,
-						{ command: 'f5-as3.getTask', title: '', arguments: [item.id] });
+				
+				treeItems = this._tasks.map( (task: any) => {
+					return new AS3item(task.iId.split('-').pop(), task.timeStamp, '', '', vscode.TreeItemCollapsibleState.None,
+						{ command: 'f5-as3.getTask', title: '', arguments: [task.iId] });
 				});
-
 			}
 
 		} else {
 
-			const count = this._tenants.length !== 0 ? this._tenants.length.toString() : '';
+			/**
+			 * todo:  look at moving this to the refresh function, might cut back on how often it gets called
+			 */
+			await ext.mgmtClient.getToken();
+			await this.getTenants(); // refresh tenant information
+			await this.getTasks();	// refresh tasks information
+
+			const tenCount = this._tenants.length !== 0 ? this._tenants.length.toString() : '';
+			const taskCount = this._tasks.length !== 0 ? this._tasks.length.toString() : '';
 
 			treeItems.push(
-				new AS3item('Tenants', count, 'Get All Tenants', vscode.TreeItemCollapsibleState.Collapsed, 
+				new AS3item('Tenants', tenCount, 'Get All Tenants', '', vscode.TreeItemCollapsibleState.Collapsed, 
 					{ command: 'f5-as3.getDecs', title: '', arguments: [''] })
 			);
 			treeItems.push(
-				new AS3item('Tasks', '', 'Get All Tasks', vscode.TreeItemCollapsibleState.Collapsed,
+				new AS3item('Tasks', taskCount, 'Get All Tasks', '', vscode.TreeItemCollapsibleState.Collapsed,
 					{ command: 'f5-as3.getTask', title: '', arguments: [''] })
 			);
 		}
@@ -77,6 +78,20 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3item> {
 			}
 		}
 	}
+
+	private async getTasks() {
+		const tasks: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/`);
+
+		this._tasks = [];	// clear current tenant list
+		this._tasks = tasks.data.items.map((item:any) => {
+			// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
+			const timeStamp = item.declaration.hasOwnProperty('controls') ? item.declaration.controls.archiveTimestamp : '';
+			const iId = item.id;
+
+			return { iId, timeStamp };
+			});
+	}
+
 }
 
 function isObject(obj: object) {
@@ -89,6 +104,7 @@ class AS3item extends vscode.TreeItem {
 		public readonly label: string,
 		private version: string,
 		private toolTip: string,
+		public context: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
@@ -102,4 +118,6 @@ class AS3item extends vscode.TreeItem {
 	get description(): string {
 		return this.version;
 	}
+
+	contextValue = this.context;
 }

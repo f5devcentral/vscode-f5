@@ -6,10 +6,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as keyTarType from 'keytar';
 
-import { F5TreeProvider, F5Host } from './treeViewsProviders/hostsTreeProvider';
+import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
-import { ExampleDecsProvider, ExampleDec } from './treeViewsProviders/githubDecExamples';
+import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
@@ -21,7 +21,7 @@ import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
-import { chuckJoke2, chuckJoke1 } from './chuckJoke';
+import { chuckJoke1 } from './chuckJoke';
 
 const fast = require('@f5devcentral/f5-fast-core');
 
@@ -48,6 +48,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(ext.doBar);
 	ext.tsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
 	context.subscriptions.push(ext.tsBar);
+	
+
+	ext.connectBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 9);
+	context.subscriptions.push(ext.connectBar);
+	ext.connectBar.command = 'f5.connectDevice';
+    ext.connectBar.text = 'F5-FAST -> Connect!';
+	ext.connectBar.tooltip = 'Click to connect!';
+	ext.connectBar.show();
 	
 
 	ext.keyTar = keyTarType;
@@ -126,17 +134,12 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 		
-		// let fullDevice = `${device.user}@${device.host}`;
-		// if(device.hasOwnProperty('port')) {
-		// 	fullDevice = `${device}:${device.port}`;
-		// }
-
 		console.log('device-connect', device);
 
 		var [user, host] = device.device.split('@');
 		var [host, port] = host.split(':');
 
-		ext.logonProviderName = device.provider;
+		// ext.logonProviderName = device.provider;
 
 		const password: string = await utils.getPassword(device.device);
 
@@ -152,40 +155,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const connect = await ext.mgmtClient.connect();
 		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
 
-
-
-		// const discovery = await f5Api.connectF5(device.device, password);
-		// console.log(`F5 Connect Discovered ${JSON.stringify(discovery)}`);
-
-
-		/**
-		 * following not really being used yet, but it the beginning of using a class
-		 * 	to manage host/port/user/password across all calls within the extension
-		 * This is taking heavy inspiration from the f5-sdk-js
-		 */
-
-		// const provider = 'local';
-
-		// add password to device object
-		// device['password'] = password;
-
-
-
-		/**
-		 * setup CVE-2020-5902 stuff?
-		 * 
-		 * - check running code version against patched versions
-		 * 		- alert if running old code
-		 * - 
-		 */
-		
-		/**
-		 * setup the following to replace the f5Api.connectF5
-		 * do all the service discovery
-		 * 
-		 * need to be able to call this after ilx install/un-install
-		 */
-		
+		as3TenantTree.refresh();
 
 	}));
 	
@@ -218,6 +188,8 @@ export function activate(context: vscode.ExtensionContext) {
 		utils.setAS3Bar();
 		utils.setDOBar();
 		utils.setTSBar();
+
+		ext.connectBar.show();
 
 		// return vscode.window.showInformationMessage('clearing selected bigip and status bar details');
 	}));
@@ -255,7 +227,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const newBigipHosts = bigipHosts.filter( item => item.device !== hostID.label);
 		// console.log(`less bigipHosts: ${JSON.stringify(newBigipHosts)}`)
 		
-		vscode.window.showInformationMessage(`${JSON.stringify(hostID.label)} removed!!!`);
+		// vscode.window.showInformationMessage(`${JSON.stringify(hostID.label)} removed!!!`);
 		await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
 		hostsTreeProvider.refresh();
 	}));
@@ -290,7 +262,7 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				});
 				
-				vscode.window.showInformationMessage(`Updating ${input} device name.`);
+				// vscode.window.showInformationMessage(`Updating ${input} device name.`);
 				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
 
 				// need to give the configuration a chance to save before refresing tree
@@ -330,7 +302,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			});
 			
-			vscode.window.showInformationMessage(`Updating ${input} device name.`);
+			// vscode.window.showInformationMessage(`Updating ${hostID.label} device provider.`);
 			vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
 
 			setTimeout( () => { hostsTreeProvider.refresh();}, 300);
@@ -366,7 +338,6 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
 			}
-			// debugger;
 		});
 
 	}));
@@ -425,20 +396,6 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log('selected rpm', selectedRPM);
 		// console.log('installed rpms', JSON.stringify(iRpms));
 
-		/**
-		 * todo:  work on setting up updating installed atc
-		 * 
-		 * now that we have the final rpm selected, let's see whats installed
-		 * 	- if selected version = an installed version -> exit messageBox
-		 * 	- if 
-		 * 
-		 * figure out which atc the selectedRPM and installed RPM are
-		 * -> then figure out if the selected RPM atc is already installed or not
-		 * 	->
-		 * 
-		 * function - list installed packages
-		 */
-
 		if(!selectedRPM) {
 			debugger;
 			// probably need to setup error handling for this situation
@@ -447,25 +404,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
 		console.log('installed rpm', installedRpm);
 
-		/**
-		 * if rpmFromExplorer
-		 * 	- means user right-clicked an npm from a folder in the workspace
-		 * 	- return file location 
-		 * else
-		 * 	- start atc/tool/version picker/downloader function
-		 * 	- return file location once downloaded
-		 * 
-		 * --- npm picker function (no input)
-		 * 1. quickPick to select ATC service [fast, as3, do, ts]
-		 * 2. quickPick version [latest, v3.20.0, v3.19.2]
-		 * 3. download rpm and sha
-		 * 4. return file location
-		 * 
-		 * --- npm installer function -> input: string = <file_location>
-		 * 1. upload rpm
-		 * 2. install rpm
-		 * 3. reconnect to refresh everything
-		 */
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.unInstallRPM', async (rpm) => {

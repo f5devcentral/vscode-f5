@@ -16,8 +16,8 @@ import * as utils from './utils';
  *      user: 'admin',
  *      password: 'admin'
  * });
- * await mgmtClient.login();
- * await mgmtClient.makeRequest('/mgmt/tm/sys/version');
+ * await mgmtClient.getToken();
+ * const variable = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
  * ```
  */
 export class MgmtClient {
@@ -46,7 +46,7 @@ export class MgmtClient {
     }) {
         this.device = device;
         this.host = options['host'];
-        this.port = options['port'] | 443;
+        this.port = options['port'] || 443;
         this.provider = options['provider'];
         this._user = options['user'];
         this._password = options['password'];
@@ -55,7 +55,7 @@ export class MgmtClient {
 
     /**
      * Login (using credentials provided during instantiation)
-     * sets auth token
+     * sets/gets/refreshes auth token
      * @returns void
      */
     async getToken(): Promise<void> {
@@ -90,25 +90,12 @@ export class MgmtClient {
             console.error(`HTTP Auth FAILURE: ${status} - ${message} - ${JSON.stringify(resp.data)}`);
             throw new Error(`HTTP Auth FAILURE: ${status} - ${message}`);
         }
-        // switch(resp.status){
-        //     case 200: {
 
-        //     }
-        //     case 401: {
-
-        //     }
-        //     default: {
-        //         console.error('getAuthToken unExpected response', resp);
-        //     }
-        // }
     }
 
     /**
-     * setup connect function
-     * this could make other sub calls
-     *  - discover provider?
-     *  - service discovery
-     *  - set status bar stuff
+     * connect to f5 and discover ATC services
+     * Pulls device/connection details from this. within the class
      */
     async connect() {
         const progress = await vscode.window.withProgress({
@@ -126,16 +113,13 @@ export class MgmtClient {
             await this.getToken();
             
             let returnInfo: string[] = [];
-            /**
-             * clear "connect" status bar
-             * set "connected" status bar
-             * 
-             */
+ 
 
             // cache password in keytar
             ext.keyTar.setPassword('f5Hosts', this.device, this._password);
 
-            utils.setHostStatusBar(this.device);
+            utils.setHostStatusBar(this.device);    // show device bar
+            ext.connectBar.hide();      // hide connect bar
             
             //********** Host info **********/
             const hostInfo: any = await this.makeRequest('/mgmt/shared/identified-devices/config/device-info');
@@ -162,7 +146,7 @@ export class MgmtClient {
 
             if (as3Info.status === 200) {
                 const text = `AS3(${as3Info.data.version})`;
-                const tip = `schemaCurrent: ${as3Info.data.schemaCurrent} `;
+                const tip = `CLICK FOR ALL TENANTS \r\nschemaCurrent: ${as3Info.data.schemaCurrent} `;
                 utils.setAS3Bar(text, tip);
                 returnInfo.push(text);
             }

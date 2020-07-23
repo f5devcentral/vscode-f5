@@ -738,15 +738,15 @@
 				},
 				{
 					"command": "f5-as3.fullTenant",
-					"when": "view == as3Tenants"
+					"when": "view == as3Tenants && viewItem == as3Tenant"
 				},
 				{
 					"command": "f5-as3.expandedTenant",
-					"when": "view == as3Tenants"
+					"when": "view == as3Tenants && viewItem == as3Tenant"
 				},
 				{
 					"command": "f5-as3.deleteTenant",
-					"when": "view == as3Tenants"
+					"when": "view == as3Tenants && viewItem == as3Tenant"
 				}
 			]
 		}

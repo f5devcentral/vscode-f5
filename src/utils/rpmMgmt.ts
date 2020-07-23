@@ -11,8 +11,8 @@ import * as fs from 'fs';
 // import { emitWarning } from 'process';
 
 
-axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.defaults.headers.common['User-Agent'] = 'F5 VSCode FAST Extension';
+// axios.defaults.headers.common['Content-Type'] = 'application/json';
+// axios.defaults.headers.common['User-Agent'] = 'F5 VSCode FAST Extension';
 
 const FAST_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases';
 const AS3_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-appsvcs-extension/releases';
@@ -392,7 +392,13 @@ async function listGitReleases(url: string){
 export async function rpmDownload (url: string, destPath: string) {
     // https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
     const writeFile = fs.createWriteStream(destPath);
-    const resp: any = await axios.get(url, {responseType: 'stream'})
+    const resp: any = await axios.get(url, {
+        responseType: 'stream',
+        headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'F5 VSCode FAST Extension'
+        }
+    })
     .catch( error => {
         console.log('npmGetter error', error);
     });

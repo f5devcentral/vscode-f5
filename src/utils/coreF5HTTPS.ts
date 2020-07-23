@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
 import axios from 'axios';
-import { url } from 'inspector';
+// import { url } from 'inspector';
 
 
 
@@ -36,45 +36,21 @@ export async function makeAuth(
         password: string,
         logonProviderName: string
     }): Promise<object> {
+
+        console.log('AUTH-DETAILS:', hostPort, JSON.stringify(data));
         const resp = await axios.request({
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false
             }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
             method: 'POST',
             baseURL: `https://${hostPort}`,
             url: '/mgmt/shared/authn/login',
             data,
             validateStatus: () => true  // return ALL responses
         });
-        // .then( resp => {
-        //     // if good, just return the response
-        //     return resp;
-        // })
-        // .catch( error => {
-
-        //     // The request was made and the server responded with a status code
-        //     // that falls out of the range of 2xx
-        //     // console.log('AX-HTTP-error.response', error.response.data);
-        //     // console.log('AX-HTTP-error.status', error.response.status);
-        //     // console.log('AX-HTTP-error.headers', error.response.headers);
-
-        //     const status = error.response.status;
-        //     const message = error.response.data?.message;
-
-        //     if(status === 401 && message === "Authentication failed.") {
-        //         console.error('401 - auth failed!!!!!!  ***setup clear password***');
-        //         // ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
-        //     } else if (status === 401 && message === undefined) {
-        //         // not sure what other error conditions might be needed
-        //         // return 'bigiq-remote-auth-provider-needed';
-        //         Promise.resolve('bigiq-remote-auth-provider-needed');
-        //     }
-
-
-        //     vscode.window.showErrorMessage(`AX-HTTP FAILURE: ${status} - ${message}`);
-        //     console.error(`AX-HTTP FAILURE: ${status} - ${message} - ${JSON.stringify(error.response.data)}`);
-        //     throw new Error(`AX-HTTP FAILURE: ${status} - ${message}`);
-        // });
         return resp;
     }
 
@@ -166,27 +142,6 @@ export async function makeReqAXnew(host: string, uri: string, options: {
           }
           console.error(error.config);
     });
-
-    // return response body
-    // console.log('makeReqAXnew-RESPONSE', httpResponse);
-
-    // console.log(`makeReqAXnew-RESPONSE - Data:`, httpResponse.data);
-
-    // // check for advanced return
-    // if (options.advancedReturn) {
-    //     return {
-    //         statusCode: httpResponse.status,
-    //         body: httpResponse.data
-    //     };
-    // }
-
-    // // check for unsuccessful request
-    // if (httpResponse.status > 300) {
-    //     return Promise.reject(new Error(
-    //         `makeReqAXnew HTTP request failed: ${httpResponse.status} ${JSON.stringify(httpResponse.data)}`
-    //     ));
-    // }
-    
     return httpResponse;
 };
 
@@ -391,111 +346,111 @@ export async function downloadToFile(url: string, file: string): Promise<void> {
 // });
 
 
-interface OptsObject {
-    host: string,
-    port?: number,
-    path: string,
-    method?: string,
-    headers?: object,
-}
+// interface OptsObject {
+//     host: string,
+//     port?: number,
+//     path: string,
+//     method?: string,
+//     headers?: object,
+// }
 
-/**
- * Core HTTPs request
- * @param opts https call options
- * @param payload http call payload
- */
-function makeRequest(opts: OptsObject, payload?: object ): Promise<any> {
+// /**
+//  * Core HTTPs request
+//  * @param opts https call options
+//  * @param payload http call payload
+//  */
+// function makeRequest(opts: OptsObject, payload?: object ): Promise<any> {
 
-    const defaultOpts = {
-        port: 443,
-        method: 'GET',
-        rejectUnauthorized: false,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
+//     const defaultOpts = {
+//         port: 443,
+//         method: 'GET',
+//         rejectUnauthorized: false,
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     };
 
-    if(opts.host.includes(':')) {
-        var [host, port] = opts.host.split(':');
-        opts.host = host;
-        opts.port = parseInt(port);
-    }
+//     if(opts.host.includes(':')) {
+//         var [host, port] = opts.host.split(':');
+//         opts.host = host;
+//         opts.port = parseInt(port);
+//     }
 
-    // combine defaults with passed in options
-    const combOpts = Object.assign({}, defaultOpts, opts);
+//     // combine defaults with passed in options
+//     const combOpts = Object.assign({}, defaultOpts, opts);
 
-    console.log(`HTTP-REQUEST: ${combOpts.host} - ${combOpts.method} - ${combOpts.path}`, combOpts);
-    // exclude logging of user creds for auth token and empty body, but log everything else
-    if(combOpts.path !== '/mgmt/shared/authn/login' && combOpts.method === 'POST') {
-        console.log(`HTTP-REQUEST-BODY`, payload);
-    }
+//     console.log(`HTTP-REQUEST: ${combOpts.host} - ${combOpts.method} - ${combOpts.path}`, combOpts);
+//     // exclude logging of user creds for auth token and empty body, but log everything else
+//     if(combOpts.path !== '/mgmt/shared/authn/login' && combOpts.method === 'POST') {
+//         console.log(`HTTP-REQUEST-BODY`, payload);
+//     }
 
-    return new Promise((resolve, reject) => {
-        const req = request(combOpts, (res) => {
-            const buffer: any = [];
-            res.setEncoding('utf8');
-            res.on('data', (data) => {
-                buffer.push(data);
-            });
-            res.on('end', () => {
-                let body = buffer.join('');
-                body = body || '{}';
+//     return new Promise((resolve, reject) => {
+//         const req = request(combOpts, (res) => {
+//             const buffer: any = [];
+//             res.setEncoding('utf8');
+//             res.on('data', (data) => {
+//                 buffer.push(data);
+//             });
+//             res.on('end', () => {
+//                 let body = buffer.join('');
+//                 body = body || '{}';
 
-                try {
-                    body = JSON.parse(body);
-                } catch (e) {
-                    console.log(combOpts);
-                    console.log(e);
-                    return reject(new Error(`Invalid response object ${combOpts}`));
-                };
+//                 try {
+//                     body = JSON.parse(body);
+//                 } catch (e) {
+//                     console.log(combOpts);
+//                     console.log(e);
+//                     return reject(new Error(`Invalid response object ${combOpts}`));
+//                 };
                 
-                // // TODO: configure global logging system
-                // console.log('makeRequest***STATUS: ' + res.statusCode);
-                // console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
-                // console.log('makeRequest***BODY: ' + JSON.stringify(body));
+//                 // // TODO: configure global logging system
+//                 // console.log('makeRequest***STATUS: ' + res.statusCode);
+//                 // console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
+//                 // console.log('makeRequest***BODY: ' + JSON.stringify(body));
 
-                console.log(`HTTP-RESPONSE: ${res.statusCode}`);
-                console.log({
-                    status: res.statusCode,
-                    headers: res.headers,
-                    body
-                });
+//                 console.log(`HTTP-RESPONSE: ${res.statusCode}`);
+//                 console.log({
+//                     status: res.statusCode,
+//                     headers: res.headers,
+//                     body
+//                 });
 
                 
-                const goodResp: Array<number> = [200, 201, 202];
-                // was trying to check against array above with arr.includes or arr.indexOf
-                /**
-                 * Opening this up to any response code, to handle errors higher in logic
-                 * might need to key off 500s and more 400s when waitng for DO
-                 */
-                // if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404 || res.statusCode === 422) {
-                    if (res.statusCode) {
-                    return resolve({
-                        status: res.statusCode,
-                        headers: res.headers,
-                        body
-                    });
-                } else {
-                    vscode.window.showErrorMessage(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
-                    console.error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
-                    return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
-                }
+//                 const goodResp: Array<number> = [200, 201, 202];
+//                 // was trying to check against array above with arr.includes or arr.indexOf
+//                 /**
+//                  * Opening this up to any response code, to handle errors higher in logic
+//                  * might need to key off 500s and more 400s when waitng for DO
+//                  */
+//                 // if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404 || res.statusCode === 422) {
+//                     if (res.statusCode) {
+//                     return resolve({
+//                         status: res.statusCode,
+//                         headers: res.headers,
+//                         body
+//                     });
+//                 } else {
+//                     vscode.window.showErrorMessage(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
+//                     console.error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
+//                     return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
+//                 }
 
-            });
-        });
+//             });
+//         });
 
-        req.on('error', (e) => {
-            // might need to stringify combOpts for proper log output
-            reject(new Error(`${combOpts}:${e.message}`));
-        });
+//         req.on('error', (e) => {
+//             // might need to stringify combOpts for proper log output
+//             reject(new Error(`${combOpts}:${e.message}`));
+//         });
 
-        // if a payload was passed in, post it!
-        if (payload) {
-            req.write(JSON.stringify(payload));
-        }
-        req.end();
-    });
-};
+//         // if a payload was passed in, post it!
+//         if (payload) {
+//             req.write(JSON.stringify(payload));
+//         }
+//         req.end();
+//     });
+// };
 
 
 

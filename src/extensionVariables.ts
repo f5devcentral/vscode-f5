@@ -26,6 +26,7 @@ export namespace ext {
     export let fastBar: StatusBarItem;
     export let doBar: StatusBarItem;
     export let tsBar: StatusBarItem;
+    export let connectBar: StatusBarItem;
     export let as3AsyncPost: boolean | undefined;
     // export let f5Api: F5Api;
     export let carTreeData: object | undefined;

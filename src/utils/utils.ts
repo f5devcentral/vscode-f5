@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+
 // import { F5Api } from './f5Api';
 
 // const f5API = new f5Api();
@@ -98,7 +99,7 @@ export async function setAS3Bar(text: string = '', tip: string = '') {
         vscode.commands.executeCommand('setContext', 'f5.as3Installed', false);
     }
 
-
+    
 
 };
 
