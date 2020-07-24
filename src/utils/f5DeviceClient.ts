@@ -65,7 +65,7 @@ export class MgmtClient {
         const resp: any = await makeAuth(`${this.host}:${this.port}`, {
             username: this._user,
             password: this._password,
-            logonProviderName: this.provider
+            loginProviderName: this.provider
         });
 
         if(resp.status === 200){

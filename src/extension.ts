@@ -118,10 +118,6 @@ export function activate(context: vscode.ExtensionContext) {
 			 * [ {label: admin@192.168.1.254:8443, target: { host: 192.168.1.254, user: admin, ...}}, ...]
 			 */
 			const qPickHostList = bigipHosts.map( item => {
-				// let fullDevice = `${item.user}@${item.host}`;
-				// if(item.hasOwnProperty('port')) {
-				// 	fullDevice = `${fullDevice}:${item.port}`;
-				// }
 				return { label: item.device, target: item };
 			});
 
@@ -139,8 +135,6 @@ export function activate(context: vscode.ExtensionContext) {
 		var [user, host] = device.device.split('@');
 		var [host, port] = host.split(':');
 
-		// ext.logonProviderName = device.provider;
-
 		const password: string = await utils.getPassword(device.device);
 
 		ext.mgmtClient = new MgmtClient( device.device, {
@@ -151,11 +145,10 @@ export function activate(context: vscode.ExtensionContext) {
 			password
 		});
 
-		// await ext.mgmtClient.getToken();
 		const connect = await ext.mgmtClient.connect();
 		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
 
-		as3TenantTree.refresh();
+		// as3TenantTree.refresh();
 
 	}));
 	
@@ -283,17 +276,30 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
 		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
-		
-		vscode.window.showInputBox({
-			prompt: 'Update Logon Provider', 
-			value: hostID.version
-		})
-		.then( input => {
+
+		const providerOptions: string[] = [
+			'local',
+			'radius',
+			'tacacs',
+			'active-dirctory',
+			'ldap',
+			'apm',
+			'custom for bigiq'
+		];
+
+		vscode.window.showQuickPick(providerOptions)
+		.then( async input => {
 
 			console.log('user input', input);
 
 			if (input === undefined || bigipHosts === undefined) {
 				throw new Error('Update device inputBox cancelled');
+			}
+
+			if (input === 'custom for bigiq') {
+				input = await vscode.window.showInputBox({
+					prompt: "Input custom bigiq login provider"
+				});
 			}
 
 			bigipHosts.forEach( (item: { device: string; provider?: string; }) => {
