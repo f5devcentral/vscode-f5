@@ -2,10 +2,13 @@
 
 @hostQ = 10.200.244.15
 @hostR = 192.168.200.131
+@hostR = 10.200.244.202
 #@host = 10.200.244.5
 
 @user = admin
-@upass = benrocks
+@user = fside
+@upass = somthin
+@provider = tmos
 @authToken = {{loginA.response.body.token.token}}
 
 ###   # get auth token
@@ -15,11 +18,27 @@ Content-Type: application/json
 
 {
     "username": "{{user}}",
-    "password": "{{upass}}"
+    "password": "{{upass}}",
+    "loginProviderName": "{{provider}}"
 }
 
 
 ###   # get auth token
+# @name loginA
+POST https://{{hostR}}/mgmt/shared/authn/login
+Content-Type: application/json
+
+{
+    "username": "ted",
+    "password": "benrocks",
+    "logonProviderName": "radius"
+}
+
+
+
+
+
+###   # get auth SOURCE
 # @name loginA
 POST https://{{hostR}}/mgmt/tm/auth/source
 Content-Type: application/json
@@ -30,6 +49,13 @@ Content-Type: application/json
     "logonProviderName": "local"
 }
 
+
+
+
+###   # get auth source
+GET https://{{hostR}}/mgmt/tm/auth/source
+Content-Type: application/json
+X-F5-Auth-Token: {{authToken}}
 
 
 

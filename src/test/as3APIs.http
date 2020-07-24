@@ -15,7 +15,7 @@ Content-Type: application/json
 {
     "username": "{{user}}",
     "password": "{{upass}}",
-    "logonProviderName": "provider"
+    "loginProviderName": "tmos"
 }
 
 
