@@ -34,10 +34,10 @@ export async function makeAuth(
     data: {
         username: string,
         password: string,
-        logonProviderName: string
+        loginProviderName: string
     }): Promise<object> {
 
-        console.log('AUTH-DETAILS:', hostPort, JSON.stringify(data));
+        // console.log('AUTH-DETAILS:', hostPort, JSON.stringify(data));
         const resp = await axios.request({
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false
