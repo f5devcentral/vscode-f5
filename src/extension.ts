@@ -450,23 +450,11 @@ export function activate(context: vscode.ExtensionContext) {
 	 */
 	
 	// setting up hosts tree
-	const fastTreeProvider = new FastTemplatesTreeProvider('');
+	const fastTreeProvider = new FastTemplatesTreeProvider();
 	vscode.window.registerTreeDataProvider('fastView', fastTreeProvider);
 	vscode.commands.registerCommand('f5-fast.refreshTemplates', () => fastTreeProvider.refresh());
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
-		// var device: string | undefined = ext.hostStatusBar.text;
-		
-		// if (!device) {
-		// 	device = await vscode.commands.executeCommand('f5.connectDevice');
-		// }
-
-		// if (device === undefined) {
-		// 	throw new Error('no hosts in configuration');
-		// }
-
-		// const password = await utils.getPassword(device);
-		// const resp = await f5Api.getF5FastInfo(device, password);
 
 		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);

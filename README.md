@@ -283,7 +283,34 @@ HTTP/422 responses - Can happen for a handful of reasons:
   - Sometimes this is from the '$schema' reference in the declaration
 - Sometimes you can fix a DO HTTP/400 response by overwriting with a clean/updated declaration
 
-You cannot select a tenant application in the tree view.  It is only for visibility.  Select the tenant for configuration
+### HTTP Auth Failures
+
+When utilizing an external auth provider, occasionally restjavad/restnoded can have some issues, resulting in some occansional HTTP/400 auth errors:
+
+The fix is to restart: restjavad and restnoded
+
+Error from extension
+> HTTP Auth FAILURE: 400 - undefined
+
+Error from restjavad log
+```
+[SEVERE][6859][24 Jul 2020 13:11:39 UTC][8100/shared/authn/login AuthnWorker] Error as the maximum time to wait exceeded while getting value of loginProviderName
+[SEVERE][6860][24 Jul 2020 13:11:39 UTC][8100/shared/authn/login AuthnWorker] Error while setting value to loginProviderName when no loginReference and no loginProviderName were given
+[WARNING][6861][24 Jul 2020 13:11:39 UTC][com.f5.rest.common.RestWorker] dispatch to worker http://localhost:8100/shared/authn/login caught following exception: java.lang.NullPointerException
+        at com.f5.rest.workers.authn.AuthnWorker.onPost(AuthnWorker.java:394)
+        at com.f5.rest.common.RestWorker.callDerivedRestMethod(RestWorker.java:1276)
+        at com.f5.rest.common.RestWorker.callRestMethodHandler(RestWorker.java:1190)
+        at com.f5.rest.common.RestServer.processQueuedRequests(RestServer.java:1207)
+        at com.f5.rest.common.RestServer.access$000(RestServer.java:44)
+        at com.f5.rest.common.RestServer$1.run(RestServer.java:285)
+        at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:473)
+        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:178)
+        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:292)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:622)
+        at java.lang.Thread.run(Thread.java:748)
+```
 
 ---
 
