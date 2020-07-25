@@ -41,7 +41,7 @@ export async function installedRPMs () {
      *      is being gathered and waiting for user to select...
      */
     
-    await ext.mgmtClient.getToken();   // refresh token
+    //await ext.mgmtClient.getToken();   // refresh token
     // start installed pkgs query
     const query: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
@@ -246,7 +246,7 @@ export async function rpmInstaller (rpm: string) {
         const rpmName = path.basename(rpm);
 
 
-        await ext.mgmtClient.getToken();   // refresh auth token
+        //await ext.mgmtClient.getToken();   // refresh auth token
         // let rpms finish downloading...
         await new Promise(resolve => { setTimeout(resolve, 2000); });
 
