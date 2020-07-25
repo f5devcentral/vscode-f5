@@ -114,7 +114,6 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 
 		} else {
 
-		await ext.mgmtClient.getToken();
 		// gather all necessary details
 		// looking for ways to do this async
 		await this.getApps();

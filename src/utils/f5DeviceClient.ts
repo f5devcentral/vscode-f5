@@ -27,10 +27,10 @@ export class MgmtClient {
     provider: string;
     protected _user: string;
     protected _password: string;
-    protected _token!: string | '1234';
-    // set above token to '1234' to get through TS typing
-    // at instaniation it will be empty but should get updated
-    // via code as calls are made
+    protected _token: any;
+    protected _tmrBar: any;
+    protected _tokenTimeout: number = 0;
+
 
     /**
      * @param options function options
@@ -58,7 +58,7 @@ export class MgmtClient {
      * sets/gets/refreshes auth token
      * @returns void
      */
-    async getToken(): Promise<void> {
+    private async getToken(): Promise<void> {
 
         console.log('reFreshing auth token', `${this.host}:${this.port}`);
 
@@ -70,8 +70,12 @@ export class MgmtClient {
 
         if(resp.status === 200){
             // assign token and exit sucessfully
-            this._token = resp.data['token']['token'];
-            console.log('newToken', this._token);
+            this._token = resp.data.token;
+            this._tokenTimeout = this._token.timeout;
+
+            console.log('newTokn', this._token);
+
+            this.tokenTimer();  // start token timer
             return;
 
         } else {
@@ -180,7 +184,7 @@ export class MgmtClient {
      * @param file full path/file location
      */
     async upload(file: string) {
-        return await multiPartUploadSDK(file, this.host, this.port, this._token);
+        return await multiPartUploadSDK(file, this.host, this.port, this._token.token);
     }
 
 
@@ -206,6 +210,11 @@ export class MgmtClient {
     }): Promise<object>  {
         options = options || {};
 
+        // if auth token has expired, it should have been cleared, get new one
+        if(!this._token){
+            await this.getToken();
+        }
+
         return await makeReqAXnew(
             this.host,
             uri,
@@ -213,7 +222,7 @@ export class MgmtClient {
                 method: options.method || 'GET',
                 port: this.port,
                 headers: Object.assign(options.headers || {}, {
-                    'X-F5-Auth-Token': this._token,
+                    'X-F5-Auth-Token': this._token.token,
                     'Content-Type': 'application/json'
                 }),
                 body: options.body || undefined,
@@ -221,5 +230,61 @@ export class MgmtClient {
             }
         );
     }
+
+
+    /**
+     * bigip auth token lifetime countdown
+     * will clear auth token details when finished
+     * prompting the next http call to get a new token
+     */
+    private async tokenTimer() {
+
+        this._tmrBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._tmrBar.tooltip = 'F5 AuthToken Timer';
+        this._tmrBar.color = 'silver';
+
+        const makeVisible = vscode.workspace.getConfiguration().get('f5.showAuthTokenTimer');
+        if(makeVisible) {
+            this._tmrBar.show();
+        }
+
+        let intervalId = setInterval(() => {
+            this._tmrBar.text = `${this._tokenTimeout}`;
+            // console.log('token timeout', timeout);
+            this._tokenTimeout--;
+            if (this._tokenTimeout <= 0) {
+                clearInterval(intervalId);
+                this._tmrBar.hide();
+                console.log('authToken expired');
+                this._token = undefined; // clearing token details should get a new token
+                this._tmrBar.dispose();
+            } else if (this._tokenTimeout <= 30){
+                // turn text color reddish/pink to indicate expiring token
+                this._tmrBar.color = '#ED5A75';
+            }
+        }, 1000);
+        
+    }
+
+
+    /**
+     * clears auth token and connected status bars
+     */
+    async disconnect() {
+
+        this._tokenTimeout = 0;  // zero/expire authToken
+
+        // clear connected details status bars
+        utils.setHostStatusBar();
+		utils.setHostnameBar();
+		utils.setFastBar();
+		utils.setAS3Bar();
+		utils.setDOBar();
+		utils.setTSBar();
+
+        // show connect status bar
+		ext.connectBar.show();
+    }
+
 }
 

@@ -89,17 +89,11 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
-		
-
 		console.log('selected device', device);
 
-		// clear status bars before new connect
-		utils.setHostStatusBar();
-		utils.setHostnameBar();
-		utils.setFastBar();
-		utils.setAS3Bar();
-		utils.setDOBar();
-		utils.setTSBar();	
+		if(ext.mgmtClient) {
+			ext.mgmtClient.disconnect();
+		}
 
 		type devObj = {
 			device: string,
@@ -148,8 +142,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const connect = await ext.mgmtClient.connect();
 		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
 
-		// as3TenantTree.refresh();
-
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', async () => {
@@ -163,40 +155,23 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 
-		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/shared/identified-devices/config/device-info');
-
-		// const password: string = await utils.getPassword(device);
-		// const hostInfo  = await f5Api.getF5HostInfo(device, password);
-
 		utils.displayJsonInEditor(resp.data);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
 
-		// clear status bars
-		utils.setHostStatusBar();
-		utils.setHostnameBar();
-		utils.setFastBar();
-		utils.setAS3Bar();
-		utils.setDOBar();
-		utils.setTSBar();
-
-		ext.connectBar.show();
-
-		// return vscode.window.showInformationMessage('clearing selected bigip and status bar details');
+		if(ext.mgmtClient) {
+			ext.mgmtClient.disconnect();
+		}
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.clearPasswords', async () => {
 		console.log('CLEARING KEYTAR PASSWORD CACHE');
 
-		// clear status bars 
-		utils.setHostStatusBar();
-		utils.setHostnameBar();
-		utils.setFastBar();
-		utils.setAS3Bar();
-		utils.setDOBar();
-		utils.setTSBar();
+		if(ext.mgmtClient) {
+			ext.mgmtClient.disconnect();
+		}
 
 		// get list of items in keytar for the 'f5Hosts' service
 		await ext.keyTar.findCredentials('f5Hosts').then( list => {
@@ -212,17 +187,14 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`Remove Host command: ${JSON.stringify(hostID)}`);
 		
 		let bigipHosts: {device: string} [] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		// console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`)
 		
 		if ( !bigipHosts || !hostID) {
 			throw new Error('device delete, no devices in config or no selected host to delete');
 		}
 		const newBigipHosts = bigipHosts.filter( item => item.device !== hostID.label);
-		// console.log(`less bigipHosts: ${JSON.stringify(newBigipHosts)}`)
-		
-		// vscode.window.showInformationMessage(`${JSON.stringify(hostID.label)} removed!!!`);
+
 		await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
-		hostsTreeProvider.refresh();
+		setTimeout( () => { hostsTreeProvider.refresh();}, 300);
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.editHost', async (hostID) => {
@@ -255,10 +227,7 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				});
 				
-				// vscode.window.showInformationMessage(`Updating ${input} device name.`);
 				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
-
-				// need to give the configuration a chance to save before refresing tree
 				setTimeout( () => { hostsTreeProvider.refresh();}, 300);
 			} else {
 		
@@ -272,22 +241,20 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.editDeviceProvider', async (hostID) => {
 		
-		console.log(`EditDeviceProvider command: ${JSON.stringify(hostID)}`);
-		
 		let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
-		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
 
 		const providerOptions: string[] = [
 			'local',
 			'radius',
 			'tacacs',
+			'tmos',
 			'active-dirctory',
 			'ldap',
 			'apm',
 			'custom for bigiq'
 		];
 
-		vscode.window.showQuickPick(providerOptions)
+		vscode.window.showQuickPick(providerOptions, {placeHolder: 'Default BIGIP providers'})
 		.then( async input => {
 
 			console.log('user input', input);
@@ -308,7 +275,6 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			});
 			
-			// vscode.window.showInformationMessage(`Updating ${hostID.label} device provider.`);
 			vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
 
 			setTimeout( () => { hostsTreeProvider.refresh();}, 300);
@@ -359,7 +325,7 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('Remote Command inputBox cancelled');
 		}
 
-		await ext.mgmtClient.getToken();
+		//await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
 			method: 'POST',
 			body: {
@@ -462,7 +428,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
 
-		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -515,7 +480,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApp', async (tenApp) => {
 
-		await ext.mgmtClient.getToken();
 		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -528,7 +492,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTask', async (taskId) => {
 
-		await ext.mgmtClient.getToken();
 		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -541,7 +504,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplate', async (template) => {
 
-		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templates/${template}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -554,7 +516,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
 
-		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -824,7 +785,6 @@ export function activate(context: vscode.ExtensionContext) {
 		// set blank value if not defined -> get all tenants dec
 		tenant = tenant ? tenant : '';
 
-		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
 		utils.displayJsonInEditor(resp.data);
 
@@ -845,7 +805,7 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Deleting ${tenant.label} Tenant`
 		}, async (progress) => {
-			await ext.mgmtClient.getToken();
+			
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant.label}`, {
 				method: 'DELETE'
 			});
@@ -864,7 +824,7 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting AS3 Task`
 		}, async () => {
-			await ext.mgmtClient.getToken();
+
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
 			utils.displayJsonInEditor(resp.data);
 		});
@@ -873,9 +833,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.postDec', async () => {
 
-		// var device: string | undefined = ext.hostStatusBar.text;
 		ext.as3AsyncPost = vscode.workspace.getConfiguration().get('f5.as3Post.async');
-		// const postParam: string | undefined = vscode.workspace.getConfiguration().get('f5.as3Post.async');
 
 		let postParam;
 		if(ext.as3AsyncPost) {
@@ -900,8 +858,6 @@ export function activate(context: vscode.ExtensionContext) {
 			return vscode.window.showErrorMessage('Not valid JSON object');
 		}
 
-		// use the following logic to implement robust async
-		// https://github.com/vinnie357/demo-gcp-tf/blob/add-glb-targetpool/terraform/gcp/templates/as3.sh
 		const resp = await f5Api.postAS3Dec(postParam, JSON.parse(text));
 
 		if (ext.settings.previewResponseInUntitledDocument) {
@@ -910,7 +866,6 @@ export function activate(context: vscode.ExtensionContext) {
 			WebViewPanel.render(context.extensionPath, resp.data);
 		}
 		as3TenantTree.refresh();
-		// as3Tree.refresh();
 	}));
 
 
@@ -1042,14 +997,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
-		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/shared/telemetry/info');
 		utils.displayJsonInEditor(resp.data);
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.getDec', async () => {
-		await ext.mgmtClient.getToken();
 		await vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting TS Dec`
@@ -1080,7 +1033,6 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Posting TS Dec`
 		}, async () => {
-			await ext.mgmtClient.getToken();
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`, {
 				method: 'POST',
 				body: JSON.parse(text)
@@ -1137,7 +1089,6 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Dec`
 		}, async () => {
-			await ext.mgmtClient.getToken();
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`);
 			utils.displayJsonInEditor(resp.data.declaration);
 		});
@@ -1175,7 +1126,6 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Inspect`
 		}, async () => {
-			await ext.mgmtClient.getToken();
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
 			utils.displayJsonInEditor(resp.data);
 		}); 
@@ -1190,7 +1140,6 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Tasks`
 		}, async () => {
-			await ext.mgmtClient.getToken();
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
 			utils.displayJsonInEditor(resp.data);
 		});

@@ -179,6 +179,11 @@
 						"default": true,
 						"description": "Make as3 posts async by default"
 					},
+					"f5.showAuthTokenTimer": {
+						"type": "boolean",
+						"default": false,
+						"description": "Displays a countdown of the auth token lifetime.  Extension will refresh the token as needed with the next call.  This is mainly for visibility/debugging purposes, or for those like a ton of feedback"
+					},
 					"f5.asyncInterval": {
 						"type": "number",
 						"default": 5,
