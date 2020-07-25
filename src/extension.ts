@@ -144,6 +144,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 	
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getProvider', async () => {
+
+		await ext.mgmtClient.getToken();
+		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/tm/auth/source');
+
+		utils.displayJsonInEditor(resp.data);
+	}));
+
+
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getF5HostInfo', async () => {
 		var device: string | undefined = ext.hostStatusBar.text;
 		
