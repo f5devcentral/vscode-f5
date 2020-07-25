@@ -48,7 +48,6 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3item> {
 			/**
 			 * todo:  look at moving this to the refresh function, might cut back on how often it gets called
 			 */
-			//await ext.mgmtClient.getToken();
 			await this.getTenants(); // refresh tenant information
 			await this.getTasks();	// refresh tasks information
 

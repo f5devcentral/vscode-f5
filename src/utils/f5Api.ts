@@ -381,8 +381,6 @@ export async function postDoDec(dec: Dec) {
             return new Error(`User canceled the async post`);
         });
         
-        //await ext.mgmtClient.getToken();
-
         // post initial dec
         let resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`, {
             method: 'POST',
@@ -575,7 +573,6 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
         });
 
         // post initial dec
-        //await ext.mgmtClient.getToken();
         let resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare?${postParam}`, {
             method: 'POST',
             body: dec

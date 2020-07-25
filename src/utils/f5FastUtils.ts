@@ -100,8 +100,6 @@ export async function zipPostTemplate (doc: string) {
         // console.log(package1);
         // console.log('zipOut', zipOut);
 
-        //await ext.mgmtClient.getToken();
-
         //f5-sdk-js version
         progress.report({ message: `Uploading Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
@@ -189,13 +187,6 @@ export async function zipPostTempSet (folder: string) {
         /**
          * if we have gotten this far, it's time to get ready for POST
          */
-
-        // const device = ext.hostStatusBar.text;
-        // const password = await utils.getPassword(device);
-        // const [username, host] = device.split('@');
-        // const authToken = await getAuthToken(host, username, password);
-
-        //await ext.mgmtClient.getToken();
 
         // //f5-sdk-js version
         progress.report({ message: `Uploading Template set`});
