@@ -242,7 +242,11 @@ export class MgmtClient {
         this._tmrBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this._tmrBar.tooltip = 'F5 AuthToken Timer';
         this._tmrBar.color = 'silver';
-        this._tmrBar.show();
+
+        const makeVisible = vscode.workspace.getConfiguration().get('f5.showAuthTokenTimer');
+        if(makeVisible) {
+            this._tmrBar.show();
+        }
 
         let intervalId = setInterval(() => {
             this._tmrBar.text = `${this._tokenTimeout}`;
