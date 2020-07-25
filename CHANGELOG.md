@@ -8,26 +8,38 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [1.1.0] - (7-20-2020)
+## [2.0.0] - (7-28-2020)
 
 ### Added
 - ATC rpm install/un-install/upgrade
   - will download and cache rpm from official github repo
   - Also right click rpm in folder to install
+  - *** LOCAL CACHE LOCATION? ***
 - json <-> yaml conversion (highlight -> right-click)
 - base64 encode/decode (highlight -> right-click)
-- right-click template/folder to upload FAST template/template Set
-- support remote authentication via logonProvider - PENDING
+- right-click template/folder in explorer view to upload FAST template/template Set
 - Added 'F5-FAST -> Connect!' status bar to provide another way to connect
   - This is especially useful when working in a repo, which is outside the main F5-Fast extension view
+- Added, highlight declaration in editor -> right-click, options for posting AS3/DO/TS declarations
+- support remote authentication via logonProvider - PENDING
+  - Updated config structure (what stores devices details)
+  - Includes right-click option on device to update logonProvider
+    - This provides a list of default options for BIGIP and an option to provide a custom provider for BIGIQ
 
 ### Modified
 - Combined AS3 Tenant and Tasks views
   - This should provider a cleaner and more efficient interface
-  - Now showing number of configured tenants
+  - Now showing number of configured tenants and tasks
+- Updated FAST view
+  - Now includes item counts
+  - This also resulted in more efficient data storage and retrieval
 - Provided feedback and cancellation when connecting to devices
 - Updated examples to include DO github examples
   - Added placeholder for AS3 and linked to AS3 repo issue with pending "examples" folder
+- Auth token now utilized for entire token lifetime
+  - Drastically cut down on network traffic constantly refreshing token for major different functions throughout extension
+  - Added configuration option to show token life countdown in status bar (disabled by default)
+  - If token does expire, next http call will refresh it as needed
 
 Created a git repo for documenting the building of fast templates and a bunch of other things for demo'ing the extension
 
