@@ -451,16 +451,6 @@
 				"enablement": "f5.doInstalled"
 			},
 			{
-				"command": "writeMemento",
-				"title": "writeMemento",
-				"category": "F5"
-			},
-			{
-				"command": "readMemento",
-				"title": "readMemento",
-				"category": "F5"
-			},
-			{
 				"command": "f5.editHost",
 				"title": "Edit Host",
 				"category": "F5",
@@ -473,6 +463,12 @@
 				"command": "f5.editDeviceProvider",
 				"title": "Edit Logon Provider",
 				"category": "F5"
+			},
+			{
+				"command": "f5.getProvider",
+				"title": "Get Current Device Provider",
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.removeHost",
@@ -616,6 +612,10 @@
 					"when": "none"
 				},
 				{
+					"command": "f5.getProvider",
+					"when": "f5.device"
+				},
+				{
 					"command": "f5.installRPM",
 					"when": "f5.device"
 				},
@@ -732,6 +732,10 @@
 				},
 				{
 					"command": "f5.editDeviceProvider",
+					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5.getProvider",
 					"when": "view == f5Hosts"
 				},
 				{
