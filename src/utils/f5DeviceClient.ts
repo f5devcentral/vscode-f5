@@ -27,14 +27,10 @@ export class MgmtClient {
     provider: string;
     protected _user: string;
     protected _password: string;
-    protected _token!: string | '1234';
-    protected _tokn: any;
+    protected _token: any;
     protected _tmrBar: any;
-    protected _timeout: any;
+    protected _tokenTimeout: number = 0;
 
-    // set above token to '1234' to get through TS typing
-    // at instaniation it will be empty but should get updated
-    // via code as calls are made
 
     /**
      * @param options function options
@@ -66,16 +62,6 @@ export class MgmtClient {
 
         console.log('reFreshing auth token', `${this.host}:${this.port}`);
 
-        // if(!this._tokn){
-        //     console.log('no token detected - fetching fresh token');
-        // } else {
-        //     console.log('--token detected - issue time: ', this._tokn.startTime);
-        //     console.log('tokn timeout', this._tokn.timeout);
-        // }
-
-        // const d = new Date();
-        // console.log('current system iso time', d.toISOString());
-
         const resp: any = await makeAuth(`${this.host}:${this.port}`, {
             username: this._user,
             password: this._password,
@@ -84,19 +70,12 @@ export class MgmtClient {
 
         if(resp.status === 200){
             // assign token and exit sucessfully
-            this._token = resp.data['token']['token'];
-            this._tokn = resp.data.token;
-            this._timeout = this._tokn.timeout;
+            this._token = resp.data.token;
+            this._tokenTimeout = this._token.timeout;
 
-            console.log('newToken', this._token);
-            console.log('newTokn', this._tokn);
+            console.log('newTokn', this._token);
 
             this.tokenTimer();  // start token timer
-
-
-            // this._timer.setTimer(this._tokn.timeout);
-            // this._timer.start();
-            // this._timer.onTimeChanged( el => { this._tmrBar.text = el.remainingSeconds;});
             return;
 
         } else {
@@ -205,7 +184,7 @@ export class MgmtClient {
      * @param file full path/file location
      */
     async upload(file: string) {
-        return await multiPartUploadSDK(file, this.host, this.port, this._token);
+        return await multiPartUploadSDK(file, this.host, this.port, this._token.token);
     }
 
 
@@ -231,8 +210,8 @@ export class MgmtClient {
     }): Promise<object>  {
         options = options || {};
 
-        // if authe token has expired, get new one
-        if(!this._tokn){
+        // if auth token has expired, it should have been cleared, get new one
+        if(!this._token){
             await this.getToken();
         }
 
@@ -243,7 +222,7 @@ export class MgmtClient {
                 method: options.method || 'GET',
                 port: this.port,
                 headers: Object.assign(options.headers || {}, {
-                    'X-F5-Auth-Token': this._token,
+                    'X-F5-Auth-Token': this._token.token,
                     'Content-Type': 'application/json'
                 }),
                 body: options.body || undefined,
@@ -252,34 +231,46 @@ export class MgmtClient {
         );
     }
 
+
+    /**
+     * bigip auth token lifetime countdown
+     * will clear auth token details when finished
+     * prompting the next http call to get a new token
+     */
     private async tokenTimer() {
-        // this._timeout = 60;
-        // let timeout = this._tokn.timeout;
+
         this._tmrBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this._tmrBar.tooltip = 'F5 AuthToken Timer';
         this._tmrBar.color = 'silver';
         this._tmrBar.show();
 
         let intervalId = setInterval(() => {
-            this._tmrBar.text = `${this._timeout}`;
+            this._tmrBar.text = `${this._tokenTimeout}`;
             // console.log('token timeout', timeout);
-            this._timeout--;
-            if (this._timeout <= 0) {
+            this._tokenTimeout--;
+            if (this._tokenTimeout <= 0) {
                 clearInterval(intervalId);
                 this._tmrBar.hide();
                 console.log('authToken expired');
-                this._tokn = undefined; // clearing token details should get a new token
+                this._token = undefined; // clearing token details should get a new token
                 this._tmrBar.dispose();
-            } else if (this._timeout <= 30){
+            } else if (this._tokenTimeout <= 30){
+                // turn text color reddish/pink to indicate expiring token
                 this._tmrBar.color = '#ED5A75';
             }
         }, 1000);
         
     }
+
+
+    /**
+     * clears auth token and connected status bars
+     */
     async disconnect() {
 
-        this._timeout = 0;  // zero/expire authToken
+        this._tokenTimeout = 0;  // zero/expire authToken
 
+        // clear connected details status bars
         utils.setHostStatusBar();
 		utils.setHostnameBar();
 		utils.setFastBar();
@@ -287,6 +278,7 @@ export class MgmtClient {
 		utils.setDOBar();
 		utils.setTSBar();
 
+        // show connect status bar
 		ext.connectBar.show();
     }
 
