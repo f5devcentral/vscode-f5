@@ -7,10 +7,34 @@ import * as fs from 'fs';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
 import axios from 'axios';
-// import { url } from 'inspector';
 
 
 
+/**
+ * tested working with axios interceptors
+ */
+// axios.interceptors.request.use(function (config) {
+//     // Do something before request is sent
+//     console.log('HTTP-request-config', request);
+//     return config;
+// }, function (error) {
+//     // Do something with request error
+//     console.log('HTTP-request-error', error);
+//     return Promise.reject(error);
+//   });
+
+//   // Axios response interceptor
+// axios.interceptors.response.use(function (response) {
+//     // // Do something with response data
+//     // console.log('HTTP-response-data', response);
+//     return response;
+//   }, function (error) {
+//     // Do something with response error
+//     // console.error('HTTP-response-error:', error);
+//     // vscode.window.showErrorMessage(`${error.code}-${error.message}`);
+//     // return Promise.reject(error);
+//     return error;
+//   });
 
 /**
  * Everything below this is for all the new f5 https calls
@@ -35,7 +59,7 @@ export async function makeAuth(
         username: string,
         password: string,
         loginProviderName: string
-    }): Promise<object> {
+    }) {
 
         // console.log('AUTH-DETAILS:', hostPort, JSON.stringify(data));
         const resp = await axios.request({
@@ -49,7 +73,50 @@ export async function makeAuth(
             baseURL: `https://${hostPort}`,
             url: '/mgmt/shared/authn/login',
             data,
-            validateStatus: () => true  // return ALL responses
+            // validateStatus: () => true  // return ALL responses
+        })
+        .then( resp => {
+            return resp;
+        })
+        .catch(function (error) {
+            // debugger;
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                // console.error(error.response.data);
+                // console.error(error.response.status);
+                // console.error(error.response.headers);
+
+                const status = error.response.status;
+                const message = error.response.data.message;
+
+                // if user/pass failed - clear cached password
+                if(message === "Authentication failed.") {
+                    console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
+                    vscode.window.showErrorMessage('Authentication Failed - clearing password');
+                    // clear cached password and disconnect
+                    ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
+                    ext.mgmtClient.disconnect();
+                } 
+
+                vscode.window.showErrorMessage(`HTTP Auth FAILURE: ${status} - ${message}`);
+                console.error(`HTTP Auth FAILURE: ${status} - ${message} - ${JSON.stringify(error.response.data)}`);
+                throw new Error(`HTTP Auth FAILURE: ${status} - ${message}`);
+            // } else if (error.request) {
+            //   // The request was made but no response was received
+            //   // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            //   // http.ClientRequest in node.js
+            //   console.log('AuthHttpErrorRequest', error.request);
+            } else if (error.code && error.message){
+                // console.error('HTTP-response-error:', error);
+                console.error(`HTTP-response-error: ${error.code} - ${error.message}`);
+                vscode.window.showErrorMessage(`${error.code} - ${error.message}`);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('AuthHttpError', error.message);
+            }
+            // console.error('AuthHttpConfigError',error.config);
+            console.error('AuthHttpFULLError',error);
         });
         return resp;
     }
@@ -75,7 +142,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     options = options || {};
 
     // logger.debug(`Making HTTP request: ${host} ${uri} ${JSON.stringify(options)}`);
-    console.log(`makeReqAXnew-REQUEST: ${options.method} -> ${host}:${options.port}${uri} - ${JSON.stringify(options.headers)}`);
+    console.log(`makeReqAXnew-REQUEST: ${options.method} -> ${host}:${options.port}${uri}`);
 
     /**
      * todo:  move some of the parameter assignments above so they can be logged before execution
@@ -115,14 +182,14 @@ export async function makeReqAXnew(host: string, uri: string, options: {
             const status = error.response.status;
             const message = error.response.data?.message;
 
-            if(status === 401 && message === "Authentication failed.") {
-                console.error('401 - auth failed!!!!!!  ***setup clear password***');
-                // ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
-            } else if (status === 401 && message === undefined) {
-                // not sure what other error conditions might be needed
-                // return 'bigiq-remote-auth-provider-needed';
-                Promise.resolve('bigiq-remote-auth-provider-needed');
-            }
+            // if(status === 401 && message === "Authentication failed.") {
+            //     console.error('401 - auth failed!!!!!!  ***setup clear password***');
+            //     // ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
+            // } else if (status === 401 && message === undefined) {
+            //     // not sure what other error conditions might be needed
+            //     // return 'bigiq-remote-auth-provider-needed';
+            //     Promise.resolve('bigiq-remote-auth-provider-needed');
+            // }
 
 
             vscode.window.showErrorMessage(`AX-HTTP FAILURE: ${status} - ${message}`);
@@ -256,289 +323,3 @@ export async function downloadToFile(url: string, file: string): Promise<void> {
         });
     }));
 }
-
-
-
-
-
-
-
-
-/**
- * #######################################################################################################
- * #######################################################################################################
- * #######################################################################################################
- */
-
-
-
-
-
-
-
-
-/**
- * Every below this should be the original F5 HTTPS calls, in the process of moving to 
- * the new F5 calls through the f5DeviceClient which should be 
- * 
- */
-
-
-
-// /**
-//  * Get tmos auth token
-//  * @param host fqdn or IP address of destination
-//  * @param username 
-//  * @param password 
-//  */
-// export const getAuthToken = async (host: string, username: string, password: string) => makeRequest(
-//     {
-//         host,
-//         path: '/mgmt/shared/authn/login',
-//         method: 'POST',
-//     }, 
-//     { 
-//         username,
-//         password,
-//         logonProviderName: ext.logonProviderName
-//     })
-//     .then( async res => {
-//         if (res.status === 200) {
-//             return res.body.token.token;
-//         } else if (res.status === 401 && res.body.message === "Authentication failed.") {
-//             // clear cached password for this device
-//             ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
-    
-//             vscode.window.showErrorMessage(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//             console.error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//             throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//         } else {
-//             // await new Promise(resolve => { setTimeout(resolve, 3000); });
-//             vscode.window.showErrorMessage(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//             console.error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//             throw new Error(`HTTP FAILURE: ${res.status} - ${res.body.message}`);
-//         }
-// });
-
-
-// /**
-//  * core makeRequest wrapper for f5 https calls
-//  * @param method HTTP method (GET,POST)
-//  * @param host hostname/ip of destination
-//  * @param path uri path
-//  * @param token bigip auth token value
-//  * @param payload json object post payload
-//  */
-// export const callHTTP = (method: string, host: string, path: string, token: string, payload: object = {}) => makeRequest(
-//     {
-//         method,
-//         host,
-//         path,
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-F5-Auth-Token': token
-//         }
-//     },
-//     payload
-// )
-// .then( response => {
-//     return response;
-// });
-
-
-// interface OptsObject {
-//     host: string,
-//     port?: number,
-//     path: string,
-//     method?: string,
-//     headers?: object,
-// }
-
-// /**
-//  * Core HTTPs request
-//  * @param opts https call options
-//  * @param payload http call payload
-//  */
-// function makeRequest(opts: OptsObject, payload?: object ): Promise<any> {
-
-//     const defaultOpts = {
-//         port: 443,
-//         method: 'GET',
-//         rejectUnauthorized: false,
-//         headers: {
-//             'Content-Type': 'application/json'
-//         }
-//     };
-
-//     if(opts.host.includes(':')) {
-//         var [host, port] = opts.host.split(':');
-//         opts.host = host;
-//         opts.port = parseInt(port);
-//     }
-
-//     // combine defaults with passed in options
-//     const combOpts = Object.assign({}, defaultOpts, opts);
-
-//     console.log(`HTTP-REQUEST: ${combOpts.host} - ${combOpts.method} - ${combOpts.path}`, combOpts);
-//     // exclude logging of user creds for auth token and empty body, but log everything else
-//     if(combOpts.path !== '/mgmt/shared/authn/login' && combOpts.method === 'POST') {
-//         console.log(`HTTP-REQUEST-BODY`, payload);
-//     }
-
-//     return new Promise((resolve, reject) => {
-//         const req = request(combOpts, (res) => {
-//             const buffer: any = [];
-//             res.setEncoding('utf8');
-//             res.on('data', (data) => {
-//                 buffer.push(data);
-//             });
-//             res.on('end', () => {
-//                 let body = buffer.join('');
-//                 body = body || '{}';
-
-//                 try {
-//                     body = JSON.parse(body);
-//                 } catch (e) {
-//                     console.log(combOpts);
-//                     console.log(e);
-//                     return reject(new Error(`Invalid response object ${combOpts}`));
-//                 };
-                
-//                 // // TODO: configure global logging system
-//                 // console.log('makeRequest***STATUS: ' + res.statusCode);
-//                 // console.log('makeRequest***HEADERS: ' + JSON.stringify(res.headers));
-//                 // console.log('makeRequest***BODY: ' + JSON.stringify(body));
-
-//                 console.log(`HTTP-RESPONSE: ${res.statusCode}`);
-//                 console.log({
-//                     status: res.statusCode,
-//                     headers: res.headers,
-//                     body
-//                 });
-
-                
-//                 const goodResp: Array<number> = [200, 201, 202];
-//                 // was trying to check against array above with arr.includes or arr.indexOf
-//                 /**
-//                  * Opening this up to any response code, to handle errors higher in logic
-//                  * might need to key off 500s and more 400s when waitng for DO
-//                  */
-//                 // if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 202 || res.statusCode === 404 || res.statusCode === 422) {
-//                     if (res.statusCode) {
-//                     return resolve({
-//                         status: res.statusCode,
-//                         headers: res.headers,
-//                         body
-//                     });
-//                 } else {
-//                     vscode.window.showErrorMessage(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
-//                     console.error(`HTTP FAILURE: ${res.statusCode} - ${res.statusMessage}`);
-//                     return reject(new Error(`HTTP - ${res.statusCode} - ${res.statusMessage}`));
-//                 }
-
-//             });
-//         });
-
-//         req.on('error', (e) => {
-//             // might need to stringify combOpts for proper log output
-//             reject(new Error(`${combOpts}:${e.message}`));
-//         });
-
-//         // if a payload was passed in, post it!
-//         if (payload) {
-//             req.write(JSON.stringify(payload));
-//         }
-//         req.end();
-//     });
-// };
-
-
-
-
-
-
-
-
-
-/**
- * #######################################################################################################
- * #######################################################################################################
- * #######################################################################################################
- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// /**
-//  * Axios HTTPS agent specific for bigip
-//  * modeled after f5-sdk-js implementation
-//  * Will probably become the new https method, but will need some refactoring
-//  * @param host hostname/IP
-//  * @param uri http uri path
-//  * @param options http options (method, port, body, headers, basicAuth)
-//  */
-// export async function makeRequestAX(host: string, uri: string, options: {
-//     method?: any; 
-//     port?: number;
-//     body?: object;
-//     headers?: object;
-//     auth?: object;
-//     // basicAuth?: object;
-//     advancedReturn?: boolean;
-// }): Promise<object> {
-//     options = options || {};
-
-//     // logger.debug(`Making HTTP request: ${host} ${uri} ${JSON.stringify(options)}`);
-//     console.log(`makeRequestAX: ${host} ${uri} ${JSON.stringify(options)}`);
-
-//     const httpResponse = await axios.request({
-//         httpsAgent: new https.Agent({
-//             rejectUnauthorized: false
-//         }),
-//         method: options['method'] || 'GET',
-//         baseURL: `https://${host}:${options['port'] || 443}`,
-//         url: uri,
-//         headers: options['headers'] !== undefined ? options['headers'] : {},
-//         data: options['body'] || null,
-//         // auth: options['basicAuth'] !== undefined ? {
-//         //     username: options['basicAuth']['user'],
-//         //     password: options['basicAuth']['password']
-//         // } : undefined,
-//         // validateStatus: null
-//         // validateStatus: () => true
-//     });
-
-//     // check for advanced return
-//     if (options.advancedReturn) {
-//         return {
-//             statusCode: httpResponse.status,
-//             body: httpResponse.data
-//         };
-//     }
-
-//     // check for unsuccessful request
-//     if (httpResponse.status > 400) {
-//         return Promise.reject(new Error(
-//             `makeRequestAX HTTP request failed: ${httpResponse.status} ${JSON.stringify(httpResponse.data)}`
-//         ));
-//     }
-
-//     // return response body
-//     console.log('makeRequestAX-response', httpResponse);
-    
-//     return httpResponse;
-// };
-
-
-
