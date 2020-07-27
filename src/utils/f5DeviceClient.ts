@@ -16,7 +16,6 @@ import * as utils from './utils';
  *      user: 'admin',
  *      password: 'admin'
  * });
- * await mgmtClient.getToken();
  * const variable = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
  * ```
  */
@@ -60,7 +59,7 @@ export class MgmtClient {
      */
     private async getToken(): Promise<void> {
 
-        console.log('reFreshing auth token', `${this.host}:${this.port}`);
+        console.log('getting auth token from: ', `${this.host}:${this.port}`);
 
         const resp: any = await makeAuth(`${this.host}:${this.port}`, {
             username: this._user,
@@ -68,33 +67,12 @@ export class MgmtClient {
             loginProviderName: this.provider
         });
 
-        if(resp.status === 200){
-            // assign token and exit sucessfully
-            this._token = resp.data.token;
-            this._tokenTimeout = this._token.timeout;
+        this._token = resp.data.token;
+        this._tokenTimeout = this._token.timeout;
 
-            console.log('newTokn', this._token);
+        console.log('newTokn', this._token);
 
-            this.tokenTimer();  // start token timer
-            return;
-
-        } else {
-            const status = resp.status;
-            const message = resp.data.message;
-
-            // if user/pass failed - clear cached password
-            if(message === "Authentication failed.") {
-                console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
-                vscode.window.showErrorMessage('Authentication Failed - clearing password');
-                // clear cached password
-                ext.keyTar.deletePassword('f5Hosts', `${this._user}@${this.host}`);
-            } 
-
-            vscode.window.showErrorMessage(`HTTP Auth FAILURE: ${status} - ${message}`);
-            console.error(`HTTP Auth FAILURE: ${status} - ${message} - ${JSON.stringify(resp.data)}`);
-            throw new Error(`HTTP Auth FAILURE: ${status} - ${message}`);
-        }
-
+        this.tokenTimer();  // start token timer
     }
 
     /**
@@ -102,6 +80,7 @@ export class MgmtClient {
      * Pulls device/connection details from this. within the class
      */
     async connect() {
+        await this.disconnect();
         const progress = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Connecting to ${this.host}`,
@@ -114,7 +93,7 @@ export class MgmtClient {
             });
             
             
-            await this.getToken();
+            // await this.getToken();
             
             let returnInfo: string[] = [];
  
@@ -239,7 +218,7 @@ export class MgmtClient {
      */
     private async tokenTimer() {
 
-        this._tmrBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._tmrBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
         this._tmrBar.tooltip = 'F5 AuthToken Timer';
         this._tmrBar.color = 'silver';
 
@@ -248,9 +227,11 @@ export class MgmtClient {
             this._tmrBar.show();
         }
 
+        // consider adding an icon, maybe even spinning
+        //https://code.visualstudio.com/api/references/icons-in-labels
+
         let intervalId = setInterval(() => {
             this._tmrBar.text = `${this._tokenTimeout}`;
-            // console.log('token timeout', timeout);
             this._tokenTimeout--;
             if (this._tokenTimeout <= 0) {
                 clearInterval(intervalId);

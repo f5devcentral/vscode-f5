@@ -25,9 +25,6 @@ import { chuckJoke1 } from './chuckJoke';
 
 const fast = require('@f5devcentral/f5-fast-core');
 
-// import { MemFS } from './treeViewsProviders/fileSystemProvider';
-// import { HttpResponseWebview } from './responseWebview';
-
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
@@ -89,7 +86,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
-		console.log('selected device', device);
+		// console.log('selected device', device);
 
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
@@ -124,7 +121,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 		
-		console.log('device-connect', device);
+		console.log('device-connect:', JSON.stringify(device));
 
 		var [user, host] = device.device.split('@');
 		var [host, port] = host.split(':');
@@ -145,10 +142,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getProvider', async () => {
-
-		await ext.mgmtClient.getToken();
 		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/tm/auth/source');
-
 		utils.displayJsonInEditor(resp.data);
 	}));
 

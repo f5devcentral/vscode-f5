@@ -277,18 +277,15 @@ export async function rpmInstaller (rpm: string) {
         let i = 0;  // loop counter
         // use taskId to control loop
         while(taskId && i < 10) {
-            // const installStatus = await callHTTP('GET', host, `/mgmt/shared/iapp/package-management-tasks/${taskId}`, authToken);
             const resp: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
-            // progress.report({ message: `... ... ...`});
             console.log('task in progress', taskId, resp.status, resp.data.status);
             
             if(resp.data.status === 'FINISHED') {
                 vscode.window.showInformationMessage(`${rpmName} Install Complete!`);
                 progress.report({ message: `Waiting for node services to restart before refreshing status bars...`});
                 // todo: watch node service restart before refreshing status bars
-                await new Promise(resolve => { setTimeout(resolve, 10000); }); // pause a moment
-                // ext.mgmtClient.connect();   // refresh connect/status bars
+                await new Promise(resolve => { setTimeout(resolve, 15000); }); // pause a moment
 
                 return resp;
             } else if (resp.data.status === 'FAILED') {
