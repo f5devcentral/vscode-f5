@@ -18,11 +18,42 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	getChildren(element?: F5Host): Thenable<F5Host[]> {
         
-        const bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
+        var bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
 		
 		if ( bigipHosts === undefined) {
 			throw new Error('No configured hosts - from hostTreeProvider');
+		}
+
+		console.log('checking for legacy hosts config');
+
+
+		/**
+		 * 7.27.2020
+		 * the following code bloc detects the legacy device configuration structure of an array of strings
+		 * 	then converts it to the new structure for the new devices view, which is an array of objects.  
+		 * 
+		 * Should only run once when it detects the legacy config the first time.
+		 * 
+		 * Should be able remove this down the road
+		 */
+
+		// if devices in list and first list item is a string, not an object
+		if(bigipHosts.length > 0 && typeof(bigipHosts[0]) === 'string') {
+			
+			console.log('devices are type of:', typeof(bigipHosts[0]));
+			bigipHosts = bigipHosts.map( (el: any) => {
+				let newObj: { device: string } = { device: el };
+				console.log(`device coverted from: ${el} -> ${JSON.stringify(newObj)}`);
+				return newObj;
+			});
+			
+			console.log('conversion complete, saving new devices list:', bigipHosts);
+			// save config
+			vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
+			vscode.window.showWarningMessage('Legacy device config list converted!!!');
+		} else {
+			console.log('New device configuration list detected -> no conversion');
 		}
 
 		const treeItems = bigipHosts.map( (item: { 

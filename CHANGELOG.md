@@ -8,23 +8,31 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.0.1] - (7-28-2020)
+
+### Added
+- Function to migration legacy devices config to new devices config
+
+---
+
 ## [2.0.0] - (7-28-2020)
 
 ### Added
 - ATC rpm install/un-install/upgrade
   - will download and cache rpm from official github repo
+  - cache is located in %USERPROFILE%\.vscode\extensions\%extensionInstall%\atc_ilx_rpm_cache
   - Also right click rpm in folder to install
-  - *** LOCAL CACHE LOCATION? ***
 - json <-> yaml conversion (highlight -> right-click)
 - base64 encode/decode (highlight -> right-click)
 - right-click template/folder in explorer view to upload FAST template/template Set
 - Added 'F5-FAST -> Connect!' status bar to provide another way to connect
   - This is especially useful when working in a repo, which is outside the main F5-Fast extension view
-- Added, highlight declaration in editor -> right-click, options for posting AS3/DO/TS declarations
-- support remote authentication via logonProvider - PENDING
+- Added options for posting AS3/DO/TS declarations (highlight declaration in editor -> right-click)
+- support for remote authentication via logonProvider
   - Updated config structure (what stores devices details)
   - Includes right-click option on device to update logonProvider
     - This provides a list of default options for BIGIP and an option to provide a custom provider for BIGIQ
+    - Also added function to show configured logon provider (right-click device in list)
 
 ### Modified
 - Combined AS3 Tenant and Tasks views
@@ -34,6 +42,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Now includes item counts
   - This also resulted in more efficient data storage and retrieval
 - Provided feedback and cancellation when connecting to devices
+  - including better feedback of auth errors and network timeout/errors
 - Updated examples to include DO github examples
   - Added placeholder for AS3 and linked to AS3 repo issue with pending "examples" folder
 - Auth token now utilized for entire token lifetime
