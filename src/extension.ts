@@ -1243,14 +1243,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.makeRequest', async () => {
-		// 
-
 		/**
 		 * make open/raw https call
-		 * 
-		 * if no host param, assume connected f5 device
-		 *   - take uri (and body if provided) -> makeRequest
-		 * if host param, assume not connected f5 device -> make regular axios call
 		 * 
 		 */
 
@@ -1269,43 +1263,16 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 
 				console.log('NOT JSON');
+				if(text.includes('uri:')) {
+					// if yaml should have uri: param
+					console.log('yaml with uri: param -> parsing raw to JSON', text);
+					text = jsYaml.safeLoad(text);
 
-				if(text.includes('http')){
-					
-					// if full fqdn with uri
-					// const vUri = vscode.Uri.parse(text);
-					// console.log('parsed raw uri', vUri);
-
-					if(text.includes('uri:')) {
-						// if yaml should have uri: param
-						text = jsYaml.safeLoad(text);
-						console.log('yaml with uri: param -> parsing to JSON', text);
-
-					} else {
-						console.log('http with OUT uri param -> converting to json');
-						text = { uri: text };
-					}
-
-				// } else if(text.includes('uri:') || text.includes('host:')) {
 				} else {
-
-					// no uri param detected, assuming just uri string so, make it json object
-					console.log('no uri/http param detected, converting string to basic uri param');
-					// text = { uri: text };
-					if(text.includes('uri:')) {
-						// if yaml should have uri: param
-						text = jsYaml.safeLoad(text);
-						console.log('yaml with uri: param -> parsing to JSON', text);
-
-					} else {
-						console.log('http with OUT uri param -> converting to json');
-						text = { uri: text };
-					}
-
+					console.log('http with OUT uri param -> converting to json');
+					text = { uri: text };
 				}
 			}
-
-			console.log('json to be sent', text);
 
 			/**
 			 * At this point we should have a json object with parameters
@@ -1334,7 +1301,6 @@ export function activate(context: vscode.ExtensionContext) {
 				});
 				utils.displayJsonInEditor(resp.data);
 			}
-			// return;
 		}
 
 	}));
