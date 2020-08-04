@@ -1263,14 +1263,18 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 
 				console.log('NOT JSON');
-				if(text.includes('uri:')) {
-					// if yaml should have uri: param
-					console.log('yaml with uri: param -> parsing raw to JSON', text);
+				// trim line breaks
+				text = text.replace(/(\r\n|\n|\r)/gm,"");
+
+				if(text.includes('url:')) {
+					// if yaml should have url: param
+					console.log('yaml with url: param -> parsing raw to JSON', text);
 					text = jsYaml.safeLoad(text);
 
 				} else {
-					console.log('http with OUT uri param -> converting to json');
-					text = { uri: text };
+					// not yaml
+					console.log('http with OUT url param -> converting to json');
+					text = { url: text };
 				}
 			}
 
@@ -1279,11 +1283,11 @@ export function activate(context: vscode.ExtensionContext) {
 			 * 	depending on the parameters, it's an F5 call, or an external call
 			 */
 
-			if(text.uri.includes('http')) {
+			if(text.url.includes('http')) {
 				
 				//external call
 				console.log('external call -> ', JSON.stringify(text));
-				const resp = await extAPI.makeRequest(text);
+				const resp: any = await extAPI.makeRequest(text);
 				utils.displayJsonInEditor(resp.data);
 				
 			} else {
@@ -1295,7 +1299,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				
 				console.log('device call -> ', JSON.stringify(text));
-				const resp: any = await ext.mgmtClient.makeRequest(text.uri, {
+				const resp: any = await ext.mgmtClient.makeRequest(text.url, {
 					method: text.method,
 					body: text.body
 				});
