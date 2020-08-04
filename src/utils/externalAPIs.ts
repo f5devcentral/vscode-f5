@@ -2,11 +2,59 @@
 
 import * as vscode from 'vscode';
 import { request } from 'https';
+import axios from 'axios';
 // import { ext } from './extensionVariables';
 
 /**
  * external API commands
  */
+
+interface AxOpts {
+    url?: string,
+    method?: string,
+    baseURL?: string,
+    auth?: {
+        username: string,
+        password: string
+    }
+    data?: string | object
+}
+
+export async function makeRequest(opts: any) {
+    
+    /**
+     * based on axios HTTP
+     * https://github.com/axios/axios#request-config
+     * 
+     * 
+     */
+
+    // `url` is the server URL that will be used for the request
+    // url: '/user',
+
+    // `method` is the request method to be used when making the request
+    // method: 'get', // default
+
+    // `baseURL` will be prepended to `url` unless `url` is absolute.
+    // It can be convenient to set `baseURL` for an instance of axios to pass relative URLs
+    // to methods of that instance.
+    //   baseURL: 'https://some-domain.com/api/',
+
+    // opts = 'https://api.chucknorris.io/jokes/random';
+    console.log('pre Opts', opts);
+    
+    opts = {
+        method: opts['method'] || 'GET',
+        url: opts.uri,
+        data: opts['data'] || null,
+    };
+
+    console.log('post Opts', opts);
+
+    const resp = await axios.request(opts);
+
+    return resp;
+}
 
 
 export function callHTTPS(opts: object, payload: object = {}): Promise<any> {

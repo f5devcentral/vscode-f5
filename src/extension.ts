@@ -13,6 +13,7 @@ import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
+import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
@@ -1238,6 +1239,104 @@ export function activate(context: vscode.ExtensionContext) {
 		editor.edit( editBuilder => {
 			editBuilder.replace(editor.selection, decoded);
 		});
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.makeRequest', async () => {
+		// 
+
+		/**
+		 * make open/raw https call
+		 * 
+		 * if no host param, assume connected f5 device
+		 *   - take uri (and body if provided) -> makeRequest
+		 * if host param, assume not connected f5 device -> make regular axios call
+		 * 
+		 */
+
+		console.log('executing f5.makeRequest');
+		const editor = vscode.window.activeTextEditor;
+
+		if(editor){
+			var text: any = editor.document.getText(editor.selection);	// highlighted text
+
+			// see if it's json or yaml or string
+			if(utils.isValidJson(text)) {
+
+				console.log('JSON detected -> parsing');
+				text = JSON.parse(text);
+
+			} else {
+
+				console.log('NOT JSON');
+
+				if(text.includes('http')){
+					
+					// if full fqdn with uri
+					// const vUri = vscode.Uri.parse(text);
+					// console.log('parsed raw uri', vUri);
+
+					if(text.includes('uri:')) {
+						// if yaml should have uri: param
+						text = jsYaml.safeLoad(text);
+						console.log('yaml with uri: param -> parsing to JSON', text);
+
+					} else {
+						console.log('http with OUT uri param -> converting to json');
+						text = { uri: text };
+					}
+
+				// } else if(text.includes('uri:') || text.includes('host:')) {
+				} else {
+
+					// no uri param detected, assuming just uri string so, make it json object
+					console.log('no uri/http param detected, converting string to basic uri param');
+					// text = { uri: text };
+					if(text.includes('uri:')) {
+						// if yaml should have uri: param
+						text = jsYaml.safeLoad(text);
+						console.log('yaml with uri: param -> parsing to JSON', text);
+
+					} else {
+						console.log('http with OUT uri param -> converting to json');
+						text = { uri: text };
+					}
+
+				}
+			}
+
+			console.log('json to be sent', text);
+
+			/**
+			 * At this point we should have a json object with parameters
+			 * 	depending on the parameters, it's an F5 call, or an external call
+			 */
+
+			if(text.uri.includes('http')) {
+				
+				//external call
+				console.log('external call -> ', JSON.stringify(text));
+				const resp = await extAPI.makeRequest(text);
+				utils.displayJsonInEditor(resp.data);
+				
+			} else {
+				
+				// f5 device call
+				if(!ext.mgmtClient) {
+					// connect to f5 if not already connected
+					await vscode.commands.executeCommand('f5.connectDevice');
+				}
+				
+				console.log('device call -> ', JSON.stringify(text));
+				const resp: any = await ext.mgmtClient.makeRequest(text.uri, {
+					method: text.method,
+					body: text.body
+				});
+				utils.displayJsonInEditor(resp.data);
+			}
+			// return;
+		}
+
 	}));
 
 

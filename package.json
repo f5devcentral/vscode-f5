@@ -281,6 +281,11 @@
 				"enablement": "f5.device"
 			},
 			{
+				"command": "f5.makeRequest",
+				"title": "Make HTTP Request",
+				"category": "F5"
+			},
+			{
 				"command": "f5.openSettings",
 				"title": "Settings",
 				"category": "F5"
@@ -508,6 +513,11 @@
 		],
 		"menus": {
 			"editor/context": [
+				{
+					"when": "editorHasSelection",
+					"command": "f5.makeRequest",
+					"group": "F5"
+				},
 				{
 					"when": "editorHasSelection",
 					"command": "f5-fast.deployApp",
