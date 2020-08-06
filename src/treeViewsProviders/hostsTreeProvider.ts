@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
-
+	
 	private _onDidChangeTreeData: vscode.EventEmitter<F5Host | undefined> = new vscode.EventEmitter<F5Host | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<F5Host | undefined> = this._onDidChangeTreeData.event;
 
@@ -82,29 +82,73 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			});
 			return treeItem;
 		});
-   
-        // // takes individual host item and creates a tree item
-        // const treeHosts = (name: string): F5Host => {
-        //     const treeItem = new F5Host(name, vscode.TreeItemCollapsibleState.None, {
-        //         command: 'f5.connectDevice',
-        //         title: 'hostTitle',
-        //         arguments: [name]
-        //     });
-        //     // console.log(`treeItem: ${JSON.stringify(treeItem)}`);
-        //     return treeItem;
-        // };
-
-		// // takes list of bigip hosts from the workspace config file, in the variable "bigipHosts"
-		// //		for each item in list assign item to "host", feed "host" to the function treeHosts
-		// //		treeHosts return a treeItem, that gets returned as a list of treeItems in the promise.resolve
-		// // basically, vscode api call this function of this class and expects a resolved promise which is a list of objects it can use to make a tree!
-        // const treeItems = bigipHosts.map(host => treeHosts(host));
-
-        // console.log(`treeItems full: ${JSON.stringify(treeItems)}`);
 
         return Promise.resolve(treeItems);
 	}
-    
+
+	async addDevice(newHost: string) {
+
+		let bigipHosts: {device: string} [] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
+
+		if(!newHost) {
+			// attempt to get user to input new device
+			newHost = await vscode.window.showInputBox({
+				prompt: 'Device/BIG-IP/Host',
+				placeHolder: '<user>@<host/ip>'
+			})
+			.then( el => {
+				if(el) {
+					return el;
+				} else {
+					throw new Error('user escapted new device input');
+				}
+			});
+		}
+
+		if (bigipHosts === undefined) {
+			// throw new Error('no devices in config?');
+			bigipHosts = [];
+		}
+
+		const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
+		const devicesString = JSON.stringify(bigipHosts);
+
+		if (!devicesString.includes(`\"${newHost}\"`) && deviceRex.test(newHost)){
+			bigipHosts.push({device: newHost});
+			await vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
+			// vscode.window.showInformationMessage(`Adding ${newHost} to list!`);
+			this.refresh();
+			return `${newHost} added to device configuration`;
+		} else {
+			vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
+			return 'FAILED - Already exists or invalid format: <user>@<host/ip>';
+			// Promise.reject('Already exists or invalid format: <user>@<host/ip>');
+			// throw new Error('Already exists or invalid format: <user>@<host/ip>');
+		}
+	}
+
+	async removeDevice(hostID: any) {
+		console.log(`Remove Host command: ${JSON.stringify(hostID)}`);
+		
+		let bigipHosts: {device: string} [] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
+		
+		if ( !bigipHosts || !hostID) {
+			throw new Error('device delete, no devices in config or no selected host to delete');
+		}
+
+		const newBigipHosts = bigipHosts.filter( item => item.device !== hostID.label);
+
+		 if(bigipHosts.length === (newBigipHosts.length+1) ) {
+			console.log('successfully removed device!!!');
+			await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
+			setTimeout( () => { this.refresh();}, 300);
+			return `successfully removed ${hostID.label} from devices configuration`;
+		 } else {
+			console.log('something with remove device FAILED!!!');
+			throw new Error('something with remove device FAILED!!!');
+		 }
+
+	}
 
 }
 

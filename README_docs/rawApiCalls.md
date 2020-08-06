@@ -1,6 +1,6 @@
 
 
-# Make HTTPS Request documentation and examples
+# Make HTTP/S Request documentation and examples
 
 [BACK TO MAIN README](../README.md)
 

@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
-		// console.log('selected device', device);
+		console.log('selected device', device);
 
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
@@ -187,18 +187,12 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.removeHost', async (hostID) => {
-		console.log(`Remove Host command: ${JSON.stringify(hostID)}`);
-		
-		let bigipHosts: {device: string} [] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		
-		if ( !bigipHosts || !hostID) {
-			throw new Error('device delete, no devices in config or no selected host to delete');
-		}
-		const newBigipHosts = bigipHosts.filter( item => item.device !== hostID.label);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.addHost', async (newHost) => {
+		return await hostsTreeProvider.addDevice(newHost);
+	}));
 
-		await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
-		setTimeout( () => { hostsTreeProvider.refresh();}, 300);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.removeHost', async (hostID) => {
+		return await hostsTreeProvider.removeDevice(hostID);
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.editHost', async (hostID) => {
@@ -293,30 +287,6 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.addHost', () => {
-
-		vscode.window.showInputBox({prompt: 'Device/BIG-IP/Host', placeHolder: '<user>@<host/ip>'})
-		.then(newHost => {
-			let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
-
-			if (newHost === undefined || bigipHosts === undefined) {
-				throw new Error('Add device inputBox cancelled');
-			}
-
-			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
-			const devicesString = JSON.stringify(bigipHosts);
-
-			if (!devicesString.includes(`\"${newHost}\"`) && deviceRex.test(newHost)){
-				bigipHosts.push({device: newHost});
-				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
-				vscode.window.showInformationMessage(`Adding ${newHost} to list!`);
-				hostsTreeProvider.refresh();
-			} else {
-				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
-			}
-		});
-
-	}));
 
 
 	//original way the example extension structured the command
@@ -1263,17 +1233,17 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 
 				console.log('NOT JSON');
-				// trim line breaks
-				text = text.replace(/(\r\n|\n|\r)/gm,"");
-
+				
 				if(text.includes('url:')) {
 					// if yaml should have url: param
-					console.log('yaml with url: param -> parsing raw to JSON', text);
+					console.log('yaml with url: param -> parsing raw to JSON', JSON.stringify(text));
 					text = jsYaml.safeLoad(text);
-
+					
 				} else {
 					// not yaml
 					console.log('http with OUT url param -> converting to json');
+					// trim line breaks
+					text = text.replace(/(\r\n|\n|\r)/gm,"");
 					text = { url: text };
 				}
 			}
@@ -1284,26 +1254,52 @@ export function activate(context: vscode.ExtensionContext) {
 			 */
 
 			if(text.url.includes('http')) {
+
+				const progress = await vscode.window.withProgress({
+					location: vscode.ProgressLocation.Notification,
+					title: `Making External API Request`,
+					cancellable: true
+				}, async (progress, token) => {
+					token.onCancellationRequested(() => {
+						// this logs but doesn't actually cancel...
+						console.log("User canceled External API Request");
+						return new Error(`User canceled External API Request`);
+					});
+					
+					//external call
+					console.log('external call -> ', JSON.stringify(text));
+					const resp: any = await extAPI.makeRequest(text);
+					utils.displayJsonInEditor(resp.data);
+				});
 				
-				//external call
-				console.log('external call -> ', JSON.stringify(text));
-				const resp: any = await extAPI.makeRequest(text);
-				utils.displayJsonInEditor(resp.data);
 				
 			} else {
 				
-				// f5 device call
-				if(!ext.mgmtClient) {
-					// connect to f5 if not already connected
-					await vscode.commands.executeCommand('f5.connectDevice');
-				}
+				const progress = await vscode.window.withProgress({
+					location: vscode.ProgressLocation.Notification,
+					title: `Making API Request`,
+					cancellable: true
+				}, async (progress, token) => {
+					token.onCancellationRequested(() => {
+						// this logs but doesn't actually cancel...
+						console.log("User canceled API Request");
+						return new Error(`User canceled API Request`);
+					});
+
+					// f5 device call
+					if(!ext.mgmtClient) {
+						// connect to f5 if not already connected
+						await vscode.commands.executeCommand('f5.connectDevice');
+					}
 				
-				console.log('device call -> ', JSON.stringify(text));
-				const resp: any = await ext.mgmtClient.makeRequest(text.url, {
-					method: text.method,
-					body: text.body
+					console.log('device call -> ', JSON.stringify(text));
+					const resp: any = await ext.mgmtClient.makeRequest(text.url, {
+						method: text.method,
+						body: text.body
+					});
+					utils.displayJsonInEditor(resp.data);
+
 				});
-				utils.displayJsonInEditor(resp.data);
 			}
 		}
 
