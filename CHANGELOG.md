@@ -20,6 +20,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Documented usage and examples:
     - * [Crafting raw API calls](./README_docs/rawApiCalls.md)
 
+
+### Modified
+- Added nodejs nock for api tests
+- Started refactoring device mgmt functions for automated testing
+  - Device Add/Remove
+  - allowing entry/command functions to take parameters that would normally be collected from the user by some sort of input, like a click or input/select box
+
+
 ---
 
 ## [2.0.1] - (7-28-2020)
