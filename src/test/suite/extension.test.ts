@@ -12,15 +12,15 @@ import * as utils from '../../utils/utils';
 import { ext } from '../../extensionVariables';
 // import delay = require('delay');
 
-suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
-	test('Sample test - test time to load extension?', () => {
-		console.log('update for loading extension');
+// suite('Extension Test Suite', () => {
+// 	vscode.window.showInformationMessage('Start all tests.');
+// 	test('Sample test - test time to load extension?', () => {
+// 		console.log('update for loading extension');
 		
-		assert.equal(-1, [1, 2, 3].indexOf(5));
-		assert.equal(-1, [1, 2, 3].indexOf(0));
-	});
-});
+// 		assert.equal(-1, [1, 2, 3].indexOf(5));
+// 		assert.equal(-1, [1, 2, 3].indexOf(0));
+// 	});
+// });
 
 
 suite('Extension GUI tests', () => {

@@ -19,8 +19,15 @@ Any comments, questions or feature requests, please open a github repository iss
 
 * [CHANGELOG](CHANGELOG.md)
 * [Research](./README_docs/research.md)
+* [Writing ATC declarations in YAML!!!](./README_docs/jsonSchemaInYaml.md)
+* [Crafting raw API calls](./README_docs/rawApiCalls.md)
+* [ATC ILX rpm package management](./README_docs/rpmMgmt.md)
+* [FAST information and How-To's](./README_docs/fast.md)
+* [Additional Tools](./README_docs/tools.md)
+
 
 Future extension features and enhancements have been moved to the repo issues(enhancements) for better tracking
+* [repo issues and enhancements](https://github.com/DumpySquare/vscode-f5-fast/issues)
 
 ---
 

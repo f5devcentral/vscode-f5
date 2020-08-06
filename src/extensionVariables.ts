@@ -17,8 +17,8 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
-    export let mgmtClient: MgmtClient;
-    export let logonProviderName: string = 'local'; // todo: move this to mgmtClient
+    export let mgmtClient: MgmtClient | undefined;
+    // export let logonProviderName: string = 'local'; // todo: move this to mgmtClient
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;

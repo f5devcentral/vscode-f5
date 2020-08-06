@@ -184,6 +184,25 @@ export async function displayMstInEditor(item: object): Promise<any> {
     );
 }
 
+
+/**
+ * display text in new editor window
+ * @param item string to display in new editor
+ */
+export async function displayInTextEditor(text: string): Promise<void> {
+    vscode.workspace.openTextDocument({ 
+        content: text 
+    })
+    .then( doc => 
+        vscode.window.showTextDocument(
+            doc, 
+            { 
+                preview: false 
+            }
+        )
+    );
+}
+
 export function isValidJson(json: string) {
     try {
         return JSON.parse(json);

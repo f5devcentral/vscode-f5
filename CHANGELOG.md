@@ -8,6 +8,28 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.1.0] - (8-5-2020)
+
+### Added
+- Make HTTP/S Requests function provides the necessary flexbility to make any API call to ANYthing (mostly...)
+  - Highlight text, right-click, select: `Make HTTPS Request`
+  - support raw URL, json and yaml structures
+  - Added the ability to make any api call to connected f5 (will utilized other known device details like: host/port/user/password/token/headers)
+  - Also accepts enough parameters to craft an external API for any destination
+  - Includes connection status pop up and error handling like other api calls in the extension
+  - Documented usage and examples:
+    - * [Crafting raw API calls](./README_docs/rawApiCalls.md)
+
+
+### Modified
+- Added nodejs nock for api tests
+- Started refactoring device mgmt functions for automated testing
+  - Device Add/Remove
+  - allowing entry/command functions to take parameters that would normally be collected from the user by some sort of input, like a click or input/select box
+
+
+---
+
 ## [2.0.1] - (7-28-2020)
 
 ### Added

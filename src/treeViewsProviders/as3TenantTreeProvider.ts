@@ -67,7 +67,7 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3item> {
 	}
 
 	private async getTenants() {
-		const tenCall: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/`);
+		const tenCall: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/`);
 
 		this._tenants = [];	// clear current tenant list
 		for ( const tenant in tenCall.data) {
@@ -79,7 +79,7 @@ export class AS3TenantTreeProvider implements vscode.TreeDataProvider<AS3item> {
 	}
 
 	private async getTasks() {
-		const tasks: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/`);
+		const tasks: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/`);
 
 		this._tasks = [];	// clear current tenant list
 		this._tasks = tasks.data.items.map((item:any) => {

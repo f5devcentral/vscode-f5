@@ -13,6 +13,7 @@ import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
+import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
@@ -86,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
-		// console.log('selected device', device);
+		console.log('selected device', device);
 
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
@@ -142,7 +143,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getProvider', async () => {
-		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/tm/auth/source');
+		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/auth/source');
 		utils.displayJsonInEditor(resp.data);
 	}));
 
@@ -158,7 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
 			throw new Error('no hosts in configuration');
 		}
 
-		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/shared/identified-devices/config/device-info');
+		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/identified-devices/config/device-info');
 		utils.displayJsonInEditor(resp.data);
 	}));
 
@@ -166,6 +167,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
+			ext.mgmtClient = undefined;
 		}
 	}));
 
@@ -186,18 +188,12 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.removeHost', async (hostID) => {
-		console.log(`Remove Host command: ${JSON.stringify(hostID)}`);
-		
-		let bigipHosts: {device: string} [] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		
-		if ( !bigipHosts || !hostID) {
-			throw new Error('device delete, no devices in config or no selected host to delete');
-		}
-		const newBigipHosts = bigipHosts.filter( item => item.device !== hostID.label);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.addHost', async (newHost) => {
+		return await hostsTreeProvider.addDevice(newHost);
+	}));
 
-		await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
-		setTimeout( () => { hostsTreeProvider.refresh();}, 300);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.removeHost', async (hostID) => {
+		return await hostsTreeProvider.removeDevice(hostID);
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.editHost', async (hostID) => {
@@ -292,30 +288,6 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.addHost', () => {
-
-		vscode.window.showInputBox({prompt: 'Device/BIG-IP/Host', placeHolder: '<user>@<host/ip>'})
-		.then(newHost => {
-			let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
-
-			if (newHost === undefined || bigipHosts === undefined) {
-				throw new Error('Add device inputBox cancelled');
-			}
-
-			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
-			const devicesString = JSON.stringify(bigipHosts);
-
-			if (!devicesString.includes(`\"${newHost}\"`) && deviceRex.test(newHost)){
-				bigipHosts.push({device: newHost});
-				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
-				vscode.window.showInformationMessage(`Adding ${newHost} to list!`);
-				hostsTreeProvider.refresh();
-			} else {
-				vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
-			}
-		});
-
-	}));
 
 
 	//original way the example extension structured the command
@@ -329,7 +301,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		//await ext.mgmtClient.getToken();
-		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
 			method: 'POST',
 			body: {
 				command: 'run',
@@ -378,7 +350,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
 		console.log('installed rpm', installedRpm);
-		ext.mgmtClient.connect(); // refresh connect/status bars
+		ext.mgmtClient?.connect(); // refresh connect/status bars
 
 	}));
 
@@ -405,7 +377,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// used to pause between uninstalling and installing a new version of the same atc
 		//		should probably put this somewhere else
 		await new Promise(resolve => { setTimeout(resolve, 2000); });
-		ext.mgmtClient.connect(); // refresh connect/status bars
+		ext.mgmtClient?.connect(); // refresh connect/status bars
 
 	}));
 
@@ -431,7 +403,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
 
-		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/info`);
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/info`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(resp.data);
@@ -483,7 +455,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApp', async (tenApp) => {
 
-		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
+		const task: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(task.data);
@@ -495,7 +467,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTask', async (taskId) => {
 
-		const task: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
+		const task: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(task.data);
@@ -507,7 +479,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplate', async (template) => {
 
-		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templates/${template}`);
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templates/${template}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(resp.data);
@@ -519,7 +491,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
 
-		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
 
 		if (ext.settings.previewResponseInUntitledDocument) {
 			utils.displayJsonInEditor(resp.data);
@@ -788,7 +760,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// set blank value if not defined -> get all tenants dec
 		tenant = tenant ? tenant : '';
 
-		const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
 		utils.displayJsonInEditor(resp.data);
 
 	}));
@@ -809,7 +781,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Deleting ${tenant.label} Tenant`
 		}, async (progress) => {
 			
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant.label}`, {
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant.label}`, {
 				method: 'DELETE'
 			});
 			const resp2 = resp.data.results[0];
@@ -828,7 +800,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting AS3 Task`
 		}, async () => {
 
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
 			utils.displayJsonInEditor(resp.data);
 		});
 
@@ -1000,7 +972,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
-		const resp: any = await ext.mgmtClient.makeRequest('/mgmt/shared/telemetry/info');
+		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/telemetry/info');
 		utils.displayJsonInEditor(resp.data);
 	}));
 
@@ -1010,7 +982,7 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting TS Dec`
 		}, async () => {
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`);
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/telemetry/declare`);
 			utils.displayJsonInEditor(resp.data.declaration);
 		});
 	}));
@@ -1036,7 +1008,7 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Posting TS Dec`
 		}, async () => {
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/telemetry/declare`, {
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/telemetry/declare`, {
 				method: 'POST',
 				body: JSON.parse(text)
 			});
@@ -1092,7 +1064,7 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Dec`
 		}, async () => {
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`);
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/`);
 			utils.displayJsonInEditor(resp.data.declaration);
 		});
 
@@ -1129,7 +1101,7 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Inspect`
 		}, async () => {
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
 			utils.displayJsonInEditor(resp.data);
 		}); 
 
@@ -1143,7 +1115,7 @@ export function activate(context: vscode.ExtensionContext) {
 			location: vscode.ProgressLocation.Notification,
 			title: `Getting DO Tasks`
 		}, async () => {
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
 			utils.displayJsonInEditor(resp.data);
 		});
 	}));
@@ -1238,6 +1210,100 @@ export function activate(context: vscode.ExtensionContext) {
 		editor.edit( editBuilder => {
 			editBuilder.replace(editor.selection, decoded);
 		});
+	}));
+
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.makeRequest', async () => {
+		/**
+		 * make open/raw https call
+		 * 
+		 */
+
+		console.log('executing f5.makeRequest');
+		const editor = vscode.window.activeTextEditor;
+
+		if(editor){
+			var text: any = editor.document.getText(editor.selection);	// highlighted text
+
+			// see if it's json or yaml or string
+			if(utils.isValidJson(text)) {
+
+				console.log('JSON detected -> parsing');
+				text = JSON.parse(text);
+
+			} else {
+
+				console.log('NOT JSON');
+				
+				if(text.includes('url:')) {
+					// if yaml should have url: param
+					console.log('yaml with url: param -> parsing raw to JSON', JSON.stringify(text));
+					text = jsYaml.safeLoad(text);
+					
+				} else {
+					// not yaml
+					console.log('http with OUT url param -> converting to json');
+					// trim line breaks
+					text = text.replace(/(\r\n|\n|\r)/gm,"");
+					text = { url: text };
+				}
+			}
+
+			/**
+			 * At this point we should have a json object with parameters
+			 * 	depending on the parameters, it's an F5 call, or an external call
+			 */
+
+			if(text.url.includes('http')) {
+
+				const progress = await vscode.window.withProgress({
+					location: vscode.ProgressLocation.Notification,
+					title: `Making External API Request`,
+					cancellable: true
+				}, async (progress, token) => {
+					token.onCancellationRequested(() => {
+						// this logs but doesn't actually cancel...
+						console.log("User canceled External API Request");
+						return new Error(`User canceled External API Request`);
+					});
+					
+					//external call
+					console.log('external call -> ', JSON.stringify(text));
+					const resp: any = await extAPI.makeRequest(text);
+					utils.displayJsonInEditor(resp.data);
+				});
+				
+				
+			} else {
+				
+				const progress = await vscode.window.withProgress({
+					location: vscode.ProgressLocation.Notification,
+					title: `Making API Request`,
+					cancellable: true
+				}, async (progress, token) => {
+					token.onCancellationRequested(() => {
+						// this logs but doesn't actually cancel...
+						console.log("User canceled API Request");
+						return new Error(`User canceled API Request`);
+					});
+
+					// f5 device call
+					if(!ext.mgmtClient) {
+						// connect to f5 if not already connected
+						await vscode.commands.executeCommand('f5.connectDevice');
+					}
+				
+					console.log('device call -> ', JSON.stringify(text));
+					const resp: any = await ext.mgmtClient?.makeRequest(text.url, {
+						method: text.method,
+						body: text.body
+					});
+					utils.displayJsonInEditor(resp.data);
+
+				});
+			}
+		}
+
 	}));
 
 

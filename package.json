@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "2.0.1",
+	"version": "2.1.0",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -281,6 +281,11 @@
 				"enablement": "f5.device"
 			},
 			{
+				"command": "f5.makeRequest",
+				"title": "Make HTTP Request",
+				"category": "F5"
+			},
+			{
 				"command": "f5.openSettings",
 				"title": "Settings",
 				"category": "F5"
@@ -508,6 +513,11 @@
 		],
 		"menus": {
 			"editor/context": [
+				{
+					"when": "editorHasSelection",
+					"command": "f5.makeRequest",
+					"group": "F5"
+				},
 				{
 					"when": "editorHasSelection",
 					"command": "f5-fast.deployApp",
@@ -800,6 +810,7 @@
 		"@types/highlight.js": "^9.12.4",
 		"@types/js-yaml": "^3.12.5",
 		"@types/jszip": "^3.4.1",
+		"@types/nock": "^11.1.0",
 		"axios": "^0.19.2",
 		"code-highlight-linenums": "^0.2.1",
 		"fs": "0.0.1-security",
@@ -808,6 +819,7 @@
 		"js-yaml": "^3.14.0",
 		"jszip": "^3.4.0",
 		"keytar": "^5.6.0",
+		"nock": "^13.0.3",
 		"vsce": "^1.75.0"
 	}
 }

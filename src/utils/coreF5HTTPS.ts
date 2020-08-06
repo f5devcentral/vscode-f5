@@ -96,7 +96,10 @@ export async function makeAuth(
                     vscode.window.showErrorMessage('Authentication Failed - clearing password');
                     // clear cached password and disconnect
                     ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
-                    ext.mgmtClient.disconnect();
+                    // todo: this should probably call the main extension disconnect command
+                    //      and all it's functionality moved to the mgmtClient.disconnect function
+                    //      so everything uses the same end to end flow
+                    ext.mgmtClient?.disconnect();
                 } 
 
                 vscode.window.showErrorMessage(`HTTP Auth FAILURE: ${status} - ${message}`);
