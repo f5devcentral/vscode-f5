@@ -137,6 +137,17 @@ suite('external raw HTTP API tests', () => {
         
         const testAPI = 'https://api.chucknorris.io/jokes/random';
         const recvString = { data: { joke: 'awesome' }};
+
+        // example chuck norris joke response
+        const example = {
+            "categories": [],
+            "created_at": "2020-01-05 13:42:28.420821",
+            "icon_url": "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
+            "id": "dAFN-DNnSRGqDkLJXIKA-g",
+            "updated_at": "2020-01-05 13:42:28.420821",
+            "url": "https://api.chucknorris.io/jokes/dAFN-DNnSRGqDkLJXIKA-g",
+            "value": "Google is named after the number of Kilograms Chuck Norris can benchpress."
+        };
         
         // setup nock to respond to api
         nock('https://api.chucknorris.io')
@@ -219,6 +230,30 @@ suite('external raw HTTP API tests', () => {
 
         const testAPI = "url: https://postman-echo.com/post\r\nmethod: POST\r\ndata:\r\n  hi: yo";
         const recvString = { json: { hi: 'yo' }};
+
+        // example postman post
+        const example = {
+            "args": {},
+            "data": {
+                "hi": "yo"
+            },
+            "files": {},
+            "form": {},
+            "headers": {
+                "x-forwarded-proto": "https",
+                "x-forwarded-port": "443",
+                "host": "postman-echo.com",
+                "x-amzn-trace-id": "Root=1-5f2bf624-cb3ae080860a6404f899659c",
+                "content-length": "11",
+                "accept": "application/json, text/plain, */*",
+                "content-type": "application/json;charset=utf-8",
+                "user-agent": "axios/0.19.2"
+            },
+            "json": {
+                "hi": "yo"
+            },
+            "url": "https://postman-echo.com/post"
+        };
         
         // setup nock to respond to api
         nock('https://postman-echo.com')

@@ -382,7 +382,7 @@ export async function postDoDec(dec: Dec) {
         });
         
         // post initial dec
-        let resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/`, {
+        let resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/`, {
             method: 'POST',
             body: dec
         });
@@ -403,12 +403,12 @@ export async function postDoDec(dec: Dec) {
             // get got a 202 and a taskId (single dec), check task status till complete
             while(taskId && loopCount <= 10) {
                 loopCount++;
-                resp = await ext.mgmtClient.makeRequest(`/mgmt/shared/declarative-onboarding/task/${taskId}`);
+                resp = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/task/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
                 if(resp.data.result.status === 'FINISHED' || resp.data.result.status === 'ERROR' || resp.data.result.status === 'OK'){
                     taskId = undefined;
-                    vscode.window.showInformationMessage(`DO POST: ${resp.data.result.status}`)
+                    vscode.window.showInformationMessage(`DO POST: ${resp.data.result.status}`);
                     return resp;
                 }
                 progress.report({ message: `${resp.data.result.message}`});
@@ -573,7 +573,7 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
         });
 
         // post initial dec
-        let resp: any = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/declare?${postParam}`, {
+        let resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare?${postParam}`, {
             method: 'POST',
             body: dec
         });
@@ -602,7 +602,7 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
             // get got a 202 and a taskId (single dec), check task status till complete
             while(taskId) {
                 // resp = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${taskId}`, authToken);
-                resp = await ext.mgmtClient.makeRequest(`/mgmt/shared/appsvcs/task/${taskId}`);
+                resp = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
                 if(resp.data.results[0].message !== 'in progress'){

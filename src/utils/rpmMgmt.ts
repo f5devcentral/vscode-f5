@@ -42,7 +42,7 @@ export async function installedRPMs () {
      */
     
     // start installed pkgs query
-    const query: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
+    const query: any = await ext.mgmtClient?.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
             body: { 
                 operation: 'QUERY' 
@@ -55,7 +55,7 @@ export async function installedRPMs () {
     await new Promise(resolve => { setTimeout(resolve, 1000); });
  
     // query task to get installed rpms
-    const tasks: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`);
+    const tasks: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`);
 
     // not sure if this error logic is even needed...
     if(tasks.status === 200) {
@@ -93,7 +93,7 @@ export async function unInstallRpm (packageName: string) {
         });
         
         // start unInstall job
-        const start: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
+        const start: any = await ext.mgmtClient?.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
             body: {
                 operation: 'UNINSTALL',
@@ -114,7 +114,7 @@ export async function unInstallRpm (packageName: string) {
         // use taskId to control loop
         while(taskId && i < 10) {
 
-            const resp: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
+            const resp: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
             progress.report({ message: `${resp.data.status}`});
             console.log('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
@@ -248,14 +248,14 @@ export async function rpmInstaller (rpm: string) {
         await new Promise(resolve => { setTimeout(resolve, 2000); });
 
         // upload rpm to f5
-        const instA = await ext.mgmtClient.upload(rpm);
+        const instA = await ext.mgmtClient?.upload(rpm);
         
         console.log('uploaded', instA);
         progress.report({ message: `installing`});
         await new Promise(resolve => { setTimeout(resolve, 2000); });
         
         // start rpm install
-        const installStart: any = await ext.mgmtClient.makeRequest(PKG_MGMT_URI, {
+        const installStart: any = await ext.mgmtClient?.makeRequest(PKG_MGMT_URI, {
             method: 'POST',
             body: {
                 operation: 'INSTALL',
@@ -277,7 +277,7 @@ export async function rpmInstaller (rpm: string) {
         let i = 0;  // loop counter
         // use taskId to control loop
         while(taskId && i < 10) {
-            const resp: any = await ext.mgmtClient.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
+            const resp: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
             console.log('task in progress', taskId, resp.status, resp.data.status);
             
