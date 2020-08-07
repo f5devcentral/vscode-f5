@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { request } from 'https';
 import axios, { AxiosRequestConfig } from 'axios';
+var https = require('https');
 // import { ext } from './extensionVariables';
 
 /**
@@ -19,12 +20,17 @@ import axios, { AxiosRequestConfig } from 'axios';
 export async function makeRequest(req: AxiosRequestConfig) {
 
     console.log('external http pre-Opts', JSON.stringify(req));
+
+    // const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     
     // rewrite req object with defaults
     req = {
         url: req.url,
         method: req['method'] || 'GET',
         data: req['data'] || null,
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        }),
     };
 
     console.log('external http defaults-Opts', JSON.stringify(req));

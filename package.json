@@ -89,12 +89,12 @@
 					"when": "f5.as3Installed"
 				},
 				{
-					"id": "f5Tcl",
-					"name": "TCL"
-				},
-				{
 					"id": "decExamples",
 					"name": "Declaration Examples"
+				},
+				{
+					"id": "f5Tcl",
+					"name": "TCL"
 				}
 			]
 		},
@@ -231,6 +231,12 @@
 						"scope": "resource",
 						"description": "*DEV-Preview response panel will take focus after receiving response."
 					},
+					"f5.irules": {
+						"type": "boolean",
+						"default": false,
+						"scope": "resource",
+						"description": "*DEV-beta-Preview* irule functionality."
+					},
 					"f5.logLevel": {
 						"type": "string",
 						"enum": [
@@ -314,6 +320,11 @@
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
 				}
+			},
+			{
+				"command": "f5.postRule",
+				"title": "Update iRule",
+				"category": "F5"
 			},
 			{
 				"command": "f5.refreshTclTree",
@@ -782,6 +793,10 @@
 				{
 					"command": "f5.getF5HostInfo",
 					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5.postRule",
+					"when": "view == f5Tcl && viewItem == rule"
 				},
 				{
 					"command": "f5-fast.deleteFastApp",

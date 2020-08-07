@@ -83,13 +83,30 @@ export function activate(context: vscode.ExtensionContext) {
 	 */
 	
 
-	const tclTreeProvider = new TclTreeProvider('');
+	
+	const irulesEnabled: boolean= vscode.workspace.getConfiguration().get<boolean>('f5.irules', false);
+	
+	if(irulesEnabled){
+		vscode.commands.executeCommand('setContext', 'f5.irules', true);
+	} else {
+		vscode.commands.executeCommand('setContext', 'f5.irules', false);
+	}
+
+	const tclTreeProvider = new TclTreeProvider(irulesEnabled);
 	vscode.window.registerTreeDataProvider('f5Tcl', tclTreeProvider);
 	vscode.commands.registerCommand('f5.refreshTclTree', () => tclTreeProvider.refresh());
+	
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getRule', async (rule) => {
 		console.log('f5.getRule command: ', rule);
-		utils.displayInTextEditor(rule.apiAnonymous);
+		// utils.displayInTextEditor(rule.apiAnonymous);
+		return tclTreeProvider.display(rule);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.postRule', async (rule) => {
+		console.log('f5.postRule command: ', rule);
+		// utils.displayInTextEditor(rule.apiAnonymous);
+		return tclTreeProvider.postUpdate(rule);
 	}));
 	
 	
