@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as keyTarType from 'keytar';
 
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
+import { TclTreeProvider } from './treeViewsProviders/tclTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
 import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
@@ -82,6 +83,16 @@ export function activate(context: vscode.ExtensionContext) {
 	 */
 	
 
+	const tclTreeProvider = new TclTreeProvider('');
+	vscode.window.registerTreeDataProvider('f5Tcl', tclTreeProvider);
+	vscode.commands.registerCommand('f5.refreshTclTree', () => tclTreeProvider.refresh());
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getRule', async (rule) => {
+		console.log('f5.getRule command: ', rule);
+		utils.displayInTextEditor(rule.apiAnonymous);
+	}));
+	
+	
 	const hostsTreeProvider = new F5TreeProvider('');
 	vscode.window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
@@ -139,6 +150,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const connect = await ext.mgmtClient.connect();
 		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
+		tclTreeProvider.refresh();
 
 	}));
 	

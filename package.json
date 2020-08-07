@@ -89,6 +89,10 @@
 					"when": "f5.as3Installed"
 				},
 				{
+					"id": "f5Tcl",
+					"name": "TCL"
+				},
+				{
 					"id": "decExamples",
 					"name": "Declaration Examples"
 				}
@@ -305,6 +309,15 @@
 			{
 				"command": "f5.refreshHostsTree",
 				"title": "Refresh Devices",
+				"category": "F5",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5.refreshTclTree",
+				"title": "Refresh tcl",
 				"category": "F5",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -595,6 +608,11 @@
 					"group": "navigation"
 				},
 				{
+					"command": "f5.refreshTclTree",
+					"when": "view == f5Tcl",
+					"group": "navigation"
+				},
+				{
 					"command": "f5-as3.refreshTenantsTree",
 					"when": "view == as3Tenants",
 					"group": "navigation"
@@ -644,6 +662,10 @@
 				},
 				{
 					"command": "f5.refreshHostsTree",
+					"when": "none"
+				},
+				{
+					"command": "f5.refreshTclTree",
 					"when": "none"
 				},
 				{
