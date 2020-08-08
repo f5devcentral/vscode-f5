@@ -18,7 +18,6 @@ type KeyTar = typeof keyTarType;
 export namespace ext {
     export let context: ExtensionContext;
     export let mgmtClient: MgmtClient | undefined;
-    // export let logonProviderName: string = 'local'; // todo: move this to mgmtClient
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;
@@ -28,13 +27,13 @@ export namespace ext {
     export let tsBar: StatusBarItem;
     export let connectBar: StatusBarItem;
     export let as3AsyncPost: boolean | undefined;
-    // export let f5Api: F5Api;
     export let carTreeData: object | undefined;
     export let tsExampleView: object | undefined;
     
     export namespace settings {
         export let as3PostAsync: boolean;
         export let asyncInterval: number;
+        export let irulesEnabled: boolean;
         export let timeoutInMilliseconds: number;
         export let showResponseInDifferentTab: boolean;
         export let previewResponseInUntitledDocument: boolean;
@@ -44,24 +43,27 @@ export namespace ext {
     }
 }
 
-ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
-ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
-ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
-ext.settings.showResponseInDifferentTab = workspace.getConfiguration().get('f5.showResponseInDifferentTab', false);
-ext.settings.previewResponseInUntitledDocument = workspace.getConfiguration().get('f5.previewResponseInUntitledDocument', false);
-ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.previewColumn', 'two'));
-ext.settings.previewResponsePanelTakeFocus = workspace.getConfiguration().get('f5.previewResponsePanelTakeFocus', true);
-ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
+workspace.onDidChangeConfiguration( () => {
+    console.log('CONFIGURATION CHANGED!!!');
+    ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
+    ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
+    ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.irules', false);
+    ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
+    ext.settings.showResponseInDifferentTab = workspace.getConfiguration().get('f5.showResponseInDifferentTab', false);
+    ext.settings.previewResponseInUntitledDocument = workspace.getConfiguration().get('f5.previewResponseInUntitledDocument', false);
+    ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.previewColumn', 'two'));
+    ext.settings.previewResponsePanelTakeFocus = workspace.getConfiguration().get('f5.previewResponsePanelTakeFocus', true);
+    ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
+});
 
 
-// all this can possibly be replaced by the f5-cli
+
 export namespace git {
     export let latestAS3schema: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';
     export let examplesAS3: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';
 
     export let latestDOschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json';
     export let examplesDO: string = 'https://github.com/F5Networks/f5-declarative-onboarding/tree/master/examples';
-    
     
     export let latestTSschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json';
     export let examplesTS: string = 'https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples/declarations';

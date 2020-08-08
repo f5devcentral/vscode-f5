@@ -89,12 +89,13 @@
 					"when": "f5.as3Installed"
 				},
 				{
-					"id": "decExamples",
-					"name": "Declaration Examples"
+					"id": "f5Tcl",
+					"name": "TCL",
+					"when": "f5.irules"
 				},
 				{
-					"id": "f5Tcl",
-					"name": "TCL"
+					"id": "decExamples",
+					"name": "Declaration Examples"
 				}
 			]
 		},
@@ -135,49 +136,6 @@
 							]
 						}
 					},
-					"f5.hosts_2": {
-						"type": "array",
-						"items": {
-							"type": "string",
-							"description": "BIG-IP/Device/Host",
-							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
-						},
-						"default": [
-							"admin@192.168.1.245"
-						],
-						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format"
-					},
-					"f5.hosts_3": {
-						"type": "object",
-						"description": "testing configuration for name device objects",
-						"propertyNames": {
-							"type": "string",
-							"description": "BIG-IP/Device/Host",
-							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
-						},
-						"patternProperties": {
-							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
-						},
-						"additionalProperties": {
-							"type": "object",
-							"description": "named object device details",
-							"Properties": {
-								"provider": {
-									"type": "string",
-									"description": "logonProviderName",
-									"default": "local"
-								}
-							},
-							"required": [
-								"provider"
-							]
-						},
-						"default": {
-							"admin@192.168.1.254": {
-								"provider": "local"
-							}
-						}
-					},
 					"f5.as3Post.async": {
 						"type": "boolean",
 						"default": true,
@@ -197,19 +155,19 @@
 						"type": "integer",
 						"default": 0,
 						"scope": "resource",
-						"description": "Timeout in milliseconds. 0 for infinity"
+						"description": "*DEV-beta-Preview* Timeout in milliseconds. 0 for infinity"
 					},
 					"f5.showResponseInDifferentTab": {
 						"type": "boolean",
 						"default": false,
 						"scope": "resource",
-						"description": "Show response in different tab"
+						"description": "*DEV-beta-Preview* Show response in different tab"
 					},
 					"f5.previewResponseInUntitledDocument": {
 						"type": "boolean",
 						"default": true,
 						"scope": "resource",
-						"description": "Preview response in untitled document if set to true, otherwise displayed in html view.\n *** Disable to see webviews ***"
+						"description": "*DEV-beta-Preview* Preview response in untitled document if set to true, otherwise displayed in html view.\n *** Disable to see webviews ***"
 					},
 					"f5.previewColumn": {
 						"type": "string",
@@ -223,7 +181,7 @@
 						],
 						"default": "beside",
 						"scope": "resource",
-						"description": "Response preview column option"
+						"description": "*DEV-beta-Preview* Response preview column option"
 					},
 					"f5.previewResponsePanelTakeFocus": {
 						"type": "boolean",
@@ -247,7 +205,7 @@
 						],
 						"default": "error",
 						"scope": "resource",
-						"description": "*DEV-The verbosity of logging in the REST output panel"
+						"description": "*DEV-beta-Preview* The verbosity of logging in the REST output panel"
 					}
 				}
 			}
