@@ -89,8 +89,8 @@
 					"when": "f5.as3Installed"
 				},
 				{
-					"id": "f5Tcl",
-					"name": "TCL",
+					"id": "as3Tasks",
+					"name": "iRules/iApps",
 					"when": "f5.irules"
 				},
 				{
@@ -578,7 +578,7 @@
 				},
 				{
 					"command": "f5.refreshTclTree",
-					"when": "view == f5Tcl",
+					"when": "view == as3Tasks",
 					"group": "navigation"
 				},
 				{
@@ -754,7 +754,7 @@
 				},
 				{
 					"command": "f5.postRule",
-					"when": "view == f5Tcl && viewItem == rule"
+					"when": "view == as3Tasks && viewItem == rule"
 				},
 				{
 					"command": "f5-fast.deleteFastApp",

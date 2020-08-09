@@ -16,7 +16,7 @@ import * as f5Api from './utils/f5Api';
 import { callHTTPS } from './utils/externalAPIs';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
-import { ext, git } from './extensionVariables';
+import { ext, git, loadConfig } from './extensionVariables';
 import { displayWebView, WebViewPanel } from './webview';
 import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
 import * as f5FastApi from './utils/f5FastApi';
@@ -59,6 +59,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	ext.keyTar = keyTarType;
 
+	// load ext config to ext.settings.
+	loadConfig();
+
 	// keep an eye on this for different user install scenarios, like slim docker containers that don't have the supporting librarys
 	// if this error happens, need to find a fallback method of password caching or disable caching without breaking everything
 	if (ext.keyTar === undefined) {
@@ -84,16 +87,8 @@ export function activate(context: vscode.ExtensionContext) {
 	
 
 	
-	const irulesEnabled: boolean= vscode.workspace.getConfiguration().get<boolean>('f5.irules', false);
-	
-	if(irulesEnabled){
-		vscode.commands.executeCommand('setContext', 'f5.irules', true);
-	} else {
-		vscode.commands.executeCommand('setContext', 'f5.irules', false);
-	}
-
-	const tclTreeProvider = new TclTreeProvider(irulesEnabled);
-	vscode.window.registerTreeDataProvider('f5Tcl', tclTreeProvider);
+	const tclTreeProvider = new TclTreeProvider(ext.settings.irulesEnabled);
+	vscode.window.registerTreeDataProvider('as3Tasks', tclTreeProvider);
 	vscode.commands.registerCommand('f5.refreshTclTree', () => tclTreeProvider.refresh());
 	
 
@@ -167,7 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const connect = await ext.mgmtClient.connect();
 		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
-		tclTreeProvider.refresh();
+		// tclTreeProvider.refresh();
 
 	}));
 	

@@ -54,9 +54,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	async getChildren(element?: TCLitem) {
 		let treeItems: any[] = [];
 		
-		if(!this.irulesEnabled) {
-			return;	// should be here since this should be disabled
-		}
+		// if(!this.irulesEnabled) {
+		// 	return;	// should be here since this should be disabled
+		// }
 
 		if (!ext.mgmtClient) {
 			// return nothing if not connected yet

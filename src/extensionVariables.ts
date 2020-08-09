@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, StatusBarItem, workspace, ViewColumn } from "vscode";
+import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands } from "vscode";
 import * as keyTarType from "keytar";
 // import { F5Api } from './utils/f5Api';
 import { MgmtClient } from './utils/f5DeviceClient';
@@ -26,6 +26,7 @@ export namespace ext {
     export let doBar: StatusBarItem;
     export let tsBar: StatusBarItem;
     export let connectBar: StatusBarItem;
+    export let iRulesAble: boolean = false;
     export let as3AsyncPost: boolean | undefined;
     export let carTreeData: object | undefined;
     export let tsExampleView: object | undefined;
@@ -44,17 +45,31 @@ export namespace ext {
 }
 
 workspace.onDidChangeConfiguration( () => {
-    console.log('CONFIGURATION CHANGED!!!');
+    console.log('EXTENSION CONFIGURATION CHANGED!!!');
+    loadConfig();
+});
+
+export async function loadConfig() {
+    console.log('loading configuration for ext.settings!!!');
     ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
     ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
-    ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.irules', false);
+    // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.irules', false);
     ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
     ext.settings.showResponseInDifferentTab = workspace.getConfiguration().get('f5.showResponseInDifferentTab', false);
     ext.settings.previewResponseInUntitledDocument = workspace.getConfiguration().get('f5.previewResponseInUntitledDocument', false);
     ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.previewColumn', 'two'));
     ext.settings.previewResponsePanelTakeFocus = workspace.getConfiguration().get('f5.previewResponsePanelTakeFocus', true);
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
-});
+
+
+    // irule view stuff - in progress
+    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.irules', false);
+    if(ext.settings.irulesEnabled && ext.iRulesAble){
+        commands.executeCommand('setContext', 'f5.irules', true);
+    } else {
+        commands.executeCommand('setContext', 'f5.irules', false);
+    }
+}
 
 
 
