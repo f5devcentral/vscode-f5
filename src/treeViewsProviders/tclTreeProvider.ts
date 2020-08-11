@@ -38,9 +38,10 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	readonly onDidChangeTreeData: vscode.Event<TCLitem | undefined> = this._onDidChangeTreeData.event;
 
 	private _iRules: string[] = [];  
-	private _iApps: string[] = [];
+	private _apps: string[] = [];  
+	private _iAppTemplates: string[] = [];
 
-	constructor(private irulesEnabled: boolean) {
+	constructor() {
 	}
 
 	refresh(): void {
@@ -74,24 +75,41 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
                         { command: 'f5.getRule', title: '', arguments: [el] });
                 });
 				
-			} else if (element.label === 'iApps'){
+			} else if (element.label === 'Deployed-Apps'){
 				// todo: get iapps stuff
+				treeItems = this._apps.map( (el: any) => {
+                    return new TCLitem(el.fullPath, '', '', 'iApp', vscode.TreeItemCollapsibleState.None, 
+                        { command: 'f5.getApp', title: '', arguments: [el] });
+				});
+				
+			} else if (element.label === 'iApp-Templates'){
+				// todo: get iapp templates stuff
+				treeItems = this._iAppTemplates.map( (el: any) => {
+                    return new TCLitem(el.fullPath, '', '', 'iAppTemplate', vscode.TreeItemCollapsibleState.None, 
+                        { command: 'f5.getTemplate', title: '', arguments: [el] });
+                });
 			}
 
 		} else {
 
 			await this.getIrules(); // refresh tenant information
-			await this.getIapps();	// refresh tasks information
+			await this.getApps();	// refresh tasks information
+			await this.getTemplates();	// refresh tasks information
 
 			const ruleCount = this._iRules.length !== 0 ? this._iRules.length.toString() : '';
-			const appCount = this._iApps.length !== 0 ? this._iApps.length.toString() : '';
+			const appCount = this._apps.length !== 0 ? this._apps.length.toString() : '';
+			const tempCount = this._iAppTemplates.length !== 0 ? this._iAppTemplates.length.toString() : '';
 
 			treeItems.push(
-				new TCLitem('iRules', ruleCount, '', '', vscode.TreeItemCollapsibleState.Expanded, 
+				new TCLitem('iRules', ruleCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 					{ command: '', title: '', arguments: [''] })
 			);
 			treeItems.push(
-				new TCLitem('iApps', appCount, '', '', vscode.TreeItemCollapsibleState.Collapsed,
+				new TCLitem('Deployed-Apps', appCount, '', '', vscode.TreeItemCollapsibleState.Collapsed,
+					{ command: '', title: '', arguments: [''] })
+			);
+			treeItems.push(
+				new TCLitem('iApp-Templates', tempCount, '', '', vscode.TreeItemCollapsibleState.Collapsed,
 					{ command: '', title: '', arguments: [''] })
 			);
 		}
@@ -106,12 +124,22 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 	}
 
-	private async getIapps() {
-		// const tasks: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/`);
-		this._iApps = [];	// clear current list
+	private async getApps() {
 		/**
-		 * todo: fill in iApps stuff
+		 * todo: fill in deployed iApps stuff
 		 */
+		const apps: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service`);
+		this._apps = [];	// clear current list
+		this._apps = apps.data.items.map( (el: any) => el);
+	}
+
+	private async getTemplates() {
+		/**
+		 * todo: fill in iApp templates stuff
+		 */
+		const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template`);
+		this._iAppTemplates = [];	// clear current list
+		this._iAppTemplates = templates.data.items.map( (el: any) => el);
 	}
 	
 	async display(item: any) {
@@ -132,6 +160,15 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		if (!vscode.window.activeTextEditor) {
 			return; // no editor
 		}
+
+		/**
+		 * need to confirm inbound item fullPath from right click on view item
+		 * matches up with the fullPath in the editor window where we are getting
+		 * 	the irule guts
+		 * This is provide some bumpers on this hackey solution so users shouldn't be able
+		 * 	to modify the fullPath header on the irule and/or try to send the wrong irule
+		 * 	back to the wrong destination
+		 */
 
 		// get document information from the active editor
 		let editor = vscode.window.activeTextEditor;
@@ -155,6 +192,19 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			return vscode.window.showErrorMessage('no postUrl header or text for iRule update');
 		}
 
+		/**
+		 * now that we confirmed we have the appropriate irule header to understand where to post updates to
+		 * Need to confirm the header matches the inbound item fullPath from right click on view item
+		 * matches up with the fullPath in the editor window where we are getting
+		 * 	the irule guts from
+		 * This is provide some bumpers on this hackey solution so users shouldn't be able
+		 * 	to modify the fullPath header on the irule and/or try to send the wrong irule
+		 * 	back to the wrong destination
+		 */
+
+		// if(postUrl != item.fullPath?) => return with error 'irule fullPath url doesn't match view item destination'
+
+
 		// patch irule to f5
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/ltm/rule/' + postUrl, {
 			method: 'PATCH',
@@ -172,6 +222,46 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		
 		// return something for automated tests
 		return resp.status;
+	}
+
+	async postTemplate(item: any) {
+
+		// if available, get entire text from active editor
+		// command should only be called from editor under certain situations
+		const text = vscode.window.activeTextEditor?.document.getText();
+
+		/**
+		 * 1. parse template pieces
+		 * 		a. name from first line: sys application template /Common/A_base_iapp_1
+		 * 		b. html help (maybe)
+		 * 		c. implementation
+		 * 		d. presentation
+		 * 		e. requires-bigip-version-min
+		 * 		f. required modules
+		 * 2. post template
+		 */
+
+		// parse editor stuff to iapp template fields
+		// capture entire header and fullPath
+		const templateName = text?.match(/sys application template (.*?)\s*{/);
+		const templateHelp = text?.match(/html-help\s{\s*(.*?)\s*}\s*implementation\s{/s);
+		const templateImplementation = text?.match(/implementation\s*{\s(.*?)\s*}\s*macro\s*{/s);
+		const templatePresentation = text?.match(/presentation\s*{\s(.*?)\s*}\s*role-acl\s\w+\s*run-as\s\w+/s);
+		const templateRequiredVersion = text?.match(/requires-bigip-version-min\s([\.\d]+)/);
+		const templateRequiredModules = text?.match(/requires-modules\s?{\s?([\w\s]+)}/);
+		console.log('break');
+
+		// console.log(templateImplementation[1]);
+		
+
+		return {
+			templateName,
+			templateHelp,
+			templateImplementation,
+			templatePresentation,
+			templateRequiredVersion,
+			templateRequiredModules
+		};
 	}
 }
 

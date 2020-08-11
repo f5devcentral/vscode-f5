@@ -85,25 +85,6 @@ export function activate(context: vscode.ExtensionContext) {
 	 * #########################################################################
 	 */
 	
-
-	
-	const tclTreeProvider = new TclTreeProvider(ext.settings.irulesEnabled);
-	vscode.window.registerTreeDataProvider('as3Tasks', tclTreeProvider);
-	vscode.commands.registerCommand('f5.refreshTclTree', () => tclTreeProvider.refresh());
-	
-
-	context.subscriptions.push(vscode.commands.registerCommand('f5.getRule', async (rule) => {
-		console.log('f5.getRule command: ', rule);
-		// utils.displayInTextEditor(rule.apiAnonymous);
-		return tclTreeProvider.display(rule);
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('f5.postRule', async (rule) => {
-		console.log('f5.postRule command: ', rule);
-		// utils.displayInTextEditor(rule.apiAnonymous);
-		return tclTreeProvider.postUpdate(rule);
-	}));
-	
 	
 	const hostsTreeProvider = new F5TreeProvider('');
 	vscode.window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
@@ -313,42 +294,18 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 
-
-	//original way the example extension structured the command
-	let disposable = vscode.commands.registerCommand('f5.remoteCommand', async () => {
-	
-		const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' });
-		
-		if ( cmd === undefined ) {
-			// maybe just showInformationMessage and exit instead of error?
-			throw new Error('Remote Command inputBox cancelled');
-		}
-
-		//await ext.mgmtClient.getToken();
-		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
-			method: 'POST',
-			body: {
-				command: 'run',
-				utilCmdArgs: `-c '${cmd}'`
-			}
-		});
-
-		vscode.workspace.openTextDocument({ 
-			language: 'text', 
-			content: resp.data.commandResult
-		})
-		.then( doc => 
-			vscode.window.showTextDocument(
-				doc, 
-				{ 
-					preview: false 
-				}
-			)
-		);
-	});	
-	context.subscriptions.push(disposable);
-
-
+	/**
+	 * ###########################################################################
+	 * 
+	 * 				RRRRRR     PPPPPP     MM    MM 
+	 * 				RR   RR    PP   PP    MMM  MMM 
+	 * 				RRRRRR     PPPPPP     MM MM MM 
+	 * 				RR  RR     PP         MM    MM 
+	 * 				RR   RR    PP         MM    MM 
+	 * 
+	 * ############################################################################
+	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
+	 */
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.installRPM', async (selectedRPM) => {
 
@@ -404,6 +361,91 @@ export function activate(context: vscode.ExtensionContext) {
 		ext.mgmtClient?.connect(); // refresh connect/status bars
 
 	}));
+
+
+
+	/**
+	 * ###########################################################################
+	 * 
+	 * 				TTTTTTT    CCCCC    LL      
+  	 * 				  TTT     CC    C   LL      
+  	 * 				  TTT     CC        LL      
+  	 * 				  TTT     CC    C   LL      
+	 * 				  TTT      CCCCC    LLLLLLL 
+	 * 
+	 * ############################################################################
+	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
+	 */
+
+
+	const tclTreeProvider = new TclTreeProvider();
+	vscode.window.registerTreeDataProvider('as3Tasks', tclTreeProvider);
+	vscode.commands.registerCommand('f5.refreshTclTree', () => tclTreeProvider.refresh());
+	
+
+	// --- IRULE COMMANDS ---
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getRule', async (rule) => {
+		console.log('f5.getRule command: ', rule);
+		// utils.displayInTextEditor(rule.apiAnonymous);
+		return tclTreeProvider.display(rule);
+	}));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('f5.postRule', async (rule) => {
+		console.log('f5.postRule command: ', rule);
+		return tclTreeProvider.postUpdate(rule);
+	}));
+	
+	
+	
+	
+	// --- IAPP COMMANDS ---
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getApp', async (item) => {
+		console.log('f5.getApp command: ', item);
+		// return tclTreeProvider.display(item);
+		return utils.displayJsonInEditor(item);
+	}));
+
+	
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTemp', async (item) => {
+		console.log('f5.getTemplate command: ', item);
+		// return tclTreeProvider.display(item);
+		return utils.displayJsonInEditor(item);
+	}));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempDef', async (item) => {
+		console.log('f5.getTempDef command: ', item);
+		// return tclTreeProvider.display(item);
+		return utils.displayJsonInEditor(item);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempDefExp', async (item) => {
+		console.log('f5.getTempDefExp command: ', item);
+		// return tclTreeProvider.display(item);
+		return utils.displayJsonInEditor(item);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempDefImp', async (item) => {
+		console.log('f5.getTempDefImp command: ', item);
+		// return tclTreeProvider.display(item);
+		return utils.displayJsonInEditor(item);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempDefPres', async (item) => {
+		console.log('f5.getTempDefPres command: ', item);
+		// return tclTreeProvider.display(item);
+		return utils.displayJsonInEditor(item);
+	}));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('f5.postTemplate', async (item) => {
+		console.log('f5.postTemplate command: ', item);
+
+
+		const resp: any = await tclTreeProvider.postTemplate(item);
+		console.log(resp);
+		
+		return utils.displayJsonInEditor(resp);
+	}));
+
 
 
 
@@ -1329,6 +1371,41 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 	}));
+
+
+	//original way the example extension structured the command
+	let disposable = vscode.commands.registerCommand('f5.remoteCommand', async () => {
+
+		const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' });
+		
+		if ( cmd === undefined ) {
+			// maybe just showInformationMessage and exit instead of error?
+			throw new Error('Remote Command inputBox cancelled');
+		}
+
+		//await ext.mgmtClient.getToken();
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+			method: 'POST',
+			body: {
+				command: 'run',
+				utilCmdArgs: `-c '${cmd}'`
+			}
+		});
+
+		vscode.workspace.openTextDocument({ 
+			language: 'text', 
+			content: resp.data.commandResult
+		})
+		.then( doc => 
+			vscode.window.showTextDocument(
+				doc, 
+				{ 
+					preview: false 
+				}
+			)
+		);
+	});	
+	context.subscriptions.push(disposable);
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {

@@ -254,6 +254,11 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.postTemplate",
+				"title": "Post iApp Template",
+				"category": "F5"
+			},
+			{
 				"command": "f5.openSettings",
 				"title": "Settings",
 				"category": "F5"
@@ -518,6 +523,10 @@
 				{
 					"when": "editorHasSelection",
 					"command": "f5-ts.postDec",
+					"group": "F5"
+				},
+				{
+					"command": "f5.postTemplate",
 					"group": "F5"
 				},
 				{
