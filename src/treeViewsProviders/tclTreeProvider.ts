@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+import * as path from 'path';
 
 
 /**
@@ -86,7 +87,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 				// todo: get iapp templates stuff
 				treeItems = this._iAppTemplates.map( (el: any) => {
                     return new TCLitem(el.fullPath, '', '', 'iAppTemplate', vscode.TreeItemCollapsibleState.None, 
-                        { command: 'f5.getTemplate', title: '', arguments: [el] });
+                        { command: 'f5.viewTMPL', title: '', arguments: [el] });
                 });
 			}
 
@@ -137,12 +138,12 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		/**
 		 * todo: fill in iApp templates stuff
 		 */
-		const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template`);
+		const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template?expandSubcollections=true`);
 		this._iAppTemplates = [];	// clear current list
 		this._iAppTemplates = templates.data.items.map( (el: any) => el);
 	}
 	
-	async display(item: any) {
+	async displayRule(item: any) {
 		
 		// append fullPath tag to irule so we know where to post the updated irule when needed
 		const content = `#${item.fullPath}#\r\n` + item.apiAnonymous;
@@ -243,6 +244,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 		// parse editor stuff to iapp template fields
 		// capture entire header and fullPath
+		//https://stackoverflow.com/questions/12317049/how-to-split-a-long-regular-expression-into-multiple-lines-in-javascript
 		const templateName = text?.match(/sys application template (.*?)\s*{/);
 		const templateHelp = text?.match(/html-help\s{\s*(.*?)\s*}\s*implementation\s{/s);
 		const templateImplementation = text?.match(/implementation\s*{\s(.*?)\s*}\s*macro\s*{/s);
@@ -252,18 +254,139 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		console.log('break');
 
 		// console.log(templateImplementation[1]);
+
+		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/sys/application/template/', {
+			method: 'POST',
+			body: {
+				actions: [
+					{
+					htmlHelp: '-- insert html help text --',
+					implementation: '### insert tmsh script ###',
+					name: 'definition',
+					presentation: '### insert presentations stuff ###',
+					roleAcl: [
+						'admin',
+						'manager',
+						'resource-admin'
+					]
+					},
+				],
+				ignoreVerification: 'false',
+				name: 'A_test_up1',
+				requiresBigipVersionMin: '11.6.0',
+				totalSigningStatus: 'not-all-signed'
+			}
+		});
 		
 
-		return {
-			templateName,
-			templateHelp,
-			templateImplementation,
-			templatePresentation,
-			templateRequiredVersion,
-			templateRequiredModules
-		};
+		// return {
+		// 	templateName,
+		// 	templateHelp,
+		// 	templateImplementation,
+		// 	templatePresentation,
+		// 	templateRequiredVersion,
+		// 	templateRequiredModules
+		// };
+	}
+
+	async getTemplateJSON(tempName: any) {
+		/**
+		 * get full template details from f5, and display as requested
+		 * - expanded = all details in raw json format
+		 * - tmpl = should be same expanded details, but in original .tmpl txt format
+		 * 		- gonna have to work all the json params back into txt
+		 * - implementation = just implementation portion?
+		 * - presentation = just presentation portion?
+		 * 
+		 */
+		const output = 'expanded';
+		console.log('output', output);
+		console.log('tempName', tempName);
+
+		const urlName = tempName?.label.replace(/\//g, '~');
+
+		const url = `/mgmt/tm/sys/application/template/${urlName}/actions/definition?expandSubcollections=true`;
+		
+
+		if(output === 'expanded') {
+			const resp: any = await ext.mgmtClient?.makeRequest(url);
+			console.log('response', resp.data);
+			return resp.data;
+		}
+	}
+
+	async getTMPL(tempName: any) {
+		/**
+		 * get full template details from f5, and display as requested
+		 * - expanded = all details in raw json format
+		 * - tmpl = should be same expanded details, but in original .tmpl txt format
+		 * 		- gonna have to work all the json params back into txt
+		 * - implementation = just implementation portion?
+		 * - presentation = just presentation portion?
+		 * 
+		 */
+		const output = 'expanded';
+		console.log('output', output);
+		console.log('tempName', tempName);
+
+		const urlName = tempName?.label.replace(/\//g, '~');
+
+		const url = `/mgmt/tm/sys/application/template/${urlName}/actions/definition?expandSubcollections=true`;
+		
+
+		if(output === 'expanded') {
+			const resp: any = await ext.mgmtClient?.makeRequest(url);
+			console.log('response', resp.data);
+			return resp.data;
+		}
+	}
+
+	async postTMPL (template: any) {
+		console.log('postTMPL: ', template);
+
+		// const fileP = vscode.Uri.parse(template.fsPath);
+		const fileName = path.basename(template.fsPath);
+
+		/**
+		 * // upload .tmpl file via /mgmt/shared/file-transfer/uploads/
+		 * should show up in /var/config/rest/downloads/
+		 * K38306494: Importing an iApp template using the CLI
+		 * - https://support.f5.com/csp/article/K38306494
+		 * 		- tmsh load /sys application template <path/to/iApp/template/file>
+		 * 		- tmsh save /sys config
+		 * 
+		 */
+
+		// upload .tmpl file
+		const upload = await ext.mgmtClient?.upload(template.fsPath);
+		
+		console.log('break');
+
+		const importTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+			method: 'POST',
+			body: {
+				command: 'run',
+				utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
+			}
+		});
+
+		return importTMPL.data.commandResult;
+	}
+
+	async deleteTMPL (template: string) {
+		console.log('deleteTMPL: ', template);
+		const urlName = template.label.replace(/\//g, '~');
+		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
+			method: 'DELETE'
+		});
+		
+		console.log('deleteTMPL: resp-> ', resp);
 	}
 }
+
+/**
+ * to save 
+ */
 
 class TCLitem extends vscode.TreeItem {
 	constructor(

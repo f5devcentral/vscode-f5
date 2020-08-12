@@ -259,6 +259,26 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.getTempOriginal",
+				"title": "Get iApp Template Original",
+				"category": "F5"
+			},
+			{
+				"command": "f5.getTmpl",
+				"title": "Get iApp Template .tmpl",
+				"category": "F5"
+			},
+			{
+				"command": "f5.deleteTMPL",
+				"title": "DELETE iApp Template",
+				"category": "F5"
+			},
+			{
+				"command": "f5.postTMPL",
+				"title": "POST iApp Template .tmpl",
+				"category": "F5"
+			},
+			{
 				"command": "f5.openSettings",
 				"title": "Settings",
 				"category": "F5"
@@ -564,6 +584,11 @@
 					"group": "F5"
 				},
 				{
+					"when": "f5.irules && resourceExtname == .tmpl",
+					"command": "f5.postTMPL",
+					"group": "F5"
+				},
+				{
 					"when": "f5.fastInstalled && explorerResourceIsFolder",
 					"command": "f5-fast.postTemplateSet",
 					"group": "F5-Fast"
@@ -764,6 +789,18 @@
 				{
 					"command": "f5.postRule",
 					"when": "view == as3Tasks && viewItem == rule"
+				},
+				{
+					"command": "f5.getTempOriginal",
+					"when": "view == as3Tasks && viewItem == iAppTemplate"
+				},
+				{
+					"command": "f5.getTmpl",
+					"when": "view == as3Tasks && viewItem == iAppTemplate"
+				},
+				{
+					"command": "f5.deleteTMPL",
+					"when": "view == as3Tasks && viewItem == iAppTemplate"
 				},
 				{
 					"command": "f5-fast.deleteFastApp",

@@ -387,7 +387,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getRule', async (rule) => {
 		console.log('f5.getRule command: ', rule);
 		// utils.displayInTextEditor(rule.apiAnonymous);
-		return tclTreeProvider.display(rule);
+		return tclTreeProvider.displayRule(rule);
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.postRule', async (rule) => {
@@ -418,31 +418,42 @@ export function activate(context: vscode.ExtensionContext) {
 		return utils.displayJsonInEditor(item);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempDefExp', async (item) => {
-		console.log('f5.getTempDefExp command: ', item);
-		// return tclTreeProvider.display(item);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempOriginal', async (item) => {
+		// gets the original .tmpl output
+		console.log('f5.getTempOriginal command: ', item);
+		const temp = await tclTreeProvider.getTemplateJSON(item);
+		return utils.displayJsonInEditor(temp);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTmpl', async (item) => {
+		// gets full api output of template in JSON
+		console.log('f5.getTmpl command: ', item);
+		const temp = await tclTreeProvider.getTMPL(item);
 		return utils.displayJsonInEditor(item);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempDefImp', async (item) => {
-		console.log('f5.getTempDefImp command: ', item);
-		// return tclTreeProvider.display(item);
-		return utils.displayJsonInEditor(item);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.postTMPL', async (item) => {
+		console.log('f5.postTMPL command: ', item);
+		const resp: any = await tclTreeProvider.postTMPL(item);
+		// utils.displayInTextEditor(resp);
+		vscode.window.showInformationMessage(resp);
+		tclTreeProvider.refresh();
+		return resp;
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempDefPres', async (item) => {
-		console.log('f5.getTempDefPres command: ', item);
-		// return tclTreeProvider.display(item);
-		return utils.displayJsonInEditor(item);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.deleteTMPL', async (item) => {
+		console.log('f5.deleteTMPL command: ', item);
+		const resp: any = await tclTreeProvider.deleteTMPL(item);
+		// utils.displayInTextEditor(resp);
+		// vscode.window.showInformationMessage(resp);
+		tclTreeProvider.refresh();
+		return resp;
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.postTemplate', async (item) => {
 		console.log('f5.postTemplate command: ', item);
-
-
 		const resp: any = await tclTreeProvider.postTemplate(item);
 		console.log(resp);
-		
 		return utils.displayJsonInEditor(resp);
 	}));
 
