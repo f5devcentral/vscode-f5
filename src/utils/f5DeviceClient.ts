@@ -172,7 +172,12 @@ export class MgmtClient {
      * setup multi part upload to f5 function
      * @param file full path/file location
      */
-    async upload(file: string) {
+    async upload(file: string = '') {
+
+        /**
+         * todo: add ability to provide buffer data to bypass the need for
+         * a temp file
+         */
         return await multiPartUploadSDK(file, this.host, this.port, this._token.token);
     }
 

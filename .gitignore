@@ -16,3 +16,7 @@ atc_ilx_rpm_cache
 /fastTemplateFolderUploadTemp/
 *.http
 /restTests/
+
+
+# ignore f5 iApp template files
+*.tmpl

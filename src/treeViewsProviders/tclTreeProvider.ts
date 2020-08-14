@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
-
+import * as fs from 'fs';
+import * as os from 'os';
 
 /**
  * The following has an example/explaination of using onWillSaveTextDocument event
@@ -87,7 +88,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 				// todo: get iapp templates stuff
 				treeItems = this._iAppTemplates.map( (el: any) => {
                     return new TCLitem(el.fullPath, '', '', 'iAppTemplate', vscode.TreeItemCollapsibleState.None, 
-                        { command: 'f5.viewTMPL', title: '', arguments: [el] });
+                        { command: 'f5.getTMPL', title: '', arguments: [el] });
                 });
 			}
 
@@ -150,6 +151,18 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 		// open editor and feed it the content
 		const doc = await vscode.workspace.openTextDocument({ content: content, language: 'irule-lang' });
+		// make the editor appear
+		await vscode.window.showTextDocument( doc, { preview: false });
+		return doc;	// return something for automated testing
+	}
+
+	async displayTMPL(item: any) {
+		
+		// append fullPath tag to irule so we know where to post the updated irule when needed
+		// const content = `#${item.fullPath}#\r\n` + item.apiAnonymous;
+
+		// open editor and feed it the content
+		const doc = await vscode.workspace.openTextDocument({ content: item, language: 'irule-lang' });
 		// make the editor appear
 		await vscode.window.showTextDocument( doc, { preview: false });
 		return doc;	// return something for automated testing
@@ -289,7 +302,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		// };
 	}
 
-	async getTemplateJSON(tempName: any) {
+	async getTMPL(tempName: any) {
 		/**
 		 * get full template details from f5, and display as requested
 		 * - expanded = all details in raw json format
@@ -299,23 +312,36 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		 * - presentation = just presentation portion?
 		 * 
 		 */
-		const output = 'expanded';
-		console.log('output', output);
+
 		console.log('tempName', tempName);
 
-		const urlName = tempName?.label.replace(/\//g, '~');
+		const getTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+			method: 'POST',
+			body: {
+				command: 'run',
+				utilCmdArgs: `-c 'tmsh list sys application template ${tempName.fullPath}'`
+			}
+		});
 
-		const url = `/mgmt/tm/sys/application/template/${urlName}/actions/definition?expandSubcollections=true`;
+		// await this.displayRule(getTMPL.data.commandResult);
+		return getTMPL.data.commandResult;
+
+		 // const output = 'expanded';
+		// console.log('output', output);
+
+		// const urlName = tempName?.label.replace(/\//g, '~');
+
+		// const url = `/mgmt/tm/sys/application/template/${urlName}/actions/definition?expandSubcollections=true`;
 		
 
-		if(output === 'expanded') {
-			const resp: any = await ext.mgmtClient?.makeRequest(url);
-			console.log('response', resp.data);
-			return resp.data;
-		}
+		// if(output === 'expanded') {
+		// 	const resp: any = await ext.mgmtClient?.makeRequest(url);
+		// 	console.log('response', resp.data);
+		// 	return resp.data;
+		// }
 	}
 
-	async getTMPL(tempName: any) {
+	async getTemplate(tempName: any) {
 		/**
 		 * get full template details from f5, and display as requested
 		 * - expanded = all details in raw json format
@@ -344,8 +370,10 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	async postTMPL (template: any) {
 		console.log('postTMPL: ', template);
 
-		// const fileP = vscode.Uri.parse(template.fsPath);
-		const fileName = path.basename(template.fsPath);
+		// assign details if coming from explorer right-click
+		var filePath = template.fsPath;
+		var fileName = path.basename(template.fsPath);
+		var cleanUp: string | undefined;
 
 		/**
 		 * // upload .tmpl file via /mgmt/shared/file-transfer/uploads/
@@ -355,31 +383,90 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		 * 		- tmsh load /sys application template <path/to/iApp/template/file>
 		 * 		- tmsh save /sys config
 		 * 
+		 * explorering two routes to push .tmpl
+		 * 1. from explorer view
+		 * 		- these are templates from a file system that a user has saved (like f5 provided)
+		 * 		- this just passes the filePath to upload and import the template
+		 * 2. from editor view
+		 * 		- this is a template that came from an F5 since it would fetched from the IRULE/IAPPS view
+		 * 		- this method has to extract the template name for temp file
+		 * 		- create temp file, then upload file, import template, and delete temp file
 		 */
 
-		// upload .tmpl file
-		const upload = await ext.mgmtClient?.upload(template.fsPath);
-		
-		console.log('break');
+		// template.scheme === 'file' -> came from right-click explorer
+		// template.scheme === 'untitled' -> came from right-click editor (untitled document)
 
-		const importTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
-			method: 'POST',
-			body: {
-				command: 'run',
-				utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
+		 if(template.scheme === 'untitled') {
+
+			// get editor text (should be iapp .tmpl)
+			const text = vscode.window.activeTextEditor?.document.getText();
+			const coreDir = ext.context.extensionPath;	// extension core directory
+			console.log('POST iApp .tmpl via editor detected');
+
+			if(!text) {
+				console.error('no text and/or editor');
+				return vscode.window.showErrorMessage('no text and/or editor');;
 			}
-		});
+			
+			const templateName = text.match(/sys\sapplication\stemplate\s(.*?)\s*{/);
+			if(templateName) {
+				// regex worked, got template name from text, assigne capture group, not entire regex match
+				fileName = `${templateName[1]}.tmpl`;
+				console.log('found iApp name from editor text: ', fileName);
+			} else {
+				// regex failed to find iapp name -> fail with messaging
+				const erTxt = 'Could not find iApp template name in text - use output from "tmsh list" command or original .tmpl format';
+				console.error(erTxt);
+				return vscode.window.showErrorMessage(erTxt);
+			}
 
-		return importTMPL.data.commandResult;
+			const dstFilePath = path.join(coreDir, fileName);
+
+			// const tmpDir = os.tmpdir();		// look at moving temp files to this...
+
+			// write temp iapp .tmpl file to extension core directory
+			fs.writeFileSync(dstFilePath, text);
+			
+			// set fsPath to tempFilePath for upload
+			filePath = dstFilePath;
+			// set cleanUp var to delete templ file when done
+			cleanUp = dstFilePath;
+			console.log('write temp iapp file complete:', dstFilePath);
+		 } else {
+			 console.log('iApp upload from explorer view detected -> filePath:', filePath);
+		 }
+
+		// upload .tmpl file
+		if(ext.mgmtClient) {
+			const upload = await ext.mgmtClient.upload(filePath);
+			console.log('iApp upload complete -> importing iApp via tmsh bash api', upload);
+	
+			const importTMPL: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
+				method: 'POST',
+				body: {
+					command: 'run',
+					utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
+				}
+			});
+
+			if(cleanUp) {
+				console.log('deleting iApp temp file at:', cleanUp);
+				fs.unlinkSync(cleanUp);
+			}
+			return importTMPL.data.commandResult;
+		} else {
+			console.error('iApp .tmpl upload: no connected device, connect to issue command');
+		}
+
+		
 	}
 
-	async deleteTMPL (template: string) {
+	async deleteTMPL (template: {label: string}) {
 		console.log('deleteTMPL: ', template);
 		const urlName = template.label.replace(/\//g, '~');
 		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
 			method: 'DELETE'
 		});
-		
 		console.log('deleteTMPL: resp-> ', resp);
 	}
 }

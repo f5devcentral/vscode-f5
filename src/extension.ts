@@ -418,17 +418,18 @@ export function activate(context: vscode.ExtensionContext) {
 		return utils.displayJsonInEditor(item);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.getTempOriginal', async (item) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTMPL', async (item) => {
 		// gets the original .tmpl output
-		console.log('f5.getTempOriginal command: ', item);
-		const temp = await tclTreeProvider.getTemplateJSON(item);
-		return utils.displayJsonInEditor(temp);
+		console.log('f5.getTMPL command: ', item);
+		const temp = await tclTreeProvider.getTMPL(item);
+		// return utils.displayJsonInEditor(temp);
+		tclTreeProvider.displayTMPL(temp);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.getTmpl', async (item) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.getTemplate', async (item) => {
 		// gets full api output of template in JSON
-		console.log('f5.getTmpl command: ', item);
-		const temp = await tclTreeProvider.getTMPL(item);
+		console.log('f5.getTemplate command: ', item);
+		const temp = await tclTreeProvider.getTemplate(item);
 		return utils.displayJsonInEditor(item);
 	}));
 
@@ -451,6 +452,10 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.postTemplate', async (item) => {
+		/**
+		 *  --- OLD ---
+		 * first try at this - attempts to parse .tmpl, and post to template api
+		 */
 		console.log('f5.postTemplate command: ', item);
 		const resp: any = await tclTreeProvider.postTemplate(item);
 		console.log(resp);

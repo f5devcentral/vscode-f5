@@ -254,18 +254,13 @@
 				"category": "F5"
 			},
 			{
-				"command": "f5.postTemplate",
-				"title": "Post iApp Template",
+				"command": "f5.getTMPL",
+				"title": "Get iApp Template Origin .tmpl",
 				"category": "F5"
 			},
 			{
-				"command": "f5.getTempOriginal",
-				"title": "Get iApp Template Original",
-				"category": "F5"
-			},
-			{
-				"command": "f5.getTmpl",
-				"title": "Get iApp Template .tmpl",
+				"command": "f5.getTemplate",
+				"title": "Get iApp Template JSON",
 				"category": "F5"
 			},
 			{
@@ -276,7 +271,8 @@
 			{
 				"command": "f5.postTMPL",
 				"title": "POST iApp Template .tmpl",
-				"category": "F5"
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.openSettings",
@@ -546,7 +542,7 @@
 					"group": "F5"
 				},
 				{
-					"command": "f5.postTemplate",
+					"command": "f5.postTMPL",
 					"group": "F5"
 				},
 				{
@@ -791,11 +787,7 @@
 					"when": "view == as3Tasks && viewItem == rule"
 				},
 				{
-					"command": "f5.getTempOriginal",
-					"when": "view == as3Tasks && viewItem == iAppTemplate"
-				},
-				{
-					"command": "f5.getTmpl",
+					"command": "f5.getTemplate",
 					"when": "view == as3Tasks && viewItem == iAppTemplate"
 				},
 				{
