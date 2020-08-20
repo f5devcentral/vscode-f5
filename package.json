@@ -254,22 +254,32 @@
 				"category": "F5"
 			},
 			{
-				"command": "f5.getTMPL",
+				"command": "f5-tcl.getTMPL",
 				"title": "Get iApp Template Origin .tmpl",
 				"category": "F5"
 			},
 			{
-				"command": "f5.getTemplate",
+				"command": "f5-tcl.getTemplate",
 				"title": "Get iApp Template JSON",
 				"category": "F5"
 			},
 			{
-				"command": "f5.deleteTMPL",
+				"command": "f5-tcl.iAppRedeploy",
+				"title": "RE-DEPLOY iApp-App",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.iAppDelete",
+				"title": "DELETE iApp-App",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.deleteTMPL",
 				"title": "DELETE iApp Template",
 				"category": "F5"
 			},
 			{
-				"command": "f5.postTMPL",
+				"command": "f5-tcl.postTMPL",
 				"title": "POST iApp Template .tmpl",
 				"category": "F5",
 				"enablement": "f5.device"
@@ -301,7 +311,7 @@
 				}
 			},
 			{
-				"command": "f5.postRule",
+				"command": "f5-tcl.postRule",
 				"title": "Update iRule",
 				"category": "F5"
 			},
@@ -542,7 +552,7 @@
 					"group": "F5"
 				},
 				{
-					"command": "f5.postTMPL",
+					"command": "f5-tcl.postTMPL",
 					"group": "F5"
 				},
 				{
@@ -581,7 +591,7 @@
 				},
 				{
 					"when": "f5.irules && resourceExtname == .tmpl",
-					"command": "f5.postTMPL",
+					"command": "f5-tcl.postTMPL",
 					"group": "F5"
 				},
 				{
@@ -783,15 +793,23 @@
 					"when": "view == f5Hosts"
 				},
 				{
-					"command": "f5.postRule",
+					"command": "f5-tcl.postRule",
 					"when": "view == as3Tasks && viewItem == rule"
 				},
 				{
-					"command": "f5.getTemplate",
+					"command": "f5-tcl.getTemplate",
 					"when": "view == as3Tasks && viewItem == iAppTemplate"
 				},
 				{
-					"command": "f5.deleteTMPL",
+					"command": "f5-tcl.iAppRedeploy",
+					"when": "view == as3Tasks && viewItem == iApp"
+				},
+				{
+					"command": "f5-tcl.iAppDelete",
+					"when": "view == as3Tasks && viewItem == iApp"
+				},
+				{
+					"command": "f5-tcl.deleteTMPL",
 					"when": "view == as3Tasks && viewItem == iAppTemplate"
 				},
 				{
