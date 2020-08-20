@@ -274,6 +274,12 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5-tcl.mergeTCL",
+				"title": "Merge TCL/TMOS",
+				"category": "F5",
+				"enablement": "f5.device"
+			},
+			{
 				"command": "f5-tcl.deleteTMPL",
 				"title": "DELETE iApp Template",
 				"category": "F5"
@@ -311,8 +317,8 @@
 				}
 			},
 			{
-				"command": "f5-tcl.postRule",
-				"title": "Update iRule",
+				"command": "f5-tcl.deleteRule",
+				"title": "Delete iRule",
 				"category": "F5"
 			},
 			{
@@ -552,6 +558,10 @@
 					"group": "F5"
 				},
 				{
+					"command": "f5-tcl.mergeTCL",
+					"group": "F5"
+				},
+				{
 					"command": "f5-tcl.postTMPL",
 					"group": "F5"
 				},
@@ -587,6 +597,11 @@
 				{
 					"when": "f5.device && resourceExtname == .rpm",
 					"command": "f5.installRPM",
+					"group": "F5"
+				},
+				{
+					"when": "f5.irules && resourceExtname =~ /\\.(tcl|conf|rule)/",
+					"command": "f5-tcl.mergeTCL",
 					"group": "F5"
 				},
 				{
@@ -793,7 +808,7 @@
 					"when": "view == f5Hosts"
 				},
 				{
-					"command": "f5-tcl.postRule",
+					"command": "f5-tcl.deleteRule",
 					"when": "view == as3Tasks && viewItem == rule"
 				},
 				{

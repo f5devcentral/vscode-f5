@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+import * as utils from '../utils/utils';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -56,16 +57,11 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 	async getChildren(element?: TCLitem) {
 		let treeItems: any[] = [];
-		
-		// if(!this.irulesEnabled) {
-		// 	return;	// should be here since this should be disabled
-		// }
 
 		if (!ext.mgmtClient) {
 			// return nothing if not connected yet
 			return Promise.resolve([]);
 		}
-
 
 		if (element) {
 			
@@ -143,15 +139,25 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		this._iAppTemplates = [];	// clear current list
 		this._iAppTemplates = templates.data.items.map( (el: any) => el);
 	}
-	
+
 	/**
-	 * 
+	 * changes fullName to urlName to use in API
+	 * 	Ex:   /Common/A_test -> \~Common\~A_test
+	 * @param name as string
+	 */
+	private name2uri(name: string) {
+		return name.replace(/\//g, '~');
+	}
+
+
+	/**
+	 * crafts irule tcl object and displays in editor with irule language
 	 * @param item iRule item passed from view click
 	 */
 	async displayRule(item: any) {
 		
-		// append fullPath tag to irule so we know where to post the updated irule when needed
-		const content = `#${item.fullPath}#\r\n` + item.apiAnonymous;
+		// make it look like a tcl irule object so it can be merged back with changes
+		const content = `ltm rule ${item.fullPath} {\r\n` + item.apiAnonymous + '\r\n}';
 
 		// open editor and feed it the content
 		const doc = await vscode.workspace.openTextDocument({ content: content, language: 'irule-lang' });
@@ -160,151 +166,34 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		return doc;	// return something for automated testing
 	}
 
+	async deleteRule(item: any) {
+		console.log('deleteRule: ', item);
+
+		const name = this.name2uri(item.label);
+
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule/${name}`, {
+			method: 'DELETE'
+		});
+
+		// console.log('deteleRule response: ', resp.data);
+		setTimeout( () => { this.refresh();}, 500);	// refresh after update
+		return `${resp.status}-${resp.statusText}`;
+	}
+
+	/**
+	 * display .tmpl from f5 in editor
+	 * @param item from tree view click
+	 */
 	async displayTMPL(item: any) {
 		
-		// append fullPath tag to irule so we know where to post the updated irule when needed
-		// const content = `#${item.fullPath}#\r\n` + item.apiAnonymous;
-
 		// open editor and feed it the content
 		const doc = await vscode.workspace.openTextDocument({ content: item, language: 'irule-lang' });
 		// make the editor appear
 		await vscode.window.showTextDocument( doc, { preview: false });
 		return doc;	// return something for automated testing
 	}
-	
-	async postUpdate(item: any) {
-
-		// get current active editor - should be the irule we just edited and are posting updates for
-		if (!vscode.window.activeTextEditor) {
-			return; // no editor
-		}
-
-		/**
-		 * need to confirm inbound item fullPath from right click on view item
-		 * matches up with the fullPath in the editor window where we are getting
-		 * 	the irule guts
-		 * This is provide some bumpers on this hackey solution so users shouldn't be able
-		 * 	to modify the fullPath header on the irule and/or try to send the wrong irule
-		 * 	back to the wrong destination
-		 */
-
-		// get document information from the active editor
-		let editor = vscode.window.activeTextEditor;
-
-		const text = editor.document.getText();	// entire editor/doc window
-
-		// capture entire header and fullPath
-		const found = text.match(/#(.*?)#/);
-		let postUrl: string = '';
-		let newText: string = '';
-		if(found) {
-			// swap out / for ~ in fullPath to not conflict with URLs
-			postUrl = found[1].replace(/\//g, '~');
-			// remove entire header with what was found
-			newText = text.replace(found[0], '');
-		}
-
-		// make sure something didn't happen to the header and skew what we expect
-		if(!postUrl || !newText) {
-			console.error('no postUrl header or text for iRule update');
-			return vscode.window.showErrorMessage('no postUrl header or text for iRule update');
-		}
-
-		/**
-		 * now that we confirmed we have the appropriate irule header to understand where to post updates to
-		 * Need to confirm the header matches the inbound item fullPath from right click on view item
-		 * matches up with the fullPath in the editor window where we are getting
-		 * 	the irule guts from
-		 * This is provide some bumpers on this hackey solution so users shouldn't be able
-		 * 	to modify the fullPath header on the irule and/or try to send the wrong irule
-		 * 	back to the wrong destination
-		 */
-
-		// if(postUrl != item.fullPath?) => return with error 'irule fullPath url doesn't match view item destination'
 
 
-		// patch irule to f5
-		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/ltm/rule/' + postUrl, {
-			method: 'PATCH',
-			body: {
-				apiAnonymous: newText
-			}
-		});
-
-		// feedback to user of what happened
-		if(resp.status === 200) {
-			vscode.window.showInformationMessage('iRule Post Update Successfull');
-		} else {
-			vscode.window.showErrorMessage(`iRule Post Update: ${resp.status}-${resp.statusText}`);
-		}
-		
-		// return something for automated tests
-		return resp.status;
-	}
-
-	// async postTemplate(item: any) {
-
-	// 	// if available, get entire text from active editor
-	// 	// command should only be called from editor under certain situations
-	// 	const text = vscode.window.activeTextEditor?.document.getText();
-
-	// 	/**
-	// 	 * 1. parse template pieces
-	// 	 * 		a. name from first line: sys application template /Common/A_base_iapp_1
-	// 	 * 		b. html help (maybe)
-	// 	 * 		c. implementation
-	// 	 * 		d. presentation
-	// 	 * 		e. requires-bigip-version-min
-	// 	 * 		f. required modules
-	// 	 * 2. post template
-	// 	 */
-
-	// 	// parse editor stuff to iapp template fields
-	// 	// capture entire header and fullPath
-	// 	//https://stackoverflow.com/questions/12317049/how-to-split-a-long-regular-expression-into-multiple-lines-in-javascript
-	// 	const templateName = text?.match(/sys application template (.*?)\s*{/);
-	// 	const templateHelp = text?.match(/html-help\s{\s*(.*?)\s*}\s*implementation\s{/s);
-	// 	const templateImplementation = text?.match(/implementation\s*{\s(.*?)\s*}\s*macro\s*{/s);
-	// 	const templatePresentation = text?.match(/presentation\s*{\s(.*?)\s*}\s*role-acl\s\w+\s*run-as\s\w+/s);
-	// 	const templateRequiredVersion = text?.match(/requires-bigip-version-min\s([\.\d]+)/);
-	// 	const templateRequiredModules = text?.match(/requires-modules\s?{\s?([\w\s]+)}/);
-	// 	console.log('break');
-
-	// 	// console.log(templateImplementation[1]);
-
-	// 	const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/sys/application/template/', {
-	// 		method: 'POST',
-	// 		body: {
-	// 			actions: [
-	// 				{
-	// 				htmlHelp: '-- insert html help text --',
-	// 				implementation: '### insert tmsh script ###',
-	// 				name: 'definition',
-	// 				presentation: '### insert presentations stuff ###',
-	// 				roleAcl: [
-	// 					'admin',
-	// 					'manager',
-	// 					'resource-admin'
-	// 				]
-	// 				},
-	// 			],
-	// 			ignoreVerification: 'false',
-	// 			name: 'A_test_up1',
-	// 			requiresBigipVersionMin: '11.6.0',
-	// 			totalSigningStatus: 'not-all-signed'
-	// 		}
-	// 	});
-		
-
-	// 	// return {
-	// 	// 	templateName,
-	// 	// 	templateHelp,
-	// 	// 	templateImplementation,
-	// 	// 	templatePresentation,
-	// 	// 	templateRequiredVersion,
-	// 	// 	templateRequiredModules
-	// 	// };
-	// }
 
 	/**
 	 * Gets the 'tmsh list sys application template <template_name>' output
@@ -313,17 +202,6 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 */
 	async getTMPL(tempName: any) {
 		console.log('tempName', tempName);
-
-		/**
-		 * todo: clean the following lines from the tmpl so it can be uploaded
-		 * 
-		 *  # signing-key none
-    	 *  # tmpl-checksum none
-    	 *  # tmpl-signature none
-    	 *  # total-signing-status not-all-signed
-    	 *  # verification-status none
-		 * 
-		 */
 
 		const getTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
 			method: 'POST',
@@ -365,32 +243,79 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 	}
 
-	// async getTemplate(tempName: any) {
-	// 	/**
-	// 	 * get full template details from f5, and display as requested
-	// 	 * - expanded = all details in raw json format
-	// 	 * - tmpl = should be same expanded details, but in original .tmpl txt format
-	// 	 * 		- gonna have to work all the json params back into txt
-	// 	 * - implementation = just implementation portion?
-	// 	 * - presentation = just presentation portion?
-	// 	 * 
-	// 	 */
-	// 	const output = 'expanded';
-	// 	console.log('output', output);
-	// 	console.log('tempName', tempName);
 
-	// 	const urlName = tempName?.label.replace(/\//g, '~');
+	/**
+	 * upload/import tmos/tcl config
+	 * 
+	 * supports entire editor or highlight code pieces
+	 * 
+	 * 	*Example:
+	 * 		net vlan interal {
+	 * 			tag 4094
+	 * 		}
+	 * 
+	 * @param config tmos config as a string 
+	 */
+	async mergeTCL (config: string) {
+		console.log('mergeTCL', config);
 
-	// 	const url = `/mgmt/tm/sys/application/template/${urlName}/actions/definition?expandSubcollections=true`;
-		
+		const text = await utils.getText();	// get text from editor
+		const tmpFile = 'tempTmosConfigMerge.tcl';	// temp file name
+		const tmpDir = os.tmpdir();	//os temp directory
+		const dstFilePath = path.join(tmpDir, tmpFile);	// -> /tmpDirectory/tmpFile.tcl
 
-	// 	if(output === 'expanded') {
-	// 		const resp: any = await ext.mgmtClient?.makeRequest(url);
-	// 		console.log('response', resp.data);
-	// 		return resp.data;
-	// 	}
-	// }
+		// write temp iapp .tmpl file to extension core directory
+		fs.writeFileSync(dstFilePath, text);
 
+		// upload .tmpl file
+		if(ext.mgmtClient) {
+			const upload: any = await ext.mgmtClient.upload(dstFilePath);
+			console.log('tcl upload complete -> moving to /tmp/ location', upload);
+
+			await new Promise(r => setTimeout(r, 100)); // pause to finish upload
+			
+			// move file to temp location - required for tmsh merge command
+			const move: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/unix-mv`, {
+				method: 'POST',
+				body: {
+					command: 'run',
+					utilCmdArgs: `/var/config/rest/downloads/${tmpFile} /tmp/${tmpFile}`
+				}
+			});
+			
+			await new Promise(r => setTimeout(r, 100)); // pause to finish move
+			console.log('tcl upload complete -> merging with running config', move.data);
+	
+			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
+				method: 'POST',
+				body: {
+					command: 'run',
+					utilCmdArgs: `-c 'tmsh load sys config merge file /tmp/${tmpFile}'`
+				}
+			});
+
+			const final = resp.data.commandResult;
+
+			if(final.match(/(error|fail)/gi)) {
+				//  merge failed -> display error in editor tab
+				utils.displayInTextEditor(final);
+
+				Promise.reject(new Error(`tmsh merge failed with error: ${final}`));
+			} else {
+				vscode.window.showInformationMessage('mergeTCL -> SUCCESSFUL!!!', );
+				setTimeout( () => { this.refresh();}, 500);	// refresh after update
+				return 'success';
+			}
+
+		} else {
+			console.error('tcl upload/import: no connected device, connect to a device to issue command');
+		}
+	}
+
+	/**
+	 * Upload/Import iApp template
+	 * @param template 
+	 */
 	async postTMPL (template: any) {
 		console.log('postTMPL: ', template);
 
@@ -399,30 +324,8 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		var fileName = path.basename(template.fsPath);
 		var cleanUp: string | undefined;
 
-		/**
-		 * // upload .tmpl file via /mgmt/shared/file-transfer/uploads/
-		 * should show up in /var/config/rest/downloads/
-		 * K38306494: Importing an iApp template using the CLI
-		 * - https://support.f5.com/csp/article/K38306494
-		 * 		- tmsh load /sys application template <path/to/iApp/template/file>
-		 * 		- tmsh save /sys config
-		 * 
-		 * explorering two routes to push .tmpl
-		 * 1. from explorer view
-		 * 		- these are templates from a file system that a user has saved (like f5 provided)
-		 * 		- this just passes the filePath to upload and import the template
-		 * 2. from editor view
-		 * 		- this is a template that came from an F5 since it would fetched from the IRULE/IAPPS view
-		 * 		- this method has to extract the template name for temp file
-		 * 		- create temp file, then upload file, import template, and delete temp file
-		 * template.scheme === 'file' -> came from right-click explorer
-		 * 	- user needs to save any changes for them to get uploaded...
-		 * template.scheme === 'untitled' -> came from right-click editor (untitled document)
-		 * 
-		 */
 
-
-		 if(template.scheme === 'untitled') {
+		if(template.scheme === 'untitled') {
 
 			// get editor text (should be iapp .tmpl)
 			const text = vscode.window.activeTextEditor?.document.getText();
@@ -452,6 +355,8 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			}
 
 			const dstFilePath = path.join(coreDir, fileName);
+
+			// todo: move temp file location to os.tempdir like below
 
 			// const tmpDir = os.tmpdir();		// look at moving temp files to this...
 
@@ -484,15 +389,21 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 				console.log('deleting iApp temp file at:', cleanUp);
 				fs.unlinkSync(cleanUp);
 			}
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
 			return importTMPL.data.commandResult;
 		} else {
 			console.error('iApp .tmpl upload: no connected device, connect to issue command');
 		}
 	}
 
+	/**
+	 * redeploy iapp with current params
+	 * @param item tree view item from click
+	 */
 	async iAppRedeploy (item: {label: string}) {
 		console.log('iAppRedeploy: ', item);
-		const urlName = item.label.replace(/\//g, '~');
+		// const urlName = item.label.replace(/\//g, '~');
+		const urlName = this.name2uri(item.label);
 		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
 			method: 'PATCH',
 			body: {
@@ -502,28 +413,37 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		console.log('iAppReDeploy: resp-> ', resp);
 	}
 
+	/**
+	 * deletes selected iApp-App
+	 * @param item tree view item from click
+	 */
 	async iAppDelete (item: {label: string}) {
 		console.log('iAppDelete: ', item);
-		const urlName = item.label.replace(/\//g, '~');
+		// const urlName = item.label.replace(/\//g, '~');
+		const urlName = this.name2uri(item.label);
 		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
 			method: 'DELETE'
 		});
 		console.log('iAppDelete: resp-> ', resp);
+		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 
-	async deleteTMPL (template: {label: string}) {
-		console.log('deleteTMPL: ', template);
-		const urlName = template.label.replace(/\//g, '~');
+	/**
+	 * deletes iapp template
+	 * @param template tree veiw item from click
+	 */
+	async deleteTMPL (item: {label: string}) {
+		console.log('deleteTMPL: ', item);
+		// const urlName = template.label.replace(/\//g, '~');
+		const urlName = this.name2uri(item.label);
 		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
 			method: 'DELETE'
 		});
 		console.log('deleteTMPL: resp-> ', resp);
+		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 }
 
-/**
- * to save 
- */
 
 class TCLitem extends vscode.TreeItem {
 	constructor(
