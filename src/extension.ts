@@ -403,7 +403,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	
-	context.subscriptions.push(vscode.commands.registerCommand('f5-tcl.getTemp', async (item) => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5-tcl.getTemplate', async (item) => {
 		// returns json view of iApp Template
 		return utils.displayJsonInEditor(item);
 	}));
