@@ -53,7 +53,7 @@ export async function loadConfig() {
     console.log('loading configuration for ext.settings!!!');
     ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
     ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
-    // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.irules', false);
+    // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.tcl', false);
     ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
     ext.settings.showResponseInDifferentTab = workspace.getConfiguration().get('f5.showResponseInDifferentTab', false);
     ext.settings.previewResponseInUntitledDocument = workspace.getConfiguration().get('f5.previewResponseInUntitledDocument', false);
@@ -63,11 +63,11 @@ export async function loadConfig() {
 
 
     // irule view stuff - in progress
-    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.irules', false);
+    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', false);
     if(ext.settings.irulesEnabled && ext.iRulesAble){
-        commands.executeCommand('setContext', 'f5.irules', true);
+        commands.executeCommand('setContext', 'f5.tcl', true);
     } else {
-        commands.executeCommand('setContext', 'f5.irules', false);
+        commands.executeCommand('setContext', 'f5.tcl', false);
     }
 }
 

@@ -19,9 +19,11 @@ Any comments, questions or feature requests, please open a github repository iss
 
 * [CHANGELOG](CHANGELOG.md)
 * [Research](./README_docs/research.md)
-* [Writing ATC declarations in YAML!!!](./README_docs/jsonSchemaInYaml.md)
-* [Crafting raw API calls](./README_docs/rawApiCalls.md)
+* [Writing ATC declarations in YAML](./README_docs/jsonSchemaInYaml.md)
+* [Crafting raw API calls](https://github.com/DumpySquare/f5-fasting/blob/master/makeHTTPsTesting.md)
+    > hosted in the f5-fasting repo that is used to document and demonstrate fast/extension functionality for demos
 * [ATC ILX rpm package management](./README_docs/rpmMgmt.md)
+* [TCL/iRules/iApps](./README_docs/tcl.md)
 * [FAST information and How-To's](./README_docs/fast.md)
 * [Additional Tools](./README_docs/tools.md)
 

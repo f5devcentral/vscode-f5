@@ -91,7 +91,7 @@
 				{
 					"id": "as3Tasks",
 					"name": "iRules/iApps",
-					"when": "f5.irules"
+					"when": "f5.tcl"
 				},
 				{
 					"id": "decExamples",
@@ -189,11 +189,11 @@
 						"scope": "resource",
 						"description": "*DEV-Preview response panel will take focus after receiving response."
 					},
-					"f5.irules": {
+					"f5.tcl": {
 						"type": "boolean",
 						"default": false,
 						"scope": "resource",
-						"description": "*DEV-beta-Preview* irule functionality."
+						"description": "*DEV-beta-Preview* tcl/irule/iapp functionality."
 					},
 					"f5.logLevel": {
 						"type": "string",
@@ -245,12 +245,21 @@
 			{
 				"command": "f5.remoteCommand",
 				"title": "Remote Command Execute",
-				"category": "F5",
-				"enablement": "f5.device"
+				"category": "F5"
 			},
 			{
 				"command": "f5.makeRequest",
 				"title": "Make HTTP Request",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.mergeTCL",
+				"title": "Merge TCL/TMOS",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.deleteRule",
+				"title": "DELETE iRule",
 				"category": "F5"
 			},
 			{
@@ -274,12 +283,6 @@
 				"category": "F5"
 			},
 			{
-				"command": "f5-tcl.mergeTCL",
-				"title": "Merge TCL/TMOS",
-				"category": "F5",
-				"enablement": "f5.device"
-			},
-			{
 				"command": "f5-tcl.deleteTMPL",
 				"title": "DELETE iApp Template",
 				"category": "F5"
@@ -287,8 +290,7 @@
 			{
 				"command": "f5-tcl.postTMPL",
 				"title": "POST iApp Template .tmpl",
-				"category": "F5",
-				"enablement": "f5.device"
+				"category": "F5"
 			},
 			{
 				"command": "f5.openSettings",
@@ -315,11 +317,6 @@
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
 				}
-			},
-			{
-				"command": "f5-tcl.deleteRule",
-				"title": "Delete iRule",
-				"category": "F5"
 			},
 			{
 				"command": "f5.refreshTclTree",
@@ -558,10 +555,12 @@
 					"group": "F5"
 				},
 				{
+					"when": "f5.tcl",
 					"command": "f5-tcl.mergeTCL",
 					"group": "F5"
 				},
 				{
+					"when": "f5.tcl",
 					"command": "f5-tcl.postTMPL",
 					"group": "F5"
 				},
@@ -600,12 +599,12 @@
 					"group": "F5"
 				},
 				{
-					"when": "f5.irules && resourceExtname =~ /\\.(tcl|conf|rule)/",
+					"when": "f5.tcl && resourceExtname =~ /\\.(tcl|conf|rule)/",
 					"command": "f5-tcl.mergeTCL",
 					"group": "F5"
 				},
 				{
-					"when": "f5.irules && resourceExtname == .tmpl",
+					"when": "f5.tcl && resourceExtname == .tmpl",
 					"command": "f5-tcl.postTMPL",
 					"group": "F5"
 				},
@@ -690,6 +689,38 @@
 				},
 				{
 					"command": "f5.refreshTclTree",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.mergeTCL",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.deleteRule",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.getTMPL",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.getTemplate",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.iAppRedeploy",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.iAppDelete",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.deleteTMPL",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.postTMPL",
 					"when": "none"
 				},
 				{
@@ -779,6 +810,18 @@
 				{
 					"command": "f5-ts.postDec",
 					"when": "f5.tsInstalled"
+				},
+				{
+					"command": "f5.jsonYmlConvert",
+					"when": "none"
+				},
+				{
+					"command": "f5.b64Encode",
+					"when": "none"
+				},
+				{
+					"command": "f5.b64Decode",
+					"when": "none"
 				}
 			],
 			"view/item/context": [

@@ -285,7 +285,7 @@ export class MgmtClient {
          *  next connect should refresh the data as needed, but there seems to
          *  be a better way to do this.
          */
-        vscode.commands.executeCommand('setContext', 'f5.irules', false);
+        vscode.commands.executeCommand('setContext', 'f5.tcl', false);
         // ext.iRulesAble = false;
 
         // show connect status bar
