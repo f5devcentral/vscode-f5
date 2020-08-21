@@ -8,6 +8,23 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.2.0] - (8-21-2020)
+
+### Added
+- tcl/iRule/iApp functionality
+  - create/modify/delete irules
+  - upload/import/create/modify/delete iApp templates
+    - Also shows deployed iApp-Apps
+      - included options for redeploying iApp-App with current paramters and deleting an iApp-App
+  - `Merge TCL/TMOS` can be used to merge ANY TMOS config item
+
+Documentation: https://github.com/DumpySquare/vscode-f5-fast/blob/master/README_docs/tcl.md
+
+### Modified
+- extension now has dynamic config-settings changes, meaning, when an extension setting is changed, it is applied to extension without reload of workspace
+
+---
+
 ## [2.1.0] - (8-5-2020)
 
 ### Added
