@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { makeAuth, makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
-import { ext } from '../extensionVariables';
+import { ext, loadConfig } from '../extensionVariables';
 import * as utils from './utils';
 
 /**
@@ -112,9 +112,19 @@ export class MgmtClient {
                 utils.setHostnameBar(text, tip);
                 returnInfo.push(text);
             }
-
+            
             progress.report({ message: `CONNECTED, checking installed ATC services...`});
+            
+            
+            //********** enable irules view **********/
+            const iRules: any = await this.makeRequest('/mgmt/tm/ltm/rule/');
 
+            if(iRules.status === 200) {
+                // if irules detected, device is iRulesAble, so set that flag, 
+                //  then reload the config to make the view show
+                ext.iRulesAble = true;
+                loadConfig();
+            }
 
             //********** FAST info **********/
             const fastInfo: any = await this.makeRequest('/mgmt/shared/fast/info');
@@ -162,7 +172,12 @@ export class MgmtClient {
      * setup multi part upload to f5 function
      * @param file full path/file location
      */
-    async upload(file: string) {
+    async upload(file: string = '') {
+
+        /**
+         * todo: add ability to provide buffer data to bypass the need for
+         * a temp file
+         */
         return await multiPartUploadSDK(file, this.host, this.port, this._token.token);
     }
 
@@ -261,7 +276,17 @@ export class MgmtClient {
 		utils.setFastBar();
 		utils.setAS3Bar();
 		utils.setDOBar();
-		utils.setTSBar();
+        utils.setTSBar();
+        
+        /**
+         * // hide irules/iapps view
+         * this should probably dispose of the view or at least clear it's contents?
+         *  - currently, this just hides the view with all data in it
+         *  next connect should refresh the data as needed, but there seems to
+         *  be a better way to do this.
+         */
+        vscode.commands.executeCommand('setContext', 'f5.tcl', false);
+        // ext.iRulesAble = false;
 
         // show connect status bar
 		ext.connectBar.show();

@@ -244,3 +244,23 @@ export async function getPassword(device: string): Promise<any> {
     // console.log(`PASSWORD BOUT TO BE RETURNED!!! - ${password}`);
     return password;
 }
+
+/**
+ * capture entire active editor text or selected text
+ */
+export async function getText() {
+
+    // get editor window
+    var editor = vscode.window.activeTextEditor;
+    if (!editor) {	
+        console.warn('getText was called, but no active editor... this should not happen');
+        return; // No open/active text editor
+    }
+    
+    // capture selected text or all text in editor
+    if (editor.selection.isEmpty) {
+        return editor.document.getText();	// entire editor/doc window
+    } else {
+        return editor.document.getText(editor.selection);	// highlighted text
+    } 
+}

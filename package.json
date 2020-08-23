@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -89,6 +89,11 @@
 					"when": "f5.as3Installed"
 				},
 				{
+					"id": "as3Tasks",
+					"name": "iRules/iApps",
+					"when": "f5.tcl"
+				},
+				{
 					"id": "decExamples",
 					"name": "Declaration Examples"
 				}
@@ -131,49 +136,6 @@
 							]
 						}
 					},
-					"f5.hosts_2": {
-						"type": "array",
-						"items": {
-							"type": "string",
-							"description": "BIG-IP/Device/Host",
-							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
-						},
-						"default": [
-							"admin@192.168.1.245"
-						],
-						"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format"
-					},
-					"f5.hosts_3": {
-						"type": "object",
-						"description": "testing configuration for name device objects",
-						"propertyNames": {
-							"type": "string",
-							"description": "BIG-IP/Device/Host",
-							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
-						},
-						"patternProperties": {
-							"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$"
-						},
-						"additionalProperties": {
-							"type": "object",
-							"description": "named object device details",
-							"Properties": {
-								"provider": {
-									"type": "string",
-									"description": "logonProviderName",
-									"default": "local"
-								}
-							},
-							"required": [
-								"provider"
-							]
-						},
-						"default": {
-							"admin@192.168.1.254": {
-								"provider": "local"
-							}
-						}
-					},
 					"f5.as3Post.async": {
 						"type": "boolean",
 						"default": true,
@@ -193,19 +155,19 @@
 						"type": "integer",
 						"default": 0,
 						"scope": "resource",
-						"description": "Timeout in milliseconds. 0 for infinity"
+						"description": "*DEV-beta-Preview* Timeout in milliseconds. 0 for infinity"
 					},
 					"f5.showResponseInDifferentTab": {
 						"type": "boolean",
 						"default": false,
 						"scope": "resource",
-						"description": "Show response in different tab"
+						"description": "*DEV-beta-Preview* Show response in different tab"
 					},
 					"f5.previewResponseInUntitledDocument": {
 						"type": "boolean",
 						"default": true,
 						"scope": "resource",
-						"description": "Preview response in untitled document if set to true, otherwise displayed in html view.\n *** Disable to see webviews ***"
+						"description": "*DEV-beta-Preview* Preview response in untitled document if set to true, otherwise displayed in html view.\n *** Disable to see webviews ***"
 					},
 					"f5.previewColumn": {
 						"type": "string",
@@ -219,13 +181,19 @@
 						],
 						"default": "beside",
 						"scope": "resource",
-						"description": "Response preview column option"
+						"description": "*DEV-beta-Preview* Response preview column option"
 					},
 					"f5.previewResponsePanelTakeFocus": {
 						"type": "boolean",
 						"default": true,
 						"scope": "resource",
 						"description": "*DEV-Preview response panel will take focus after receiving response."
+					},
+					"f5.tcl": {
+						"type": "boolean",
+						"default": false,
+						"scope": "resource",
+						"description": "*DEV-beta-Preview* tcl/irule/iapp functionality."
 					},
 					"f5.logLevel": {
 						"type": "string",
@@ -237,7 +205,7 @@
 						],
 						"default": "error",
 						"scope": "resource",
-						"description": "*DEV-The verbosity of logging in the REST output panel"
+						"description": "*DEV-beta-Preview* The verbosity of logging in the REST output panel"
 					}
 				}
 			}
@@ -277,12 +245,51 @@
 			{
 				"command": "f5.remoteCommand",
 				"title": "Remote Command Execute",
-				"category": "F5",
-				"enablement": "f5.device"
+				"category": "F5"
 			},
 			{
 				"command": "f5.makeRequest",
 				"title": "Make HTTP Request",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.mergeTCL",
+				"title": "Merge TCL/TMOS",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.deleteRule",
+				"title": "DELETE iRule",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.getTMPL",
+				"title": "Get iApp Template Origin .tmpl",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.getTemplate",
+				"title": "Get iApp Template JSON",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.iAppRedeploy",
+				"title": "RE-DEPLOY iApp-App",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.iAppDelete",
+				"title": "DELETE iApp-App",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.deleteTMPL",
+				"title": "DELETE iApp Template",
+				"category": "F5"
+			},
+			{
+				"command": "f5-tcl.postTMPL",
+				"title": "POST iApp Template .tmpl",
 				"category": "F5"
 			},
 			{
@@ -305,6 +312,15 @@
 			{
 				"command": "f5.refreshHostsTree",
 				"title": "Refresh Devices",
+				"category": "F5",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5.refreshTclTree",
+				"title": "Refresh tcl",
 				"category": "F5",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -539,6 +555,16 @@
 					"group": "F5"
 				},
 				{
+					"when": "f5.tcl",
+					"command": "f5-tcl.mergeTCL",
+					"group": "F5"
+				},
+				{
+					"when": "f5.tcl",
+					"command": "f5-tcl.postTMPL",
+					"group": "F5"
+				},
+				{
 					"when": "editorHasSelection",
 					"command": "f5.jsonYmlConvert",
 					"group": "F5"
@@ -573,6 +599,16 @@
 					"group": "F5"
 				},
 				{
+					"when": "f5.tcl && resourceExtname =~ /\\.(tcl|conf|rule)/",
+					"command": "f5-tcl.mergeTCL",
+					"group": "F5"
+				},
+				{
+					"when": "f5.tcl && resourceExtname == .tmpl",
+					"command": "f5-tcl.postTMPL",
+					"group": "F5"
+				},
+				{
 					"when": "f5.fastInstalled && explorerResourceIsFolder",
 					"command": "f5-fast.postTemplateSet",
 					"group": "F5-Fast"
@@ -592,6 +628,11 @@
 				{
 					"command": "f5.refreshHostsTree",
 					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.refreshTclTree",
+					"when": "view == as3Tasks",
 					"group": "navigation"
 				},
 				{
@@ -644,6 +685,42 @@
 				},
 				{
 					"command": "f5.refreshHostsTree",
+					"when": "none"
+				},
+				{
+					"command": "f5.refreshTclTree",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.mergeTCL",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.deleteRule",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.getTMPL",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.getTemplate",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.iAppRedeploy",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.iAppDelete",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.deleteTMPL",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.postTMPL",
 					"when": "none"
 				},
 				{
@@ -733,6 +810,18 @@
 				{
 					"command": "f5-ts.postDec",
 					"when": "f5.tsInstalled"
+				},
+				{
+					"command": "f5.jsonYmlConvert",
+					"when": "none"
+				},
+				{
+					"command": "f5.b64Encode",
+					"when": "none"
+				},
+				{
+					"command": "f5.b64Decode",
+					"when": "none"
 				}
 			],
 			"view/item/context": [
@@ -760,6 +849,26 @@
 				{
 					"command": "f5.getF5HostInfo",
 					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5-tcl.deleteRule",
+					"when": "view == as3Tasks && viewItem == rule"
+				},
+				{
+					"command": "f5-tcl.getTemplate",
+					"when": "view == as3Tasks && viewItem == iAppTemplate"
+				},
+				{
+					"command": "f5-tcl.iAppRedeploy",
+					"when": "view == as3Tasks && viewItem == iApp"
+				},
+				{
+					"command": "f5-tcl.iAppDelete",
+					"when": "view == as3Tasks && viewItem == iApp"
+				},
+				{
+					"command": "f5-tcl.deleteTMPL",
+					"when": "view == as3Tasks && viewItem == iAppTemplate"
 				},
 				{
 					"command": "f5-fast.deleteFastApp",
