@@ -23,7 +23,7 @@ import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
-import { chuckJoke1 } from './chuckJoke';
+import { chuckJoke1, chuckJoke2 } from './chuckJoke';
 
 const fast = require('@f5devcentral/f5-fast-core');
 
@@ -1408,7 +1408,49 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
-		chuckJoke1();
+
+		// const resp = {
+		// 	hi: 'one',
+		// 	ho: 'two',
+		// 	data: {
+		// 		chuck: 'joke'
+		// 	}
+		// };
+
+		const enum1 = ext.settings.previewResponseInUntitledDocument;
+		const previewColumnSetting = ext.settings.previewColumn;
+
+		// const pCS = parseColumn(previewColumnSetting);
+
+		const pc1 = ext.settings.previewColumn;
+
+		const vs1 = vscode.ViewColumn;
+
+		// const joke = await chuckJoke2();
+
+		const resp = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
+
+		const activeColumn = vscode.window.activeTextEditor!.viewColumn;
+
+		if(!activeColumn) {
+			console.error('open a file/editor!!!');
+		}
+
+		const previewColumn = ext.settings.previewColumn === vscode.ViewColumn.Active
+			? activeColumn
+			: ((activeColumn as number) + 1) as vscode.ViewColumn;
+		if (ext.settings.previewResponseInUntitledDocument) {
+			// this._textDocumentView.render(response, previewColumn);
+			utils.displayJsonInEditor(resp.data);
+
+		} else if (previewColumn) {
+			// this._webview.render(response, previewColumn);
+			WebViewPanel.render(context.extensionPath, resp.data);
+		}
+
+
+		// chuckJoke1();
+
 	}));
 
 }

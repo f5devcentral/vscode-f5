@@ -55,9 +55,12 @@ export async function loadConfig() {
     ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
     // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.tcl', false);
     ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
+
     ext.settings.showResponseInDifferentTab = workspace.getConfiguration().get('f5.showResponseInDifferentTab', false);
+
     ext.settings.previewResponseInUntitledDocument = workspace.getConfiguration().get('f5.previewResponseInUntitledDocument', false);
     ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.previewColumn', 'two'));
+
     ext.settings.previewResponsePanelTakeFocus = workspace.getConfiguration().get('f5.previewResponsePanelTakeFocus', true);
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
 
