@@ -165,7 +165,7 @@
 					},
 					"f5.previewResponseInUntitledDocument": {
 						"type": "boolean",
-						"default": true,
+						"default": false,
 						"scope": "resource",
 						"description": "*DEV-beta-Preview* Preview response in untitled document if set to true, otherwise displayed in html view.\n *** Disable to see webviews ***"
 					},
