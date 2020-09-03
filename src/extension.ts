@@ -25,6 +25,11 @@ import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
 import { chuckJoke1, chuckJoke2 } from './chuckJoke';
 
+// import { HttpResponseWebview } from './webViews/httpResponseWebview';
+import { TextDocumentView } from './editorViews/editorView';
+// import { tstResponse } from './webViews/webView_vars';
+// import { AxiosResponse } from 'axios';
+
 const fast = require('@f5devcentral/f5-fast-core');
 
 export function activate(context: vscode.ExtensionContext) {
@@ -55,8 +60,10 @@ export function activate(context: vscode.ExtensionContext) {
     ext.connectBar.text = 'F5-FAST -> Connect!';
 	ext.connectBar.tooltip = 'Click to connect!';
 	ext.connectBar.show();
-	
 
+	// const webview = new HttpResponseWebview(context);
+	const panel = new TextDocumentView();
+	
 	ext.keyTar = keyTarType;
 
 	// load ext config to ext.settings.
@@ -149,7 +156,8 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getProvider', async () => {
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/auth/source');
-		utils.displayJsonInEditor(resp.data);
+		// utils.displayJsonInEditor(resp.data);
+		panel.render(resp);
 	}));
 
 
@@ -165,7 +173,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/identified-devices/config/device-info');
-		utils.displayJsonInEditor(resp.data);
+		// utils.displayJsonInEditor(resp.data);
+		panel.render(resp);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
@@ -399,13 +408,15 @@ export function activate(context: vscode.ExtensionContext) {
 	// --- IAPP COMMANDS ---
 	context.subscriptions.push(vscode.commands.registerCommand('f5-tcl.getApp', async (item) => {
 		console.log('f5-tcl.getApp command: ', item);
-		return utils.displayJsonInEditor(item);
+		// return utils.displayJsonInEditor(item);
+		return panel.render(item);
 	}));
 
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-tcl.getTemplate', async (item) => {
 		// returns json view of iApp Template
-		return utils.displayJsonInEditor(item);
+		// return utils.displayJsonInEditor(item);
+		return panel.render(item);
 	}));
 	
 
@@ -469,12 +480,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/info`);
-
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(resp.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, resp.data);
-		}
+		panel.render(resp);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(resp.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, resp.data);
+		// }
 
 	}));
 
@@ -503,13 +514,14 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		
-		const response = await f5FastApi.deployFastApp(jsonText);
+		const resp = await f5FastApi.deployFastApp(jsonText);
 
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, response.data);
-		}
+		panel.render(resp);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(response.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, response.data);
+		// }
 
 		// give a little time to finish before refreshing trees
 		await new Promise(resolve => { setTimeout(resolve, 3000); });
@@ -520,49 +532,51 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApp', async (tenApp) => {
 
-		const task: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
-
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(task.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, task.data);
-		}
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
+		panel.render(resp);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(task.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, task.data);
+		// }
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTask', async (taskId) => {
 
-		const task: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
-
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(task.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, task.data);
-		}
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
+		panel.render(resp);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(task.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, task.data);
+		// }
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplate', async (template) => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templates/${template}`);
+		panel.render(resp);
 
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(resp.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, resp.data);
-		}
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(resp.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, resp.data);
+		// }
 
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
+		panel.render(resp);
 
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(resp.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, resp.data);
-		}
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(resp.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, resp.data);
+		// }
 
 	}));
 
@@ -707,13 +721,13 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		// var device: string | undefined = ext.hostStatusBar.text;
 		// const password = await utils.getPassword(device);
-		const response = await f5FastApi.delTenApp(tenApp.label);
-
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(response.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, response.data);
-		}
+		const resp = await f5FastApi.delTenApp(tenApp.label);
+		panel.render(resp);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(resp.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, resp.data);
+		// }
 	
 		// give a little time to finish
 		await new Promise(resolve => { setTimeout(resolve, 2000); });
@@ -826,8 +840,8 @@ export function activate(context: vscode.ExtensionContext) {
 		tenant = tenant ? tenant : '';
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
-		utils.displayJsonInEditor(resp.data);
-
+		// utils.displayJsonInEditor(resp.data);
+		panel.render(resp);
 	}));
 
 
@@ -866,7 +880,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}, async () => {
 
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
-			utils.displayJsonInEditor(resp.data);
+			// utils.displayJsonInEditor(resp.data);
+			panel.render(resp);
 		});
 
 	}));
@@ -899,12 +914,12 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const resp = await f5Api.postAS3Dec(postParam, JSON.parse(text));
-
-		if (ext.settings.previewResponseInUntitledDocument) {
-			utils.displayJsonInEditor(resp.data);
-		} else {
-			WebViewPanel.render(context.extensionPath, resp.data);
-		}
+		panel.render(resp);
+		// if (ext.settings.previewResponseInUntitledDocument) {
+		// 	utils.displayJsonInEditor(resp.data);
+		// } else {
+		// 	WebViewPanel.render(context.extensionPath, resp.data);
+		// }
 		as3TenantTree.refresh();
 	}));
 
@@ -1038,7 +1053,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/telemetry/info');
-		utils.displayJsonInEditor(resp.data);
+		// utils.displayJsonInEditor(resp.data);
+		panel.render(resp);
 	}));
 
 
@@ -1048,7 +1064,8 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting TS Dec`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/telemetry/declare`);
-			utils.displayJsonInEditor(resp.data.declaration);
+			// utils.displayJsonInEditor(resp.data.declaration);
+			panel.render(resp);
 		});
 	}));
 
@@ -1077,7 +1094,8 @@ export function activate(context: vscode.ExtensionContext) {
 				method: 'POST',
 				body: JSON.parse(text)
 			});
-			utils.displayJsonInEditor(resp.data);
+			// utils.displayJsonInEditor(resp.data);
+			panel.render(resp);
 		});
 	}));
 
@@ -1091,7 +1109,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		decUrl = vscode.Uri.parse(decUrl);
-		const decCall = await callHTTPS({
+		const resp = await callHTTPS({
 		    method: 'GET',
 		    host: decUrl.authority,
 		    path: decUrl.path,
@@ -1103,7 +1121,8 @@ export function activate(context: vscode.ExtensionContext) {
 			return resp;
 		});
 
-		utils.displayJsonInEditor(decCall.body);
+		// utils.displayJsonInEditor(decCall.body);
+		return panel.render(resp.body);
 	}));
 
 
@@ -1130,7 +1149,8 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Dec`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/`);
-			utils.displayJsonInEditor(resp.data.declaration);
+			// utils.displayJsonInEditor(resp.data.declaration);
+			panel.render(resp);
 		});
 
 
@@ -1155,8 +1175,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const resp = await f5Api.postDoDec(JSON.parse(text));
-		utils.displayJsonInEditor(resp.data);
-
+		// utils.displayJsonInEditor(resp.data);
+		panel.render(resp);
 	}));
 
 
@@ -1167,7 +1187,8 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Inspect`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
-			utils.displayJsonInEditor(resp.data);
+			// utils.displayJsonInEditor(resp.data);
+			panel.render(resp);
 		}); 
 
 	}));
@@ -1181,7 +1202,8 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Tasks`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
-			utils.displayJsonInEditor(resp.data);
+			// utils.displayJsonInEditor(resp.data);
+			panel.render(resp);
 		});
 	}));
 
@@ -1286,6 +1308,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		console.log('executing f5.makeRequest');
 		const editor = vscode.window.activeTextEditor;
+		let resp;
 
 		if(editor){
 			var text: any = editor.document.getText(editor.selection);	// highlighted text
@@ -1321,7 +1344,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if(text.url.includes('http')) {
 
-				const progress = await vscode.window.withProgress({
+				resp = await vscode.window.withProgress({
 					location: vscode.ProgressLocation.Notification,
 					title: `Making External API Request`,
 					cancellable: true
@@ -1334,14 +1357,13 @@ export function activate(context: vscode.ExtensionContext) {
 					
 					//external call
 					console.log('external call -> ', JSON.stringify(text));
-					const resp: any = await extAPI.makeRequest(text);
-					utils.displayJsonInEditor(resp.data);
+					return await extAPI.makeRequest(text);
 				});
 				
-				
+				// utils.displayJsonInEditor(progress.data);	
 			} else {
 				
-				const progress = await vscode.window.withProgress({
+				resp = await vscode.window.withProgress({
 					location: vscode.ProgressLocation.Notification,
 					title: `Making API Request`,
 					cancellable: true
@@ -1359,23 +1381,23 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				
 					console.log('device call -> ', JSON.stringify(text));
-					const resp: any = await ext.mgmtClient?.makeRequest(text.url, {
+					return await ext.mgmtClient?.makeRequest(text.url, {
 						method: text.method,
 						body: text.body
 					});
-					utils.displayJsonInEditor(resp.data);
-
+					// utils.displayJsonInEditor(resp.data);
 				});
 			}
+
+			panel.render(resp);
 		}
 
 	}));
 
 
-	//original way the example extension structured the command
-	let disposable = vscode.commands.registerCommand('f5.remoteCommand', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.remoteCommand', async () => {
 
-		const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?' });
+		const cmd = await vscode.window.showInputBox({ placeHolder: 'Bash Command to Execute?', ignoreFocusOut: true });
 		
 		if ( cmd === undefined ) {
 			// maybe just showInformationMessage and exit instead of error?
@@ -1391,62 +1413,45 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 
-		vscode.workspace.openTextDocument({ 
-			language: 'text', 
-			content: resp.data.commandResult
-		})
-		.then( doc => 
-			vscode.window.showTextDocument(
-				doc, 
-				{ 
-					preview: false 
-				}
-			)
-		);
-	});	
-	context.subscriptions.push(disposable);
+		panel.render(resp.data.commandResult);
+	}));	
+
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
 
-		// const resp = {
-		// 	hi: 'one',
-		// 	ho: 'two',
-		// 	data: {
-		// 		chuck: 'joke'
-		// 	}
-		// };
+		const newEditorColumn = ext.settings.previewColumn;
+		const window = vscode.window.visibleTextEditors;
+		let viewColumn: vscode.ViewColumn | undefined;
+		
+		window.forEach(el => {
+			// const el1 = element;
+			if (el.document.fileName === 'chuck-joke.json') {
+				// console.log('f5-fast.json editor column', el1.viewColumn);
+				viewColumn = el.viewColumn;
+			}
+		});
+		
+		
+		const resp: any = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
+		// let activeColumn = vscode.window.activeTextEditor?.viewColumn;
 
-		const enum1 = ext.settings.previewResponseInUntitledDocument;
-		const previewColumnSetting = ext.settings.previewColumn;
+		const content = JSON.stringify(resp.data, undefined, 4);
 
-		// const pCS = parseColumn(previewColumnSetting);
+		// if vClm has a value assign it, else set column 1
+		viewColumn = viewColumn ? viewColumn : newEditorColumn;
 
-		const pc1 = ext.settings.previewColumn;
-
-		const vs1 = vscode.ViewColumn;
-
-		// const joke = await chuckJoke2();
-
-		const resp = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
-
-		const activeColumn = vscode.window.activeTextEditor!.viewColumn;
-
-		if(!activeColumn) {
-			console.error('open a file/editor!!!');
-		}
-
-		const previewColumn = ext.settings.previewColumn === vscode.ViewColumn.Active
-			? activeColumn
-			: ((activeColumn as number) + 1) as vscode.ViewColumn;
-		if (ext.settings.previewResponseInUntitledDocument) {
-			// this._textDocumentView.render(response, previewColumn);
-			utils.displayJsonInEditor(resp.data);
-
-		} else if (previewColumn) {
-			// this._webview.render(response, previewColumn);
-			WebViewPanel.render(context.extensionPath, resp.data);
-		}
+		var vDoc: vscode.Uri = vscode.Uri.parse("untitled:" + "chuck-Joke.json");
+		vscode.workspace.openTextDocument(vDoc)
+		.then((a: vscode.TextDocument) => {
+			vscode.window.showTextDocument(a, viewColumn, false).then(e => {
+				e.edit(edit => {
+					const startPosition = new vscode.Position(0, 0);
+					const endPosition = a.lineAt(a.lineCount - 1).range.end;
+					edit.replace(new vscode.Range(startPosition, endPosition), content);
+				});
+			});
+		});
 
 
 		// chuckJoke1();
