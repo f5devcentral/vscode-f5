@@ -653,7 +653,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// didn't get a path passed in from right click, so we have to gather necessary details
 
 			// get list of open workspaces
-			const workspaces: vscode.WorkspaceFolder[] | undefined= vscode.workspace.workspaceFolders;
+			const workspaces = vscode.workspace.workspaceFolders;
 			console.log('workspaces', workspaces);
 			
 			// if no open workspace...
@@ -1108,21 +1108,8 @@ export function activate(context: vscode.ExtensionContext) {
 			return vscode.env.openExternal(vscode.Uri.parse(gitIssueUrl));
 		}
 
-		decUrl = vscode.Uri.parse(decUrl);
-		const resp = await callHTTPS({
-		    method: 'GET',
-		    host: decUrl.authority,
-		    path: decUrl.path,
-		    headers: {
-		        'Content-Type': 'application/json',
-		        'User-Agent': 'nodejs native HTTPS'
-		    }
-		}).then( resp => {
-			return resp;
-		});
-
-		// utils.displayJsonInEditor(decCall.body);
-		return panel.render(resp.body);
+		const resp = await extAPI.makeRequest({	url: decUrl	});
+		return panel.render(resp);
 	}));
 
 
