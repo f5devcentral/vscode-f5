@@ -10,6 +10,21 @@ var https = require('https');
  * external API commands
  */
 
+ interface HttpResp {
+    status: string,
+    statusText: string,
+    headers: object,
+    data: object,
+    request: {
+        url: string,
+        method: string,
+        protocol: string,
+        headers: object,
+        data?: any
+    }
+
+ }
+
 
 /**
  * calls external HTTP APIs based on axsios.request parameters
@@ -37,7 +52,24 @@ export async function makeRequest(req: AxiosRequestConfig) {
 
     const resp = await axios.request(req)
     .then( resp => {
-        return resp;
+        console.log('buuuug');
+        /**
+         * only return the things we want/need
+         */
+        return {
+            data: resp.data,
+            headers: resp.headers,
+            status: resp.status,
+            statusText: resp.statusText,
+            request: {
+                url: resp.config.url,
+                method: resp.request.method,
+                headers: resp.request._headers,
+                protocol: resp.config.httpsAgent.protocol,
+                data: resp.data
+            }
+        };
+        // return resp;
     })
     .catch(function (error) {
         // debugger;

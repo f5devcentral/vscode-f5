@@ -933,23 +933,16 @@
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.5.1",
-		"@types/fs-extra": "^9.0.1",
-		"@types/highlight.js": "^9.12.4",
 		"@types/js-yaml": "^3.12.5",
 		"@types/jszip": "^3.4.1",
 		"@types/nock": "^11.1.0",
 		"axios": "^0.19.2",
-		"code-highlight-linenums": "^0.2.1",
 		"fs": "0.0.1-security",
-		"fs-extra": "^5.0.0",
-		"highlight.js": "^10.0.3",
 		"https": "^1.0.0",
 		"js-yaml": "^3.14.0",
-		"jsonc-parser": "^2.0.2",
 		"jszip": "^3.4.0",
 		"keytar": "^5.6.0",
 		"nock": "^13.0.3",
-		"pretty-data": "^0.40.0",
 		"vsce": "^1.75.0"
 	}
 }

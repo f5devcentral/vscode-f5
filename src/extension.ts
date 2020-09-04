@@ -17,7 +17,7 @@ import { callHTTPS } from './utils/externalAPIs';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git, loadConfig } from './extensionVariables';
-import { displayWebView, WebViewPanel } from './webview';
+// import { displayWebView, WebViewPanel } from './webview';
 import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
@@ -1389,7 +1389,9 @@ export function activate(context: vscode.ExtensionContext) {
 				});
 			}
 
-			panel.render(resp);
+			if(resp) {
+				panel.render(resp);
+			}
 		}
 
 	}));

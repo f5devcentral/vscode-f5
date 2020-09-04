@@ -1,12 +1,12 @@
 import { EOL } from 'os';
-import * as path from 'path';
+// import * as path from 'path';
 import { languages, Position, Range, TextDocument, ViewColumn, window, workspace } from 'vscode';
 // import { RequestHeaders, ResponseHeaders } from '../models/base';
 // import { RestClientSettings } from '../models/configurationSettings';
 // import { HttpResponse } from '../models/httpResponse';
 // import { PreviewOption } from './previewOption';
-import { MimeUtility } from './mimeUtility';
-import { ResponseFormatUtility } from './responseFormatUtility';
+// import { MimeUtility } from './mimeUtility';
+// import { ResponseFormatUtility } from './responseFormatUtility';
 import { ext } from '../extensionVariables';
 // import * as utils from '../utils/utils';
 
@@ -246,14 +246,7 @@ export class TextDocumentView {
         }
 
         // add body
-        if (httpResponseDetails === 'exchange' || httpResponseDetails === 'full' || httpResponseDetails === 'body') {
-            const data = JSON.stringify(response.data);
-            // const prefix = previewOption === PreviewOption.Body ? '' : EOL;
-            response.contentType = 'application/json; charset=utf-8';
-            content += `${ResponseFormatUtility.formatBody(data, response.contentType, true)}`;
-            console.log('editorView add body');
-            
-        }
+        content += JSON.stringify(response.data, undefined, 4);
 
         return content;
     }
@@ -271,20 +264,3 @@ export class TextDocumentView {
         return headerString;
     }
 }
-
-// export function previewColumn(): ViewColumn | undefined {
-//     let activeColumn = window.activeTextEditor?.viewColumn;
-
-//     if(!activeColumn) {
-//         console.error('no active column - open a file/editor!!!');
-//     } else {
-//         console.log('activeColum:', activeColumn);
-//         activeColumn = 1;
-//     }
-    
-//     const previewColumn = ext.settings.previewColumn === ViewColumn.Active
-//     ? activeColumn
-//     : ((activeColumn as number) + 1) as ViewColumn;
-//     console.log('previewColumn', previewColumn);
-//     return previewColumn;
-// }
