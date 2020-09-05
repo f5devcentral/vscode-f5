@@ -8,12 +8,12 @@ import * as keyTarType from 'keytar';
 
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { TclTreeProvider } from './treeViewsProviders/tclTreeProvider';
-import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
-import { AS3TenantTreeProvider } from './treeViewsProviders/as3TenantTreeProvider';
+// import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
+import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
-import { callHTTPS } from './utils/externalAPIs';
+// import { callHTTPS } from './utils/externalAPIs';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git, loadConfig } from './extensionVariables';
@@ -526,7 +526,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// give a little time to finish before refreshing trees
 		await new Promise(resolve => { setTimeout(resolve, 3000); });
 		fastTreeProvider.refresh();
-		as3TenantTree.refresh();
+		as3Tree.refresh();
 	}));
 
 
@@ -732,7 +732,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// give a little time to finish
 		await new Promise(resolve => { setTimeout(resolve, 2000); });
 		fastTreeProvider.refresh();
-		as3TenantTree.refresh();
+		as3Tree.refresh();
 	}));
 
 
@@ -830,9 +830,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	
 	// setting up as3 tree
-	const as3TenantTree = new AS3TenantTreeProvider('');
-	vscode.window.registerTreeDataProvider('as3Tenants', as3TenantTree);
-	vscode.commands.registerCommand('f5-as3.refreshTenantsTree', () => as3TenantTree.refresh());
+	const as3Tree = new AS3TreeProvider();
+	vscode.window.registerTreeDataProvider('as3Tenants', as3Tree);
+	vscode.commands.registerCommand('f5-as3.refreshTenantsTree', () => as3Tree.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getDecs', async (tenant) => {
 
@@ -869,7 +869,7 @@ export function activate(context: vscode.ExtensionContext) {
 			await new Promise(resolve => { setTimeout(resolve, 5000); });
 		});
 
-		as3TenantTree.refresh();
+		as3Tree.refresh();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-as3.getTask', (id) => {
@@ -920,7 +920,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// } else {
 		// 	WebViewPanel.render(context.extensionPath, resp.data);
 		// }
-		as3TenantTree.refresh();
+		as3Tree.refresh();
 	}));
 
 
