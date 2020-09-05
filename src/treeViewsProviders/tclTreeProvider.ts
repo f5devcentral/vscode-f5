@@ -51,6 +51,16 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		this._onDidChangeTreeData.fire();
 	}
 
+	/**
+	 * clear current tcl/iRules/iApps for next device
+	 */
+	clear(): void {
+		// clear arrays on disconnect
+		this._iRules = [];
+		this._apps = [];
+		this._iAppTemplates = [];
+	}
+
 	getTreeItem(element: TCLitem): vscode.TreeItem {
 		return element;
 	}
@@ -97,6 +107,10 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			const appCount = this._apps.length !== 0 ? this._apps.length.toString() : '';
 			const tempCount = this._iAppTemplates.length !== 0 ? this._iAppTemplates.length.toString() : '';
 
+			if (ruleCount === '0' && appCount === '0' && tempCount === '0') {
+				Promise.resolve([]);
+			}
+
 			treeItems.push(
 				new TCLitem('iRules', ruleCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
 					{ command: '', title: '', arguments: [''] })
@@ -117,27 +131,30 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 * Get all iRules to hole in "this" view class
 	 */
 	private async getIrules() {
-        const irules: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule`);
         this._iRules = [];	// clear current irule list
-        this._iRules = irules.data.items.map( (el: any) => el);
+		const iRules: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule`);
+		const miRules = iRules.data.items.map( (el: any) => el);
+        this._iRules = miRules ? miRules : [];
 	}
 
 	/**
 	 * Get all deployed iApp-Apps to hold in "this" view class
 	 */
 	private async getApps() {
-		const apps: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service`);
 		this._apps = [];	// clear current list
-		this._apps = apps.data.items.map( (el: any) => el);
+		const apps: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service`);
+		const mApps = apps.data?.items?.map( (el: any) => el);
+		this._apps = mApps ? mApps : [];
 	}
 
 	/**
 	 * Get all iApp Templates (expanded details) to hold in "this" view class
 	 */
 	private async getTemplates() {
-		const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template?expandSubcollections=true`);
 		this._iAppTemplates = [];	// clear current list
-		this._iAppTemplates = templates.data.items.map( (el: any) => el);
+		const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template?expandSubcollections=true`);
+		const mTemplates = templates.data.items.map( (el: any) => el);
+		this._iAppTemplates = mTemplates ? mTemplates : [];
 	}
 
 	/**
