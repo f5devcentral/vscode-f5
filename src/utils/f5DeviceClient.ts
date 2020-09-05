@@ -292,5 +292,15 @@ export class MgmtClient {
 		ext.connectBar.show();
     }
 
+
+    /**
+     * clears password for currently connected device
+     *  to be called by http since it won't know curren
+     *  device details
+     */
+    async clearPassword() {
+        await vscode.commands.executeCommand('f5.clearPassword', { label: this.device });
+    }
+
 }
 

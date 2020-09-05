@@ -240,8 +240,8 @@
 				"enablement": "f5.device"
 			},
 			{
-				"command": "f5.clearPasswords",
-				"title": "Disconnect and Clear all Passwords",
+				"command": "f5.clearPassword",
+				"title": "Clear Password",
 				"category": "F5"
 			},
 			{
@@ -514,11 +514,6 @@
 				"enablement": "f5.device"
 			},
 			{
-				"command": "f5.removeHost",
-				"title": "Delete",
-				"category": "F5"
-			},
-			{
 				"command": "f5.injectSchemaRef",
 				"title": "Inject/Remove Schema Reference",
 				"category": "F5"
@@ -674,6 +669,10 @@
 				},
 				{
 					"command": "f5.removeHost",
+					"when": "none"
+				},
+				{
+					"command": "f5.clearPassword",
 					"when": "none"
 				},
 				{
@@ -861,6 +860,10 @@
 				},
 				{
 					"command": "f5.removeHost",
+					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5.clearPassword",
 					"when": "view == f5Hosts"
 				},
 				{
