@@ -51,16 +51,6 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		this._onDidChangeTreeData.fire();
 	}
 
-	/**
-	 * clear current tcl/iRules/iApps for next device
-	 */
-	clear(): void {
-		// clear arrays on disconnect
-		this._iRules = [];
-		this._apps = [];
-		this._iAppTemplates = [];
-	}
-
 	getTreeItem(element: TCLitem): vscode.TreeItem {
 		return element;
 	}
@@ -106,10 +96,6 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			const ruleCount = this._iRules.length !== 0 ? this._iRules.length.toString() : '';
 			const appCount = this._apps.length !== 0 ? this._apps.length.toString() : '';
 			const tempCount = this._iAppTemplates.length !== 0 ? this._iAppTemplates.length.toString() : '';
-
-			if (ruleCount === '0' && appCount === '0' && tempCount === '0') {
-				Promise.resolve([]);
-			}
 
 			treeItems.push(
 				new TCLitem('iRules', ruleCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
