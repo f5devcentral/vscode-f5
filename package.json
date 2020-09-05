@@ -133,7 +133,8 @@
 							},
 							"required": [
 								"device"
-							]
+							],
+							"default": "admin@192.168.1.254"
 						}
 					},
 					"f5.as3Post.async": {
@@ -157,43 +158,59 @@
 						"scope": "resource",
 						"description": "*DEV-beta-Preview* Timeout in milliseconds. 0 for infinity"
 					},
-					"f5.showResponseInDifferentTab": {
+					"f5.newEditorTabForAll": {
 						"type": "boolean",
 						"default": false,
 						"scope": "resource",
-						"description": "*DEV-beta-Preview* Show response in different tab"
+						"description": "Show everything in a new editor tab"
 					},
-					"f5.previewResponseInUntitledDocument": {
+					"f5.enableWebViews": {
 						"type": "boolean",
-						"default": true,
+						"default": false,
 						"scope": "resource",
-						"description": "*DEV-beta-Preview* Preview response in untitled document if set to true, otherwise displayed in html view.\n *** Disable to see webviews ***"
+						"description": "*DEV-inProgress*"
 					},
-					"f5.previewColumn": {
+					"f5.newEditorColumn": {
 						"type": "string",
 						"enum": [
 							"current",
 							"beside"
 						],
 						"markdownEnumDescriptions": [
-							"Preview in the column of current request file",
-							"previewing at the side of the current active column and the side direction depends on `workbench.editor.openSideBySideDirection` setting, either right or below the current editor column"
+							"Open new editor tab in the column of current editor tab",
+							"Open editor tab to the side of the current active column and the side direction depends on `workbench.editor.openSideBySideDirection` setting, either right or below the current editor column"
 						],
 						"default": "beside",
 						"scope": "resource",
-						"description": "*DEV-beta-Preview* Response preview column option"
+						"description": "Display new editor in current column or beside"
 					},
-					"f5.previewResponsePanelTakeFocus": {
-						"type": "boolean",
-						"default": true,
+					"f5.httpResponseDetails": {
+						"type": "string",
+						"enum": [
+							"exchange",
+							"full",
+							"body"
+						],
+						"enumDescriptions": [
+							"Entire HTTP exchange including both request/response headers + body",
+							"Response headers + body",
+							"Response body only"
+						],
+						"default": "body",
 						"scope": "resource",
-						"description": "*DEV-Preview response panel will take focus after receiving response."
+						"description": "HTTP Response details (if any) shown in editor tab"
+					},
+					"f5.preserveEditorFocus": {
+						"type": "boolean",
+						"default": false,
+						"scope": "resource",
+						"description": "Prevent new editor tab from taking focus when opened or updated\n So, by default(disabled), each new editor that is opened and/or updated with also take focus"
 					},
 					"f5.tcl": {
 						"type": "boolean",
 						"default": false,
 						"scope": "resource",
-						"description": "*DEV-beta-Preview* tcl/irule/iapp functionality."
+						"description": "Enable tcl/irule/iapp functionality."
 					},
 					"f5.logLevel": {
 						"type": "string",
@@ -902,33 +919,30 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/glob": "^7.1.1",
+		"@types/glob": "^7.1.3",
 		"@types/mocha": "^7.0.1",
-		"@types/node": "^12.12.37",
-		"@types/vscode": "^1.42.0",
-		"@typescript-eslint/eslint-plugin": "^2.18.0",
-		"@typescript-eslint/parser": "^2.18.0",
+		"@types/node": "^12.12.55",
+		"@types/vscode": "^1.48.0",
+		"@typescript-eslint/eslint-plugin": "^2.34.0",
+		"@typescript-eslint/parser": "^2.34.0",
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
-		"mocha": "^7.2.0",
-		"typescript": "^3.7.5",
-		"vscode-test": "^1.3.0"
+		"mocha": "^8.1.3",
+		"typescript": "^3.9.7",
+		"vscode-test": "^1.4.0"
 	},
 	"dependencies": {
-		"@f5devcentral/f5-fast-core": "^0.5.1",
-		"@types/highlight.js": "^9.12.4",
+		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"@types/js-yaml": "^3.12.5",
 		"@types/jszip": "^3.4.1",
 		"@types/nock": "^11.1.0",
 		"axios": "^0.19.2",
-		"code-highlight-linenums": "^0.2.1",
 		"fs": "0.0.1-security",
-		"highlight.js": "^10.0.3",
 		"https": "^1.0.0",
 		"js-yaml": "^3.14.0",
-		"jszip": "^3.4.0",
-		"keytar": "^5.6.0",
-		"nock": "^13.0.3",
-		"vsce": "^1.75.0"
+		"jszip": "^3.5.0",
+		"keytar": "^6.0.1",
+		"nock": "^13.0.4",
+		"vsce": "^1.79.5"
 	}
 }

@@ -288,7 +288,8 @@ const validateTemplate = (templatePath: string) => loadTemplate(templatePath)
 async function validateTemplateSet (tsPath: string) {
     const tsName = path.basename(tsPath);
     const tsDir = path.dirname(tsPath);
-    const provider = new fast.FsTemplateProvider(tsDir, [tsName]);
+    // const provider = new fast.FsTemplateProvider(tsDir, [tsName]);
+    const provider = new fast.FsTemplateProvider(tsPath);
     console.log('validating template set!!!');
     
     return provider.list()
@@ -296,6 +297,6 @@ async function validateTemplateSet (tsPath: string) {
         .catch((e: { stack: any; }) => {
             vscode.window.showWarningMessage(`Template set "${tsName}" failed validation:\n${e.stack}`);
             console.error(`Template set "${tsName}" failed validation:\n${e.stack}`);
-            return Promise.reject('Template set "${tsName}" failed validation');
+            return Promise.reject(`Template set "${tsName}" failed validation`);
         });
 };

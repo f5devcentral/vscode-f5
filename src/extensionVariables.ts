@@ -36,10 +36,13 @@ export namespace ext {
         export let asyncInterval: number;
         export let irulesEnabled: boolean;
         export let timeoutInMilliseconds: number;
-        export let showResponseInDifferentTab: boolean;
-        export let previewResponseInUntitledDocument: boolean;
+
         export let previewColumn: ViewColumn;
-        export let previewResponsePanelTakeFocus: boolean;
+        export let httpResponseDetails: string;
+        export let enableWebViews: boolean;
+        export let preserveEditorFocus: boolean;
+        export let newEditorTabForAll: boolean;
+
         export let logLevel: string;
     }
 }
@@ -55,10 +58,15 @@ export async function loadConfig() {
     ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
     // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.tcl', false);
     ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
-    ext.settings.showResponseInDifferentTab = workspace.getConfiguration().get('f5.showResponseInDifferentTab', false);
-    ext.settings.previewResponseInUntitledDocument = workspace.getConfiguration().get('f5.previewResponseInUntitledDocument', false);
-    ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.previewColumn', 'two'));
-    ext.settings.previewResponsePanelTakeFocus = workspace.getConfiguration().get('f5.previewResponsePanelTakeFocus', true);
+
+
+    ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.newEditorColumn', 'two'));
+    ext.settings.httpResponseDetails = workspace.getConfiguration().get<string>("f5.httpResponseDetails", "full");
+    ext.settings.enableWebViews = workspace.getConfiguration().get('f5.enableWebViews', false);
+    ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
+    ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
+    
+    
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
 
 
@@ -95,6 +103,7 @@ function parseColumn(value: string): ViewColumn {
             return ViewColumn.Beside;
     }
 }
+
 
 /*
 // external links - for testing and future use

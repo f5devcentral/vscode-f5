@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { request } from 'https';
-import { displayWebView } from './webview';
+// import { displayWebView } from './webview';
 
 
 export async function chuckJoke2() {
@@ -46,7 +46,7 @@ export function chuckJoke1() {
                 //     // debugger
                 // };
 
-                displayWebView(result);
+                // displayWebView(result);
             }
         });
     });

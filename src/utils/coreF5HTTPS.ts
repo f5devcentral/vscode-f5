@@ -172,7 +172,20 @@ export async function makeReqAXnew(host: string, uri: string, options: {
         // the following log may cause some problems, mainly the resp.data,
         //      if it's circular...
         console.log(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`, resp.data);
-        return resp;
+        return {
+            data: resp.data,
+            headers: resp.headers,
+            status: resp.status,
+            statusText: resp.statusText,
+            request: {
+                url: resp.config.url,
+                method: resp.request.method,
+                headers: resp.request._headers,
+                protocol: resp.config.httpsAgent.protocol,
+                data: resp.data
+            }
+        };
+        // return resp;
     })
     .catch( error => {
         if (error.response) {

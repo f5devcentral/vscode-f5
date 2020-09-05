@@ -8,6 +8,22 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.3.0] - (9-4-2020)
+
+### Modified
+- primary editor tab mgmt
+  - This includes displaying json and HTTP responses with json
+  - Tabs are now managed and re-used as configured
+  - Removed webviews and supporting packages
+  - Added the following settings:
+    - 
+- Updated axios agent to only return necessary information
+  - this also allowed for standardizing how responses are used across the entire extension
+-  
+
+
+---
+
 ## [2.2.0] - (8-21-2020)
 
 ### Added
