@@ -101,7 +101,6 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log('selected device', device);
 
 		if(ext.mgmtClient) {
-			tclTreeProvider.clear();
 			ext.mgmtClient.disconnect();
 		}
 
