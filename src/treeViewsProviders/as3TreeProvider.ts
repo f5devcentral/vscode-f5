@@ -110,7 +110,6 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 		 * got an array, so this should be a bigiq list of devices with tenant information
 		 */
 		if(isArray(tenCall.data)) {
-			// const newIQTens = tenCall.data.map( (el: any) => {
 				this._bigiqTenants = tenCall.data.map( (el: any) => {
 				
 				const target = el.target.address; // got target bigip
@@ -133,7 +132,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 			 * 	loop through, return object keys 
 			 */
 			for ( const [tenant, dec] of Object.entries(tenCall.data)) {
-				if(isObject(dec) && tenant !== 'controls') {
+				if(isObject(dec) && tenant !== 'controls' && tenant !== 'target') {
 					this._tenants.push(tenant);
 				}
 			}
