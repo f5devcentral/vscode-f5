@@ -185,20 +185,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5.clearPasswords', async () => {
-		console.log('CLEARING KEYTAR PASSWORD CACHE');
-
-		if(ext.mgmtClient) {
-			ext.mgmtClient.disconnect();
-		}
-
-		// get list of items in keytar for the 'f5Hosts' service
-		await ext.keyTar.findCredentials('f5Hosts').then( list => {
-			// map through and delete all
-			list.map(item => ext.keyTar.deletePassword('f5Hosts', item.account));
-		});
-
-		return vscode.window.showInformationMessage('Disconnecting BIG-IP and clearing password cache');
+	context.subscriptions.push(vscode.commands.registerCommand('f5.clearPassword', async (item) => {
+		return hostsTreeProvider.clearPassword(item?.label);
 	}));
 
 

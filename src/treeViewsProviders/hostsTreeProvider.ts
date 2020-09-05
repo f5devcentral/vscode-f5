@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { ext } from '../extensionVariables';
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	
@@ -129,6 +130,8 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	async removeDevice(hostID: any) {
 		console.log(`Remove Host command: ${JSON.stringify(hostID)}`);
+
+		this.clearPassword(hostID.label);
 		
 		let bigipHosts: {device: string} [] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		
@@ -149,6 +152,32 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		 }
 
 	}
+
+	    /**
+     * clears password
+     */
+    async clearPassword(device?: string) {
+        
+		 if (device) {
+
+            // passed in from view click or deviceClient
+            console.log('CLEARING KEYTAR PASSWORD CACHE for', device);
+            return await ext.keyTar.deletePassword('f5Hosts', device);
+            
+		} else {
+            
+			// get list of items in keytar for the 'f5Hosts' service
+			console.log('CLEARING KEYTAR PASSWORD CACHE');
+			const one1 = await ext.keyTar.findCredentials('f5Hosts').then( list => {
+				// map through and delete all
+				list.map(item => ext.keyTar.deletePassword('f5Hosts', item.account));
+            });
+            /**
+             * future: setup clear all to return an array of touples to show which
+             *  device passwords got cleared
+             */
+		}
+    }
 
 }
 

@@ -198,14 +198,18 @@ export async function makeReqAXnew(host: string, uri: string, options: {
             const status = error.response.status;
             const message = error.response.data?.message;
 
-            // if(status === 401 && message === "Authentication failed.") {
-            //     console.error('401 - auth failed!!!!!!  ***setup clear password***');
-            //     // ext.keyTar.deletePassword('f5Hosts', `${username}@${host}`);
-            // } else if (status === 401 && message === undefined) {
-            //     // not sure what other error conditions might be needed
-            //     // return 'bigiq-remote-auth-provider-needed';
-            //     Promise.resolve('bigiq-remote-auth-provider-needed');
-            // }
+            // if user/pass failed - clear cached password
+            if(message === "Authentication failed.") {
+                console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
+                vscode.window.showErrorMessage('Authentication Failed - clearing password');
+                // clear cached password and disconnect
+                // ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
+                ext.mgmtClient?.clearPassword();
+                // todo: this should probably call the main extension disconnect command
+                //      and all it's functionality moved to the mgmtClient.disconnect function
+                //      so everything uses the same end to end flow
+                ext.mgmtClient?.disconnect();
+            } 
 
 
             vscode.window.showErrorMessage(`AX-HTTP FAILURE: ${status} - ${message}`);
