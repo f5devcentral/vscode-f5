@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { request } from 'https';
 import axios, { AxiosRequestConfig } from 'axios';
+import logger from './logger';
 var https = require('https');
 // import { ext } from './extensionVariables';
 
@@ -34,7 +35,7 @@ var https = require('https');
  */
 export async function makeRequest(req: AxiosRequestConfig) {
 
-    console.log('external http pre-Opts', JSON.stringify(req));
+    logger.debug('external http pre-Opts', JSON.stringify(req));
 
     // const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     
@@ -48,11 +49,11 @@ export async function makeRequest(req: AxiosRequestConfig) {
         }),
     };
 
-    console.log('external http defaults-Opts', JSON.stringify(req));
+    logger.debug('external http defaults-Opts', JSON.stringify(req));
 
     const resp = await axios.request(req)
     .then( resp => {
-        console.log('buuuug');
+        // logger.debug('buuuug');
         /**
          * only return the things we want/need
          */
@@ -90,7 +91,7 @@ export async function makeRequest(req: AxiosRequestConfig) {
         //   // The request was made but no response was received
         //   // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
         //   // http.ClientRequest in node.js
-        //   console.log('AuthHttpErrorRequest', error.request);
+        //   logger.debug('AuthHttpErrorRequest', error.request);
         } else if (error.code && error.message){
             // console.error('HTTP-response-error:', error);
             console.error(`HTTP_response_error: ${error.code} - ${error.message}`);
@@ -110,15 +111,15 @@ export async function makeRequest(req: AxiosRequestConfig) {
 export function callHTTPS(opts: object, payload: object = {}): Promise<any> {
 
 
-    console.log('callHTTPS---OPTS: ' + JSON.stringify(opts));
-    console.log('callHTTTS---payload: ' + JSON.stringify(payload));
+    logger.debug('callHTTPS---OPTS: ' + JSON.stringify(opts));
+    // logger.debug('callHTTTS---payload: ' + JSON.stringify(payload));
     
-    // console.log('Bout to call API token request')
+    // logger.debug('Bout to call API token request')
     return new Promise((resolve, reject) => {
         const req = request(opts, (res) => {
             const buffer: any = [];
             res.setEncoding('utf8');
-            // console.log('Sending::: ' )
+            // logger.debug('Sending::: ' )
             res.on('data', (data) => {
                 buffer.push(data);
             });
@@ -133,19 +134,19 @@ export function callHTTPS(opts: object, payload: object = {}): Promise<any> {
                 };
                 
                  // configure global logging parameters
-                console.log('callHTTPS***STATUS: ' + res.statusCode);
-                console.log('callHTTPS***HEADERS: ' + JSON.stringify(res.headers));
-                console.log('callHTTPS***BODY: ' + JSON.stringify(body));
-                // console.log('callHTTPS***BODY: ' + body);
+                logger.debug('callHTTPS***STATUS: ' + res.statusCode);
+                logger.debug('callHTTPS***HEADERS: ' + JSON.stringify(res.headers));
+                // logger.debug('callHTTPS***BODY: ' + JSON.stringify(body));
+                // logger.debug('callHTTPS***BODY: ' + body);
 
                 // if (res.statusCode == 401) {
-                //     console.log(`GOT 401!!!!!`)
+                //     logger.debug(`GOT 401!!!!!`)
                 // }
                 
                 const goodResp: Array<number> = [200, 201, 202];
                 // was trying to check against array above with arr.includes or arr.indexOf
                 if (res.statusCode === 200 ) {
-                    // console.log(`CAUGHT 200: `)
+                    // logger.debug(`CAUGHT 200: `)
                     return resolve({
                         status: res.statusCode,
                         headers: res.headers,
@@ -158,7 +159,7 @@ export function callHTTPS(opts: object, payload: object = {}): Promise<any> {
                 }
             });
         });
-        console.log(`req in callHTTPS: ${JSON.stringify(req)}`);
+        logger.debug(`req in callHTTPS: ${JSON.stringify(req)}`);
 
         req.on('error', (e) => {
             // might need to stringify combOpts for proper log output
@@ -177,15 +178,15 @@ export function callHTTPS(opts: object, payload: object = {}): Promise<any> {
 export function callHTTPSsync(opts: object, payload: object = {}) {
 
 
-    console.log('callHTTPS---OPTS: ' + JSON.stringify(opts));
-    console.log('callHTTTS---payload: ' + JSON.stringify(payload));
+    logger.debug('callHTTPS---OPTS: ' + JSON.stringify(opts));
+    // logger.debug('callHTTTS---payload: ' + JSON.stringify(payload));
     
-    // console.log('Bout to call API token request')
+    // logger.debug('Bout to call API token request')
     // return new Promise((resolve, reject) => {
         const req = request(opts, (res) => {
             const buffer: any = [];
             res.setEncoding('utf8');
-            // console.log('Sending::: ' )
+            // logger.debug('Sending::: ' )
             res.on('data', (data) => {
                 buffer.push(data);
             });
@@ -200,19 +201,19 @@ export function callHTTPSsync(opts: object, payload: object = {}) {
                 // };
                 
                  // configure global logging parameters
-                console.log('callHTTPS***STATUS: ' + res.statusCode);
-                console.log('callHTTPS***HEADERS: ' + JSON.stringify(res.headers));
-                // console.log('callHTTPS***BODY: ' + JSON.stringify(body));
-                console.log('callHTTPS***BODY: ' + body);
+                logger.debug('callHTTPS***STATUS: ' + res.statusCode);
+                logger.debug('callHTTPS***HEADERS: ' + JSON.stringify(res.headers));
+                // logger.debug('callHTTPS***BODY: ' + JSON.stringify(body));
+                // logger.debug('callHTTPS***BODY: ' + body);
 
                 // if (res.statusCode == 401) {
-                //     console.log(`GOT 401!!!!!`)
+                //     logger.debug(`GOT 401!!!!!`)
                 // }
                 
                 const goodResp: Array<number> = [200, 201, 202];
                 // was trying to check against array above with arr.includes or arr.indexOf
                 if (res.statusCode === 200 ) {
-                    console.log(`CAUGHT 200: `);
+                    logger.debug(`CAUGHT 200: `);
                     return {
                         status: res.statusCode,
                         headers: res.headers,
@@ -225,7 +226,7 @@ export function callHTTPSsync(opts: object, payload: object = {}) {
                 }
             });
         });
-        console.log(`req in callHTTPS: ${req}`);
+        // logger.debug(`req in callHTTPS: ${req}`);
 
         req.on('error', (e) => {
             // might need to stringify combOpts for proper log output
@@ -295,7 +296,7 @@ const callHTTP = (method: string, host: string, path: string, token: string, pay
     payload
 )
 .then( response => {
-    console.log('response from callHTTP: ' + JSON.stringify(response));
+    // logger.debug('response from callHTTP: ' + JSON.stringify(response));
     // Promise.resolve(value.body.token);
     return response;
 });

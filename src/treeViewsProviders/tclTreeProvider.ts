@@ -4,6 +4,7 @@ import * as utils from '../utils/utils';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
+import logger from '../utils/logger';
 
 /**
  * The following has an example/explaination of using onWillSaveTextDocument event
@@ -170,7 +171,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	}
 
 	async deleteRule(item: any) {
-		console.log('deleteRule: ', item);
+		logger.debug('deleteRule: ', item);
 
 		const name = this.name2uri(item.label);
 
@@ -178,7 +179,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			method: 'DELETE'
 		});
 
-		// console.log('deteleRule response: ', resp.data);
+		// logger.debug('deteleRule response: ', resp.data);
 		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 		return `${resp.status}-${resp.statusText}`;
 	}
@@ -204,7 +205,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 * @param tempName 
 	 */
 	async getTMPL(tempName: any) {
-		console.log('tempName', tempName);
+		logger.debug('tempName', tempName);
 
 		const getTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
 			method: 'POST',
@@ -260,7 +261,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 * @param config tmos config as a string 
 	 */
 	async mergeTCL (config: string) {
-		console.log('mergeTCL', config);
+		logger.debug('mergeTCL', config);
 
 		const text = await utils.getText();	// get text from editor
 		const tmpFile = 'tempTmosConfigMerge.tcl';	// temp file name
@@ -273,7 +274,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		// upload .tmpl file
 		if(ext.mgmtClient) {
 			const upload: any = await ext.mgmtClient.upload(dstFilePath);
-			console.log('tcl upload complete -> moving to /tmp/ location', upload);
+			logger.debug('tcl upload complete -> moving to /tmp/ location', upload);
 
 			await new Promise(r => setTimeout(r, 100)); // pause to finish upload
 			
@@ -287,7 +288,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			});
 			
 			await new Promise(r => setTimeout(r, 100)); // pause to finish move
-			console.log('tcl upload complete -> merging with running config', move.data);
+			logger.debug('tcl upload complete -> merging with running config', move.data);
 	
 			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
 				method: 'POST',
@@ -320,7 +321,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 * @param template 
 	 */
 	async postTMPL (template: any) {
-		console.log('postTMPL: ', template);
+		logger.debug('postTMPL: ', template);
 
 		// assign details if coming from explorer right-click
 		var filePath = template.fsPath;
@@ -333,7 +334,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			// get editor text (should be iapp .tmpl)
 			const text = vscode.window.activeTextEditor?.document.getText();
 			const coreDir = ext.context.extensionPath;	// extension core directory
-			console.log('POST iApp .tmpl via editor detected');
+			logger.debug('POST iApp .tmpl via editor detected');
 
 			if(!text) {
 				console.error('no text and/or editor');
@@ -347,9 +348,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 				if(fileName.includes('/')) {
 					fileName = fileName.replace(/\//g, '~');
-					console.log('iapp file name has partition -> converting to uri', fileName);
+					logger.debug('iapp file name has partition -> converting to uri', fileName);
 				}
-				console.log('found iApp name from editor text: ', fileName);
+				logger.debug('found iApp name from editor text: ', fileName);
 			} else {
 				// regex failed to find iapp name -> fail with messaging
 				const erTxt = 'Could not find iApp template name in text - use output from "tmsh list" command or original .tmpl format';
@@ -370,15 +371,15 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			filePath = dstFilePath;
 			// set cleanUp var to delete templ file when done
 			cleanUp = dstFilePath;
-			console.log('write temp iapp file complete:', dstFilePath);
+			logger.debug('write temp iapp file complete:', dstFilePath);
 		 } else {
-			 console.log('iApp upload from explorer view detected -> filePath:', filePath);
+			 logger.debug('iApp upload from explorer view detected -> filePath:', filePath);
 		 }
 
 		// upload .tmpl file
 		if(ext.mgmtClient) {
 			const upload = await ext.mgmtClient.upload(filePath);
-			console.log('iApp upload complete -> importing iApp via tmsh bash api', upload);
+			logger.debug('iApp upload complete -> importing iApp via tmsh bash api', upload);
 	
 			const importTMPL: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
 				method: 'POST',
@@ -389,7 +390,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			});
 
 			if(cleanUp) {
-				console.log('deleting iApp temp file at:', cleanUp);
+				logger.debug('deleting iApp temp file at:', cleanUp);
 				fs.unlinkSync(cleanUp);
 			}
 			setTimeout( () => { this.refresh();}, 500);	// refresh after update
@@ -404,7 +405,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 * @param item tree view item from click
 	 */
 	async iAppRedeploy (item: {label: string}) {
-		console.log('iAppRedeploy: ', item);
+		logger.debug('iAppRedeploy: ', item);
 		// const urlName = item.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
 		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
@@ -413,7 +414,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 				'execute-action': 'definition'
 			}
 		});
-		console.log('iAppReDeploy: resp-> ', resp);
+		logger.debug('iAppReDeploy: resp-> ', resp);
 	}
 
 	/**
@@ -421,13 +422,13 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 * @param item tree view item from click
 	 */
 	async iAppDelete (item: {label: string}) {
-		console.log('iAppDelete: ', item);
+		logger.debug('iAppDelete: ', item);
 		// const urlName = item.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
 		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
 			method: 'DELETE'
 		});
-		console.log('iAppDelete: resp-> ', resp);
+		logger.debug('iAppDelete: resp-> ', resp);
 		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 
@@ -436,13 +437,13 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 * @param template tree veiw item from click
 	 */
 	async deleteTMPL (item: {label: string}) {
-		console.log('deleteTMPL: ', item);
+		logger.debug('deleteTMPL: ', item);
 		// const urlName = template.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
 		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
 			method: 'DELETE'
 		});
-		console.log('deleteTMPL: resp-> ', resp);
+		logger.debug('deleteTMPL: resp-> ', resp);
 		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 }

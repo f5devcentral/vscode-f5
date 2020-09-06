@@ -221,13 +221,13 @@ export function isValidJson(json: string) {
  */
 export async function getPassword(device: string): Promise<any> {
 
-    // console.log(`getPassword Device: ${device}`);
+    // logger.debug(`getPassword Device: ${device}`);
     
     let password = await ext.keyTar.getPassword('f5Hosts', device).then( passwd => passwd );
     
-    // console.log(`IS PASSWORD IN KEYTAR?: ${password}`);
+    // logger.debug(`IS PASSWORD IN KEYTAR?: ${password}`);
     if (!password) {
-        // console.log(`NO PASSWORD IN KEYTAR! - PROMPTING!!! - ${password}`);
+        // logger.debug(`NO PASSWORD IN KEYTAR! - PROMPTING!!! - ${password}`);
         password = await vscode.window.showInputBox({
             placeHolder: 'Password',
             prompt: 'Input device password:  ',
@@ -237,11 +237,11 @@ export async function getPassword(device: string): Promise<any> {
             if (!password) {
                 throw new Error('User cancelled password input');
             }
-            // console.log(`USER INPUT PASSWORD!!! - ${password}`);
+            // logger.debug(`USER INPUT PASSWORD!!! - ${password}`);
             return password;
             });
     }
-    // console.log(`PASSWORD BOUT TO BE RETURNED!!! - ${password}`);
+    // logger.debug(`PASSWORD BOUT TO BE RETURNED!!! - ${password}`);
     return password;
 }
 

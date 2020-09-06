@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
 import axios from 'axios';
+import logger from './logger';
 
 
 
@@ -15,18 +16,18 @@ import axios from 'axios';
  */
 // axios.interceptors.request.use(function (config) {
 //     // Do something before request is sent
-//     console.log('HTTP-request-config', request);
+//     logger.debug('HTTP-request-config', request);
 //     return config;
 // }, function (error) {
 //     // Do something with request error
-//     console.log('HTTP-request-error', error);
+//     logger.debug('HTTP-request-error', error);
 //     return Promise.reject(error);
 //   });
 
 //   // Axios response interceptor
 // axios.interceptors.response.use(function (response) {
 //     // // Do something with response data
-//     // console.log('HTTP-response-data', response);
+//     // logger.debug('HTTP-response-data', response);
 //     return response;
 //   }, function (error) {
 //     // Do something with response error
@@ -61,7 +62,7 @@ export async function makeAuth(
         loginProviderName: string
     }) {
 
-        // console.log('AUTH-DETAILS:', hostPort, JSON.stringify(data));
+        // logger.debug('AUTH-DETAILS:', hostPort, JSON.stringify(data));
         const resp = await axios.request({
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false
@@ -109,7 +110,7 @@ export async function makeAuth(
             //   // The request was made but no response was received
             //   // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
             //   // http.ClientRequest in node.js
-            //   console.log('AuthHttpErrorRequest', error.request);
+            //   logger.debug('AuthHttpErrorRequest', error.request);
             } else if (error.code && error.message){
                 // console.error('HTTP-response-error:', error);
                 console.error(`HTTP-response-error: ${error.code} - ${error.message}`);
@@ -145,7 +146,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     options = options || {};
 
     // logger.debug(`Making HTTP request: ${host} ${uri} ${JSON.stringify(options)}`);
-    console.log(`makeReqAXnew-REQUEST: ${options.method} -> ${host}:${options.port}${uri}`);
+    logger.debug(`makeReqAXnew-REQUEST: ${options.method} -> ${host}:${options.port}${uri}`);
 
     /**
      * todo:  move some of the parameter assignments above so they can be logged before execution
@@ -171,7 +172,8 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     .then( resp => {
         // the following log may cause some problems, mainly the resp.data,
         //      if it's circular...
-        console.log(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`, resp.data);
+        // logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`, resp.data);
+        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
         return {
             data: resp.data,
             headers: resp.headers,
@@ -191,9 +193,9 @@ export async function makeReqAXnew(host: string, uri: string, options: {
         if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
-            // console.log('AX-HTTP-error.response', error.response.data);
-            // console.log('AX-HTTP-error.status', error.response.status);
-            // console.log('AX-HTTP-error.headers', error.response.headers);
+            // logger.debug('AX-HTTP-error.response', error.response.data);
+            // logger.debug('AX-HTTP-error.status', error.response.status);
+            // logger.debug('AX-HTTP-error.headers', error.response.headers);
 
             const status = error.response.status;
             const message = error.response.data?.message;
@@ -246,7 +248,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
 
 export async function multiPartUploadSDK(file: string, host: string, port: number, token: string) {
 
-    console.log('MULTI-PART-UPLOAD-SDK', file, host, port, token);
+    logger.debug('MULTI-PART-UPLOAD-SDK', file, host, port, token);
 
     // TODO:  move the following filename extraction back up one level to f5FastUtils
     //      and pass in as parameter?
@@ -284,10 +286,10 @@ export async function multiPartUploadSDK(file: string, host: string, port: numbe
         } else { // done - could use do..while loop instead of this
             end = fileStats.size;
         }
-        // console.log('upload stat in loop', uploadStat);
+        // logger.debug('upload stat in loop', uploadStat);
         
     }
-    // console.log('upload stat done', uploadStat);
+    // logger.debug('upload stat done', uploadStat);
     return uploadStat;
 };
 

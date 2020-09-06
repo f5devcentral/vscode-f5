@@ -8,6 +8,7 @@ import { languages, Position, Range, TextDocument, ViewColumn, window, workspace
 // import { MimeUtility } from './mimeUtility';
 // import { ResponseFormatUtility } from './responseFormatUtility';
 import { ext } from '../extensionVariables';
+import logger from '../utils/logger';
 // import * as utils from '../utils/utils';
 
 export class TextDocumentView {
@@ -47,7 +48,7 @@ export class TextDocumentView {
     public constructor() {
         // clear doc from list
         workspace.onDidCloseTextDocument(e => {
-            console.log('txtDocClose', e);
+            // logger.debug('txtDocClose', e);
             const index = this.documents.indexOf(e);
             if (index !== -1) {
                 this.documents.splice(index, 1);
@@ -128,14 +129,14 @@ export class TextDocumentView {
          *  place.  This is probably a corner case to revisit as needed
          */
         // wkspcDocs.forEach(el => {
-        //     console.log('wkspc path/file', el.fileName);
-        //     console.log('wkspc file', path.basename(el.fileName));
+        //     logger.debug('wkspc path/file', el.fileName);
+        //     logger.debug('wkspc file', path.basename(el.fileName));
         //     this.documents.forEach(doc => {
         //         // const fileName = el.fileName
         //         if(path.basename(el.fileName) === doc.fileName) {
         //             // viewColumn = el.viewColumn;
         //             window.showTextDocument(doc);
-        //             console.log('wahh');
+        //             logger.debug('wahh');
         //         }
         //     });
         // });

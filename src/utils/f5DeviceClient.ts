@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { makeAuth, makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
 import { ext, loadConfig } from '../extensionVariables';
 import * as utils from './utils';
+import logger from './logger';
 
 /**
  *
@@ -59,7 +60,7 @@ export class MgmtClient {
      */
     private async getToken(): Promise<void> {
 
-        console.log('getting auth token from: ', `${this.host}:${this.port}`);
+        logger.debug('getting auth token from: ', `${this.host}:${this.port}`);
 
         const resp: any = await makeAuth(`${this.host}:${this.port}`, {
             username: this._user,
@@ -70,7 +71,7 @@ export class MgmtClient {
         this._token = resp.data.token;
         this._tokenTimeout = this._token.timeout;
 
-        console.log('newTokn', this._token);
+        // logger.debug('newTokn', this._token);
 
         this.tokenTimer();  // start token timer
     }
@@ -88,7 +89,7 @@ export class MgmtClient {
         }, async (progress, token) => {
             token.onCancellationRequested(() => {
                 // this logs but doesn't actually cancel...
-                console.log("User canceled device connect");
+                logger.debug("User canceled device connect");
                 return new Error(`User canceled device connect`);
             });
             
@@ -251,7 +252,7 @@ export class MgmtClient {
             if (this._tokenTimeout <= 0) {
                 clearInterval(intervalId);
                 this._tmrBar.hide();
-                console.log('authToken expired');
+                logger.debug('authToken expired');
                 this._token = undefined; // clearing token details should get a new token
                 this._tmrBar.dispose();
             } else if (this._tokenTimeout <= 30){
