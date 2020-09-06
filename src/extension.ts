@@ -25,6 +25,8 @@ import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
 import { chuckJoke1, chuckJoke2 } from './chuckJoke';
 
+import { Logger } from './utils/logger';
+
 // import { HttpResponseWebview } from './webViews/httpResponseWebview';
 import { TextDocumentView } from './editorViews/editorView';
 // import { tstResponse } from './webViews/webView_vars';
@@ -63,6 +65,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// const webview = new HttpResponseWebview(context);
 	const panel = new TextDocumentView();
+	ext.logger = new Logger('f5-fast'); 
+	
+
+	// const log = new Logger('f5-fast');
+	// log.log('yeeee');
+	
 	
 	ext.keyTar = keyTarType;
 
@@ -98,6 +106,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
+		console.log('selected device', device);
+		ext.logger.log('yoooo');
 		console.log('selected device', device);
 
 		if(ext.mgmtClient) {

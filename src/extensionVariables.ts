@@ -3,10 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands } from "vscode";
+import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands, OutputChannel } from "vscode";
 import * as keyTarType from "keytar";
 // import { F5Api } from './utils/f5Api';
 import { MgmtClient } from './utils/f5DeviceClient';
+import { Logger } from './utils/logger';
 
 type KeyTar = typeof keyTarType;
 // type MgmtClient = typeof MgmtClient;
@@ -17,6 +18,7 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
+    export let logger: Logger;
     export let mgmtClient: MgmtClient | undefined;
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
