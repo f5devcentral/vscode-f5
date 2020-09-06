@@ -8,16 +8,13 @@ import * as keyTarType from 'keytar';
 
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { TclTreeProvider } from './treeViewsProviders/tclTreeProvider';
-// import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
-// import { callHTTPS } from './utils/externalAPIs';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git, loadConfig } from './extensionVariables';
-// import { displayWebView, WebViewPanel } from './webview';
 import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
@@ -25,18 +22,16 @@ import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
 import { chuckJoke1, chuckJoke2 } from './chuckJoke';
 
-import { Logger } from './utils/logger';
+import logger from './utils/logger';
 
-// import { HttpResponseWebview } from './webViews/httpResponseWebview';
 import { TextDocumentView } from './editorViews/editorView';
-// import { tstResponse } from './webViews/webView_vars';
-// import { AxiosResponse } from 'axios';
 
 const fast = require('@f5devcentral/f5-fast-core');
 
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
+	logger.verbose('Congratulations, your extension "vscode-f5-fast" is now active!');
 
 	// assign context to global
 	ext.context = context;
@@ -65,9 +60,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// const webview = new HttpResponseWebview(context);
 	const panel = new TextDocumentView();
-	ext.logger = new Logger('f5-fast'); 
-	
 
+
+	// ext.logger = new Logger('f5-fast'); 
 	// const log = new Logger('f5-fast');
 	// log.log('yeeee');
 	
@@ -107,8 +102,8 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
 		console.log('selected device', device);
-		ext.logger.log('yoooo');
-		console.log('selected device', device);
+		logger.verbose('selected device', device);
+		logger.debug('selected device', device);  // preferred at the moment
 
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
@@ -1360,6 +1355,8 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const resp: any = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
 		// let activeColumn = vscode.window.activeTextEditor?.viewColumn;
+		
+		logger.debug('chuck-joke->resp.data', resp.data);
 
 		const content = JSON.stringify(resp.data, undefined, 4);
 

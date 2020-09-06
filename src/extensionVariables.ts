@@ -3,14 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands, OutputChannel } from "vscode";
+import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands } from "vscode";
 import * as keyTarType from "keytar";
-// import { F5Api } from './utils/f5Api';
 import { MgmtClient } from './utils/f5DeviceClient';
-import { Logger } from './utils/logger';
 
 type KeyTar = typeof keyTarType;
-// type MgmtClient = typeof MgmtClient;
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -18,7 +15,6 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
-    export let logger: Logger;
     export let mgmtClient: MgmtClient | undefined;
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
@@ -67,7 +63,6 @@ export async function loadConfig() {
     ext.settings.enableWebViews = workspace.getConfiguration().get('f5.enableWebViews', false);
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
-    
     
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
 
