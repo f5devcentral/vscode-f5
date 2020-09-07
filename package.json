@@ -129,6 +129,18 @@
 										"ldap",
 										"custom"
 									]
+								},
+								"onConnect": {
+									"type":"array",
+									"description": "List of terminal/bash commands to execute at connect",
+									"examples": [
+										"ssh admin@192.168.1.254",
+										"ssh ${this.device}"
+									]
+								},
+								"onDisconnect": {
+									"type":"array",
+									"description": "List of terminal/bash commands to execute at disconnect"
 								}
 							},
 							"required": [

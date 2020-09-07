@@ -16,7 +16,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Channnel name is `f5-fast`
   - Also reduced the amount of details for things like HTTP calls since much of that stuff can be seen with the expanded details of the editor details
 - Clear password for single device
-- auto ssh functionality - PENDING!!!!!
+- onConnect/onDisconnect terminal command execution
+  - This provides the flexibility to have commands executed in the terminal at device connect/disconnect
+  - Examples shows terminal connecting to ssh and tailing ltm logs
+    - then disconnecting ssh when extension disconnects
 - Added more documentation links to Examples view - PENDING!!!!
   - Add fasting repo link
 

@@ -1,10 +1,17 @@
 'use strict';
 
-import * as vscode from 'vscode';
+import { Terminal, window, workspace, ProgressLocation, StatusBarAlignment, commands } from 'vscode';
 import { makeAuth, makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
 import { ext, loadConfig } from '../extensionVariables';
 import * as utils from './utils';
 import logger from './logger';
+
+export interface Device {
+    device: string,
+    provider?: string,
+    onConnect?: string[],
+    onDisconnect?: string[]
+}
 
 /**
  *
@@ -30,7 +37,9 @@ export class MgmtClient {
     protected _token: any;
     protected _tmrBar: any;
     protected _tokenTimeout: number = 0;
-
+    private _onConnect: string[] = [];
+    private _onDisconnect: string[] = [];
+    private terminal: Terminal;
 
     /**
      * @param options function options
@@ -50,6 +59,27 @@ export class MgmtClient {
         this.provider = options['provider'];
         this._user = options['user'];
         this._password = options['password'];
+        this.getConfig();
+        this.terminal = window.createTerminal('f5-fast-cmd');
+        this.terminal.show(true);
+    }
+
+    /**
+     * Get vscode workspace configuration for this device
+     */
+    private getConfig() {
+
+        this._onConnect = [];
+        this._onDisconnect = [];
+
+        const bigipHosts: Device[] | undefined = workspace.getConfiguration().get('f5.hosts');
+        const deviceConfig: any = bigipHosts?.find( item => item.device === this.device);
+
+        if (deviceConfig?.hasOwnProperty('onConnect')) {
+            this._onConnect = deviceConfig.onConnect;
+        } else if (deviceConfig?.hasOwnProperty('onDisconnect')) {
+            this._onConnect = deviceConfig.onDisconnect;
+        }
     }
 
 
@@ -81,9 +111,9 @@ export class MgmtClient {
      * Pulls device/connection details from this. within the class
      */
     async connect() {
-        await this.disconnect();
-        const progress = await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
+        // await this.disconnect();
+        const progress = await window.withProgress({
+            location: ProgressLocation.Notification,
             title: `Connecting to ${this.host}`,
             cancellable: true
         }, async (progress, token) => {
@@ -166,6 +196,7 @@ export class MgmtClient {
             }
             return returnInfo;
         });
+        this.termConnect();
         return progress;
     }
 
@@ -234,11 +265,11 @@ export class MgmtClient {
      */
     private async tokenTimer() {
 
-        this._tmrBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
+        this._tmrBar = window.createStatusBarItem(StatusBarAlignment.Left, 50);
         this._tmrBar.tooltip = 'F5 AuthToken Timer';
         this._tmrBar.color = 'silver';
 
-        const makeVisible = vscode.workspace.getConfiguration().get('f5.showAuthTokenTimer');
+        const makeVisible = workspace.getConfiguration().get('f5.showAuthTokenTimer');
         if(makeVisible) {
             this._tmrBar.show();
         }
@@ -265,7 +296,7 @@ export class MgmtClient {
 
 
     /**
-     * clears auth token and connected status bars
+     * clears auth token, connected status bars, and onDisconnect commands
      */
     async disconnect() {
 
@@ -286,21 +317,50 @@ export class MgmtClient {
          *  next connect should refresh the data as needed, but there seems to
          *  be a better way to do this.
          */
-        vscode.commands.executeCommand('setContext', 'f5.tcl', false);
+        commands.executeCommand('setContext', 'f5.tcl', false);
         // ext.iRulesAble = false;
 
         // show connect status bar
-		ext.connectBar.show();
+        ext.connectBar.show();
+        
+        this.termDisConnect();
     }
 
 
     /**
      * clears password for currently connected device
-     *  to be called by http since it won't know curren
+     *  to be called by http since it won't know current
      *  device details
      */
     async clearPassword() {
-        await vscode.commands.executeCommand('f5.clearPassword', { label: this.device });
+        await commands.executeCommand('f5.clearPassword', { label: this.device });
+    }
+
+    /**
+     * issues terminal commands defined for "onConnect"
+     */
+    private termConnect() {
+        // if _onConnect has a value, loop through each as terminal commands
+        this._onConnect?.forEach((el: string) => {
+            // swap out variable as needed
+            el = el.replace(/\${this.device}/, `${this.device}`);
+            setTimeout( () => {
+                // console.log(el);
+                this.terminal.sendText(el);
+            }, 500);
+        });
+    }
+
+    /**
+     * issue terminal commands defined for "onDisonnect"
+     */
+    private termDisConnect() {
+        // if _onDisconnect has a value, loop through each as terminal commands
+        this._onDisconnect?.forEach((el: string) => {
+            setTimeout( () => {
+                this.terminal.sendText(el);
+            }, 500);
+        });
     }
 
 }
