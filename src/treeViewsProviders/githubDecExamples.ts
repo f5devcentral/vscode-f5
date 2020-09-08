@@ -1,14 +1,11 @@
-import * as vscode from 'vscode';
+import { TreeDataProvider, TreeItem, TreeItemCollapsibleState, Event, EventEmitter, Uri, Command }  from 'vscode';
 import { callHTTPS } from '../utils/externalAPIs';
 
 
-export class ExampleDecsProvider implements vscode.TreeDataProvider<ExampleDec> {
-	dispose() {
-		throw new Error("Method not implemented.");
-	}
+export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<ExampleDec | undefined> = new vscode.EventEmitter<ExampleDec | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<ExampleDec | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<ExampleDec | undefined> = new EventEmitter<ExampleDec | undefined>();
+	readonly onDidChangeTreeData: Event<ExampleDec | undefined> = this._onDidChangeTreeData.event;
 
 	constructor() {
 	}
@@ -17,7 +14,7 @@ export class ExampleDecsProvider implements vscode.TreeDataProvider<ExampleDec> 
 		this._onDidChangeTreeData.fire();
 	}
 
-    getTreeItem(element: ExampleDec): vscode.TreeItem {
+    getTreeItem(element: ExampleDec): TreeItem {
 		return element;
 	}
 
@@ -30,7 +27,7 @@ export class ExampleDecsProvider implements vscode.TreeDataProvider<ExampleDec> 
 				// const examples = await getAS3examples();
 				
 				// treeItems = examples.body.map((item: any) => {
-				// 	return new ExampleDec(item.name, vscode.TreeItemCollapsibleState.None,
+				// 	return new ExampleDec(item.name, TreeItemCollapsibleState.None,
 				// 		{command: 'f5.getGitHubExample', title: '', arguments: [item.download_url]});
 				// });
 
@@ -38,7 +35,7 @@ export class ExampleDecsProvider implements vscode.TreeDataProvider<ExampleDec> 
 				const examples = await getDOexamples();
 
 				treeItems = examples.body.map((item: any) => {
-					return new ExampleDec(item.name, vscode.TreeItemCollapsibleState.None,
+					return new ExampleDec(item.name, '', TreeItemCollapsibleState.None,
 						{command: 'f5.getGitHubExample', title: '', arguments: [item.download_url]});
 				});
 
@@ -46,19 +43,45 @@ export class ExampleDecsProvider implements vscode.TreeDataProvider<ExampleDec> 
 				const examples = await getTSexamples();
 
 				treeItems = examples.body.map((item: any) => {
-					return new ExampleDec(item.name, vscode.TreeItemCollapsibleState.None,
+					return new ExampleDec(item.name, '', TreeItemCollapsibleState.None,
 						{command: 'f5.getGitHubExample', title: '', arguments: [item.download_url]});
 				});
 			}
 
 		} else {
 			//top level items
-			treeItems.push(new ExampleDec('AS3 Examples - Coming soon!', vscode.TreeItemCollapsibleState.None,
-									{command: 'f5.getGitHubExample', title: '', arguments: ['tempAS3']}));
+			let link: Uri;
+			let comment: string;
 
-			treeItems.push(new ExampleDec('DO Examples', vscode.TreeItemCollapsibleState.Collapsed));
+			link = Uri.parse('https://github.com/DumpySquare/vscode-f5-fast');
+			comment = 'Main vscode-f5-fast repo for documentation and issues';
+			treeItems.push(new ExampleDec('vscode-f5-fast repo', comment, TreeItemCollapsibleState.None,
+				{command: 'vscode.open', title: '', arguments: [link]}));
 
-			treeItems.push(new ExampleDec('TS Examples', vscode.TreeItemCollapsibleState.Collapsed));
+			link = Uri.parse('https://github.com/DumpySquare/f5-fasting');
+			comment = 'Repo used to document usage and examples used in the extension';
+			treeItems.push(new ExampleDec('f5-fasting repo', comment, TreeItemCollapsibleState.None,
+				{command: 'vscode.open', title: '', arguments: [link]}));
+			
+			link = Uri.parse('https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/');
+			comment = 'Best way to get to all documentation official F5 CloudDocs documenation for as3, including: installing, using, HTTP methods, example declarations...';
+			treeItems.push(new ExampleDec('AS3 User Guide', comment, TreeItemCollapsibleState.None,
+				{command: 'vscode.open', title: '', arguments: [link]}));
+
+			link = Uri.parse('https://github.com/F5Networks/f5-appsvcs-extension/issues/280');
+			comment = 'Please comment in git repo if you want all AS3 example declarations to show up like DO/TS below';
+			treeItems.push(new ExampleDec('AS3 Examples - Coming soon!', comment, TreeItemCollapsibleState.None,
+				{command: 'vscode.open', title: '', arguments: [link]}));
+
+			link = Uri.parse('https://github.com/F5Networks/f5-declarative-onboarding/tree/master/examples');
+			comment = 'DO examples direct from /F5Networks/f5-declarative-onboarding repo';
+			treeItems.push(new ExampleDec('DO Examples', comment, TreeItemCollapsibleState.Collapsed,
+			{command: 'vscode.open', title: '', arguments: [link]}));
+			
+			link = Uri.parse('https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples');
+			comment = 'TS examples direct from /F5Networks/f5-telemetry-streaming repo';
+			treeItems.push(new ExampleDec('TS Examples', comment, TreeItemCollapsibleState.Collapsed,
+				{command: 'vscode.open', title: '', arguments: [link]}));
 		}
         return Promise.resolve(treeItems);
 	}
@@ -102,13 +125,18 @@ async function getTSexamples(){
 	});
 }
 
-export class ExampleDec extends vscode.TreeItem {
+export class ExampleDec extends TreeItem {
 	constructor(
 		public readonly label: string,
 		// private version: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
+		private toolTip: string,
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
+	}
+
+	get tooltip(): string {
+		return this.toolTip;
 	}
 }

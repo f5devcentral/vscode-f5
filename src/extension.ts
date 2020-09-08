@@ -1039,13 +1039,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
 
-		const gitIssueUrl = 'https://github.com/F5Networks/f5-appsvcs-extension/issues/280';
-
-		if(decUrl === 'tempAS3') {
-			// remove once as3 examples are available
-			return vscode.env.openExternal(vscode.Uri.parse(gitIssueUrl));
-		}
-
 		const resp = await extAPI.makeRequest({	url: decUrl	});
 		return panel.render(resp);
 	}));
