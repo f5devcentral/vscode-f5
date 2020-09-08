@@ -132,7 +132,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	async removeDevice(hostID: any) {
 		logger.debug(`Remove Host command: ${JSON.stringify(hostID)}`);
 
-		this.clearPassword(hostID.label);
+		this.clearPassword(hostID.label);	// clear cached password for device
 		
 		let bigipHosts: {device: string} [] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 		

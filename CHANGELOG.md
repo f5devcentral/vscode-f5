@@ -8,7 +8,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [2.3.0] - (9-4-2020)
+## [2.3.0] - (9-8-2020)
+
+### Added
+- OUTPUT Logging
+  - Moved most console.log() information to the OUTPUT window at the bottom of the editor
+  - Channnel name is `f5-fast`
+  - Also reduced the amount of details for things like HTTP calls since much of that stuff can be seen with the expanded details of the editor details
+- Clear password for single device
+- onConnect/onDisconnect terminal command execution
+  - This provides the flexibility to have commands executed in the terminal at device connect/disconnect
+  - Examples shows terminal connecting to ssh and tailing ltm logs
+    - then disconnecting ssh when extension disconnects
+
 
 ### Added
 - OUTPUT Logging
@@ -26,10 +38,25 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Tabs are now managed and re-used as configured
   - Removed webviews and supporting packages
   - Added the following settings:
-    - ******** document new settings  *******
+    - `Http Response Details` provides http request/response header information (if any)
+      - `exchange` returns entire HTTP exchange including both request/response headers + body
+      - `full` returns response headers + body
+      - `body` returns response body only
+    - `New Editor Column` defines what column a new editor should be opened
+      - `current` use column of current active editor (focused)
+      - `beside` open editor in column beside currently active editor
+    - `New Editor Tab For All` provides a way for users to get a new tab for every response (how it originally worked)
+    - `Preserve Editor Focus` provides a way to keep the new editor tab from taking focus
 - Updated axios agent to only return necessary information
   - this also allowing for standardizing how responses are used across the entire extension
 - Updated Device delete function to clear keytar password
+- Added more documentation links to Examples view
+  - Vscode-f5-fast repo link to provide a quick way to access documentation, examples, and issues
+  - Fasting repo link to provide a quick way to clone repo for demo's
+  - AS3 User Guide link to provide a quick way to get users to ALL AS3 documentation
+    - This seemed better than providing a link for each of the necessary subsections
+  - Updated comment tags when hovering over each item
+  - Provided links to repos online for DO/TS at the parent level
 
 ---
 

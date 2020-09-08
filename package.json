@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "2.2.0",
+	"version": "2.3.0",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -95,7 +95,7 @@
 				},
 				{
 					"id": "decExamples",
-					"name": "Declaration Examples"
+					"name": "Documentation/Examples"
 				}
 			]
 		},
@@ -129,6 +129,18 @@
 										"ldap",
 										"custom"
 									]
+								},
+								"onConnect": {
+									"type":"array",
+									"description": "List of terminal/bash commands to execute at connect",
+									"examples": [
+										"ssh admin@192.168.1.254",
+										"ssh ${this.device}"
+									]
+								},
+								"onDisconnect": {
+									"type":"array",
+									"description": "List of terminal/bash commands to execute at disconnect"
 								}
 							},
 							"required": [
