@@ -75,11 +75,19 @@ export class MgmtClient {
         const bigipHosts: Device[] | undefined = workspace.getConfiguration().get('f5.hosts');
         const deviceConfig: any = bigipHosts?.find( item => item.device === this.device);
 
-        if (deviceConfig?.hasOwnProperty('onConnect')) {
-            this._onConnect = deviceConfig.onConnect;
-        } else if (deviceConfig?.hasOwnProperty('onDisconnect')) {
-            this._onConnect = deviceConfig.onDisconnect;
-        }
+        // if (deviceConfig?.hasOwnProperty('onConnect')) {
+        //     this._onConnect = deviceConfig.onConnect;
+        // } 
+        
+        // if (deviceConfig?.hasOwnProperty('onDisconnect')) {
+        //     this._onDisconnect = deviceConfig.onDisconnect;
+        // }
+
+        // short hand of above logic
+        deviceConfig?.hasOwnProperty('onConnect') ? this._onConnect = deviceConfig.onConnect : [];
+        deviceConfig?.hasOwnProperty('onDisconnect') ? this._onDisconnect = deviceConfig.onDisconnect : [];
+
+        console.log('done getConfig');
     }
 
 
