@@ -22,6 +22,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - then disconnecting ssh when extension disconnects
 
 
+### Added
+- OUTPUT Logging
+  - Moved most console.log() information to the OUTPUT window at the bottom of the editor
+  - Channnel name is `f5-fast`
+  - Also reduced the amount of details for things like HTTP calls since much of that stuff can be seen with the expanded details of the editor details
+- Clear password for single device
+- auto ssh functionality - PENDING!!!!!
+- Added more documentation links to Examples view - PENDING!!!!
+  - Add fasting repo link
+
 ### Modified
 - Editor tab mgmt/re-use
   - This includes displaying json and HTTP responses with json
