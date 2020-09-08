@@ -5,11 +5,10 @@
 
 import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands } from "vscode";
 import * as keyTarType from "keytar";
-// import { F5Api } from './utils/f5Api';
 import { MgmtClient } from './utils/f5DeviceClient';
+import logger from "./utils/logger";
 
 type KeyTar = typeof keyTarType;
-// type MgmtClient = typeof MgmtClient;
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -48,12 +47,12 @@ export namespace ext {
 }
 
 workspace.onDidChangeConfiguration( () => {
-    console.log('EXTENSION CONFIGURATION CHANGED!!!');
+    logger.debug('EXTENSION CONFIGURATION CHANGED!!!');
     loadConfig();
 });
 
 export async function loadConfig() {
-    console.log('loading configuration for ext.settings!!!');
+    logger.debug('loading configuration for ext.settings!!!');
     ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
     ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
     // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.tcl', false);
@@ -65,7 +64,6 @@ export async function loadConfig() {
     ext.settings.enableWebViews = workspace.getConfiguration().get('f5.enableWebViews', false);
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
-    
     
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
 

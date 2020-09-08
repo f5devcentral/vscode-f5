@@ -8,16 +8,13 @@ import * as keyTarType from 'keytar';
 
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { TclTreeProvider } from './treeViewsProviders/tclTreeProvider';
-// import { AS3TreeProvider } from './treeViewsProviders/as3TasksTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import * as f5Api from './utils/f5Api';
-// import { callHTTPS } from './utils/externalAPIs';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git, loadConfig } from './extensionVariables';
-// import { displayWebView, WebViewPanel } from './webview';
 import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
@@ -25,16 +22,16 @@ import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
 import { chuckJoke1, chuckJoke2 } from './chuckJoke';
 
-// import { HttpResponseWebview } from './webViews/httpResponseWebview';
+import logger from './utils/logger';
+
 import { TextDocumentView } from './editorViews/editorView';
-// import { tstResponse } from './webViews/webView_vars';
-// import { AxiosResponse } from 'axios';
 
 const fast = require('@f5devcentral/f5-fast-core');
 
 export function activate(context: vscode.ExtensionContext) {
 
-	console.log('Congratulations, your extension "vscode-f5-fast" is now active!');
+	logger.debug('Congratulations, your extension "vscode-f5-fast" is now active!');
+	logger.verbose('Congratulations, your extension "vscode-f5-fast" is now active!');
 
 	// assign context to global
 	ext.context = context;
@@ -63,6 +60,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// const webview = new HttpResponseWebview(context);
 	const panel = new TextDocumentView();
+
+
+	// ext.logger = new Logger('f5-fast'); 
+	// const log = new Logger('f5-fast');
+	// log.log('yeeee');
+	
 	
 	ext.keyTar = keyTarType;
 
@@ -98,10 +101,11 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
-		console.log('selected device', device);
+		// logger.debug('selected device', device);
+		// logger.verbose('selected device', device);
+		logger.debug('selected device', device);  // preferred at the moment
 
 		if(ext.mgmtClient) {
-			tclTreeProvider.clear();
 			ext.mgmtClient.disconnect();
 		}
 
@@ -134,7 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 		
-		console.log('device-connect:', JSON.stringify(device));
+		// logger.debug('device-connect:', JSON.stringify(device));
 
 		var [user, host] = device.device.split('@');
 		var [host, port] = host.split(':');
@@ -150,7 +154,7 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 
 		const connect = await ext.mgmtClient.connect();
-		console.log(`F5 Connect Discovered ${JSON.stringify(connect)}`);
+		logger.debug(`F5 Connect Discovered ${JSON.stringify(connect)}`);
 		setTimeout( () => { tclTreeProvider.refresh();}, 300);
 	}));
 	
@@ -198,10 +202,10 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.editHost', async (hostID) => {
 		
-		console.log(`Edit Host command: ${JSON.stringify(hostID)}`);
+		logger.debug(`Edit Host command: ${JSON.stringify(hostID)}`);
 		
 		let bigipHosts: {device: string} [] | undefined= vscode.workspace.getConfiguration().get('f5.hosts');
-		console.log(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
+		logger.debug(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
 		
 		vscode.window.showInputBox({
 			prompt: 'Update Device/BIG-IP/Host', 
@@ -209,7 +213,7 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 		.then( input => {
 
-			console.log('user input', input);
+			logger.debug('user input', input);
 
 			if (input === undefined || bigipHosts === undefined) {
 				throw new Error('Update device inputBox cancelled');
@@ -256,7 +260,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showQuickPick(providerOptions, {placeHolder: 'Default BIGIP providers'})
 		.then( async input => {
 
-			console.log('user input', input);
+			logger.debug('user input', input);
 
 			if (input === undefined || bigipHosts === undefined) {
 				throw new Error('Update device inputBox cancelled');
@@ -308,16 +312,16 @@ export function activate(context: vscode.ExtensionContext) {
 		if(selectedRPM) {
 			// set rpm path/location from oject return in explorer tree
 			selectedRPM = selectedRPM.fsPath;
-			console.log(`workspace selected rpm`, selectedRPM);
+			logger.debug(`workspace selected rpm`, selectedRPM);
 		} else {
 			// pick atc/tool/version picker/downloader
 			selectedRPM = await rpmMgmt.rpmPicker();
-			console.log('downloaded rpm location', selectedRPM);
+			logger.debug('downloaded rpm location', selectedRPM);
 		}
 
 		// const iRpms = await rpmMgmt.installedRPMs();
-		console.log('selected rpm', selectedRPM);
-		// console.log('installed rpms', JSON.stringify(iRpms));
+		logger.debug('selected rpm', selectedRPM);
+		// logger.debug('installed rpms', JSON.stringify(iRpms));
 
 		if(!selectedRPM) {
 			debugger;
@@ -325,7 +329,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
-		console.log('installed rpm', installedRpm);
+		logger.debug('installed rpm', installedRpm);
 		ext.mgmtClient?.connect(); // refresh connect/status bars
 
 	}));
@@ -393,7 +397,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	// --- IAPP COMMANDS ---
 	context.subscriptions.push(vscode.commands.registerCommand('f5-tcl.getApp', async (item) => {
-		console.log('f5-tcl.getApp command: ', item);
+		logger.debug('f5-tcl.getApp command: ', item);
 		return panel.render(item);
 	}));
 
@@ -545,7 +549,7 @@ export function activate(context: vscode.ExtensionContext) {
 			text = editor.document.getText(editor.selection);	// highlighted text
 		} 
 
-		console.log(JSON.stringify(text));
+		logger.debug(JSON.stringify(text));
 
 		if(utils.isValidJson(text)){
 
@@ -594,7 +598,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.postTemplateSet', async (sPath) => {
 
-		console.log('postTemplateSet selection', sPath);
+		logger.debug('postTemplateSet selection', sPath);
 		let wkspPath;
 		let selectedFolder;
 		
@@ -603,7 +607,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			// get list of open workspaces
 			const workspaces = vscode.workspace.workspaceFolders;
-			console.log('workspaces', workspaces);
+			logger.debug('workspaces', workspaces);
 			
 			// if no open workspace...
 			if(!workspaces) {
@@ -619,8 +623,8 @@ export function activate(context: vscode.ExtensionContext) {
 			wkspPath = folder1.fsPath;
 			const folder2 = await vscode.workspace.fs.readDirectory(folder1);
 		
-			// console.log('workspace', vscode.workspace);
-			console.log('workspace name', vscode.workspace.name);
+			// logger.debug('workspace', vscode.workspace);
+			logger.debug('workspace name', vscode.workspace.name);
 			
 			/**
 			 * having problems typing the workspaces to a list for quick pick
@@ -639,7 +643,7 @@ export function activate(context: vscode.ExtensionContext) {
 			for (const [name, type] of await vscode.workspace.fs.readDirectory(folder1)) {
 
 				if (type === vscode.FileType.Directory){
-					console.log('---directory', name);
+					logger.debug('---directory', name);
 					wFolders.push(name);
 				}
 			};
@@ -651,12 +655,12 @@ export function activate(context: vscode.ExtensionContext) {
 				// if user "escaped" folder selection window
 				return vscode.window.showInformationMessage('Must select a Fast Template Set folder');
 			}
-			console.log('workspace path', wkspPath);
-			console.log('workspace folder', selectedFolder);
+			logger.debug('workspace path', wkspPath);
+			logger.debug('workspace folder', selectedFolder);
 			selectedFolder = path.join(wkspPath, selectedFolder);
 
 		} else {
-			console.log('caught selected path');
+			logger.debug('caught selected path');
 			selectedFolder = sPath.fsPath;
 		}
 
@@ -906,8 +910,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 		}
 
-		console.log(`newText below`);
-		console.log(newText);
+		logger.debug(`newText below`);
+		logger.debug(newText);
 
 		const {activeTextEditor} = vscode.window;
 
@@ -1157,11 +1161,11 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		let newText: string;
 		if (utils.isValidJson(text)) {
-			console.log('converting json -> yaml');
+			logger.debug('converting json -> yaml');
 			// since it was valid json -> dump it to yaml
 			newText = jsYaml.safeDump(JSON.parse(text), {indent: 4});
 		} else {
-			console.log('converting yaml -> json');
+			logger.debug('converting yaml -> json');
 			newText = JSON.stringify(jsYaml.safeLoad(text), undefined, 4);
 		}
 
@@ -1223,7 +1227,7 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 
 		 */
 
-		console.log('executing f5.makeRequest');
+		logger.debug('executing f5.makeRequest');
 		const editor = vscode.window.activeTextEditor;
 		let resp;
 
@@ -1233,21 +1237,21 @@ export function activate(context: vscode.ExtensionContext) {
 			// see if it's json or yaml or string
 			if(utils.isValidJson(text)) {
 
-				console.log('JSON detected -> parsing');
+				logger.debug('JSON detected -> parsing');
 				text = JSON.parse(text);
 
 			} else {
 
-				console.log('NOT JSON');
+				logger.debug('NOT JSON');
 				
 				if(text.includes('url:')) {
 					// if yaml should have url: param
-					console.log('yaml with url: param -> parsing raw to JSON', JSON.stringify(text));
+					logger.debug('yaml with url: param -> parsing raw to JSON', JSON.stringify(text));
 					text = jsYaml.safeLoad(text);
 					
 				} else {
 					// not yaml
-					console.log('http with OUT url param -> converting to json');
+					logger.debug('http with OUT url param -> converting to json');
 					// trim line breaks
 					text = text.replace(/(\r\n|\n|\r)/gm,"");
 					text = { url: text };
@@ -1268,12 +1272,12 @@ export function activate(context: vscode.ExtensionContext) {
 				}, async (progress, token) => {
 					token.onCancellationRequested(() => {
 						// this logs but doesn't actually cancel...
-						console.log("User canceled External API Request");
+						logger.debug("User canceled External API Request");
 						return new Error(`User canceled External API Request`);
 					});
 					
 					//external call
-					console.log('external call -> ', JSON.stringify(text));
+					logger.debug('external call -> ', JSON.stringify(text));
 					return await extAPI.makeRequest(text);
 				});
 				
@@ -1286,7 +1290,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}, async (progress, token) => {
 					token.onCancellationRequested(() => {
 						// this logs but doesn't actually cancel...
-						console.log("User canceled API Request");
+						logger.debug("User canceled API Request");
 						return new Error(`User canceled API Request`);
 					});
 
@@ -1296,7 +1300,7 @@ export function activate(context: vscode.ExtensionContext) {
 						await vscode.commands.executeCommand('f5.connectDevice');
 					}
 				
-					console.log('device call -> ', JSON.stringify(text));
+					logger.debug('device call -> ', JSON.stringify(text));
 					return await ext.mgmtClient?.makeRequest(text.url, {
 						method: text.method,
 						body: text.body
@@ -1343,7 +1347,7 @@ export function activate(context: vscode.ExtensionContext) {
 		window.forEach(el => {
 			// const el1 = element;
 			if (el.document.fileName === 'chuck-joke.json') {
-				// console.log('f5-fast.json editor column', el1.viewColumn);
+				// logger.debug('f5-fast.json editor column', el1.viewColumn);
 				viewColumn = el.viewColumn;
 			}
 		});
@@ -1351,6 +1355,8 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const resp: any = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
 		// let activeColumn = vscode.window.activeTextEditor?.viewColumn;
+		
+		logger.debug('chuck-joke->resp.data', resp.data);
 
 		const content = JSON.stringify(resp.data, undefined, 4);
 

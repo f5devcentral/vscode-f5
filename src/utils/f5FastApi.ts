@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+import logger from './logger';
 
 
 /**
@@ -11,7 +12,7 @@ import { ext } from '../extensionVariables';
  */
 export async function deployFastApp(dec: object) {
 
-    console.log(`fast app declaration`, dec);
+    // logger.debug(`fast app declaration`, dec);
 
     const progressPost = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -20,7 +21,7 @@ export async function deployFastApp(dec: object) {
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
             // this logs but doesn't actually cancel...
-            console.log("User canceled the async post");
+            logger.debug("User canceled the async post");
             return new Error(`User canceled the async post`);
         });
 

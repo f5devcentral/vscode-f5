@@ -10,17 +10,26 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [2.3.0] - (9-4-2020)
 
+### Added
+- OUTPUT Logging
+  - Moved most console.log() information to the OUTPUT window at the bottom of the editor
+  - Channnel name is `f5-fast`
+  - Also reduced the amount of details for things like HTTP calls since much of that stuff can be seen with the expanded details of the editor details
+- Clear password for single device
+- auto ssh functionality - PENDING!!!!!
+- Added more documentation links to Examples view - PENDING!!!!
+  - Add fasting repo link
+
 ### Modified
-- primary editor tab mgmt
+- Editor tab mgmt/re-use
   - This includes displaying json and HTTP responses with json
   - Tabs are now managed and re-used as configured
   - Removed webviews and supporting packages
   - Added the following settings:
-    - 
+    - ******** document new settings  *******
 - Updated axios agent to only return necessary information
-  - this also allowed for standardizing how responses are used across the entire extension
--  
-
+  - this also allowing for standardizing how responses are used across the entire extension
+- Updated Device delete function to clear keytar password
 
 ---
 

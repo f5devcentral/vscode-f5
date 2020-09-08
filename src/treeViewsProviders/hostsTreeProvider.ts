@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+import logger from '../utils/logger';
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	
@@ -20,13 +21,13 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	getChildren(element?: F5Host): Thenable<F5Host[]> {
         
         var bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
-		// console.log(`bigips: ${JSON.stringify(bigipHosts)}`);
+		// logger.debug(`bigips: ${JSON.stringify(bigipHosts)}`);
 		
 		if ( bigipHosts === undefined) {
 			throw new Error('No configured hosts - from hostTreeProvider');
 		}
 
-		console.log('checking for legacy hosts config');
+		logger.debug('checking for legacy hosts config');
 
 
 		/**
@@ -42,19 +43,19 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		// if devices in list and first list item is a string, not an object
 		if(bigipHosts.length > 0 && typeof(bigipHosts[0]) === 'string') {
 			
-			console.log('devices are type of:', typeof(bigipHosts[0]));
+			logger.debug('devices are type of:', typeof(bigipHosts[0]));
 			bigipHosts = bigipHosts.map( (el: any) => {
 				let newObj: { device: string } = { device: el };
-				console.log(`device coverted from: ${el} -> ${JSON.stringify(newObj)}`);
+				logger.debug(`device coverted from: ${el} -> ${JSON.stringify(newObj)}`);
 				return newObj;
 			});
 			
-			console.log('conversion complete, saving new devices list:', bigipHosts);
+			logger.debug('conversion complete, saving new devices list:', bigipHosts);
 			// save config
 			vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
 			vscode.window.showWarningMessage('Legacy device config list converted!!!');
 		} else {
-			console.log('New device configuration list detected -> no conversion');
+			logger.debug('New device configuration list detected -> no conversion');
 		}
 
 		const treeItems = bigipHosts.map( (item: { 
@@ -75,7 +76,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 				item['provider'] = 'local';
 			}
 
-			// console.log('built item', device);
+			// logger.debug('built item', device);
 			const treeItem = new F5Host(item.device, item.provider, vscode.TreeItemCollapsibleState.None, {
 				        command: 'f5.connectDevice',
 				        title: 'hostTitle',
@@ -129,7 +130,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	}
 
 	async removeDevice(hostID: any) {
-		console.log(`Remove Host command: ${JSON.stringify(hostID)}`);
+		logger.debug(`Remove Host command: ${JSON.stringify(hostID)}`);
 
 		this.clearPassword(hostID.label);
 		
@@ -142,12 +143,12 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		const newBigipHosts = bigipHosts.filter( item => item.device !== hostID.label);
 
 		 if(bigipHosts.length === (newBigipHosts.length+1) ) {
-			console.log('successfully removed device!!!');
+			logger.debug('successfully removed device!!!');
 			await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
 			setTimeout( () => { this.refresh();}, 300);
 			return `successfully removed ${hostID.label} from devices configuration`;
 		 } else {
-			console.log('something with remove device FAILED!!!');
+			logger.debug('something with remove device FAILED!!!');
 			throw new Error('something with remove device FAILED!!!');
 		 }
 
@@ -161,13 +162,13 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		 if (device) {
 
             // passed in from view click or deviceClient
-            console.log('CLEARING KEYTAR PASSWORD CACHE for', device);
+            logger.debug('CLEARING KEYTAR PASSWORD CACHE for', device);
             return await ext.keyTar.deletePassword('f5Hosts', device);
             
 		} else {
             
 			// get list of items in keytar for the 'f5Hosts' service
-			console.log('CLEARING KEYTAR PASSWORD CACHE');
+			logger.debug('CLEARING KEYTAR PASSWORD CACHE');
 			const one1 = await ext.keyTar.findCredentials('f5Hosts').then( list => {
 				// map through and delete all
 				list.map(item => ext.keyTar.deletePassword('f5Hosts', item.account));

@@ -7,6 +7,7 @@ import axios from 'axios';
 // import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
+import logger from './logger';
 // import { MgmtClient } from './f5DeviceClient';
 // import { emitWarning } from 'process';
 
@@ -66,7 +67,7 @@ export async function installedRPMs () {
 
         // return just package names from list
         const installed = tasks.data.queryResponse.map( (item: { packageName: string; }) => item.packageName);
-        console.log('installed rpms', JSON.stringify(installed));
+        logger.debug('installed rpms', JSON.stringify(installed));
         
         return installed;
     } else {
@@ -117,7 +118,7 @@ export async function unInstallRpm (packageName: string) {
             const resp: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
             progress.report({ message: `${resp.data.status}`});
-            console.log('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
+            logger.debug('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
             
 
             // todo: break out the successful and failed results, only refresh statusBars on successful
@@ -156,7 +157,7 @@ export async function rpmPicker () {
         cancellable: true
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
-            console.log("User canceled atc rpm picker");
+            logger.debug("User canceled atc rpm picker");
             return new Error(`User canceled atc rpm picker`);
         });
         
@@ -198,10 +199,10 @@ export async function rpmPicker () {
         progress.report({ message: `Fetching ${atc} ${selectedAsset.label} from ${selectedAsset.asset}`});
 
         // vscode.window.showInformationMessage(`Fetching ${atc} ${selectedAsset.label} from ${selectedAsset.asset}`);
-        console.log(`selectedAsset: ${atc} ${selectedAsset.label} from ${selectedAsset.asset}`);
+        logger.debug(`selectedAsset: ${atc} ${selectedAsset.label} from ${selectedAsset.asset}`);
         
         const rpmLoc = await getRPMgit(selectedAsset.asset);
-        // console.log('rpmLoc', rpmLoc);
+        // logger.debug('rpmLoc', rpmLoc);
 
         await new Promise(resolve => { setTimeout(resolve, 2000); });
         
@@ -221,7 +222,7 @@ export async function rpmPicker () {
  */
 export async function rpmInstaller (rpm: string) {
 
-    console.log('rpmInstaller uploading', rpm);
+    logger.debug('rpmInstaller uploading', rpm);
     
 
     // * --- npm installer function -> input: string = <file_location>
@@ -235,7 +236,7 @@ export async function rpmInstaller (rpm: string) {
         cancellable: true
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
-            console.log("User canceled atc rpm upload");
+            logger.debug("User canceled atc rpm upload");
             return new Error(`User canceled atc rpm upload`);
         });
         
@@ -250,7 +251,7 @@ export async function rpmInstaller (rpm: string) {
         // upload rpm to f5
         const instA = await ext.mgmtClient?.upload(rpm);
         
-        console.log('uploaded', instA);
+        logger.debug('uploaded', instA);
         progress.report({ message: `installing`});
         await new Promise(resolve => { setTimeout(resolve, 2000); });
         
@@ -263,7 +264,7 @@ export async function rpmInstaller (rpm: string) {
             }
         });
 
-        console.log('ilx import status: ', installStart.status, installStart.data.id);
+        logger.debug('ilx import status: ', installStart.status, installStart.data.id);
         progress.report({ message: `${installStart.data.status}`});
 
         // wait for package to install
@@ -279,7 +280,7 @@ export async function rpmInstaller (rpm: string) {
         while(taskId && i < 10) {
             const resp: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
 
-            console.log('task in progress', taskId, resp.status, resp.data.status);
+            logger.debug('task in progress', taskId, resp.status, resp.data.status);
             
             if(resp.data.status === 'FINISHED') {
                 vscode.window.showInformationMessage(`${rpmName} Install Complete!`);
@@ -313,7 +314,7 @@ export async function rpmInstaller (rpm: string) {
 async function getRPMgit(assetUrl: string) {
     // get release asset information
     const resp = await axios(assetUrl);
-    console.log('Getting github asset details', resp);
+    // logger.debug('Getting github asset details', resp);
     
     
     const extDir = ext.context.extensionPath; 
@@ -321,10 +322,10 @@ async function getRPMgit(assetUrl: string) {
     const rpmDir = path.join(extDir, 'atc_ilx_rpm_cache');
 
     if (!fs.existsSync(rpmDir)) {
-        console.log('CREATING ATC ILX RPM CACHE DIRECTORY');
+        logger.debug('CREATING ATC ILX RPM CACHE DIRECTORY');
         fs.mkdirSync(rpmDir);
     } else { 
-        console.log(`existing ${rpmDir} detected`);
+        logger.debug(`existing ${rpmDir} detected`);
     };
 
 
@@ -332,7 +333,7 @@ async function getRPMgit(assetUrl: string) {
     const assetSet = resp.data.assets.map( (item: { name: string; browser_download_url: string; }) => {
         return {name: item.name, browser_download_url: item.browser_download_url};
     });
-    console.log('assetSet', JSON.stringify(assetSet));
+    logger.debug('assetSet', JSON.stringify(assetSet));
     
 
     // download assets
@@ -341,16 +342,16 @@ async function getRPMgit(assetUrl: string) {
 
         // if item already exists
         if(fs.existsSync(destPath)) {
-            console.log(`${destPath} already cached!`);
+            logger.debug(`${destPath} already cached!`);
             // return destPath;
         } else {
-            console.log(`${item.name} not found in local cache, downloading...`);
+            logger.debug(`${item.name} not found in local cache, downloading...`);
             // await rpmDownload(item.browser_download_url, destPath);
             await downloadToFile(item.browser_download_url, destPath);
         }
     });
 
-    console.log('assets done downloading');
+    logger.debug('assets done downloading');
 
     // get array item that has the installable rpm
     const rpmAsset = assetSet.filter( (el: { name: string; }) => el.name.endsWith('.rpm'));
@@ -374,7 +375,7 @@ async function listGitReleases(url: string){
             return {label: item.name, asset: item.url};
         });
     }
-    // console.log('mapEd', mapEd);
+    // logger.debug('mapEd', mapEd);
     return mapEd;
 }
 
@@ -394,7 +395,7 @@ export async function rpmDownload (url: string, destPath: string) {
         }
     })
     .catch( error => {
-        console.log('npmGetter error', error);
+        logger.debug('npmGetter error', error);
     });
     resp.data.pipe(writeFile);
 
@@ -421,10 +422,10 @@ export async function rpmDownload (url: string, destPath: string) {
     //     const destPath = path.join(rpmDir, item.name);
     //     // if item already exists
     //     if(fs.existsSync(destPath)) {
-    //         console.log(`${destPath} already cached!`);
+    //         logger.debug(`${destPath} already cached!`);
     //         return destPath;
     //     } else {
-    //         console.log(`${item.name} not found in local cache, downloading...`);
+    //         logger.debug(`${item.name} not found in local cache, downloading...`);
     //         await npmGetter(item.browser_download_url, destPath);
     //     }
     //     if(destPath === '*.rpm') {
@@ -439,9 +440,9 @@ export async function rpmDownload (url: string, destPath: string) {
     //     const destPath = path.join(rpmDir, item.name);
     //     // if item already exists
     //     if(fs.existsSync(destPath)) {
-    //         console.log(`${destPath} already cached!`);
+    //         logger.debug(`${destPath} already cached!`);
     //     } else {
-    //         console.log(`${item.name} not found in local cache, downloading...`);
+    //         logger.debug(`${item.name} not found in local cache, downloading...`);
     //         const writeFile = fs.createWriteStream(destPath);
     //         const resp = await axios.get(item.browser_download_url, {responseType: 'stream'});
     //         resp.data.pipe(writeFile);
@@ -455,7 +456,7 @@ export async function rpmDownload (url: string, destPath: string) {
 
 
             // .filter( (item: any[]) => {
-    //     console.log('filter item', item);
+    //     logger.debug('filter item', item);
     //     if(item[1].includes(".rpm") {
     //         return item[1];
     //     }
@@ -465,7 +466,7 @@ export async function rpmDownload (url: string, destPath: string) {
     // const assetSet = resp.data.assets
     // .filter( (item: any) => {
 
-    //     console.log('item.name', item.name);
+    //     logger.debug('item.name', item.name);
     //     if(item.name.includes(".rpm") {
     //         return item.name;
     //     }
@@ -474,10 +475,10 @@ export async function rpmDownload (url: string, destPath: string) {
 
     //     // // if item already exists
     //     // if(fs.existsSync(destPath)) {
-    //     //     console.log(`${destPath} already cached!`);
+    //     //     logger.debug(`${destPath} already cached!`);
     //     //     // return destPath;
     //     // } else {
-    //     //     console.log(`${item.name} not found in local cache, downloading...`);
+    //     //     logger.debug(`${item.name} not found in local cache, downloading...`);
     //     //     npmGetter(item.browser_download_url, destPath);
     //     // }
         
@@ -485,7 +486,7 @@ export async function rpmDownload (url: string, destPath: string) {
     // // .reduce( (item: any) => {
     // //     if(item.name.endsWith(".rpm")) {
     // //         // finRpm = destPath;
-    // //         console.log(`******assetItem ${item.browser_download_url}`);
+    // //         logger.debug(`******assetItem ${item.browser_download_url}`);
     // //         // Promise.resolve(item.browser_download_url);
     // //         return item.browser_download_url;
     // //     }

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { request } from 'https';
+import logger from './utils/logger';
 // import { displayWebView } from './webview';
 
 
@@ -10,27 +11,27 @@ export async function chuckJoke2() {
 
 
 export function chuckJoke1() {
-    // console.log('beginnning chuck func call')
+    // logger.debug('beginnning chuck func call')
     const chuckApiCall = {
         host: 'api.chucknorris.io',
         path: '/jokes/random',
         method: 'GET',
     };
     
-    // console.log('Bout to call request')
+    // logger.debug('Bout to call request')
     const req = request(chuckApiCall, response => {
         
-        // console.log('pre chunks definition')
+        // logger.debug('pre chunks definition')
         const chunks: any[] = [];
         
         response.on('data', (chunk) => {
             chunks.push(chunk);
         });
-        // console.log('pre response end')
+        // logger.debug('pre response end')
         response.on('end', () => {
             const result = JSON.parse(Buffer.concat(chunks).toString());
             
-            console.log('ALL CHUCK JOKE DETAILS: ', JSON.stringify(result));
+            logger.debug('ALL CHUCK JOKE DETAILS: ', JSON.stringify(result));
             vscode.window.showInformationMessage(`Getting Joke from https://api.chucknorris.io/jokes/random`);
 
             // const content = `Chuck Joke: \r\n\r\n${ result.value }`
@@ -61,17 +62,17 @@ function getJoke() {
         method: 'GET',
     };
     
-    // console.log('Bout to call request')
+    // logger.debug('Bout to call request')
     const req = request(chuckApiCall, response => {
-        // console.log('pre chunks definition')
+        // logger.debug('pre chunks definition')
         const chunks: any[] = [];
         response.on('data', (chunk) => {
             chunks.push(chunk);
         });
-        // console.log('pre response end')
+        // logger.debug('pre response end')
         response.on('end', () => {
             const result = JSON.parse(Buffer.concat(chunks).toString());
-            console.log('ALL CHUCK JOKE DETAILS: ', JSON.stringify(result));
+            logger.debug('ALL CHUCK JOKE DETAILS: ', JSON.stringify(result));
             vscode.window.showInformationMessage(`Getting Joke from https://api.chucknorris.io/jokes/random`);
             // const content = `Chuck Joke: \r\n\r\n${ result.value }`
             // const content = `Chuck Joke: \r\n\r\n${ result }`

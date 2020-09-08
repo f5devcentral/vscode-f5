@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 var https = require('https');
 import * as utils from './utils';
 import { ext } from '../extensionVariables';
+import logger from './logger';
 // import { getAuthToken, callHTTP } from './coreF5HTTPS';
 // import { memoryUsage } from 'process';
 
@@ -25,7 +26,7 @@ import { ext } from '../extensionVariables';
 //     }, async (progress, token) => {
 //         token.onCancellationRequested(() => {
 //             // this logs but doesn't actually cancel...
-//             console.log("User canceled device connect");
+//             logger.debug("User canceled device connect");
 //             return new Error(`User canceled device connect`);
 //         });
 //         /**
@@ -46,18 +47,18 @@ import { ext } from '../extensionVariables';
 //         //     // connectTimeout: 1000,
 //         //     })
 //         //     // .then( resp => {
-//         //     //     console.log('AXIOS auth source response', resp);
+//         //     //     logger.debug('AXIOS auth source response', resp);
 //         //     //     Promise.resolve(resp);
 //         //     //     return resp;
 //         //     // })
 //         //     .catch( err => {
-//         //         console.log('AXIOS auth source err', err);
-//         //         console.log('AXIOS auth source err', err.response);
+//         //         logger.debug('AXIOS auth source err', err);
+//         //         logger.debug('AXIOS auth source err', err.response);
 //         //         // Promise.reject(err);
 //         //         return err;
 //         //     });
 
-//         // console.log('=======  axResp', resp);
+//         // logger.debug('=======  axResp', resp);
 
 //         // if(!resp) {
 //         //     vscode.window.showErrorMessage(`Could not connect to ${host}`);
@@ -69,12 +70,12 @@ import { ext } from '../extensionVariables';
 //         // if (resp.status === 200) {
 //         //     // if not default, update the logonProviderName value
 //         //     if(resp.data.type !== 'local'){
-//         //         console.log(`TMOS remote auth provider detected --> ${resp.data.type}`);
+//         //         logger.debug(`TMOS remote auth provider detected --> ${resp.data.type}`);
 //         //         progress.report({ message: ` ${resp.data.type} auth provider detected`});
 //         //         // change default 'tmos' value to what is configured
 //         //         ext.logonProviderName = resp.data.type;
 //         //     } else {
-//         //         console.log(`TMOS local auth detected`);
+//         //         logger.debug(`TMOS local auth detected`);
 //         //     }
 //         // } else if (resp.status === 401 && resp.data.message === "Authentication failed.") {
 //         //     // clear cached password for this device
@@ -377,7 +378,7 @@ export async function postDoDec(dec: Dec) {
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
             // this logs but doesn't actually cancel...
-            console.log("User canceled the async post");
+            logger.debug("User canceled the async post");
             return new Error(`User canceled the async post`);
         });
         
@@ -568,7 +569,7 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
             // this logs but doesn't actually cancel...
-            console.log("User canceled the async post");
+            logger.debug("User canceled the async post");
             return new Error(`User canceled the async post`);
         });
 
