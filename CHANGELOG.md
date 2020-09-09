@@ -22,16 +22,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - then disconnecting ssh when extension disconnects
 
 
-### Added
-- OUTPUT Logging
-  - Moved most console.log() information to the OUTPUT window at the bottom of the editor
-  - Channnel name is `f5-fast`
-  - Also reduced the amount of details for things like HTTP calls since much of that stuff can be seen with the expanded details of the editor details
-- Clear password for single device
-- auto ssh functionality - PENDING!!!!!
-- Added more documentation links to Examples view - PENDING!!!!
-  - Add fasting repo link
-
 ### Modified
 - Editor tab mgmt/re-use
   - This includes displaying json and HTTP responses with json
@@ -50,6 +40,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Updated axios agent to only return necessary information
   - this also allowing for standardizing how responses are used across the entire extension
 - Updated Device delete function to clear keytar password
+- Fix for BIG-IQ AS3 declaration list
+  - Regular as3 returns an object for the device, AS3 with multi-device tenants (bigiq) returns a list of objects, one for each devcie declaration it has
+- Fix for tcl class view to refresh information accordingly when changing devices
 - Added more documentation links to Examples view
   - Vscode-f5-fast repo link to provide a quick way to access documentation, examples, and issues
   - Fasting repo link to provide a quick way to clone repo for demo's

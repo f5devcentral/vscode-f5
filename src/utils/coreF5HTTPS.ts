@@ -172,8 +172,8 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     .then( resp => {
         // the following log may cause some problems, mainly the resp.data,
         //      if it's circular...
-        // logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`, resp.data);
-        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
+        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`, resp.data);
+        // logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
         return {
             data: resp.data,
             headers: resp.headers,
@@ -216,7 +216,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
 
             vscode.window.showErrorMessage(`AX-HTTP FAILURE: ${status} - ${message}`);
             console.error(`AX-HTTP FAILURE: ${status} - ${message} - ${JSON.stringify(error.response.data)}`);
-            throw new Error(`AX-HTTP FAILURE: ${status} - ${message}`);
+            // throw new Error(`AX-HTTP FAILURE: ${status} - ${message}`);
 
           } else if (error.request) {
             // The request was made but no response was received
@@ -224,12 +224,25 @@ export async function makeReqAXnew(host: string, uri: string, options: {
             // http.ClientRequest in node.js
             vscode.window.showErrorMessage(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
             console.error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
-            throw new Error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.error('AX-HTTP-Setup-Error', error.message);
-          }
-          console.error(error.config);
+            // throw new Error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('AX-HTTP-Setup-Error', error.message);
+            }
+            console.error(error.config);
+            return {
+                data: error.resp.data,
+                headers: error.resp.headers,
+                status: error.resp.status,
+                statusText: error.resp.statusText,
+                request: {
+                    url: error.resp.config.url,
+                    method: error.resp.request.method,
+                    headers: error.resp.request._headers,
+                    protocol: error.resp.config.httpsAgent.protocol,
+                    data: error.resp.data
+                }
+            };
     });
     return httpResponse;
 };

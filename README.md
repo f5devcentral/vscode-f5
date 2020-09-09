@@ -17,9 +17,19 @@ Any comments, questions or feature requests, please open a github repository iss
 
 ## Index
 
+### This page
+
+* [Extension Commands](https://github.com/DumpySquare/vscode-f5-fast#extension-commands)
+* [Basic device management](https://github.com/DumpySquare/vscode-f5-fast#basic-device-management-addeditdelete-connectdisconnect)
+* [Connecting/Disconnecting and password caching](https://github.com/DumpySquare/vscode-f5-fast#connectingdisconnecting-and-password-caching)
+* [Extension Commands](https://github.com/DumpySquare/vscode-f5-fast#extension-commands)
+
+
+### Other Pages
+
 * [CHANGELOG](CHANGELOG.md)
 * [Research](./README_docs/research.md)
-* [Writing ATC declarations in YAML](./README_docs/jsonSchemaInYaml.md)
+* [Schema Validation](./README_docs/schemaValidation.md)
 * [Crafting raw API calls](https://github.com/DumpySquare/f5-fasting/blob/master/makeHTTPsTesting.md)
     > hosted in the f5-fasting repo that is used to document and demonstrate fast/extension functionality for demos
 * [ATC ILX rpm package management](./README_docs/rpmMgmt.md)
@@ -186,7 +196,8 @@ Within the workspace, it will list all the first level folders, select the folde
 >Each template is validated before all of them are zipped and uploaded/installed to the selected device with fast service
 
 * example of opening a workspace, then connecting to f5 with fast, and uploading folder of templates as a template set *
-![uploading template set](./README_docs/images/FAST_tempSet_upload_6.23.2020.gif)
+<!-- ![uploading template set](./README_docs/images/FAST_tempSet_upload_6.23.2020.gif) -->
+<img src="./README_docs/images/FAST_tempSet_upload_6.23.2020.gif" alt="drawing" width="80%"/>
 
 
 ### Deploying an application through FAST
@@ -213,12 +224,14 @@ Press `F1`, then filter/select `F5-Fast: Deploy Fast App`
 }
 ```
 ![deploy fast app](./README_docs/images/FAST_deployApp_6.23.2020.gif)
+<!-- <img src="./README_docs/images/remoteCMD_5.18.2020.gif" alt="drawing" width="80%"/> -->
 
 ### Delete Fast application
 
 Find the deployed application in the Fast view under "Deployed Applications", right click on the app, then select `Delete Fast App`
 
-![delete fast app](./README_docs/images/FAST_deleteApp_6.23.2020.gif)
+<!-- ![delete fast app](./README_docs/images/FAST_deleteApp_6.23.2020.gif) -->
+<img src="./README_docs/images/FAST_deleteApp_6.23.2020.gif" alt="drawing" width="80%"/>
 
 
 --- 
@@ -238,6 +251,7 @@ Select the declaration text to send or it will capture the entire editor window
 To delete a tenant, right click the tenant in the AS3 Tenant TreeView on the left and select "Delete"
 
 ![AS3 Management](./README_docs/images/as3GetPostDeleteTask_5.18.2020.gif)
+<!-- <img src="./README_docs/images/remoteCMD_5.18.2020.gif" alt="drawing" width="80%"/> -->
 
 ---
 
@@ -269,8 +283,8 @@ Select the command from the palette drop down to post a declaration
 
 Command to issue on the remote device.  Good for quickly getting information while building declarations!
 
-![Remote Command Execute](./README_docs/images/remoteCMD_5.18.2020.gif)
-
+<!-- ![Remote Command Execute](./README_docs/images/remoteCMD_5.18.2020.gif) -->
+<img src="./README_docs/images/remoteCMD_5.18.2020.gif" alt="drawing" width="80%"/>
 
 
 
@@ -292,6 +306,12 @@ HTTP/422 responses - Can happen for a handful of reasons:
   - Sometimes this is from the '$schema' reference in the declaration
 - Sometimes you can fix a DO HTTP/400 response by overwriting with a clean/updated declaration
 
+### local vs tmos for BIGIP autProvider
+
+When utilizing external auth provider on a regular BIG-IQ (not bigiq), regardless of what is set (local/tmos/radius/ldap/...), the auth provider to use that configured service should be local or tmos.  This bascially tells the api auth service on the f5 f5 to use whatever is configured for the device.  For bigiq, it must be set since the user can select which authentication service they want to use at login.
+
+> Summary -> if your connecting to a bigip and getting 401 invalid logon provider, the two main options to try should be 'local' or 'tmos'.  In my testing, no other options worked.
+
 ### HTTP Auth Failures
 
 When utilizing an external auth provider, occasionally restjavad/restnoded can have some issues, resulting in some occansional HTTP/400 auth errors:
@@ -302,7 +322,7 @@ Error from extension
 > HTTP Auth FAILURE: 400 - undefined
 
 Error from restjavad log
-```
+```log
 [SEVERE][6859][24 Jul 2020 13:11:39 UTC][8100/shared/authn/login AuthnWorker] Error as the maximum time to wait exceeded while getting value of loginProviderName
 [SEVERE][6860][24 Jul 2020 13:11:39 UTC][8100/shared/authn/login AuthnWorker] Error while setting value to loginProviderName when no loginReference and no loginProviderName were given
 [WARNING][6861][24 Jul 2020 13:11:39 UTC][com.f5.rest.common.RestWorker] dispatch to worker http://localhost:8100/shared/authn/login caught following exception: java.lang.NullPointerException
@@ -325,6 +345,8 @@ Error from restjavad log
 
 ## Client side extension debugging
 
+### Developer Debugger
+
 VScode has a built in debugger very much like Chrome.  This can be used to gain insight to what is happening when things don't respond as expected.
 
 If you are having issues, it may be best to start here and capture the output as described below:
@@ -335,7 +357,18 @@ If you are having issues, it may be best to start here and capture the output as
 
 If needed, **right-click** on an entry, then select **save-as** to save the log including expanded objects to a file.  This can be used for troubleshooting
 
-![vscode debugging console](./README_docs/images/vscodeDebugConsole_5.20.2020.PNG)
+<!-- ![vscode debugging console](./README_docs/images/vscodeDebugConsole_5.20.2020.PNG) -->
+<img src="./README_docs/images/vscodeDebugConsole_5.20.2020.PNG" alt="drawing" width="80%"/>
+
+This mainly catches logs send through the console.log(''), which should typically be for development.
+
+### OUTPUT logging
+
+As of the v2.3.0 most logs are now sent to the OUTPUT tab of the bottom pane.  This should provide easier access to what the extension is doing.
+
+<!-- ![OUTPUT logging](./README_docs/images/OUTPUT_logging_9.9.2020.PNG) -->
+
+<img src="./README_docs/images/OUTPUT_logging_9.9.2020.PNG" alt="drawing" width="80%"/>
 
 ## installing vsix 
 

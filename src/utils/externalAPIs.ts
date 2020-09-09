@@ -47,6 +47,7 @@ export async function makeRequest(req: AxiosRequestConfig) {
         httpsAgent: new https.Agent({
             rejectUnauthorized: false
         }),
+        validateStatus: () => true
     };
 
     logger.debug('external http defaults-Opts', JSON.stringify(req));
