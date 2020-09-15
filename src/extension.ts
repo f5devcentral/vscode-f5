@@ -209,7 +209,8 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		vscode.window.showInputBox({
 			prompt: 'Update Device/BIG-IP/Host', 
-			value: hostID.label
+			value: hostID.label,
+			ignoreFocusOut: true
 		})
 		.then( input => {
 

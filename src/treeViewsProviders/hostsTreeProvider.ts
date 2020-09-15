@@ -96,7 +96,8 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			// attempt to get user to input new device
 			newHost = await vscode.window.showInputBox({
 				prompt: 'Device/BIG-IP/Host',
-				placeHolder: '<user>@<host/ip>'
+				placeHolder: '<user>@<host/ip>',
+				ignoreFocusOut: true
 			})
 			.then( el => {
 				if(el) {
