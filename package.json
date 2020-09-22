@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "2.3.0",
+	"version": "2.4.0-b",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -96,6 +96,11 @@
 				{
 					"id": "decExamples",
 					"name": "Documentation/Examples"
+				},
+				{
+					"id": "cfgTree",
+					"when": "f5.cfgTreeContxt",
+					"name": "Config Explorer"
 				}
 			]
 		},
@@ -279,6 +284,11 @@
 			{
 				"command": "f5.makeRequest",
 				"title": "Make HTTP Request",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExplore",
+				"title": "Explore Config",
 				"category": "F5"
 			},
 			{
@@ -556,6 +566,10 @@
 				{
 					"when": "editorHasSelection",
 					"command": "f5.makeRequest",
+					"group": "F5"
+				},
+				{
+					"command": "f5.cfgExplore",
 					"group": "F5"
 				},
 				{
@@ -952,6 +966,7 @@
 		"@types/js-yaml": "^3.12.5",
 		"axios": "^0.19.2",
 		"js-yaml": "^3.14.0",
-		"keytar": "^6.0.1"
+		"keytar": "^6.0.1",
+		"project-corkscrew": "git+https://github.com/f5devcentral/project-corkscrew.git"
 	}
 }

@@ -11,6 +11,7 @@ import { TclTreeProvider } from './treeViewsProviders/tclTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
+import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 import * as f5Api from './utils/f5Api';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
@@ -156,6 +157,14 @@ export function activate(context: vscode.ExtensionContext) {
 		const connect = await ext.mgmtClient.connect();
 		logger.debug(`F5 Connect Discovered ${JSON.stringify(connect)}`);
 		setTimeout( () => { tclTreeProvider.refresh();}, 300);
+
+		/**
+		 * setup explode on connect
+		 * 
+		 */
+		vscode.commands.executeCommand('f5.cfgExploreOnConnect');
+
+
 	}));
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getProvider', async () => {
@@ -1143,6 +1152,91 @@ export function activate(context: vscode.ExtensionContext) {
 	// register example delarations tree
 	vscode.window.registerTreeDataProvider('decExamples', new ExampleDecsProvider());
 
+
+	/**
+	 * ###################################################################
+	 * ###################################################################
+	 * ###################################################################
+	 * ###################################################################
+	 * 
+	 * Three ways for getting the bigip.conf
+	 * 	1. from text in editor (right click in editor)
+	 * 	2. from file in explorer (right click a saved file)
+	 * 	3. http/get from device directly ("cat /config/bigip.conf" over bash endpoint)
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
+	
+	const appExplorer = new CfgProvider();
+	 vscode.window.registerTreeDataProvider('cfgTree', appExplorer);
+
+	/**
+	 * this command 
+	 */
+	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreOnConnect', async () => {
+
+		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+			method: 'POST',
+			body: {
+				command: 'run',
+				utilCmdArgs: `-c 'cat /config/bigip.conf'`
+			}
+		});
+
+		/**
+		 * todo: add getting bigip_base.conf to hold in tree next to bigip.conf
+		 * 	Can get in another api call or try to get both config files in the same
+		 * 	above api call then split them
+		 */
+
+		if(resp.data.commandResult) {
+			vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
+			appExplorer.explodeConfig(resp.data.commandResult);
+		}
+
+		setTimeout( () => { appExplorer.refresh();}, 500);
+
+	}));
+
+	/**
+	 * this command is exposed via right click in editor so user does not have to connect to F5
+	 */
+	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore', () => {
+		// Get the active text editor
+		let editor = vscode.window.activeTextEditor;
+		
+		if (editor) {
+			vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
+			const text = editor.document.getText();
+			// appExplorer = new CkProvider(text);
+			// vscode.window.registerTreeDataProvider('cfgTree', new CkProvider(text));
+			appExplorer.explodeConfig(text);
+		}
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore-show', async (text) => {
+
+		appExplorer.render(text);
+
+	}));
+
+	/**
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * ###################################################################
+	 * ###################################################################
+	 * ###################################################################
+	 * ###################################################################
+	 * ###################################################################
+	 * 
+	 * 
+	 */
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.jsonYmlConvert', async () => {
 		const editor = vscode.window.activeTextEditor;
