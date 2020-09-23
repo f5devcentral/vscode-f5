@@ -1,14 +1,14 @@
-import { bigipConfig } from 'project-corkscrew';
+// import { bigipConfig } from 'project-corkscrew';
 import { TreeDataProvider, TreeItem, TreeItemCollapsibleState, Event, EventEmitter, Uri, Command, window, ViewColumn, Position, workspace, TextDocument, Range }  from 'vscode';
 import { BigipConfig } from 'project-corkscrew/dist/ltm';
 import { ext } from '../extensionVariables';
 // import { bigipConfig } from '../../node_modules/project-corkscrew/dist/index';
 
 
-export class CfgProvider implements TreeDataProvider<cfgApp> {
+export class CfgProvider implements TreeDataProvider<CfgApp> {
 
-	private _onDidChangeTreeData: EventEmitter<cfgApp | undefined> = new EventEmitter<cfgApp | undefined>();
-    readonly onDidChangeTreeData: Event<cfgApp | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<CfgApp | undefined> = new EventEmitter<CfgApp | undefined>();
+    readonly onDidChangeTreeData: Event<CfgApp | undefined> = this._onDidChangeTreeData.event;
     
     private bigipConf: string = '';
     private tmosApps: {name: string, config: string}[] = [];
@@ -28,28 +28,26 @@ export class CfgProvider implements TreeDataProvider<cfgApp> {
         this.tmosApps = bigipConf.apps();
         this.confArray = bigipConf.configAsSingleLevelArray;
         this.confArraySingleObjs = bigipConf.configArrayOfSingleLevelObjects;
-        // setTimeout( () => { }, 500);
         this.expLogs = bigipConf.logs();
-        // setTimeout( () => { }, 500);
     }
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
 	}
 
-    getTreeItem(element: cfgApp): TreeItem {
+    getTreeItem(element: CfgApp): TreeItem {
 		return element;
 	}
 
-	async getChildren(element?: cfgApp): Promise<cfgApp[]> {
+	async getChildren(element?: CfgApp): Promise<CfgApp[]> {
 
-		var treeItems: cfgApp[] = [];
+		var treeItems: CfgApp[] = [];
 		if(element) {
             
             if (element.label === 'Apps') {
                 
 				treeItems = this.tmosApps.map((el: {name: string, config: string}) => {
-					return new cfgApp(el.name, '', TreeItemCollapsibleState.None,
+					return new CfgApp(el.name, '', TreeItemCollapsibleState.None,
 						{command: 'f5.cfgExplore-show', title: '', arguments: [{ item: el.config, type: 'app'}]});
 				});
 
@@ -57,22 +55,22 @@ export class CfgProvider implements TreeDataProvider<cfgApp> {
 
 		} else {
 
-			treeItems.push(new cfgApp('bigip.conf', '', TreeItemCollapsibleState.None,
+			treeItems.push(new CfgApp('bigip.conf', '', TreeItemCollapsibleState.None,
 				{command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.bigipConf, type: 'conf'}]}));
                 
-            treeItems.push(new cfgApp('Apps', '', TreeItemCollapsibleState.Collapsed,
+            treeItems.push(new CfgApp('Apps', '', TreeItemCollapsibleState.Collapsed,
                 {command: '', title: '', arguments: ['']}));
                 
-            treeItems.push(new cfgApp('Logs', '', TreeItemCollapsibleState.None,
+            treeItems.push(new CfgApp('Logs', '', TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.expLogs, type: 'log'}]}));
 
-            treeItems.push(new cfgApp('Config Object', '', TreeItemCollapsibleState.None,
+            treeItems.push(new CfgApp('Config Object', '', TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.confObj, type: 'obj'}]}));
             
-            treeItems.push(new cfgApp('Config Array', "ex. [ltm node /Common/192.168.1.20 { address 192.168.1.20 }, ...]", TreeItemCollapsibleState.None,
+            treeItems.push(new CfgApp('Config Array', "ex. [ltm node /Common/192.168.1.20 { address 192.168.1.20 }, ...]", TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.confArray, type: 'array'}]}));
 
-            treeItems.push(new cfgApp('Config Array Objects', "ex. [{name: 'parent object name', config: 'parent config obj body'}]", TreeItemCollapsibleState.None,
+            treeItems.push(new CfgApp('Config Array Objects', "ex. [{name: 'parent object name', config: 'parent config obj body'}]", TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.confArraySingleObjs, type: 'array'}]}));
 
             // treeItems.push(new CkApp('Config Object', '', TreeItemCollapsibleState.None,
@@ -124,7 +122,7 @@ export class CfgProvider implements TreeDataProvider<cfgApp> {
 }
 
 
-export class cfgApp extends TreeItem {
+export class CfgApp extends TreeItem {
 	constructor(
 		public readonly label: string,
 		// private version: string,
@@ -135,7 +133,7 @@ export class cfgApp extends TreeItem {
 		super(label, collapsibleState);
 	}
 
-	// get tooltip(): string {
-	// 	return this.toolTip;
-	// }
+	get tooltip(): string {
+		return this.toolTip;
+	}
 }

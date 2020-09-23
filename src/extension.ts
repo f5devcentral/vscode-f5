@@ -1210,16 +1210,12 @@ export function activate(context: vscode.ExtensionContext) {
 		if (editor) {
 			vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
 			const text = editor.document.getText();
-			// appExplorer = new CkProvider(text);
-			// vscode.window.registerTreeDataProvider('cfgTree', new CkProvider(text));
 			appExplorer.explodeConfig(text);
 		}
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore-show', async (text) => {
-
 		appExplorer.render(text);
-
 	}));
 
 	/**

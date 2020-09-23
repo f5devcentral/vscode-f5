@@ -288,7 +288,7 @@
 			},
 			{
 				"command": "f5.cfgExplore",
-				"title": "Explore Config",
+				"title": "Explore TMOS Config",
 				"category": "F5"
 			},
 			{
