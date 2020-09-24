@@ -417,13 +417,8 @@
 				"enablement": "f5.fastInstalled"
 			},
 			{
-				"command": "f5-fast.renderYmlTemplate",
-				"title": "Render YAML Template",
-				"category": "F5-Fast"
-			},
-			{
 				"command": "f5-fast.renderHtmlPreview",
-				"title": "Render HTML Preview",
+				"title": "Render Fast Template HTML Preview",
 				"category": "F5-Fast"
 			},
 			{
@@ -564,6 +559,10 @@
 					"group": "F5"
 				},
 				{
+					"command": "f5-fast.renderHtmlPreview",
+					"group": "F5"
+				},
+				{
 					"when": "editorHasSelection",
 					"command": "f5-as3.postDec",
 					"group": "F5"
@@ -640,6 +639,11 @@
 				{
 					"when": "f5.fastInstalled && resourceExtname =~ /\\.(mst|ya?ml|fast)/",
 					"command": "f5-fast.postTemplate",
+					"group": "F5-Fast"
+				},
+				{
+					"when": "resourceExtname =~ /\\.(ya?ml)/",
+					"command": "f5-fast.renderHtmlPreview",
 					"group": "F5-Fast"
 				}
 			],

@@ -15,7 +15,7 @@ import * as f5Api from './utils/f5Api';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git, loadConfig } from './extensionVariables';
-import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
+import { FastWebView } from './editorViews/fastWebView';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
@@ -697,64 +697,35 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderYmlTemplate', async () => {
 
-		/**
-		 * this is working through the f5 fast template creating process
-		 * https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/template-authoring.html
-		 * 
-		 * I think I was trying to take in a params.yml file to feed into an .mst file to test the output before
-		 * 		being able to upload to fast as a template
-		 */
+	const fastPanel = new FastWebView();
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderHtmlPreview', async (item) => {
 
-		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	return; // No open text editor
-		}
+		let text: string = 'empty';
+		let title: string = 'Fast Template';	
 
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
+		if(item.scheme === 'file') {
+			// right click from explorer view, so load file contents
+			const fileContents = fs.readFileSync(item.fsPath);
+			// convert from buffer to string
+			text = fileContents.toString('utf8');
+			// set webPanel name to filename
+			title = path.parse(item.fsPath).name;
 		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
-
-		// const templateEngine = await fast.Template.loadYaml(text);
-
-		// const schema = templateEngine.getParametersSchema();
-		// // const view = {};
-		// const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
-		// displayWebView(htmlData);
-		// f5FastUtils.templateFromYaml(text);
-
-	}));
-
-
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderHtmlPreview', async () => {
-
-		/**
-		 * this view is requested by zinke as part of the template authoring process
-		 * 	The view should consume/watch the yml file that defines the user inputs for the template
-		 * 	Every time a save occurs, it should refresh with the changes to streamline the authoring process
-		 */
-
-		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	return; // No open text editor
+			var editor = vscode.window.activeTextEditor;
+			if (editor) {	
+				if (editor?.selection?.isEmpty) {
+					text = editor.document.getText();	// entire editor/doc window
+				} else {
+					text = editor.document.getText(editor.selection);	// highlighted text
+				} 
+			}
 		}
-
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
-		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
 
 		const templateEngine = await fast.Template.loadYaml(text);
-
 		const schema = templateEngine.getParametersSchema();
-
 		const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
-		FastWebViewPanel.render(context.extensionPath, htmlData);
-		// f5FastUtils.renderHtmlPreview(text);
+		fastPanel.render(htmlData, title);
 
 	}));
 
