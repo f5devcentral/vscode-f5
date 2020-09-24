@@ -1189,6 +1189,14 @@ export function activate(context: vscode.ExtensionContext) {
 		 * todo: add getting bigip_base.conf to hold in tree next to bigip.conf
 		 * 	Can get in another api call or try to get both config files in the same
 		 * 	above api call then split them
+		 * 
+		 * The best route seems to be to ssh to the device, 
+		 * 		"tmsh save sys config" - should push config in memory to files
+		 * 	then copy down the files over ssh
+		 * 
+		 * This ssh method seems to be the best for getting multiple files and
+		 * 	making sure we don't breach the payload limit of the api
+		 * 
 		 */
 
 		if(resp.data.commandResult) {

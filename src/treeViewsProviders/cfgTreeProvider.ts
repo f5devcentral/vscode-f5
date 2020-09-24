@@ -56,10 +56,16 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 		} else {
 
 			treeItems.push(new CfgApp('bigip.conf', '', TreeItemCollapsibleState.None,
-				{command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.bigipConf, type: 'conf'}]}));
+                {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.bigipConf, type: 'conf'}]}));
+
+            treeItems.push(new CfgApp('bigip_base.conf', 'just idea to add...', TreeItemCollapsibleState.None,
+                {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.bigipConf, type: 'conf'}]}));
                 
-            treeItems.push(new CfgApp('Apps', '', TreeItemCollapsibleState.Collapsed,
-                {command: '', title: '', arguments: ['']}));
+            const allApps = this.tmosApps.map((el: {name: string, config: string}) => el.config);
+            const allAppsFlat = allApps.join('\n\n##################################################\n\n');
+                
+            treeItems.push(new CfgApp('Apps', 'All apps', TreeItemCollapsibleState.Collapsed,
+                {command: 'f5.cfgExplore-show', title: '', arguments: [{item: allAppsFlat, type: 'log'}]}));
                 
             treeItems.push(new CfgApp('Logs', '', TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.expLogs, type: 'log'}]}));
