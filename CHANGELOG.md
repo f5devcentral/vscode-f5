@@ -8,6 +8,27 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.4.0] - (10-5-2020)
+
+### Added
+- FAST YAML Template schema - (PENDING)
+  - So template schema can be validated during the authoring process (like AS3)
+
+### Modified
+- FAST Template Render HTML preview
+  - now respects tab settings like other windows
+  - Re-renders appropriately when sending new content (like changing template params)
+    - this required a complete rework of the class
+  - Re-scoped fast templates to yaml files only (it's really just the best way to go)
+  - added right click options in explorer view to render template html preview
+  - added right click option in editor view to render template html preview
+
+- onConnect/onDisconnect terminal settings
+  - updated to only execute if settings are actaully present to be executed
+  - added logic to track created terminals, use existing terminals (created by extension), and dispose terminals onDisconnect
+
+---
+
 ## [2.3.0] - (9-8-2020)
 
 ### Added
