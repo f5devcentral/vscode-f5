@@ -3,10 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands } from "vscode";
+import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands, TextDocument } from "vscode";
 import * as keyTarType from "keytar";
 import { MgmtClient } from './utils/f5DeviceClient';
 import logger from "./utils/logger";
+import { TextDocumentView } from './editorViews/editorView';
 
 type KeyTar = typeof keyTarType;
 
@@ -27,7 +28,7 @@ export namespace ext {
     export let connectBar: StatusBarItem;
     export let iRulesAble: boolean = false;
     export let as3AsyncPost: boolean | undefined;
-    export let carTreeData: object | undefined;
+    export let panel: TextDocumentView;
     export let tsExampleView: object | undefined;
     
     export namespace settings {

@@ -249,6 +249,9 @@ async function packageTemplateSet2(tsPath: string, dst: string) {
                 logger.debug(error);
             });
         // return fastPackage;
+    })
+    .catch( e => {
+        logger.error(e);
     });
     return tempVal;
 }
