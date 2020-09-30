@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "2.4.1-b",
+	"version": "2.4.0",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -47,6 +47,12 @@
 			{
 				"language": "json",
 				"path": "./snippets.json"
+			}
+		],
+		"yamlValidation": [
+			{
+			  "fileMatch": "*.fast.yml",
+			  "url": "https://github.com/f5devcentral/f5-fast-core/blob/master/schema/template.json"
 			}
 		],
 		"jsonValidation": [
@@ -427,13 +433,8 @@
 				"enablement": "f5.fastInstalled"
 			},
 			{
-				"command": "f5-fast.renderYmlTemplate",
-				"title": "Render YAML Template",
-				"category": "F5-Fast"
-			},
-			{
 				"command": "f5-fast.renderHtmlPreview",
-				"title": "Render HTML Preview",
+				"title": "Render Fast Template HTML Preview",
 				"category": "F5-Fast"
 			},
 			{
@@ -578,6 +579,10 @@
 					"group": "F5"
 				},
 				{
+					"command": "f5-fast.renderHtmlPreview",
+					"group": "F5"
+				},
+				{
 					"when": "editorHasSelection",
 					"command": "f5-as3.postDec",
 					"group": "F5"
@@ -654,6 +659,11 @@
 				{
 					"when": "f5.fastInstalled && resourceExtname =~ /\\.(mst|ya?ml|fast)/",
 					"command": "f5-fast.postTemplate",
+					"group": "F5-Fast"
+				},
+				{
+					"when": "resourceExtname =~ /\\.(ya?ml)/",
+					"command": "f5-fast.renderHtmlPreview",
 					"group": "F5-Fast"
 				}
 			],
@@ -923,6 +933,10 @@
 				{
 					"command": "f5-fast.deleteFastTempSet",
 					"when": "view == fastView && viewItem == fastTemplateSet"
+				},
+				{
+					"command": "f5-fast.renderHtmlPreview",
+					"when": "view == fastView && viewItem == fastTemplate"
 				},
 				{
 					"command": "f5-as3.fullTenant",

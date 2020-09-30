@@ -16,7 +16,7 @@ import * as f5Api from './utils/f5Api';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, git, loadConfig } from './extensionVariables';
-import { FastWebViewPanel } from './utils/fastHtmlPreveiwWebview';
+import { FastWebView } from './editorViews/fastWebView';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
@@ -27,7 +27,7 @@ import logger from './utils/logger';
 
 import { TextDocumentView } from './editorViews/editorView';
 
-const fast = require('@f5devcentral/f5-fast-core');
+// const fast = require('@f5devcentral/f5-fast-core');
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -60,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
 	ext.connectBar.show();
 
 	// const webview = new HttpResponseWebview(context);
-	const panel = new TextDocumentView();
+	ext.panel = new TextDocumentView();
 
 
 	// ext.logger = new Logger('f5-fast'); 
@@ -169,7 +169,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getProvider', async () => {
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/auth/source');
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 
@@ -185,7 +185,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/identified-devices/config/device-info');
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.disconnect', () => {
@@ -408,13 +408,13 @@ export function activate(context: vscode.ExtensionContext) {
 	// --- IAPP COMMANDS ---
 	context.subscriptions.push(vscode.commands.registerCommand('f5-tcl.getApp', async (item) => {
 		logger.debug('f5-tcl.getApp command: ', item);
-		return panel.render(item);
+		return ext.panel.render(item);
 	}));
 
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5-tcl.getTemplate', async (item) => {
 		// returns json view of iApp Template
-		return panel.render(item);
+		return ext.panel.render(item);
 	}));
 	
 
@@ -478,7 +478,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getInfo', async () => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/info`);
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.deployApp', async () => {
@@ -508,7 +508,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const resp = await f5FastApi.deployFastApp(jsonText);
 
-		panel.render(resp);
+		ext.panel.render(resp);
 
 		// give a little time to finish before refreshing trees
 		await new Promise(resolve => { setTimeout(resolve, 3000); });
@@ -520,27 +520,27 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getApp', async (tenApp) => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`);
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTask', async (taskId) => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplate', async (template) => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templates/${template}`);
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 
@@ -685,7 +685,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// var device: string | undefined = ext.hostStatusBar.text;
 		// const password = await utils.getPassword(device);
 		const resp = await f5FastApi.delTenApp(tenApp.label);
-		panel.render(resp);
+		ext.panel.render(resp);
 	
 		// give a little time to finish
 		await new Promise(resolve => { setTimeout(resolve, 2000); });
@@ -706,67 +706,55 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderYmlTemplate', async () => {
 
-		/**
-		 * this is working through the f5 fast template creating process
-		 * https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/template-authoring.html
-		 * 
-		 * I think I was trying to take in a params.yml file to feed into an .mst file to test the output before
-		 * 		being able to upload to fast as a template
-		 */
+	const fastPanel = new FastWebView();
+	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderHtmlPreview', async (item) => {
 
-		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	return; // No open text editor
-		}
+		let text: string = 'empty';
+		let title: string = 'Fast Template';	
 
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
+		if(item?.hasOwnProperty('scheme') && item?.scheme === 'file') {
+			// right click from explorer view initiation, so load file contents
+			const fileContents = fs.readFileSync(item.fsPath);
+			// convert from buffer to string
+			text = fileContents.toString('utf8');
+			// set webPanel name to filename
+			title = path.parse(item.fsPath).name;
+
+		} else if (item?.hasOwnProperty('label')) {
+			// right click on template from fast view when connected to device
+			// - ex.  label: 'goodFastTemplates/app4'
+
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templates/${item.label}`);
+
+			if (resp?.data?.sourceText) {
+				text = resp?.data?.sourceText;
+			} else {
+				// alert that we didn't get the response we were looking for
+				logger.error('f5-fast.renderHtmlPreview command tried to get template details from connected device, but did not get the source text we were looking for');
+			}
+
+
 		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+			// right-click or commandpalette initiation, so get editor text
+			var editor = vscode.window.activeTextEditor;
+			if (editor) {	
+				if (editor?.selection?.isEmpty) {
+					text = editor.document.getText();	// entire editor/doc window
+				} else {
+					text = editor.document.getText(editor.selection);	// highlighted text
+				} 
+			}
+		}
 
 		// const templateEngine = await fast.Template.loadYaml(text);
-
 		// const schema = templateEngine.getParametersSchema();
-		// // const view = {};
 		// const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
-		// displayWebView(htmlData);
-		// f5FastUtils.templateFromYaml(text);
+		// fastPanel.render(htmlData, title, );
+		fastPanel.render(text);
 
 	}));
-
-
-	context.subscriptions.push(vscode.commands.registerCommand('f5-fast.renderHtmlPreview', async () => {
-
-		/**
-		 * this view is requested by zinke as part of the template authoring process
-		 * 	The view should consume/watch the yml file that defines the user inputs for the template
-		 * 	Every time a save occurs, it should refresh with the changes to streamline the authoring process
-		 */
-
-		var editor = vscode.window.activeTextEditor;
-		if (!editor) {	return; // No open text editor
-		}
-
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
-		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
-
-		const templateEngine = await fast.Template.loadYaml(text);
-
-		const schema = templateEngine.getParametersSchema();
-
-		const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
-		FastWebViewPanel.render(context.extensionPath, htmlData);
-		// f5FastUtils.renderHtmlPreview(text);
-
-	}));
-
+	
 
 
 
@@ -798,7 +786,7 @@ export function activate(context: vscode.ExtensionContext) {
 		tenant = tenant ? tenant : '';
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 
@@ -837,7 +825,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}, async () => {
 
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
-			panel.render(resp);
+			ext.panel.render(resp);
 		});
 
 	}));
@@ -870,7 +858,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const resp = await f5Api.postAS3Dec(postParam, JSON.parse(text));
-		panel.render(resp);
+		ext.panel.render(resp);
 		as3Tree.refresh();
 	}));
 
@@ -1004,7 +992,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5-ts.info', async () => {
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/telemetry/info');
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 
@@ -1014,7 +1002,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting TS Dec`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/telemetry/declare`);
-			panel.render(resp);
+			ext.panel.render(resp);
 		});
 	}));
 
@@ -1043,14 +1031,14 @@ export function activate(context: vscode.ExtensionContext) {
 				method: 'POST',
 				body: JSON.parse(text)
 			});
-			panel.render(resp);
+			ext.panel.render(resp);
 		});
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
 
 		const resp = await extAPI.makeRequest({	url: decUrl	});
-		return panel.render(resp);
+		return ext.panel.render(resp);
 	}));
 
 
@@ -1077,7 +1065,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Dec`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/`);
-			panel.render(resp);
+			ext.panel.render(resp);
 		});
 
 
@@ -1102,7 +1090,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const resp = await f5Api.postDoDec(JSON.parse(text));
-		panel.render(resp);
+		ext.panel.render(resp);
 	}));
 
 
@@ -1113,7 +1101,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Inspect`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
-			panel.render(resp);
+			ext.panel.render(resp);
 		}); 
 
 	}));
@@ -1127,7 +1115,7 @@ export function activate(context: vscode.ExtensionContext) {
 			title: `Getting DO Tasks`
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
-			panel.render(resp);
+			ext.panel.render(resp);
 		});
 	}));
 
@@ -1401,7 +1389,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			if(resp) {
-				panel.render(resp);
+				ext.panel.render(resp);
 			}
 		}
 
@@ -1425,7 +1413,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 
-		panel.render(resp.data.commandResult);
+		ext.panel.render(resp.data.commandResult);
 	}));	
 
 
