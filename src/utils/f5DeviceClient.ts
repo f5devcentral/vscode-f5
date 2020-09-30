@@ -85,7 +85,7 @@ export class MgmtClient {
         deviceConfig?.hasOwnProperty('onConnect') ? this._onConnect = deviceConfig.onConnect : [];
         deviceConfig?.hasOwnProperty('onDisconnect') ? this._onDisconnect = deviceConfig.onDisconnect : [];
 
-        console.log('done getConfig');
+        // console.log('done getConfig');
     }
 
 

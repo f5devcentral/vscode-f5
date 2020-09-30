@@ -51,8 +51,8 @@
 		],
 		"yamlValidation": [
 			{
-			  "fileMatch": "*.fast.yml",
-			  "url": "https://github.com/f5devcentral/f5-fast-core/blob/master/schema/template.json"
+				"fileMatch": "*.fast.yml",
+				"url": "https://github.com/f5devcentral/f5-fast-core/blob/master/schema/template.json"
 			}
 		],
 		"jsonValidation": [
@@ -270,6 +270,11 @@
 			{
 				"command": "f5.getF5HostInfo",
 				"title": "Show Device Info",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExploreOnConnect",
+				"title": "Explore Config",
 				"category": "F5"
 			},
 			{
@@ -904,6 +909,10 @@
 				},
 				{
 					"command": "f5.getF5HostInfo",
+					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5.cfgExploreOnConnect",
 					"when": "view == f5Hosts"
 				},
 				{

@@ -162,7 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
 		 * setup explode on connect
 		 * 
 		 */
-		vscode.commands.executeCommand('f5.cfgExploreOnConnect');
+		// vscode.commands.executeCommand('f5.cfgExploreOnConnect');
 
 
 	}));
@@ -193,6 +193,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
 			ext.mgmtClient = undefined;
+			appExplorer.clear();
 		}
 	}));
 
@@ -1142,28 +1143,37 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	/**
-	 * ###################################################################
-	 * ###################################################################
-	 * ###################################################################
-	 * ###################################################################
 	 * 
 	 * Three ways for getting the bigip.conf
 	 * 	1. from text in editor (right click in editor)
 	 * 	2. from file in explorer (right click a saved file)
 	 * 	3. http/get from device directly ("cat /config/bigip.conf" over bash endpoint)
 	 * 
-	 * 
-	 * 
-	 * 
 	 */
 	
 	const appExplorer = new CfgProvider();
-	 vscode.window.registerTreeDataProvider('cfgTree', appExplorer);
+	vscode.window.registerTreeDataProvider('cfgTree', appExplorer);
 
 	/**
 	 * this command 
 	 */
-	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreOnConnect', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreOnConnect', async (item) => {
+
+		/**
+		 * todo:  setup logic to connect to device if not connected
+		 * 	or connect to new device if already connected...
+		 */
+		const x = item;
+
+		if (!ext.mgmtClient) {
+			/**
+			 * loop this back into the connect flow, since we have the device, automatically connect
+			 */
+			// await vscode.commands.executeCommand('f5.connectDevice', item.label);
+			return vscode.window.showWarningMessage('Connect to BIGIP Device first');
+		}
+
+		
 
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
 			method: 'POST',
@@ -1188,7 +1198,6 @@ export function activate(context: vscode.ExtensionContext) {
 		 */
 
 		if(resp.data.commandResult) {
-			vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
 			appExplorer.explodeConfig(resp.data.commandResult);
 		}
 
@@ -1199,12 +1208,12 @@ export function activate(context: vscode.ExtensionContext) {
 	/**
 	 * this command is exposed via right click in editor so user does not have to connect to F5
 	 */
-	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore', (item) => {
 		// Get the active text editor
 		let editor = vscode.window.activeTextEditor;
 		
 		if (editor) {
-			vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
+			// vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
 			const text = editor.document.getText();
 			appExplorer.explodeConfig(text);
 		}

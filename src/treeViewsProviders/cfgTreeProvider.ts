@@ -1,5 +1,5 @@
 // import { bigipConfig } from 'project-corkscrew';
-import { TreeDataProvider, TreeItem, TreeItemCollapsibleState, Event, EventEmitter, Uri, Command, window, ViewColumn, Position, workspace, TextDocument, Range }  from 'vscode';
+import { TreeDataProvider, TreeItem, TreeItemCollapsibleState, Event, commands, EventEmitter, Uri, Command, window, ViewColumn, Position, workspace, TextDocument, Range }  from 'vscode';
 import { BigipConfig } from 'project-corkscrew/dist/ltm';
 import { ext } from '../extensionVariables';
 // import { bigipConfig } from '../../node_modules/project-corkscrew/dist/index';
@@ -10,9 +10,9 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 	private _onDidChangeTreeData: EventEmitter<CfgApp | undefined> = new EventEmitter<CfgApp | undefined>();
     readonly onDidChangeTreeData: Event<CfgApp | undefined> = this._onDidChangeTreeData.event;
     
-    private bigipConf: string = '';
+    private bigipConf: string | undefined;
     private tmosApps: {name: string, config: string}[] = [];
-    private expLogs: string = '';
+    private expLogs: string | undefined;
     private confObj: any;
     private confArray: string[] = [];
     private confArraySingleObjs: string[] = [];
@@ -21,6 +21,8 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     }
     
     async explodeConfig(config: string){
+        // set context to make view visible
+        commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
         const bigipConf = new BigipConfig(config);
         this.bigipConf = bigipConf.bigipConf;
         //looking to return the multi-level object so we can see what it looks like in the view
@@ -33,7 +35,18 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
-	}
+    }
+    
+    clear(): void {
+        // hide view from being visible
+        commands.executeCommand('setContext', 'f5.cfgTreeContxt', false);
+        this.bigipConf = undefined;
+        this.tmosApps = [];
+        this.expLogs = undefined;
+        this.confObj = {};
+        this.confArray = [];
+        this.confArraySingleObjs = [];
+    }
 
     getTreeItem(element: CfgApp): TreeItem {
 		return element;
@@ -58,8 +71,8 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 			treeItems.push(new CfgApp('bigip.conf', '', TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.bigipConf, type: 'conf'}]}));
 
-            treeItems.push(new CfgApp('bigip_base.conf', 'just idea to add...', TreeItemCollapsibleState.None,
-                {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.bigipConf, type: 'conf'}]}));
+            // treeItems.push(new CfgApp('bigip_base.conf', 'just idea to add...', TreeItemCollapsibleState.None,
+            //     {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.bigipConf, type: 'conf'}]}));
                 
             const allApps = this.tmosApps.map((el: {name: string, config: string}) => el.config);
             const allAppsFlat = allApps.join('\n\n##################################################\n\n');
