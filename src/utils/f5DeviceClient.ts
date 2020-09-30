@@ -39,7 +39,7 @@ export class MgmtClient {
     protected _tokenTimeout: number = 0;
     private _onConnect: string[] = [];
     private _onDisconnect: string[] = [];
-    private terminal: Terminal;
+    private terminal: Terminal | undefined;
 
     /**
      * @param options function options
@@ -60,8 +60,6 @@ export class MgmtClient {
         this._user = options['user'];
         this._password = options['password'];
         this.getConfig();
-        this.terminal = window.createTerminal('f5-fast-cmd');
-        this.terminal.show(true);
     }
 
     /**
@@ -348,27 +346,57 @@ export class MgmtClient {
      * issues terminal commands defined for "onConnect"
      */
     private termConnect() {
-        // if _onConnect has a value, loop through each as terminal commands
-        this._onConnect?.forEach((el: string) => {
-            // swap out variable as needed
-            el = el.replace(/\${this.device}/, `${this.device}`);
-            setTimeout( () => {
-                // console.log(el);
-                this.terminal.sendText(el);
-            }, 500);
-        });
+
+        // if we have configuration in the onConnect
+        if (this._onConnect) {
+
+            // if we don't already have a terminal, create one
+            if (!this.terminal) {
+                this.terminal = window.createTerminal('f5-fast-cmd');
+                this.terminal.show(true);
+            }
+
+            // loop through onConnect commands and issue them
+            this._onConnect?.forEach((el: string) => {
+    
+                // swap out variable as needed
+                el = el.replace(/\${this.device}/, `${this.device}`);
+                setTimeout( () => {
+                    this.terminal?.sendText(el);
+                }, 500);
+            });
+        };
+
     }
 
     /**
      * issue terminal commands defined for "onDisonnect"
      */
     private termDisConnect() {
-        // if _onDisconnect has a value, loop through each as terminal commands
-        this._onDisconnect?.forEach((el: string) => {
+
+        // if we have onDisconnect commands
+        if (this._onDisconnect) {
+
+            // if we don't already have a terminal, create one (very corner cases)
+            if (!this.terminal) {
+                this.terminal = window.createTerminal('f5-fast-cmd');
+                this.terminal.show(true);
+            }
+
+            // if _onDisconnect has a value, loop through each as terminal commands
+            this._onDisconnect?.forEach((el: string) => {
+                setTimeout( () => {
+                    this.terminal?.sendText(el);
+                }, 500);
+            });
+        }
+
+        // if we have a terminal, and we are disconnecting, delete terminal when done
+        if (this.terminal) {
             setTimeout( () => {
-                this.terminal.sendText(el);
-            }, 500);
-        });
+                this.terminal?.dispose();
+            }, 1000);
+        }
     }
 
 }

@@ -75,10 +75,10 @@ export class TextDocumentView {
         const newEditorColumn = ext.settings.previewColumn; 
 
 
-        /**
-         * bool, default = false
-         */
-        const enableWebViews = ext.settings.enableWebViews;
+        // /**
+        //  * bool, default = false
+        //  */
+        // const enableWebViews = ext.settings.enableWebViews;
 
         /**
          * Should the new/updated editor take focus?
