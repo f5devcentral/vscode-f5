@@ -704,14 +704,30 @@ export function activate(context: vscode.ExtensionContext) {
 		let text: string = 'empty';
 		let title: string = 'Fast Template';	
 
-		if(item.scheme === 'file') {
-			// right click from explorer view, so load file contents
+		if(item?.hasOwnProperty('scheme') && item?.scheme === 'file') {
+			// right click from explorer view initiation, so load file contents
 			const fileContents = fs.readFileSync(item.fsPath);
 			// convert from buffer to string
 			text = fileContents.toString('utf8');
 			// set webPanel name to filename
 			title = path.parse(item.fsPath).name;
+
+		} else if (item?.hasOwnProperty('label')) {
+			// right click on template from fast view when connected to device
+			// - ex.  label: 'goodFastTemplates/app4'
+
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templates/${item.label}`);
+
+			if (resp?.data?.sourceText) {
+				text = resp?.data?.sourceText;
+			} else {
+				// alert that we didn't get the response we were looking for
+				logger.error('f5-fast.renderHtmlPreview command tried to get template details from connected device, but did not get the source text we were looking for');
+			}
+
+
 		} else {
+			// right-click or commandpalette initiation, so get editor text
 			var editor = vscode.window.activeTextEditor;
 			if (editor) {	
 				if (editor?.selection?.isEmpty) {

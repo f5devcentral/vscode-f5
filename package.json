@@ -3,7 +3,7 @@
 	"displayName": "F5 Networks FAST",
 	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
 	"publisher": "DumpySquare",
-	"version": "2.3.0",
+	"version": "2.4.0",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -47,6 +47,12 @@
 			{
 				"language": "json",
 				"path": "./snippets.json"
+			}
+		],
+		"yamlValidation": [
+			{
+			  "fileMatch": "*.fast.yml",
+			  "url": "https://github.com/f5devcentral/f5-fast-core/blob/master/schema/template.json"
 			}
 		],
 		"jsonValidation": [
@@ -913,6 +919,10 @@
 				{
 					"command": "f5-fast.deleteFastTempSet",
 					"when": "view == fastView && viewItem == fastTemplateSet"
+				},
+				{
+					"command": "f5-fast.renderHtmlPreview",
+					"when": "view == fastView && viewItem == fastTemplate"
 				},
 				{
 					"command": "f5-as3.fullTenant",
