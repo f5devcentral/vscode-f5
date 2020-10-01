@@ -1,9 +1,9 @@
 {
 	"name": "vscode-f5-fast",
-	"displayName": "F5 Networks FAST",
-	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
+	"displayName": "The F5 Extension",
+	"description": "Supercharge your F5 automation development",
 	"publisher": "DumpySquare",
-	"version": "2.4.0",
+	"version": "2.5.0",
 	"keywords": [
 		"f5",
 		"f5networks",

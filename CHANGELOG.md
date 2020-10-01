@@ -8,7 +8,21 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [2.4.0] - (10-5-2020)
+## [2.5.0] - (10-5-2020)
+
+## Added
+
+- TMOS config explorer functionality (beta)
+  - Currently parses bigip.conf for individual applications and supporting configuration
+  - Supports most common configuration items refeneced by virtual server, ie: pool, monitors, nodes, primary/fallback persistense, local traffic policies, snat pools, irules, and profiles (http, tcp, udp, client/server-ssl, ... everything referenced under the "profiles" section of the virtual server)
+  - tested to be working on v14/v15
+  - Can get bigip.conf from connected device or parse a local file
+  - Includes different structures for viewing the tmos config
+  - Includes a parsing log for feedback on the extraction process
+
+---
+
+## [2.4.0] - (9-30-2020)
 
 
 ### Modified
