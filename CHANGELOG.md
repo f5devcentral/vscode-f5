@@ -8,6 +8,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.5.1] - (10-7-2020)
+
+## Modified
+- TMOS Config Explorer
+  - Added "Clear" button to clear config explorer results and remove from view.  
+
+---
+
 ## [2.5.0] - (10-5-2020)
 
 ## Added

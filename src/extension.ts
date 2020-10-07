@@ -1219,6 +1219,10 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreClear', async (text) => {
+		appExplorer.clear();
+	}));
+
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore-show', async (text) => {
 		appExplorer.render(text);
 	}));

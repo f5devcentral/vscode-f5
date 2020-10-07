@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "DumpySquare",
-	"version": "2.5.0",
+	"version": "2.5.1",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -275,6 +275,11 @@
 			{
 				"command": "f5.cfgExploreOnConnect",
 				"title": "Explore Config",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExploreClear",
+				"title": "Clear",
 				"category": "F5"
 			},
 			{
@@ -686,6 +691,11 @@
 				{
 					"command": "f5.refreshTclTree",
 					"when": "view == as3Tasks",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.cfgExploreClear",
+					"when": "view == cfgTree",
 					"group": "navigation"
 				},
 				{
