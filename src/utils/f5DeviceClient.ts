@@ -1,7 +1,7 @@
 'use strict';
 
 import { Terminal, window, workspace, ProgressLocation, StatusBarAlignment, commands } from 'vscode';
-import { makeAuth, makeReqAXnew, multiPartUploadSDK } from './coreF5HTTPS';
+import { makeAuth, makeReqAXnew, multiPartUploadSDK, download } from './coreF5HTTPS';
 import { ext, loadConfig } from '../extensionVariables';
 import * as utils from './utils';
 import logger from './logger';
@@ -207,19 +207,44 @@ export class MgmtClient {
     }
 
     /**
-     * setup multi part upload to f5 function
-     * @param file full path/file location
+     * multi part upload to f5
+     * gets uploaded via:  /mgmt/shared/file-transfer/uploads/<file>
+     * found in remote dir:  /var/config/rest/downloads/
+     * @param file full path/file location of source file
      */
     async upload(file: string = '') {
 
         /**
          * todo: add ability to provide buffer data to bypass the need for
          * a temp file
+         *  - 10.9.2020 - may not be the best route for large files...
          */
+
+        // if auth token has expired, it should have been cleared, get new one
+        if(!this._token){
+            await this.getToken();
+        }
+
         return await multiPartUploadSDK(file, this.host, this.port, this._token.token);
     }
 
 
+    /**
+     * download file from connectd f5
+     * remote file location:  /shared/images
+     * remote api called: /mgmt/cm/autodeploy/software-image-downloads/
+     * @param file name to get
+     * @param dest path/file name (./path/test.tar.gz)
+     */
+    async download (file: string, dest: string) {
+
+        // if auth token has expired, it should have been cleared, get new one
+        if(!this._token){
+            await this.getToken();
+        }
+
+        return await download (file, dest, this.host, this.port, this._token.token);
+    }
 
 
 

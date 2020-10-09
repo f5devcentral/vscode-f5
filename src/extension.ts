@@ -1162,6 +1162,9 @@ export function activate(context: vscode.ExtensionContext) {
 		/**
 		 * todo:  setup logic to connect to device if not connected
 		 * 	or connect to new device if already connected...
+		 * 
+		 * todo:  update view to open a dedicated view with F5 globe but with a background that
+		 * 		looks like it's exploding :)
 		 */
 		const x = item;
 
@@ -1172,18 +1175,20 @@ export function activate(context: vscode.ExtensionContext) {
 			// await vscode.commands.executeCommand('f5.connectDevice', item.label);
 			return vscode.window.showWarningMessage('Connect to BIGIP Device first');
 		}
-
 		
-
 		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
 			method: 'POST',
 			body: {
 				command: 'run',
-				utilCmdArgs: `-c 'cat /config/bigip.conf'`
+				utilCmdArgs: `-c 'tar -czf /shared/images/mini_ucs.tar.gz /config/bigip.conf /config/bigip_base.conf /config/partitions'`
 			}
 		});
 
 		/**
+		 * tar -czf /shared/images/mini_ucs.tar.gz /config/bigip.conf /config/bigip_base.conf /config/partitions /usr/share/defaults
+		 * 
+		 * 
+		 * 
 		 * todo: add getting bigip_base.conf to hold in tree next to bigip.conf
 		 * 	Can get in another api call or try to get both config files in the same
 		 * 	above api call then split them
@@ -1194,6 +1199,32 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 
 		 * This ssh method seems to be the best for getting multiple files and
 		 * 	making sure we don't breach the payload limit of the api
+		 * 
+		 */
+
+		/**
+		 * download file
+		 */
+		const coreDir = ext.context.extensionPath;
+		const zipDown = path.join(coreDir, `mini_ucs.tar.gz`);
+		let dst;
+		try {
+			const resp2 = await ext.mgmtClient.download('mini_ucs.tar.gz', zipDown);
+			// dst = fs.existsSync(zipDown);
+			// console.log('resp2', resp2);
+		} catch (e) {
+			console.log('mini_ucs download error', e.message);
+		}
+		// // const r = fs.readFileSync('../../mini_ucs.tar.gz');
+		// console.log('  ');
+		/**
+		 * now to ready the archive contents and feed to corkscrew...
+		 * 
+		 * https://stackoverflow.com/questions/39705209/node-js-read-a-file-in-a-zip-without-unzipping-it
+		 * 
+		 * Thinking this is all best to handle in corkscrew so it can handle
+		 * 	any file type we specify, bigip.conf as string, bigip.conf as single file,
+		 * 	UCS arcive, qkview, or our special little archive from above
 		 * 
 		 */
 

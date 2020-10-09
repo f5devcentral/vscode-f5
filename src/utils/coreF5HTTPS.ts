@@ -248,6 +248,67 @@ export async function makeReqAXnew(host: string, uri: string, options: {
 };
 
 
+/**
+ *  just a placeholder
+ * @param url to get file
+ * @param dest path/file name (./path/test.tar.gz)
+ * @param host ip/fqdn where to get file
+ * @param port 
+ * @param token bigip auth token
+ */
+export async function download(file: string, dest: string, host: string, port: number, token: string) {
+    /**
+     * to be used for downloading 
+     * https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
+     * 
+     */
+
+    const writer = fs.createWriteStream(dest);
+    const url = `/mgmt/cm/autodeploy/software-image-downloads/${file}`;
+
+    const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'stream',
+        baseURL: `https://${host}:${port}`,
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        }),
+        headers: {
+            'X-F5-Auth-Token': token,
+        },
+    });
+
+    response.data.pipe(writer);
+
+    return new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+    });
+
+    /**
+     * was trying to get a better understanding of error handling
+     * by default, if successful, just resolve the promise with no return data
+     *      or fail and provide the failure reason from axios
+     *
+     * the following fed some of the axios response details back
+     *  but I could not get it to return a custom error message
+     */
+    // return new Promise((resolve, reject) => {
+    //     writer.on('finish', x => {
+    //         return resolve({
+    //             x,
+    //             status: response.status,
+    //             statusText: response.statusText
+    //         });
+    //     });
+    //     writer.on('error', x => {
+    //         return reject('file download failed');
+    //     });
+    // });
+}
+
+
 
 
 /**
