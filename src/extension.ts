@@ -26,6 +26,7 @@ import { chuckJoke1, chuckJoke2 } from './chuckJoke';
 import logger from './utils/logger';
 
 import { TextDocumentView } from './editorViews/editorView';
+import { makeExplosion } from './crgExplorer';
 
 // const fast = require('@f5devcentral/f5-fast-core');
 
@@ -193,7 +194,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
 			ext.mgmtClient = undefined;
-			appExplorer.clear();
+			cfgProvider.clear();
 		}
 	}));
 
@@ -1142,81 +1143,23 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('decExamples', new ExampleDecsProvider());
 
 
-	/**
-	 * 
-	 * Three ways for getting the bigip.conf
-	 * 	1. from text in editor (right click in editor)
-	 * 	2. from file in explorer (right click a saved file)
-	 * 	3. http/get from device directly ("cat /config/bigip.conf" over bash endpoint)
-	 * 
-	 */
-	
-	const appExplorer = new CfgProvider();
-	vscode.window.registerTreeDataProvider('cfgTree', appExplorer);
+	// /**
+	//  * 
+	//  * 
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * 
+	//  * 
+	//  */
 
-	/**
-	 * this command 
-	 */
+	const cfgProvider = new CfgProvider();
+	vscode.window.registerTreeDataProvider('cfgTree', cfgProvider);
+
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreOnConnect', async (item) => {
 
-		/**
-		 * todo:  setup logic to connect to device if not connected
-		 * 	or connect to new device if already connected...
-		 * 
-		 * todo:  update view to open a dedicated view with F5 globe but with a background that
-		 * 		looks like it's exploding :)
-		 */
-		const x = item;
-
-		if (!ext.mgmtClient) {
-			/**
-			 * loop this back into the connect flow, since we have the device, automatically connect
-			 */
-			// await vscode.commands.executeCommand('f5.connectDevice', item.label);
-			return vscode.window.showWarningMessage('Connect to BIGIP Device first');
-		}
-		
-		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
-			method: 'POST',
-			body: {
-				command: 'run',
-				utilCmdArgs: `-c 'tar -czf /shared/images/mini_ucs.tar.gz /config/bigip.conf /config/bigip_base.conf /config/partitions'`
-			}
-		});
-
-		/**
-		 * tar -czf /shared/images/mini_ucs.tar.gz /config/bigip.conf /config/bigip_base.conf /config/partitions /usr/share/defaults
-		 * 
-		 * 
-		 * 
-		 * todo: add getting bigip_base.conf to hold in tree next to bigip.conf
-		 * 	Can get in another api call or try to get both config files in the same
-		 * 	above api call then split them
-		 * 
-		 * The best route seems to be to ssh to the device, 
-		 * 		"tmsh save sys config" - should push config in memory to files
-		 * 	then copy down the files over ssh
-		 * 
-		 * This ssh method seems to be the best for getting multiple files and
-		 * 	making sure we don't breach the payload limit of the api
-		 * 
-		 */
-
-		/**
-		 * download file
-		 */
-		const coreDir = ext.context.extensionPath;
-		const zipDown = path.join(coreDir, `mini_ucs.tar.gz`);
-		let dst;
-		try {
-			const resp2 = await ext.mgmtClient.download('mini_ucs.tar.gz', zipDown);
-			// dst = fs.existsSync(zipDown);
-			// console.log('resp2', resp2);
-		} catch (e) {
-			console.log('mini_ucs download error', e.message);
-		}
-		// // const r = fs.readFileSync('../../mini_ucs.tar.gz');
-		// console.log('  ');
 		/**
 		 * now to ready the archive contents and feed to corkscrew...
 		 * 
@@ -1228,11 +1171,7 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 
 		 */
 
-		if(resp.data.commandResult) {
-			appExplorer.explodeConfig(resp.data.commandResult);
-		}
-
-		setTimeout( () => { appExplorer.refresh();}, 500);
+		makeExplosion(item, cfgProvider);
 
 	}));
 
@@ -1246,33 +1185,29 @@ export function activate(context: vscode.ExtensionContext) {
 		if (editor) {
 			// vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
 			const text = editor.document.getText();
-			appExplorer.explodeConfig(text);
+			// cfgProvider.explodeConfig(text);
 		}
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreClear', async (text) => {
-		appExplorer.clear();
+		cfgProvider.clear();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore-show', async (text) => {
-		appExplorer.render(text);
+		cfgProvider.render(text);
 	}));
 
-	/**
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * ###################################################################
-	 * ###################################################################
-	 * ###################################################################
-	 * ###################################################################
-	 * ###################################################################
-	 * 
-	 * 
-	 */
+	// /**
+	//  * 
+	//  * 
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * ###################################################################
+	//  * 
+	//  * 
+	//  */
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.jsonYmlConvert', async () => {
 		const editor = vscode.window.activeTextEditor;
