@@ -652,6 +652,11 @@
 					"group": "F5"
 				},
 				{
+					"when": "resourceExtname =~ /\\.(conf|ucs|qkview)/",
+					"command": "f5.cfgExplore",
+					"group": "F5"
+				},
+				{
 					"when": "f5.tcl && resourceExtname =~ /\\.(tcl|conf|rule)/",
 					"command": "f5-tcl.mergeTCL",
 					"group": "F5"

@@ -12,12 +12,12 @@ import logger from './utils/logger';
 
 
 
-export async function makeExplosion (item: any, cfgProvider: CfgProvider) {
 
+export async function getMiniUcs (): Promise<string|undefined> {
 
-    await window.withProgress({
+    return await window.withProgress({
         location: ProgressLocation.Notification,
-        title: `Making explosion!!!`,
+        title: `Getting Configuration from BIG-IP`,
         cancellable: true
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
@@ -32,14 +32,6 @@ export async function makeExplosion (item: any, cfgProvider: CfgProvider) {
         // logger.debug('external call -> ');
         // return await extAPI.makeRequest(text);
         
-        
-        if (!ext.mgmtClient) {
-            /**
-             * loop this back into the connect flow, since we have the device, automatically connect
-             */
-            // await vscode.commands.executeCommand('f5.connectDevice', item.label);
-            return window.showWarningMessage('Connect to BIGIP Device first');
-        }
         
         // /**
         //  * save config before capturing mini_ucs!!!
@@ -69,29 +61,57 @@ export async function makeExplosion (item: any, cfgProvider: CfgProvider) {
         
         const coreDir = ext.context.extensionPath;
         const zipDown = path.join(coreDir, tempFile);
-        // let dst;
+
         try {
-            await ext.mgmtClient.download(tempFile, zipDown);
-            
+            await ext.mgmtClient?.download(tempFile, zipDown);
+            return zipDown;
         } catch (e) {
-            console.log('mini_ucs download error', e.message);
+            logger.error('mini_ucs download error', e.message);
+            return undefined;
         }
+    });
+
+} 
+
+export async function makeExplosion (file: string) {
+
+
+    return await window.withProgress({
+        location: ProgressLocation.Notification,
+        title: `BIG-IP Config Explorer - Processing`,
+        cancellable: true
+    }, async (progress, token) => {
+        token.onCancellationRequested(() => {
+            // this logs but doesn't actually cancel...
+            logger.debug("User canceled External API Request");
+            return new Error(`User canceled External API Request`);
+        });
         
-        progress.report({ message: `Processing Config`});
+        progress.report({ message: `Unpacking Archive`});
         
         const bigipConf = new BigipConfig();
 
         const parsedFileEvents = [];
         const parsedObjEvents = [];
-        bigipConf.on('parseFile', x => parsedFileEvents.push(x) );
-        bigipConf.on('parseObject', x => parsedObjEvents.push(x) );
+        let currentFile = '';
+        bigipConf.on('parseFile', async x => { 
+            parsedFileEvents.push(x);
+            currentFile = `file: ${x.num} of ${x.of}`;
 
-        const loadTime = await bigipConf.load(zipDown);
+            // progress.report({ message: `Processing Config`});
+        });
+        bigipConf.on('parseObject', async x => { 
+            parsedObjEvents.push(x);
+            progress.report({ message: `${currentFile}\n object: ${x.num} of ${x.of}`});
+        });
+
+        const loadTime = await bigipConf.load(file);
 
         const parseTime = bigipConf.parse();
 
         const explosion = bigipConf.explode();
 
-        cfgProvider.explodeConfig(bigipConf.configFiles, bigipConf.configObject, explosion);
-        });
+        return { config: bigipConf.configFiles, obj: bigipConf.configObject, explosion };
+    });
+    // });
 }

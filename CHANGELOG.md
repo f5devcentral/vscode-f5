@@ -12,6 +12,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Modified
 - TMOS Config Explorer
+  - Updates for corkscrew v2
+    - Includes faster processing, mini_ucs fetch of connected device, Base config (vlans/Selfs), all partitions configs
+    - Add right click to process local ucs/qkview
   - Added "Clear" button to clear config explorer results and remove from view.  
 
 ---

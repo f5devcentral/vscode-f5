@@ -26,7 +26,8 @@ import { chuckJoke1, chuckJoke2 } from './chuckJoke';
 import logger from './utils/logger';
 
 import { TextDocumentView } from './editorViews/editorView';
-import { makeExplosion } from './crgExplorer';
+import { getMiniUcs, makeExplosion } from './crgExplorer';
+import { window } from 'vscode';
 
 // const fast = require('@f5devcentral/f5-fast-core');
 
@@ -1170,23 +1171,58 @@ export function activate(context: vscode.ExtensionContext) {
 		 * 	UCS arcive, qkview, or our special little archive from above
 		 * 
 		 */
+		         
+        if (!ext.mgmtClient) {
+            /**
+             * loop this back into the connect flow, since we have the device, automatically connect
+             *  - this should probably happen in the main extension.ts
+             */
+            // await vscode.commands.executeCommand('f5.connectDevice', item.label);
+            return window.showWarningMessage('Connect to BIGIP Device first');
+		}
+		
+		const file = await getMiniUcs();
+		let expl: any = undefined;
 
-		makeExplosion(item, cfgProvider);
+		if (file) {
+			expl = await makeExplosion(file);
+		}
+
+		if (expl) {
+			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+		}
+
 
 	}));
 
 	/**
 	 * this command is exposed via right click in editor so user does not have to connect to F5
 	 */
-	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore', (item) => {
-		// Get the active text editor
-		let editor = vscode.window.activeTextEditor;
-		
-		if (editor) {
-			// vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
-			const text = editor.document.getText();
-			// cfgProvider.explodeConfig(text);
+	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore', async (item) => {
+
+		/**
+		 * moving from getting text in the editor to selecting files from explorer
+		 */
+
+		const x = item;
+
+		let expl;
+		if (item) {
+			expl = await makeExplosion(item._fsPath);
 		}
+
+		if (expl) {
+			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+		}
+
+		// Get the active text editor
+		// let editor = vscode.window.activeTextEditor;
+		
+		// if (editor) {
+		// 	// vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
+		// 	// const text = editor.document.getText();
+		// 	// cfgProvider.explodeConfig(text);
+		// }
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreClear', async (text) => {
