@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "DumpySquare",
-	"version": "2.5.1",
+	"version": "2.5.1-beta",
 	"keywords": [
 		"f5",
 		"f5networks",
