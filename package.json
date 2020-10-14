@@ -984,7 +984,8 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
-		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
+		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
+		"refresh-corkscrew": "rm -rf node_modules/project-corkscrew && npm install https://github.com/f5devcentral/project-corkscrew.git"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",

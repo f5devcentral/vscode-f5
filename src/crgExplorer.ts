@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { ext } from "./extensionVariables";
 import BigipConfig from 'project-corkscrew/dist/ltm';
-import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
+// import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 import logger from './utils/logger';
 
 // import BigipConfig from 'project-corkscrew/dist/ltm';
@@ -26,12 +26,7 @@ export async function getMiniUcs (): Promise<string|undefined> {
             return new Error(`User canceled External API Request`);
         });
 
-        progress.report({ message: `Saving config on box`});
-        
-        //external call
-        // logger.debug('external call -> ');
-        // return await extAPI.makeRequest(text);
-        
+        progress.report({ message: `Saving config on device`});
         
         // /**
         //  * save config before capturing mini_ucs!!!
@@ -48,7 +43,7 @@ export async function getMiniUcs (): Promise<string|undefined> {
         
         const tempFile = `mini_ucs.tar.gz`;
         
-        progress.report({ message: `Downloading config`});
+        progress.report({ message: `Collecting->Downloading configs`});
         
         // build mini ucs
         await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
@@ -78,7 +73,7 @@ export async function makeExplosion (file: string) {
 
     return await window.withProgress({
         location: ProgressLocation.Notification,
-        title: `BIG-IP Config Explorer - Processing`,
+        title: `BIG-IP Config Explorer -> Processing`,
         cancellable: true
     }, async (progress, token) => {
         token.onCancellationRequested(() => {
@@ -90,23 +85,24 @@ export async function makeExplosion (file: string) {
         progress.report({ message: `Unpacking Archive`});
         
         const bigipConf = new BigipConfig();
-
+        
         const parsedFileEvents = [];
         const parsedObjEvents = [];
         let currentFile = '';
         bigipConf.on('parseFile', async x => { 
             parsedFileEvents.push(x);
             currentFile = `file: ${x.num} of ${x.of}`;
-
+            
             // progress.report({ message: `Processing Config`});
         });
         bigipConf.on('parseObject', async x => { 
             parsedObjEvents.push(x);
             progress.report({ message: `${currentFile}\n object: ${x.num} of ${x.of}`});
         });
-
+        
         const loadTime = await bigipConf.load(file);
-
+        
+        progress.report({ message: `Parsing Configs`});
         const parseTime = bigipConf.parse();
 
         const explosion = bigipConf.explode();

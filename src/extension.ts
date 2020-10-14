@@ -1215,14 +1215,6 @@ export function activate(context: vscode.ExtensionContext) {
 			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
 		}
 
-		// Get the active text editor
-		// let editor = vscode.window.activeTextEditor;
-		
-		// if (editor) {
-		// 	// vscode.commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
-		// 	// const text = editor.document.getText();
-		// 	// cfgProvider.explodeConfig(text);
-		// }
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExploreClear', async (text) => {
