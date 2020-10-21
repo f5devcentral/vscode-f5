@@ -17,7 +17,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
     constructor() {
     }
-    
+
     async explodeConfig(configs: ConfigFiles, cfgObj: BigipConfObj, explosion: Explosion){
         // set context to make view visible
         commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
@@ -27,7 +27,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     }
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+        this._onDidChangeTreeData.fire(undefined);
     }
     
     clear(): void {
@@ -86,15 +86,6 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             treeItems.push(new CfgApp('Config Object', '', TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.confObj, type: 'obj'}]}));
             
-            // treeItems.push(new CfgApp('Config Array', "ex. [ltm node /Common/192.168.1.20 { address 192.168.1.20 }, ...]", TreeItemCollapsibleState.None,
-            //     {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.confArray, type: 'array'}]}));
-
-            // treeItems.push(new CfgApp('Config Array Objects', "ex. [{name: 'parent object name', config: 'parent config obj body'}]", TreeItemCollapsibleState.None,
-            //     {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.confArraySingleObjs, type: 'array'}]}));
-
-            // treeItems.push(new CkApp('Config Object', '', TreeItemCollapsibleState.None,
-            //     {command: 'f5.cfgExplore-show', title: '', arguments: [{item: this.confObj, type: 'array'}]}));
-
 		}
         return Promise.resolve(treeItems);
     }
@@ -144,15 +135,10 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 export class CfgApp extends TreeItem {
 	constructor(
 		public readonly label: string,
-		// private version: string,
-		private toolTip: string,
+		public tooltip: string,
 		public readonly collapsibleState: TreeItemCollapsibleState,
 		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
-	}
-
-	get tooltip(): string {
-		return this.toolTip;
 	}
 }

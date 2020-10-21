@@ -20,7 +20,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	getTreeItem(element: TCLitem): vscode.TreeItem {
@@ -423,22 +423,13 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 class TCLitem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		private version: string,
-		private toolTip: string,
+		public description: string,
+		public toolTip: string,
 		public context: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 	}
-
-	get tooltip(): string {
-		return this.toolTip;
-	}
-
-	get description(): string {
-		return this.version;
-	}
-
 	contextValue = this.context;
 }

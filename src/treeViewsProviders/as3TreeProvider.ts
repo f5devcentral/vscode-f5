@@ -16,7 +16,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	getTreeItem(element: AS3item): vscode.TreeItem {
@@ -162,24 +162,13 @@ function isObject(x: any) {
 class AS3item extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		private version: string,
-		private toolTip: string,
+		public description: string,
+		public tooltip: string,
 		public context: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command: vscode.Command,
 	) {
 		super(label, collapsibleState);
 	}
-
-	// tooltip = this.toolTip;
-	// version = this.version;
-	get tooltip(): string {
-		return this.toolTip;
-	}
-
-	get description(): string {
-		return this.version;
-	}
-
 	contextValue = this.context;
 }

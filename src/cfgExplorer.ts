@@ -105,16 +105,16 @@ export async function makeExplosion (file: string) {
             logger.debug(`Corkscrew parsing ${currentFile}, object: ${x.num} of ${x.of}`);
         });
         
-       logger.debug(`Corkscrew -> Loading files`);
+        logger.debug(`Corkscrew -> Loading files`);
         const loadTime = await bigipConf.load(file);
         
-       logger.debug(`Corkscrew -> Parsing files`);
-        progress.report({ message: `Parsing Configs`, increment: 10});
+        logger.debug(`Corkscrew -> Parsing files`);
+        progress.report({ message: `Parsing Configs` });
         const parseTime = bigipConf.parse();
         
         
         const explosion = bigipConf.explode();
-        logger.debug(`Corkscrew -> explodion stats:`, JSON.stringify(explosion.stats, undefined, 4));
+        logger.debug(`Corkscrew -> explosion stats:`, JSON.stringify(explosion.stats, undefined, 4));
 
         return { config: bigipConf.configFiles, obj: bigipConf.configObject, explosion };
     });

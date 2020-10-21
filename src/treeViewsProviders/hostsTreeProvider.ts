@@ -11,7 +11,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	getTreeItem(element: F5Host): vscode.TreeItem {
@@ -186,26 +186,10 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 export class F5Host extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		private version: string,
+		public description: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 	}
-
-	get tooltip(): string {
-		return `Connect`;
-	}
-
-	get description(): string {
-		return this.version;
-	}
-
-	// iconPath = {
-	// 	light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-	// 	dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	// };
-
-    // contextValue = 'dependency';
-    
 }

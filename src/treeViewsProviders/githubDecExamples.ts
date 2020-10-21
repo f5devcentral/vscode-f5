@@ -11,7 +11,7 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
     getTreeItem(element: ExampleDec): TreeItem {
@@ -128,15 +128,10 @@ async function getTSexamples(){
 export class ExampleDec extends TreeItem {
 	constructor(
 		public readonly label: string,
-		// private version: string,
-		private toolTip: string,
+		public tooltip: string,
 		public readonly collapsibleState: TreeItemCollapsibleState,
 		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
-	}
-
-	get tooltip(): string {
-		return this.toolTip;
 	}
 }
