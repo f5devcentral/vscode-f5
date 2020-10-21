@@ -172,7 +172,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     .then( resp => {
         // the following log may cause some problems, mainly the resp.data,
         //      if it's circular...
-        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`, resp.data);
+        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
         // logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
         return {
             data: resp.data,

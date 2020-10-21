@@ -1,8 +1,6 @@
 import { OutputChannel, window } from 'vscode';
 import { ext } from '../extensionVariables';
 import { inspect } from 'util';
-// import { RestClientSettings } from './models/configurationSettings';
-// import { LogLevel } from './models/logLevel';
 
 
 /**
@@ -31,45 +29,55 @@ import { inspect } from 'util';
   * prefer to use logger.debug, but feel free to explore others
   * example: logger.debug('chuck-joke->resp.data', resp.data);
   */
-class Log {
-    private readonly _outputChannel: OutputChannel;
+export class Log {
+    // static debug(arg0: string, arg1: string) {
+    //     throw new Error('Method not implemented.');
+    // }
+    private _outputChannel: OutputChannel | undefined;
     // private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
-    private readonly _logLevel = LogLevel.Verbose;
+    private _logLevel = LogLevel.Debug;
     public constructor() {
-        this._outputChannel = window.createOutputChannel('f5-fast');
-        this.init();    // used to make it do stuff at initilization for testing
+        // this._outputChannel = window.createOutputChannel('f5-fast');
+        this.init();
     }
 
-    /**
-     * verbose logging to OUTPUT
-     * @param message message string
-     * @param data 
-     */
-    public verbose(message: string, data?: any): void {
-        this.log(LogLevel.Verbose, message, data);
-    }
-
-    public info(message: string, data?: any): void {
-        this.log(LogLevel.Info, message, data);
-    }
-
-    public warn(message: string, data?: any): void {
-        this.log(LogLevel.Warn, message, data);
-    }
-
-    public error(message: string, data?: any): void {
-        this.log(LogLevel.Error, message, data);
-    }
-
-    public log(level: LogLevel, message: string, data?: any): void {
-        if (level >= this._logLevel) {
-            const date = (new Date().toLocaleTimeString());
-            this._outputChannel.appendLine(`[${date} - ${LogLevel[level]}] ${message}`);
-            if (data) {
-                this._outputChannel.appendLine(this.data2String(data));
-            }
+    private init() {
+        // create output channel if not available
+        if (!this._outputChannel) {
+            this._outputChannel = window.createOutputChannel('f5-fast');
         }
     }
+
+    // /**
+    //  * verbose logging to OUTPUT
+    //  * @param message message string
+    //  * @param data 
+    //  */
+    // public verbose(message: string, data?: any): void {
+    //     this.log(LogLevel.Verbose, message, data);
+    // }
+
+    // public info(message: string, data?: any): void {
+    //     this.log(LogLevel.Info, message, data);
+    // }
+
+    // public warn(message: string, data?: any): void {
+    //     this.log(LogLevel.Warn, message, data);
+    // }
+
+    // public error(message: string, data?: any): void {
+    //     this.log(LogLevel.Error, message, data);
+    // }
+
+    // public log(level: LogLevel, message: string, data?: any): void {
+    //     if (level >= this._logLevel) {
+    //         const date = (new Date().toLocaleTimeString());
+    //         this._outputChannel.appendLine(`[${date} - ${LogLevel[level]}] ${message}`);
+    //         if (data) {
+    //             this._outputChannel.appendLine(this.data2String(data));
+    //         }
+    //     }
+    // }
 
     /**
      * preferred method for logggin at this time
@@ -79,25 +87,41 @@ class Log {
         this.write('DEBUG', ...msg);
     }
 
+    info(...msg: [unknown, ...unknown[]]): void {
+        this.write('INFO', ...msg);
+    }
+
+    warn(...msg: [unknown, ...unknown[]]): void {
+        this.write('WARN', ...msg);
+    }
+
+    error(...msg: [unknown, ...unknown[]]): void {
+        this.write('ERROR', ...msg);
+    }
+
     write(label: string, ...messageParts: unknown[]): void {
         const message = messageParts.map(this.stringify).join(' ');
         // const dateTime = new Date().toLocaleString();
         // const dateTime = new Date();
         const dateTime = new Date().toISOString();
-        this._outputChannel.appendLine(`[${dateTime}] ${label}: ${message}`);
+        if(!this._outputChannel) {
+            this.init();
+        } else {
+            this._outputChannel.appendLine(`[${dateTime}] ${label}: ${message}`);
+        }
     }
 
-    private init(){
-        const label = 'DeBuG';
-        // const message = 'very special log message';
-        const dateTime = new Date();
-        const dateT1 = dateTime.toISOString();
-        const dateT2 = dateTime.toLocaleString();
-        const dateT3 = dateTime.toUTCString();
-        this._outputChannel.appendLine(`[${dateT1}] ${label}: 'regular date log message'`);
-        this._outputChannel.appendLine(`[${dateT2}] ${label}: 'toLocalString date log message'`);
-        this._outputChannel.appendLine(`[${dateT3}] ${label}: 'to UTC date log message'`);
-    }
+    // private init(){
+    //     const label = 'DeBuG';
+    //     // const message = 'very special log message';
+    //     const dateTime = new Date();
+    //     const dateT1 = dateTime.toISOString();
+    //     const dateT2 = dateTime.toLocaleString();
+    //     const dateT3 = dateTime.toUTCString();
+    //     this._outputChannel.appendLine(`[${dateT1}] ${label}: 'regular date log message'`);
+    //     this._outputChannel.appendLine(`[${dateT2}] ${label}: 'toLocalString date log message'`);
+    //     this._outputChannel.appendLine(`[${dateT3}] ${label}: 'to UTC date log message'`);
+    // }
 
     
 
@@ -109,42 +133,42 @@ class Log {
         });
     }
 
-    private data2String(data: any): string {
-        if (data instanceof Error) {
-            return data.stack || data.message;
-        }
+    // private data2String(data: any): string {
+    //     if (data instanceof Error) {
+    //         return data.stack || data.message;
+    //     }
 
-        if (typeof data === 'string') {
-            return data;
-        }
+    //     if (typeof data === 'string') {
+    //         return data;
+    //     }
 
-        return JSON.stringify(data, null, 2);
-        // return data;
-    }
+    //     return JSON.stringify(data, null, 2);
+    //     // return data;
+    // }
 }
 
 
-enum LogLevel {
-    Verbose,
+export enum LogLevel {
+    Debug,
     Info,
     Warn,
     Error,
 }
 
-function fromString(value: string): LogLevel {
-    value = value.toLowerCase();
-    switch (value) {
-        case 'verbose':
-            return LogLevel.Verbose;
-        case 'info':
-            return LogLevel.Info;
-        case 'warn':
-            return LogLevel.Warn;
-        case 'error':
-        default:
-            return LogLevel.Error;
-    }
-}
+// function fromString(value: string): LogLevel {
+//     value = value.toLowerCase();
+//     switch (value) {
+//         case 'debug':
+//             return LogLevel.Debug;
+//         case 'info':
+//             return LogLevel.Info;
+//         case 'warn':
+//             return LogLevel.Warn;
+//         case 'error':
+//         default:
+//             return LogLevel.Error;
+//     }
+// }
 
 const logger = new Log();
 export default logger;

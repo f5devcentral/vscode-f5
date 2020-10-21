@@ -5,7 +5,7 @@ import { request } from 'https';
 import axios, { AxiosRequestConfig } from 'axios';
 import logger from './logger';
 var https = require('https');
-// import { ext } from './extensionVariables';
+import { ext } from '../extensionVariables';
 
 /**
  * external API commands

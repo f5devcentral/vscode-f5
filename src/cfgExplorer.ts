@@ -27,6 +27,7 @@ export async function getMiniUcs (): Promise<string|undefined> {
         });
 
         progress.report({ message: `Saving config on device`});
+        logger.debug('Saving config on F5 using bash api, "tmsh save sys config"');
         
         // /**
         //  * save config before capturing mini_ucs!!!
@@ -43,14 +44,16 @@ export async function getMiniUcs (): Promise<string|undefined> {
         
         const tempFile = `mini_ucs.tar.gz`;
         
-        progress.report({ message: `Collecting->Downloading configs`});
+        progress.report({ message: `Collecting -> Downloading configs`});
         
         // build mini ucs
+        const ucsCmd = 'tar -czf /shared/images/${tempFile} /config/bigip.conf /config/bigip_base.conf /config/partitions';
+        logger.debug(`building mini_ucs on device with following command over bash api: ${ucsCmd}`);
         await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
             method: 'POST',
             body: {
                 command: 'run',
-                utilCmdArgs: `-c 'tar -czf /shared/images/${tempFile} /config/bigip.conf /config/bigip_base.conf /config/partitions'`
+                utilCmdArgs: `-c '${ucsCmd}'`
             }
         });
         
@@ -58,7 +61,8 @@ export async function getMiniUcs (): Promise<string|undefined> {
         const zipDown = path.join(coreDir, tempFile);
 
         try {
-            await ext.mgmtClient?.download(tempFile, zipDown);
+            const resp = await ext.mgmtClient?.download(tempFile, zipDown);
+            logger.debug(`Should have downloaded new mini_ucs: ${zipDown}`);
             return zipDown;
         } catch (e) {
             logger.error('mini_ucs download error', e.message);
@@ -98,14 +102,19 @@ export async function makeExplosion (file: string) {
         bigipConf.on('parseObject', async x => { 
             parsedObjEvents.push(x);
             progress.report({ message: `${currentFile}\n object: ${x.num} of ${x.of}`});
+            logger.debug(`Corkscrew parsing ${currentFile}, object: ${x.num} of ${x.of}`);
         });
         
+       logger.debug(`Corkscrew -> Loading files`);
         const loadTime = await bigipConf.load(file);
         
-        progress.report({ message: `Parsing Configs`});
+       logger.debug(`Corkscrew -> Parsing files`);
+        progress.report({ message: `Parsing Configs`, increment: 10});
         const parseTime = bigipConf.parse();
-
+        
+        
         const explosion = bigipConf.explode();
+        logger.debug(`Corkscrew -> explodion stats:`, JSON.stringify(explosion.stats, undefined, 4));
 
         return { config: bigipConf.configFiles, obj: bigipConf.configObject, explosion };
     });

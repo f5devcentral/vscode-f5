@@ -21,20 +21,15 @@ import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
-import { chuckJoke1, chuckJoke2 } from './chuckJoke';
-
 import logger from './utils/logger';
+// import Log from './utils/logger';
 
 import { TextDocumentView } from './editorViews/editorView';
-import { getMiniUcs, makeExplosion } from './crgExplorer';
+import { getMiniUcs, makeExplosion } from './cfgExplorer';
 import { window } from 'vscode';
 
-// const fast = require('@f5devcentral/f5-fast-core');
 
 export function activate(context: vscode.ExtensionContext) {
-
-	logger.debug('Congratulations, your extension "vscode-f5-fast" is now active!');
-	logger.verbose('Congratulations, your extension "vscode-f5-fast" is now active!');
 
 	// assign context to global
 	ext.context = context;
@@ -63,13 +58,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// const webview = new HttpResponseWebview(context);
 	ext.panel = new TextDocumentView();
-
-
-	// ext.logger = new Logger('f5-fast'); 
-	// const log = new Logger('f5-fast');
-	// log.log('yeeee');
-	
-	
 	ext.keyTar = keyTarType;
 
 	// load ext config to ext.settings.
@@ -104,9 +92,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
 	
 	context.subscriptions.push(vscode.commands.registerCommand('f5.connectDevice', async (device) => {
-		// logger.debug('selected device', device);
-		// logger.verbose('selected device', device);
-		logger.debug('selected device', device);  // preferred at the moment
+
+	logger.info('selected device', device);  // preferred at the moment
 
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
@@ -141,8 +128,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 		
-		// logger.debug('device-connect:', JSON.stringify(device));
-
 		var [user, host] = device.device.split('@');
 		var [host, port] = host.split(':');
 
@@ -195,7 +180,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if(ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
 			ext.mgmtClient = undefined;
-			cfgProvider.clear();
+			// cfgProvider.clear();
 		}
 	}));
 
@@ -334,7 +319,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// const iRpms = await rpmMgmt.installedRPMs();
 		logger.debug('selected rpm', selectedRPM);
-		// logger.debug('installed rpms', JSON.stringify(iRpms));
 
 		if(!selectedRPM) {
 			debugger;
@@ -636,7 +620,6 @@ export function activate(context: vscode.ExtensionContext) {
 			wkspPath = folder1.fsPath;
 			const folder2 = await vscode.workspace.fs.readDirectory(folder1);
 		
-			// logger.debug('workspace', vscode.workspace);
 			logger.debug('workspace name', vscode.workspace.name);
 			
 			/**
@@ -749,11 +732,6 @@ export function activate(context: vscode.ExtensionContext) {
 				} 
 			}
 		}
-
-		// const templateEngine = await fast.Template.loadYaml(text);
-		// const schema = templateEngine.getParametersSchema();
-		// const htmlData = fast.guiUtils.generateHtmlPreview(schema, {});
-		// fastPanel.render(htmlData, title, );
 		fastPanel.render(text);
 
 	}));
@@ -1200,15 +1178,17 @@ export function activate(context: vscode.ExtensionContext) {
 	 */
 	context.subscriptions.push(vscode.commands.registerCommand('f5.cfgExplore', async (item) => {
 
-		/**
-		 * moving from getting text in the editor to selecting files from explorer
-		 */
-
-		const x = item;
-
 		let expl;
-		if (item) {
+		if (item._fsPath) {
+			// I think this is the better way for windows?
+			logger.debug('f5.cfgExplore got _fsPath:', item._fsPath);
 			expl = await makeExplosion(item._fsPath);
+		} else if (item.path) {
+			// only path is seen when working in wsl2
+			logger.debug('f5.cfgExplore got path:', item.path);
+			expl = await makeExplosion(item.path);
+		} else {
+			return logger.error('f5.cfgExplore -> Neither path supplied was valid', JSON.stringify(item));
 		}
 
 		if (expl) {
@@ -1434,7 +1414,7 @@ export function activate(context: vscode.ExtensionContext) {
 		window.forEach(el => {
 			// const el1 = element;
 			if (el.document.fileName === 'chuck-joke.json') {
-				// logger.debug('f5-fast.json editor column', el1.viewColumn);
+				//logger.debug('f5-fast.json editor column', el1.viewColumn);
 				viewColumn = el.viewColumn;
 			}
 		});
