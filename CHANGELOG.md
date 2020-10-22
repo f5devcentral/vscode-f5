@@ -8,6 +8,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.6.0] - (10-21-2020)
+
+## Modified
+- Updated corkscrew to new project name (f5-corkscrew) and version 0.3.0 which includes support for extracting pool configs when reference by a local traffic policy
+
+---
+
 ## [2.5.1] - (10-7-2020)
 
 ## Modified

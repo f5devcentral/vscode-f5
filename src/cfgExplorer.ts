@@ -4,11 +4,9 @@ import { window, ProgressLocation } from 'vscode';
 import * as path from 'path';
 
 import { ext } from "./extensionVariables";
-import BigipConfig from 'project-corkscrew/dist/ltm';
-// import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
+import BigipConfig from 'f5-corkscrew/dist/ltm';
 import logger from './utils/logger';
 
-// import BigipConfig from 'project-corkscrew/dist/ltm';
 
 
 

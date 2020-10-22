@@ -1,7 +1,7 @@
 import { TreeDataProvider, TreeItem, TreeItemCollapsibleState, Event, commands, EventEmitter, Uri, Command, window, ViewColumn, Position, workspace, TextDocument, Range }  from 'vscode';
 import { ext } from '../extensionVariables';
 
-import { BigipConfObj, ConfigFiles, Explosion } from 'project-corkscrew';
+import { BigipConfObj, ConfigFiles, Explosion } from 'f5-corkscrew';
 
 /**
  * Tree view provider class that hosts and present the data for the Config Explorer view
