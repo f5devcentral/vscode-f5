@@ -278,23 +278,23 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.deviceImport', async (item) => {
 
+		// get editor window
+		var editor = window.activeTextEditor;
+		if (!editor) {	
+			return; // No open text editor
+		}
 
+		// capture selected text or all text in editor
+		let text: string;
+		if (editor.selection.isEmpty) {
+			text = editor.document.getText();	// entire editor/doc window
+		} else {
+			text = editor.document.getText(editor.selection);	// highlighted text
+		} 
 
-		
-		
-		console.log('asAbsolutePath - ', context.asAbsolutePath);
-		console.log('extensionMode - ', context.extensionMode);
-		console.log('extensionPath - ', context.extensionPath);
-		// console.log('extensionPath - ', context.globalState);
+		await deviceImport(text);
 
-
-		// commands.executeCommand('f5.cfgExploreOnConnect');
-
-
-
-
-		await deviceImport('somethign we got from editor...');
-
+		setTimeout( () => { hostsTreeProvider.refresh();}, 1000);
 
 	}));
 
@@ -1464,7 +1464,8 @@ export function activate(context: ExtensionContext) {
 
 	}));
 
-	deviceImportOnLoad(context.extensionPath);
+	deviceImportOnLoad(context.extensionPath, hostsTreeProvider);
+	// setTimeout( () => { hostsTreeProvider.refresh();}, 1000);
 
 }
 

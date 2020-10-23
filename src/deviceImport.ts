@@ -2,67 +2,60 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { isArray, isString } from 'util';
 import { ConfigurationTarget, window, workspace } from 'vscode';
 import { ext } from './extensionVariables';
+import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import logger from './utils/logger';
 import { isValidJson } from './utils/utils';
 
 
-
-
 /**
- * 
- * 1. have import command, that can be executed as needed
- *  - prompt to browse to file location or just right click in explerer?
- * 
- * 2. have import that will happen on launch
- *  - if file detected, prompt for import
- *  - have a setting that:
- *      - will auto import if file detected at launch?
- *      - or disable the auto import detection process?
- * 
+ * Looks for device seed file based on path
+ *  if found, prompt user to import
+ * @param path of extension core dir
  */
-
-
-/**
- * 
- * @param path
- */
-export async function deviceImportOnLoad(extPath: string) {
-
-    // // look for seed file
-    // const seedFile = '.vscode-f5';
-    // // const seedPath = path.join(path, seedFile);
-    // const files = fs.statSync(seedPath);
+export async function deviceImportOnLoad(extPath: string, hostsTreeProvider: F5TreeProvider) {
 
     let seedContent: string = '';
+
     try {
         // try to find/read the seed file
-        seedContent = fs.readFileSync(path.join(extPath, '.vscode-f52.json'), 'utf-8');
+        seedContent = fs.readFileSync(path.join(extPath, '.vscode-f5.json'), 'utf-8');
         logger.debug('device seed file detected');
+
+        /**
+         * can also look into searching a workspace if there is one at start up
+         */
     } catch (e) {
         return logger.debug('device seed file not found', e.message);
     }
-    
-    
-    const q = await window.showInformationMessage('Device seed file detected, would you like to import?', 'Yes', 'No');
+        
+    const q = await window.showInformationMessage('Device seed file detected, would you like to import?', 'Yes', 'Yes-Consume', 'No');
     // const y = await window.showInformationMessage('found device import file', );
 
     if (q === 'Yes' && seedContent) {
 
         // read seed file
         // pass to, call deviceImport 
-        deviceImport(seedContent);
+        await deviceImport(seedContent);
+        // return;
+
+    } else if (q === 'Yes-Consume' && seedContent) {
+
+        // read seed file -> import
+        await deviceImport(seedContent);
+
+        // user selected consume -> delete file
+        setTimeout( () => { 
+            fs.unlinkSync(path.join(extPath, '.vscode-f5.json'));
+        }, 2000);
 
     } else if (q === 'No' || q === undefined) {
         logger.debug('device seed import declined by user');
     }
     
-    console.log(q);
-
-    // upon successful import, delete file?
-
+    // Refresh hosts tree to show new devices
+    setTimeout( () => { hostsTreeProvider.refresh();}, 1000);
 }
 
 type CfgDevice = {
@@ -71,68 +64,72 @@ type CfgDevice = {
     provider?: string
 };
 
+/**
+ * imports device list to user config file
+ * 
+ *  acceptable inputs as strings:
+ *      - 'admin@1.1.1.1'
+ *      - ['admin@1.1.1.1', 'usr1@2.2.2.2:8443', ...]
+ *      - [{ device: 'admin@4.4.4.4', password: 'pizzaTower', provider: 'tmos' }, ...]
+ * 
+ * @param seed file as a string
+ */
 export async function deviceImport(seed: string) {
-    // .vscode-f5_devices
-    // update to detect an array or object
-        // if array - process each item like its just a device name
-        // if object process each object with properties, like password
 
-    // let bigipHosts: {device: string} [] | undefined = await workspace.getConfiguration().get('f5.hosts');
-    
-    // const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
-    // const devicesString = JSON.stringify(bigipHosts);
+    // converts the different input structurs to a standard object list
+    const seedList2 = await parseDeviceLoad(seed);
 
-    const seedList2 = parse(seed);
+    await seedList2.forEach((el: CfgDevice) => {
+         addDevice(el);
+    });
 
-    let seedList: CfgDevice[] = [];
-    try {
-        // const string = JSON.stringify(seed);
-        seedList = isValidJson(seed);
-    } catch (e) {
-        console.log('failed to JSON parse seed - keeping as string: ', e.message);
-        // seed = seed;
-        console.log('we got a string: ', seed);
-        // add a single device
-        addDevice({ device: seed });
-    }
-
-    if ( seedList ) {
-        // if array, assume it's a list of device names like ["admin@192.168.1.1", "..."]
-        // loop through array and add each one to config
-
-        seedList.forEach(async (el: string | CfgDevice) => {
-            let password = '';
-            if (typeof el === 'string') {
-                addDevice({ device: el });
-            } else {
-                addDevice(el);
-            }
-        });
-        // console.log('we got an array: ', seed);
-
-    } else {
-        console.log('we got an object - not supported', seed);
-    }
-
-    function parse (seed: string) {
-
-        let seedList;
-        try {
-            // const string = JSON.stringify(seed);
-            seedList = isValidJson(seed);
-        } catch (e) {
-            console.log('failed to JSON parse seed - keeping as string: ', e.message);
-            // seed = seed;
-            console.log('we got a string: ', seed);
-            // add a single device
-            addDevice({ device: seed });
-        }
-    }
-
+    // outputKeytar();
+    return;
 }
 
 
+/**
+ * converts seed file to standard format for importing
+ *  acceptable inputs:
+ *      - 'admin@1.1.1.1'
+ *      - ['admin@1.1.1.1', 'usr1@2.2.2.2:8443', ...]
+ *      - [{ device: 'admin@4.4.4.4', password: 'pizzaTower', provider: 'tmos' }, ...]
+ * 
+ * had to wrap in a function to provde a standard typed output
+ * 
+ * @param seed file as a string
+ */
+export async function parseDeviceLoad (seed: string) {
 
+    // trim any leading and trailing spaces
+    seed = seed.trim();
+
+    const seedList = isValidJson(seed);
+
+    if (seedList) {
+        return seedList.map( (el: string | CfgDevice) => {
+
+            if (typeof el === 'string') {
+
+                // convert single string
+                return { device: el };
+            } else {
+                
+                // should be an object in the format we already need
+                return el;
+            }
+        });
+    } else {
+        logger.info('failed to parse seed as JSON - returning single device as string');
+        return [{ device: seed }];
+    }
+}
+
+
+/**
+ * Adds device to config
+ * @param device 
+ */
 async function addDevice (device: {device: string, provider?: string, password?: string}) {
 
     let bigipHosts: {device: string} [] | undefined = await workspace.getConfiguration().get('f5.hosts');
@@ -160,28 +157,39 @@ async function addDevice (device: {device: string, provider?: string, password?:
         bigipHosts.push(device);
         await workspace.getConfiguration().update('f5.hosts', bigipHosts, ConfigurationTarget.Global);
 
-        console.log(`${device.device} added to device configuration`);
-
-
         if (password) {
-            // extract password from object
-            ext.keyTar.setPassword('f5Hosts', device.device, password);
-            console.log(`password added for ${device.device}`);
+            // inject password to cache
+            await importPassword(device.device, password);
+            logger.debug(`password added for ${device.device}`);
         }
 
-        // Promise.resolve('yes');
-        return console.log(`${device.device} added to device configuration`);
+        logger.debug(`${device.device} added to device configuration`);
+        return;
+
     } else {
-        console.log('device import failed', device.device);
-        // return 'FAILED - Already exists or invalid format: <user>@<host/ip>';
-        // Promise.resolve('');
+
+        logger.debug('device import failed on', device.device);
         return;
     }
     
 }
 
 async function importPassword (device: string, password: string) {
+    return await ext.keyTar.setPassword('f5Hosts', device, password);
+}
 
+
+/**
+ * following is only used for troubleshooting...
+ */
+async function outputKeytar () {
+    ext.keyTar.findCredentials('f5Hosts').then( list => {
+        // map through and delete all
+        list.map(item => {
+            const psswd = ext.keyTar.getPassword('f5Hosts', item.account);
+            console.log('***KEYTAR OUTPUT***', JSON.stringify(item));
+        });
+    });
 }
 
 const exampleImport = {
