@@ -22,7 +22,7 @@ import * as f5FastUtils from './utils/f5FastUtils';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
 import logger from './utils/logger';
-// import Log from './utils/logger';
+import { deviceImport } from './cfgImport';
 
 import { TextDocumentView } from './editorViews/editorView';
 import { getMiniUcs, makeExplosion } from './cfgExplorer';
@@ -1407,40 +1407,42 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('chuckJoke', async () => {
 
-		const newEditorColumn = ext.settings.previewColumn;
-		const window = vscode.window.visibleTextEditors;
-		let viewColumn: vscode.ViewColumn | undefined;
-		
-		window.forEach(el => {
-			// const el1 = element;
-			if (el.document.fileName === 'chuck-joke.json') {
-				//logger.debug('f5-fast.json editor column', el1.viewColumn);
-				viewColumn = el.viewColumn;
-			}
-		});
-		
-		
-		const resp: any = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
-		// let activeColumn = vscode.window.activeTextEditor?.viewColumn;
-		
-		logger.debug('chuck-joke->resp.data', resp.data);
+		await deviceImport();
 
-		const content = JSON.stringify(resp.data, undefined, 4);
+		// const newEditorColumn = ext.settings.previewColumn;
+		// const window = vscode.window.visibleTextEditors;
+		// let viewColumn: vscode.ViewColumn | undefined;
+		
+		// window.forEach(el => {
+		// 	// const el1 = element;
+		// 	if (el.document.fileName === 'chuck-joke.json') {
+		// 		//logger.debug('f5-fast.json editor column', el1.viewColumn);
+		// 		viewColumn = el.viewColumn;
+		// 	}
+		// });
+		
+		
+		// const resp: any = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
+		// // let activeColumn = vscode.window.activeTextEditor?.viewColumn;
+		
+		// logger.debug('chuck-joke->resp.data', resp.data);
 
-		// if vClm has a value assign it, else set column 1
-		viewColumn = viewColumn ? viewColumn : newEditorColumn;
+		// const content = JSON.stringify(resp.data, undefined, 4);
 
-		var vDoc: vscode.Uri = vscode.Uri.parse("untitled:" + "chuck-Joke.json");
-		vscode.workspace.openTextDocument(vDoc)
-		.then((a: vscode.TextDocument) => {
-			vscode.window.showTextDocument(a, viewColumn, false).then(e => {
-				e.edit(edit => {
-					const startPosition = new vscode.Position(0, 0);
-					const endPosition = a.lineAt(a.lineCount - 1).range.end;
-					edit.replace(new vscode.Range(startPosition, endPosition), content);
-				});
-			});
-		});
+		// // if vClm has a value assign it, else set column 1
+		// viewColumn = viewColumn ? viewColumn : newEditorColumn;
+
+		// var vDoc: vscode.Uri = vscode.Uri.parse("untitled:" + "chuck-Joke.json");
+		// vscode.workspace.openTextDocument(vDoc)
+		// .then((a: vscode.TextDocument) => {
+		// 	vscode.window.showTextDocument(a, viewColumn, false).then(e => {
+		// 		e.edit(edit => {
+		// 			const startPosition = new vscode.Position(0, 0);
+		// 			const endPosition = a.lineAt(a.lineCount - 1).range.end;
+		// 			edit.replace(new vscode.Range(startPosition, endPosition), content);
+		// 		});
+		// 	});
+		// });
 
 
 		// chuckJoke1();

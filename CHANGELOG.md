@@ -8,6 +8,20 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.7.0] - (10-21-2020)
+
+## Added
+- Device import function
+  - Detect see file, prompt for import at startup (pending)
+  - Command to select seed file (pending)
+  - Seed file supports object with properties or array (pending)
+
+## Modified
+- Changed TCL visibility setting to default on
+- Updated config device regex to match the device add function
+
+---
+
 ## [2.6.0] - (10-21-2020)
 
 ## Modified
