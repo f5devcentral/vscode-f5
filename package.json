@@ -288,6 +288,11 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.deviceImport",
+				"title": "Import Devices",
+				"category": "F5"
+			},
+			{
 				"command": "f5.removeHost",
 				"title": "Remove Host",
 				"category": "F5"
@@ -584,7 +589,10 @@
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
+					"command": "f5.deviceImport",
+					"group": "F5"
+				},
+				{
 					"command": "f5-fast.deployApp",
 					"group": "F5"
 				},
@@ -593,17 +601,14 @@
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
 					"command": "f5-as3.postDec",
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
 					"command": "f5-do.postDec",
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
 					"command": "f5-ts.postDec",
 					"group": "F5"
 				},

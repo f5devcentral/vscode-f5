@@ -19,6 +19,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Modified
 - Changed TCL visibility setting to default on
 - Updated config device regex to match the device add function
+- Opened editor actions to allow declaration post without highligh (FAST/AS3/DO/TS)
 
 ---
 

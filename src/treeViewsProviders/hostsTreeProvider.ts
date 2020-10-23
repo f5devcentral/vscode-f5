@@ -113,6 +113,9 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			bigipHosts = [];
 		}
 
+		// the following is a quick and dirty way to search the entire 
+		//	devices config obj for a match without having to check each piece
+
 		const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
 		const devicesString = JSON.stringify(bigipHosts);
 

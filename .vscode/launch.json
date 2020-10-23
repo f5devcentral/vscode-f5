@@ -33,6 +33,22 @@
 				"${workspaceFolder}/out/test/**/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
+		},
+		{
+			"name": "device import Tests",
+			"type": "node",
+			"request": "launch",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-r",
+                "ts-node/register",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}/src/test/suite/deviceImport.tests.ts",
+            ],
+            "internalConsoleOptions": "neverOpen",
+            "protocol": "inspector",
 		}
 	]
 }
