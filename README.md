@@ -1,17 +1,18 @@
-# vscode-f5-fast README
+# vscode-f5
 
-This is the README for the F5 (A)pplication (S)ervices (T)emplates(FAST), "vscode-f5-fast". 
+We'ved moved and renamed!!!
 
-This extension is intented to help interface with the F5 (A)utomated (T)ool(C)ain extensions, including FAST to manage templates/declarations.
+Formerly the F5 (A)pplication (S)ervices (T)emplates(FAST), "vscode-f5-fast" extension, now just "The F5 VSCode" Extension (vscode-f5). 
 
-This extension typically works with any F5 product running tmos and/or any of the primary ILX extensions(AS3/DO/TS), including BIG-IQ.
+Not only not it fully integrate with the (A)utomated (T)ool (C)hain but also support TCL/iRules/iApps and much more!!!
 
-Any comments, questions or feature requests, please open a github repository issue
+More to come over the next couple of weeks as we finalize the move and prepare for the next release.  Please stay tuned.
+
+Any comments, questions or feature requests, please open a github repository issue!!!
 
 
 ### Download via the Microsoft extension marketplace or directly from within VSCode
-> https://marketplace.visualstudio.com/items?itemName=DumpySquare.vscode-f5-fast
-
+> to be updated when with next release!
 
 ---
 
