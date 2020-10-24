@@ -38,7 +38,6 @@ export async function deviceImportOnLoad(extPath: string, hostsTreeProvider: F5T
         // read seed file
         // pass to, call deviceImport 
         await deviceImport(seedContent);
-        // return;
 
     } else if (q === 'Yes-Consume' && seedContent) {
 
@@ -47,7 +46,10 @@ export async function deviceImportOnLoad(extPath: string, hostsTreeProvider: F5T
 
         // user selected consume -> delete file
         setTimeout( () => { 
+
+            logger.debug('Deleting seed file at', path.join(extPath, '.vscode-f5.json'));
             fs.unlinkSync(path.join(extPath, '.vscode-f5.json'));
+
         }, 2000);
 
     } else if (q === 'No' || q === undefined) {

@@ -53,7 +53,7 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 			let link: Uri;
 			let comment: string;
 
-			link = Uri.parse('https://github.com/DumpySquare/vscode-f5-fast');
+			link = Uri.parse('https://github.com/f5devcentral/vscode-f5');
 			comment = 'Main vscode-f5-fast repo for documentation and issues';
 			treeItems.push(new ExampleDec('vscode-f5-fast repo', comment, TreeItemCollapsibleState.None,
 				{command: 'vscode.open', title: '', arguments: [link]}));

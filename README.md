@@ -4,13 +4,15 @@ We'ved moved and renamed!!!
 
 Formerly the F5 (A)pplication (S)ervices (T)emplates(FAST), "vscode-f5-fast" extension, now just "The F5 VSCode" Extension (vscode-f5). 
 
-Not only not it fully integrate with the (A)utomated (T)ool(C)hain but also support TCL/iRules/iApps and much more!!!
+Not only not it fully integrate with the (A)utomated (T)ool (C)hain but also support TCL/iRules/iApps and much more!!!
+
+More to come over the next couple of weeks as we finalize the move and prepare for the next release.  Please stay tuned.
 
 Any comments, questions or feature requests, please open a github repository issue!!!
 
 
 ### Download via the Microsoft extension marketplace or directly from within VSCode
-> to be updated when with next release!
+> to be updated with next release!
 
 
 ---
@@ -19,10 +21,10 @@ Any comments, questions or feature requests, please open a github repository iss
 
 ### This page
 
-* [Extension Commands](https://github.com/DumpySquare/vscode-f5-fast#extension-commands)
-* [Basic device management](https://github.com/DumpySquare/vscode-f5-fast#basic-device-management-addeditdelete-connectdisconnect)
-* [Connecting/Disconnecting and password caching](https://github.com/DumpySquare/vscode-f5-fast#connectingdisconnecting-and-password-caching)
-* [Extension Commands](https://github.com/DumpySquare/vscode-f5-fast#extension-commands)
+* [Extension Commands](https://github.com/f5devcentral/vscode-f5#extension-commands)
+* [Basic device management](https://github.com/f5devcentral/vscode-f5#basic-device-management-addeditdelete-connectdisconnect)
+* [Connecting/Disconnecting and password caching](https://github.com/f5devcentral/vscode-f5#connectingdisconnecting-and-password-caching)
+* [Extension Commands](https://github.com/f5devcentral/vscode-f5#extension-commands)
 
 
 ### Other Pages
@@ -39,7 +41,7 @@ Any comments, questions or feature requests, please open a github repository iss
 
 
 Future extension features and enhancements have been moved to the repo issues(enhancements) for better tracking
-* [repo issues and enhancements](https://github.com/DumpySquare/vscode-f5-fast/issues)
+* [repo issues and enhancements](https://github.com/f5devcentral/vscode-f5/issues)
 
 ---
 
@@ -437,7 +439,7 @@ As of the v2.3.0 most logs are now sent to the OUTPUT tab of the bottom pane.  T
 
 The recommended way to get this extension is to install from the Microsoft VScode extension marketplace or from within VSCode directly, under the extensions activity bar view on the left.
 
-If you still need to install from vsix, they can be downloaded under the 'release' tab above: https://github.com/DumpySquare/vscode-f5-fast/releases
+If you still need to install from vsix, they can be downloaded under the 'release' tab above: https://github.com/f5devcentral/vscode-f5/releases
 
 Different ways to install vsix:
 - https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix
@@ -448,7 +450,7 @@ Different ways to install vsix:
 
 - Clone and install dependencies:
     ```bash
-    git clone https://github.com/DumpySquare/vscode-f5-fast.git
+    git clone https://github.com/f5devcentral/vscode-f5.git
     cd cd vscode-f5-fast/
     npm install
     code .

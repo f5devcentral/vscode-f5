@@ -130,7 +130,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
       - included options for redeploying iApp-App with current paramters and deleting an iApp-App
   - `Merge TCL/TMOS` can be used to merge ANY TMOS config item
 
-Documentation: https://github.com/DumpySquare/vscode-f5-fast/blob/master/README_docs/tcl.md
+Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs/tcl.md
 
 ### Modified
 - extension now has dynamic config-settings changes, meaning, when an extension setting is changed, it is applied to extension without reload of workspace
@@ -318,7 +318,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
   - This was to allow for more robust error handling for async post operations
 - Updated password prompt to provide more clarity of what is expected
 - Refined conditions that clear cached passwords
-  - [issue #19]https://github.com/DumpySquare/vscode-f5-fast/issues/19
+  - [issue #19]https://github.com/f5devcentral/vscode-f5/issues/19
 
 ### Added
 - Auto-refresh AS3 trees after tenant delete or declaration post
@@ -344,7 +344,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ### Modified
 - Device add/modify
   - Relaxed regex to allow :port for single nic ve
-  - [issue #5] https://github.com/DumpySquare/vscode-f5-fast/issues/5
+  - [issue #5] https://github.com/f5devcentral/vscode-f5/issues/5
 
 ---
 

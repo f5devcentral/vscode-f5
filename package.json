@@ -1,8 +1,8 @@
 {
-	"name": "vscode-f5-fast",
+	"name": "vscode-f5",
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
-	"publisher": "DumpySquare",
+	"publisher": "F5DevCentral",
 	"version": "2.7.0-beta",
 	"keywords": [
 		"f5",
@@ -11,6 +11,9 @@
 		"FAST",
 		"DO",
 		"TS",
+		"TCL",
+		"iRules",
+		"iApps",
 		"bigip",
 		"big-ip",
 		"Snippets"
@@ -19,7 +22,7 @@
 		"vscode": "^1.42.0"
 	},
 	"bugs": {
-		"url": "https://github.com/DumpySquare/vscode-f5-fast/issues"
+		"url": "https://github.com/f5devcentral/vscode-f5/issues"
 	},
 	"license": "SEE LICENSE IN LICENSE.txt",
 	"icon": "images/f5.png",
@@ -27,10 +30,10 @@
 		"color": "#DCDCDC",
 		"theme": "light"
 	},
-	"homepage": "https://github.com/DumpySquare/vscode-f5-fast/blob/master/README.md",
+	"homepage": "https://github.com/f5devcentral/vscode-f5/blob/master/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/DumpySquare/vscode-f5-fast.git"
+		"url": "https://github.com/f5devcentral/vscode-f5.git"
 	},
 	"categories": [
 		"Formatters",
