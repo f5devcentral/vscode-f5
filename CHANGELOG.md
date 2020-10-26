@@ -18,8 +18,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Modified
 - Changed TCL visibility setting to default on
+  - way past the initial beta of this feature set and haven't seen any bugs since
 - Updated config device regex to match the device add function
 - Opened editor actions to allow declaration post without highligh (FAST/AS3/DO/TS)
+  - When no highlighted text to capture, it will capture the entire editor text
+- Updated corkscrew integration including:
+  - latest corkscrew ouput
+  - More view device details
+  - Object counts for many view items
 
 ---
 

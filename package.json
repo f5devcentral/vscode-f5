@@ -286,6 +286,11 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.cfgExplore-show",
+				"title": "Show Apps",
+				"category": "F5"
+			},
+			{
 				"command": "f5.addHost",
 				"title": "Add Host",
 				"category": "F5"
@@ -641,18 +646,6 @@
 					"group": "F5"
 				}
 			],
-			"editor/title": [
-				{
-					"command": "f5-as3.postDec",
-					"group": "F5"
-				}
-			],
-			"editor/title/context": [
-				{
-					"command": "f5-do.postDec",
-					"group": "F5"
-				}
-			],
 			"explorer/context": [
 				{
 					"when": "f5.device && resourceExtname == .rpm",
@@ -937,6 +930,10 @@
 				{
 					"command": "f5.cfgExploreOnConnect",
 					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5.cfgExplore-show",
+					"when": "view == cfgTree && viewItem == cfgAppItem"
 				},
 				{
 					"command": "f5-tcl.deleteRule",

@@ -26,6 +26,7 @@ import { deviceImport, deviceImportOnLoad } from './deviceImport';
 
 import { TextDocumentView } from './editorViews/editorView';
 import { getMiniUcs, makeExplosion } from './cfgExplorer';
+import { isString } from 'util';
 
 
 export function activate(context: ExtensionContext) {
@@ -1151,7 +1152,8 @@ export function activate(context: ExtensionContext) {
 	//  */
 
 	const cfgProvider = new CfgProvider();
-	window.registerTreeDataProvider('cfgTree', cfgProvider);
+	// const cfgView = window.registerTreeDataProvider('cfgTree', cfgProvider);
+	const cfgView = window.createTreeView('cfgTree', { treeDataProvider: cfgProvider, showCollapseAll: true, canSelectMany: true });
 
 	context.subscriptions.push(commands.registerCommand('f5.cfgExploreOnConnect', async (item) => {
 
@@ -1184,6 +1186,7 @@ export function activate(context: ExtensionContext) {
 
 		if (expl) {
 			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+
 		}
 
 
@@ -1209,6 +1212,12 @@ export function activate(context: ExtensionContext) {
 
 		if (expl) {
 			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+			// // cfgView.reveal( );
+			// // cfgView.title = 'yay!!!';
+			// cfgView.description = 'descrrrrr';
+			// cfgView.message = 'messsg';
+			// cfgView.selection;
+			// cfgView.visible
 		}
 
 	}));
@@ -1218,9 +1227,62 @@ export function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore-show', async (text) => {
+		const x = cfgView.selection;
+		let full: string[] = [];
+		// let text2;
+		if (Array.isArray(x) && x.length > 1) {
+			// got multi-select array, push all necessary details to a single object
+			// const items = x.map( el => {
+			// 	return el.command.arguments;
+			// 	console.log(el);
+			// });
+			
+			// // : {item: string[], type: string}
+			// const strings = items.map( (el2) => {
+
+			// 	if (el2) {
+
+			// 	}
+			// 	el2[0];
+			// 	console.log(el2);
+			// });
+
+			x.forEach( (el) => {
+				const y = el.command?.arguments;
+				if (y) {
+					// console.log(y);
+					// const v: string[] = y;
+					// const z = y[0].join('\n');
+					full.push(y[0].join('\n'));
+					full.push('\n\n#############################################\n\n');
+
+					// full.push(y.flat(6));
+				}
+				// text2 = text;
+			});
+			text = full;
+
+		// } else if (Array.isArray(x) && x.length === 1) {
+		// 	return window.showWarningMessage('Select multiple apps with "Control" key');
+		} else if (typeof text === 'string') {
+			// just text, convert to single array with render
+			text = [text];
+		}
+
+		// todo: add logic to catch single right 
+
 		cfgProvider.render(text);
 	}));
 
+	// context.subscriptions.push(commands.registerCommand('f5.cfgExplore-showMultiApp', async (text) => {
+
+	// 	const x = cfgView.selection;
+	// 	if (x) {
+	// 		console.log(x);
+	// 	}
+	// 	cfgProvider.render(text);
+	// }));
+	
 	// /**
 	//  * 
 	//  * 
