@@ -22,10 +22,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Updated config device regex to match the device add function
 - Opened editor actions to allow declaration post without highligh (FAST/AS3/DO/TS)
   - When no highlighted text to capture, it will capture the entire editor text
-- Updated corkscrew integration including:
+- Updated corkscrew integration (v0.4.0) including:
   - latest corkscrew ouput
   - More view device details
   - Object counts for many view items
+- Delete mini_ucs after mini_ucs is collected and exploded by corkscrew
+- Updated logging OUTPUT to be visible when launching
+- Fixed f5 terminal creation from happening every connect and taking focus
+  - This should only happen if configuration for the feature is present
 
 ---
 

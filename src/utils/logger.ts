@@ -44,7 +44,8 @@ export class Log {
     private init() {
         // create output channel if not available
         if (!this._outputChannel) {
-            this._outputChannel = window.createOutputChannel('f5-fast');
+            this._outputChannel = window.createOutputChannel('f5');
+            this._outputChannel.show(true);
         }
     }
 

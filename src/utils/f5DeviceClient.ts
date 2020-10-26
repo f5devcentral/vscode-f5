@@ -373,11 +373,11 @@ export class MgmtClient {
     private termConnect() {
 
         // if we have configuration in the onConnect
-        if (this._onConnect) {
+        if (this._onConnect.length > 0) {
 
             // if we don't already have a terminal, create one
             if (!this.terminal) {
-                this.terminal = window.createTerminal('f5-fast-cmd');
+                this.terminal = window.createTerminal('f5-cmd');
                 this.terminal.show(true);
             }
 
@@ -404,7 +404,7 @@ export class MgmtClient {
 
             // if we don't already have a terminal, create one (very corner cases)
             if (!this.terminal) {
-                this.terminal = window.createTerminal('f5-fast-cmd');
+                this.terminal = window.createTerminal('f5-cmd');
                 this.terminal.show(true);
             }
 

@@ -26,7 +26,6 @@ import { deviceImport, deviceImportOnLoad } from './deviceImport';
 
 import { TextDocumentView } from './editorViews/editorView';
 import { getMiniUcs, makeExplosion } from './cfgExplorer';
-import { isString } from 'util';
 
 
 export function activate(context: ExtensionContext) {
@@ -1181,13 +1180,27 @@ export function activate(context: ExtensionContext) {
 		let expl: any = undefined;
 
 		if (file) {
+			logger.debug('Got mini_ucs -> extracting config with corkscrew');
+			
 			expl = await makeExplosion(file);
+			
+			if (expl) {
+				await cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+			}
+
+			logger.debug('Deleting mini_ucs file at', file);
+
+			try {
+				// wait  couple seconds before we try to delete the mini_ucs
+				setTimeout( () => { fs.unlinkSync(file); }, 2000);
+			} catch (e) {
+				logger.error('Not able to delete mini_ucs at:', file);
+			}
+		} else {
+			logger.error('Failed to retrieve mini_ucs for configuration exploration');
 		}
 
-		if (expl) {
-			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
 
-		}
 
 
 	}));
@@ -1212,7 +1225,11 @@ export function activate(context: ExtensionContext) {
 
 		if (expl) {
 			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
-			// // cfgView.reveal( );
+			// starting to setup the ability to have the view come into focus when excuted
+			// I believe this will require enabling experimental features, so I'm tabling
+			// 	for now
+			// cfgView.reveal('Apps', { focus: true, select: false, expand: true } );
+
 			// // cfgView.title = 'yay!!!';
 			// cfgView.description = 'descrrrrr';
 			// cfgView.message = 'messsg';
@@ -1232,33 +1249,13 @@ export function activate(context: ExtensionContext) {
 		// let text2;
 		if (Array.isArray(x) && x.length > 1) {
 			// got multi-select array, push all necessary details to a single object
-			// const items = x.map( el => {
-			// 	return el.command.arguments;
-			// 	console.log(el);
-			// });
-			
-			// // : {item: string[], type: string}
-			// const strings = items.map( (el2) => {
-
-			// 	if (el2) {
-
-			// 	}
-			// 	el2[0];
-			// 	console.log(el2);
-			// });
 
 			x.forEach( (el) => {
 				const y = el.command?.arguments;
 				if (y) {
-					// console.log(y);
-					// const v: string[] = y;
-					// const z = y[0].join('\n');
 					full.push(y[0].join('\n'));
 					full.push('\n\n#############################################\n\n');
-
-					// full.push(y.flat(6));
 				}
-				// text2 = text;
 			});
 			text = full;
 
@@ -1269,19 +1266,11 @@ export function activate(context: ExtensionContext) {
 			text = [text];
 		}
 
-		// todo: add logic to catch single right 
+		// todo: add logic to catch single right click
 
 		cfgProvider.render(text);
 	}));
 
-	// context.subscriptions.push(commands.registerCommand('f5.cfgExplore-showMultiApp', async (text) => {
-
-	// 	const x = cfgView.selection;
-	// 	if (x) {
-	// 		console.log(x);
-	// 	}
-	// 	cfgProvider.render(text);
-	// }));
 	
 	// /**
 	//  * 
