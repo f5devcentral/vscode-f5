@@ -2,7 +2,7 @@
 
 [BACK TO MAIN README](README.md)
 
-All notable changes to the "vscode-f5-fast" extension will be documented in this file.
+All notable changes to the "vscode-f5" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
@@ -12,9 +12,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Added
 - Device import function
-  - Detect see file, prompt for import at startup (pending)
-  - Command to select seed file (pending)
-  - Seed file supports object with properties or array (pending)
+  - Detect seed file, prompt for import at startup
+    - `Yes` to just import, or `Yes-Consume` will delete the file after contents have been read (devices imported)
+  - Command to import seed/device details
+  - Seed file supports object with properties or array or string (see documentation)
 
 ## Modified
 - Changed TCL visibility setting to default on
