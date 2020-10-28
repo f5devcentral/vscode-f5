@@ -8,16 +8,26 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.8.0] - (10-21-2020)
+
+### Added
+- function to attempt to remove old extension if detected
+  - the functions/settings it provides will conflict with new/reBranded extension
+
+---
+
 ## [2.7.0] - (10-21-2020)
 
-## Added
+### Added
+
 - Device import function
   - Detect seed file, prompt for import at startup
     - `Yes` to just import, or `Yes-Consume` will delete the file after contents have been read (devices imported)
   - Command to import seed/device details
   - Seed file supports object with properties or array or string (see documentation)
 
-## Modified
+### Modified
+
 - Changed TCL visibility setting to default on
   - way past the initial beta of this feature set and haven't seen any bugs since
 - Updated config device regex to match the device add function
@@ -36,14 +46,15 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [2.6.0] - (10-21-2020)
 
-## Modified
+### Modified
+
 - Updated corkscrew to new project name (f5-corkscrew) and version 0.3.0 which includes support for extracting pool configs when reference by a local traffic policy
 
 ---
 
 ## [2.5.1] - (10-7-2020)
 
-## Modified
+### Modified
 - TMOS Config Explorer
   - Updates for corkscrew v2
     - Includes faster processing, mini_ucs fetch of connected device, Base config (vlans/Selfs), all partitions configs
@@ -54,7 +65,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [2.5.0] - (10-5-2020)
 
-## Added
+### Added
 
 - TMOS config explorer functionality (beta)
   - Currently parses bigip.conf for individual applications and supporting configuration
