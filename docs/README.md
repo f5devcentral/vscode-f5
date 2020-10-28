@@ -34,6 +34,6 @@ details on getting the as3 example snippet and deploying to connected device
 
 
 
-
+<!-- 
 ### other wiki I was trying out...
-https://github.com/f5devcentral/vscode-f5.wiki.git
+https://github.com/f5devcentral/vscode-f5.wiki.git -->
