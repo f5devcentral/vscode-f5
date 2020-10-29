@@ -32,7 +32,7 @@ export async function unInstallOldExtension () {
 		// await window.showWarningMessage('Please uninstall the old vscode-f5-fast extension!', {modal: true});
 
 		const msg = 'Detected both old (vscode-f5-fast) and new F5 (vscode-f5) extensions.  They have conflicting commands.  Attempt to uninstall the old extension?';
-		const answer = await window.showInformationMessage(msg, {modal: true}, 'Continue');
+		const answer = await window.showInformationMessage(msg, 'Continue');
 
 		if (answer) {
 
@@ -62,7 +62,7 @@ export async function unInstallOldExtension () {
 
 		// 		// may need to just try to delete the old folder, then reload...
 		
-				const reld = await window.showInformationMessage('It should be uninstalled (deleted) now, reload?', {modal: true}, 'ok');
+				const reld = await window.showInformationMessage('It should be uninstalled (deleted) now, reload?', 'ok');
 				if (reld) {
 					commands.executeCommand('workbench.action.reloadWindow');
 				}
