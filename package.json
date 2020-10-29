@@ -609,6 +609,10 @@
 					"group": "F5"
 				},
 				{
+					"command": "f5.injectSchemaRef",
+					"group": "F5"
+				},
+				{
 					"command": "f5-as3.postDec",
 					"group": "F5"
 				},

@@ -1,6 +1,6 @@
 'use strict';
 
-import { window, extensions, StatusBarAlignment, commands, workspace, ExtensionContext, ConfigurationTarget, FileType, ProgressLocation, Range, ViewColumn, Uri, TextDocument, Position } from 'vscode';
+import { window, StatusBarAlignment, commands, workspace, ExtensionContext, ConfigurationTarget, FileType, ProgressLocation, Range, ViewColumn, Uri, TextDocument, Position } from 'vscode';
 import * as jsYaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -15,7 +15,7 @@ import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 import * as f5Api from './utils/f5Api';
 import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
-import { ext, git, loadConfig } from './extensionVariables';
+import { ext, loadConfig } from './extensionVariables';
 import { FastWebView } from './editorViews/fastWebView';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
@@ -23,14 +23,10 @@ import * as rpmMgmt from './utils/rpmMgmt';
 import { MgmtClient } from './utils/f5DeviceClient';
 import logger from './utils/logger';
 import { deviceImport, deviceImportOnLoad } from './deviceImport';
-
 import { TextDocumentView } from './editorViews/editorView';
 import { getMiniUcs, makeExplosion } from './cfgExplorer';
-
-// import * as cp from 'child_process';
-// import ChildProcess = cp.ChildProcess;
-
 import { unInstallOldExtension } from './extMigration';
+import { injectSchema } from './atcSchema';
 
 
 export async function activate(context: ExtensionContext) {
@@ -874,99 +870,33 @@ export async function activate(context: ExtensionContext) {
 	 */
 	context.subscriptions.push(commands.registerCommand('f5.injectSchemaRef', async () => {
 
-		window.showWarningMessage('experimental feature in development');
+		// Get the active text editor
+		const editor = window.activeTextEditor;
 		
-		var editor = window.activeTextEditor;
-		if (!editor) {
-			return; // No open text editor
-		}
+		if (editor) {
+			let text: string;
+			const document = editor.document;
 
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
-		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
-
-		if (!utils.isValidJson(text)) {
-			return window.showErrorMessage('Not valid JSON object');
-		}
-		
-		var newText = JSON.parse(text);
-		if(!newText.hasOwnProperty('$schema')) {
-			//if it has the class property, see what it is
-			if(newText.hasOwnProperty('class') && newText.class === 'AS3') {
-				newText['$schema'] = git.latestAS3schema;
-
-			} else if (newText.hasOwnProperty('class') && newText.class === 'Device') {
-				newText['$schema'] = git.latestDOschema;
-				
-			} else if (newText.hasOwnProperty('class') && newText.class === 'Telemetry') {
-				newText['$schema'] = git.latestTSschema;
+			// capture selected text or all text in editor
+			if (editor.selection.isEmpty) {
+				text = editor.document.getText();	// entire editor/doc window
 			} else {
-				window.showInformationMessage(`Could not find base declaration class for as3/do/ts`);
+				text = editor.document.getText(editor.selection);	// highlighted text
+			} 
+
+			const newText = await injectSchema(text);
+			
+			// check if modification worked
+			if (newText) {
+				editor.edit(edit => {
+					const startPosition = new Position(0, 0);
+					const endPosition = document.lineAt(document.lineCount - 1).range.end;
+					edit.replace(new Range(startPosition, endPosition), JSON.stringify(newText, undefined, 4));
+				});
+			} else {
+				logger.warn('ATC schema inject failed');
 			}
-		} else {
-			window.showInformationMessage(`Removing ${newText.$schema}`);
-			delete newText.$schema;
-
 		}
-
-		logger.debug(`newText below`);
-		logger.debug(newText);
-
-		const {activeTextEditor} = window;
-
-        if (activeTextEditor && activeTextEditor.document.languageId === 'json') {
-            const {document} = activeTextEditor;
-			const firstLine = document.lineAt(0);
-			const lastLine = document.lineAt(document.lineCount - 1);
-			var textRange = new Range(0,
-			firstLine.range.start.character,
-			document.lineCount - 1,
-			lastLine.range.end.character);
-			editor.edit( edit => {
-				edit.replace(textRange, newText);
-			});
-            // if (firstLine.text !== '42') {
-            //     const edit = new WorkspaceEdit();
-            //     edit.insert(document.uri, firstLine.range.start, '42\n');
-            //     return workspace.applyEdit(edit)
-            // }
-        }
-		// const { activeTextEditor } = window;
-		// const { document } = activeTextEditor;
-
-		// const fullText = document.getText();
-		// const fullRange = new Range(
-		// 	document.positionAt(0),
-		// 	document.positionAt(fullText.length - 1)
-		// )
-
-		// let invalidRange = new Range(0, 0, textDocument.lineCount /*intentionally missing the '-1' */, 0);
-		// let fullRange = textDocument.validateRange(invalidRange);
-		// editor.edit(edit => edit.replace(fullRange, newText));
-		
-		// editor.edit(edit => {
-		// 	const startPosition = new Position(0, 0);
-		// 	const endPosition = TextDocument.lineAt(document.lineCount - 1).range.end;
-		// 	edit.replace(new Range(startPosition, endPosition), newText);
-		// });
-
-		// var firstLine = textEdit.document.lineAt(0);
-		// var lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
-		// var textRange = new Range(0,
-		// firstLine.range.start.character,
-		// textEditor.document.lineCount - 1,
-		// lastLine.range.end.character);
-
-		// textEditor.edit(function (editBuilder) {
-		// 	editBuilder.replace(textRange, '$1');
-		// });
-
-
-		// editor.edit(builder => builder.replace(textRange, newText));
-		// });
 
 	}));
 

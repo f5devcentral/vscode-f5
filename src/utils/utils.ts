@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
+import logger from './logger';
 
 /**
  * Host Connectivity Status Bar
@@ -203,6 +204,12 @@ export async function displayInTextEditor(text: string): Promise<void> {
     );
 }
 
+
+/**
+ * validates json blob
+ * @param json
+ * @returns parsed json object
+ */
 export function isValidJson(json: string) {
     try {
         return JSON.parse(json);
@@ -252,15 +259,16 @@ export async function getText() {
 
     // get editor window
     var editor = vscode.window.activeTextEditor;
-    if (!editor) {	
-        console.warn('getText was called, but no active editor... this should not happen');
+    if (editor) {	
+        // capture selected text or all text in editor
+        if (editor.selection.isEmpty) {
+            return editor.document.getText();	// entire editor/doc window
+        } else {
+            return editor.document.getText(editor.selection);	// highlighted text
+        } 
+    } else {
+        logger.warn('getText was called, but no active editor... this should not happen');
         return; // No open/active text editor
     }
     
-    // capture selected text or all text in editor
-    if (editor.selection.isEmpty) {
-        return editor.document.getText();	// entire editor/doc window
-    } else {
-        return editor.document.getText(editor.selection);	// highlighted text
-    } 
 }
