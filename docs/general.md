@@ -66,14 +66,13 @@ Details about how to setup the authentication provider
 
 When utilizing external auth provider on a regular BIG-IQ (not bigiq), regardless of what is set (local/tmos/radius/ldap/...), the auth provider to use that configured service should be local or tmos.  This bascially tells the api auth service on the f5 f5 to use whatever is configured for the device.  For bigiq, it must be set since the user can select which authentication service they want to use at login.
 
-> Summary -> if your connecting to a bigip and getting 401 invalid logon provider, the two main options to try should be 'local' or 'tmos'.  In my testing, no other options worked.
+!> Summary -> if your connecting to a bigip and getting 401 invalid logon provider, the two main options to try should be 'local' or 'tmos'.  In my testing, no other options worked.
 
 ## OUTPUT logging
 
 As of the v2.3.0 most logs are now sent to the OUTPUT tab of the bottom pane.  This should provide easier access to what the extension is doing.
 
-<!-- ![OUTPUT logging](./README_docs/images/OUTPUT_logging_9.9.2020.PNG) -->
-
+!> as of 10.28.2020 v2.7.+, this OUTPUT chanel is now called "f5" as part of the new name changes
 <img src="./media/OUTPUT_logging_9.9.2020.PNG" alt="drawing" width="80%"/>
 
 
@@ -86,6 +85,8 @@ This extension contributes the following settings:
 
 
 Enable TCL functionality under `F5: Tcl`.  This is disabled by default (now enabled by default)
+
+!> As of 10.28.2020 - v2.7.+ this is enabled by default now
 
 ![TCL setting](./media/tcl_setting_8.21.2020.PNG)
 

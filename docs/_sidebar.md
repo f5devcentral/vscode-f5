@@ -1,4 +1,3 @@
-<!-- - Getting Started -->
 
 
 - [Home](README.md)
@@ -15,3 +14,8 @@
 - [Utilities](utilities.md)
 - [Research](research.md)
 - [Change Log](/changelog)
+
+&nbsp;
+
+- **Links**
+- [![Github](media/github.svg)Github](https://github.com/f5devcentral/vscode-f5)

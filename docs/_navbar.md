@@ -7,6 +7,7 @@
     - <a href="#" data-link-title="Simple Dark">Simple Dark</a>
     - <a href="#" data-link-title="Buble">Buble</a>
     - <a href="#" data-link-title="Dark">Dark</a>
+    - <a href="#" data-link-title="Pure">Pure</a>
 
 
 
