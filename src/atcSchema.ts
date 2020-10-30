@@ -13,130 +13,91 @@ import logger from './utils/logger';
  */
 export async function injectSchema (text: string) {
     
-    let dec = isValidJson(text);
-    // let returnDec = {};
+    let newText = isValidJson(text);
 
-    if (!dec) {
-        const msg = 'Not valid JSON object';
-        logger.debug(msg);
-        window.showErrorMessage(msg);
-        return;
+    if (!newText) {
+        logger.debug('Not valid JSON object - managing as string');
+
+        const rex = / *"\$schema":.+[\n]*/g;
+        const hasSchema = text.match(rex);
+
+        if (hasSchema) {
+            // found schema references, so remove them and return
+            text = text.replace(rex, '');
+            return [ text, false ];
+        }
+
+        // no schema found so, get information needed to add it
+        const answer = await window.showInformationMessage(`Not able to detect valid JSON or ATC declaration type.  If you want to inject anyway, select type:`, 'AS3', 'DO', 'TS', 'Cancel');
+
+        // prepend the appropriate schema to the text
+        switch (answer) {
+            case 'AS3':
+                logger.debug('Invalid json, injecting AS3 schema anyway');
+                return [ `"$schema": "${git.latestAS3schema}",\n` + text, false ];
+            case 'DO':
+                logger.debug('Invalid json, injecting DO schema anyway');
+                return [ `"$schema": "${git.latestDOschema}",\n` + text, false ];
+            case 'TS':
+                logger.debug('Invalid json, injecting TS schema anyway');
+                return [ `"$schema": "${git.latestTSschema}",\n` + text, false ];
+            case 'Cancel':
+                logger.debug('User canceled invalid json atc schema inject');
+                return [ '', false ];
+        }
     }
     
-    // var dec = JSON.parse(text);
-    if(dec.hasOwnProperty('$schema')) {
+    // got valid json, so parse/inject/remove accorindly
+    if(newText.hasOwnProperty('$schema')) {
 
         logger.debug('Removing schema from declaration');
         // if declaration has schema reference -> remove it
         // this only looks at the parent level
-        delete dec.$schema;
-        // return dec;
+        delete newText.$schema;
+        return [ newText, true ];
 
     } else {
 
         // schema not detected -> adding appropriate schema
-        if(dec.hasOwnProperty('class') && dec.class === 'AS3') {
+        if(newText.hasOwnProperty('class') && newText.class === 'AS3') {
 
             logger.debug('got a regular new as3 declaration with deployment parameters -> adding as3 schema');
             
             // the following add the schema to the beginning of the dec as compared
             //      to the typical dec.$schema param add would put it at the end
-            dec = { "$schema": git.latestAS3schema, ...dec };
+            newText = { "$schema": git.latestAS3schema, ...newText };
             
-        } else if (dec.hasOwnProperty('class') && dec.class === 'ADC') {
+        } else if (newText.hasOwnProperty('class') && newText.class === 'ADC') {
             
             // typically come from getting existing decs from as3 service
             // so, we wrap the declartion with details of the necessary ADC class
             logger.debug('got a bare ADC declaration -> wrapping with AS3 object/params/schema');
             
-            dec = {
+            newText = {
                 "$schema": git.latestAS3schema,
                 "class": "AS3",
-                declaration: dec
+                declaration: newText
             };
             
-        } else if (dec.hasOwnProperty('class') && dec.class === 'Device') {
+        } else if (newText.hasOwnProperty('class') && newText.class === 'Device') {
             
             logger.debug('Detected DO declaration -> adding schema');
-            dec = { "$schema": git.latestDOschema, ...dec };
+            newText = { "$schema": git.latestDOschema, ...newText };
             
-        } else if (dec.hasOwnProperty('class') && dec.class === 'Telemetry') {
+        } else if (newText.hasOwnProperty('class') && newText.class === 'Telemetry') {
             
             logger.debug('Detected TS declaration -> adding schema');
-            dec = { "$schema": git.latestTSschema, ...dec };
+            newText = { "$schema": git.latestTSschema, ...newText };
 
         } else {
 
             const msg = `Could not find base declaration class for as3/do/ts or ADC`;
             logger.debug(msg);
             window.showInformationMessage(msg);
-            return;
+            return [ '', false ];
 
         }
 
     }
-    return dec;
-
-
-
-
-    // Get the active text editor
-
-
-    // const {activeTextEditor} = window;
-
-    // if (activeTextEditor && activeTextEditor.document.languageId === 'json') {
-    //     const { document } = activeTextEditor;
-
-    //     activeTextEditor.edit( e => {
-    //         const startPosition = new Position(0, 0);
-    //         const endPosition = document.lineAt(document.lineCount - 1).range.end;
-    //         e.replace(new Range(startPosition, endPosition), text);
-    //     });
-
-    //     workspace.applyEdit()
-    //     // const firstLine = document.lineAt(0);
-    //     // const lastLine = document.lineAt(document.lineCount - 1);
-    //     // var textRange = new Range(0,
-    //     // firstLine.range.start.character,
-    //     // document.lineCount - 1,
-    //     // lastLine.range.end.character);
-    //     // editor.edit( edit => {
-    //     //     edit.replace(textRange, dec);
-    //     // });
-    //     // if (firstLine.text !== '42') {
-    //     //     const edit = new WorkspaceEdit();
-    //     //     edit.insert(document.uri, firstLine.range.start, '42\n');
-    //     //     return workspace.applyEdit(edit)
-    //     // }
-    // }
-    // const { activeTextEditor } = window;
-    // const { document } = activeTextEditor;
-
-    // const fullText = document.getText();
-    // const fullRange = new Range(
-    // 	document.positionAt(0),
-    // 	document.positionAt(fullText.length - 1)
-    // )
-
-    // let invalidRange = new Range(0, 0, textDocument.lineCount /*intentionally missing the '-1' */, 0);
-    // let fullRange = textDocument.validateRange(invalidRange);
-    // editor.edit(edit => edit.replace(fullRange, newText));
-    
-
-
-    // var firstLine = textEdit.document.lineAt(0);
-    // var lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
-    // var textRange = new Range(0,
-    // firstLine.range.start.character,
-    // textEditor.document.lineCount - 1,
-    // lastLine.range.end.character);
-
-    // textEditor.edit(function (editBuilder) {
-    // 	editBuilder.replace(textRange, '$1');
-    // });
-
-
-    // editor.edit(builder => builder.replace(textRange, newText));
-    // });
+    return [ newText, true ];
 }

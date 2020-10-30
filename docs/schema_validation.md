@@ -39,6 +39,15 @@ This commmand is easily accessable with a right click in an editor window, then 
 
 <img src="./media/injectSchema_existing_v2.8.0_10.30.2020.gif" alt="drawing" width="80%"/>
 
+### Schema mgmt with invalid json
+
+If invalid json is detected but a schema reference is found in the text, it will remove the schema reference
+
+If invalid json is detected and no schema reference is found, it will present an option to add the desired schema at the top of the editor/text.  
+
+<img src="./media/injectSchema_existingBroken_v2.8.0_10.30.2020.gif" alt="drawing" width="80%"/>
+
+
 ---
 
 <p>&nbsp;</p>

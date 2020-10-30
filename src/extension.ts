@@ -884,14 +884,20 @@ export async function activate(context: ExtensionContext) {
 				text = editor.document.getText(editor.selection);	// highlighted text
 			} 
 
-			const newText = await injectSchema(text);
+			const [ newText, validDec ] = await injectSchema(text);
 			
 			// check if modification worked
-			if (newText) {
+			if (newText && validDec) {
 				editor.edit(edit => {
 					const startPosition = new Position(0, 0);
 					const endPosition = document.lineAt(document.lineCount - 1).range.end;
 					edit.replace(new Range(startPosition, endPosition), JSON.stringify(newText, undefined, 4));
+				});
+			} else if (newText) {
+				editor.edit(edit => {
+					const startPosition = new Position(0, 0);
+					const endPosition = document.lineAt(document.lineCount - 1).range.end;
+					edit.replace(new Range(startPosition, endPosition), newText);
 				});
 			} else {
 				logger.warn('ATC schema inject failed');
