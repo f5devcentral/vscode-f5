@@ -10,7 +10,7 @@
 - [TCL/iRules/iApps](tcl.md)
 - [Device Importing](device_importing.md)
 - [ATC RPM Mgmt](atc_rpm_mgmt.md)
-- [Generic Rest Calls](generic_rest_salls.md)
+- [Generic Rest Calls](generic_rest_calls.md)
 - [Utilities](utilities.md)
 - [Research](research.md)
 - [Change Log](/changelog)

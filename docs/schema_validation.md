@@ -13,7 +13,7 @@ There is a schema for each of the different ATC services (AS3/DO/TS), these meth
 
 There are two main ways schema validation can be applied:
 
-### Untitled document schema or in-declaration direct reference
+## Untitled document schema or in-declaration direct reference
 
 Just as documented here: https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/validate.html, the necessary json schema can be referenced diretly within the declaration.
 
@@ -23,13 +23,27 @@ The extension contains basics example declaration of AS3/DO/TS, each containing 
 
 ***See extension Snippets below***
 
+## Inject/Remove Schema Reference Command
+
+There is a command to inject the appropriate schema reference into any editor declaration (mainly the untitled).
+
+This commmand is easily accessable with a right click in an editor window, then selecting `Inject/Remove Schema Reference`.  This will read the declaration in the current active editor and attempt to inject the appropriate schema.  This is done by parsing the text into a json object, detecting the particular class parameters for each of the ATC services, adding the appropriate object schema reference, and updating all the text in the editor.
+
 <p>&nbsp;</p>
+
+### Removing and re-injecting schema to the as3 example declaration snippet
+
+<img src="./media/injectSchema_v2.8.0_10.30.2020.gif" alt="drawing" width="80%"/>
+
+### Injecting schema into an as3 declaration when viewing a deployed as3 declaration
+
+<img src="./media/injectSchema_existing_v2.8.0_10.30.2020.gif" alt="drawing" width="80%"/>
 
 ---
 
 <p>&nbsp;</p>
 
-### File Type schema reference
+## File Type schema reference
 
 <p>&nbsp;</p>
 
@@ -57,7 +71,6 @@ To access the snippets, open an editor file, change the language to JSON, then s
 
 > NOTE:  these snippets include the direct schema reference
 
-<!-- ![as3 snippet](./images/as3_snippet_9.9.2020.gif) -->
 <img src="./media/as3_snippet_9.9.2020.gif" alt="drawing" width="80%"/>
 
 VSCode guide for defining customer user snippets
