@@ -11,9 +11,9 @@ More to come over the next couple of weeks as we finalize the move and prepare f
 Any comments, questions or feature requests, please open a github repository issue!!!
 
 
-### Download via the Microsoft extension marketplace or directly from within VSCode
-> to be updated with next release!
 
+### Download via the Microsoft extension marketplace or directly from within VSCode
+> to be updated when with next release!
 
 ---
 
