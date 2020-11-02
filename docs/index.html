@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>F5 VSCode Docs</title>
+  <link rel="icon" href="media/f5_white_24x24.svg">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="keywords" content="f5,vscode,vscode-f5,atc,automation,ltm,f5networks">
+  <meta name="description" content="Accelerate your F5 automation with this vsode extension">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css" title="Simple">
+    <link rel="stylesheet" href="assets/main.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css" title="Simple Dark">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/buble.css" title="Buble">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/dark.css" title="Dark">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/pure.css" title="Pure">
+    
+    <!-- banner sylesheet - testing -->
+    <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-top-banner-plugin@latest/dist/style.css"> -->
+</head>
+
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      alias: {
+        '/changelog': 'https://raw.githubusercontent.com/f5devcentral/vscode-f5/corkscrew/CHANGELOG.md'
+      },
+      topMargin: 90, // default: 0
+      name: 'F5 VSCode Docs',
+      repo: 'https://github.com/f5devcentral/vscode-f5',
+      homepage: 'README.md',
+      auto2top: true,
+      coverpage: true,
+      executeScript: true,
+      loadSidebar: true,
+      loadNavbar: true,
+      mergeNavbar: true,
+      maxLevel: 2,
+      subMaxLevel: 2,
+      // formatUpdated: '{MM}/{DD} {HH}:{mm}',
+      // formatUpdated: function (time) {
+      //   // ...
+
+      //   return time;
+      // },
+
+      // themeColor: '#DCDCDC'
+
+      search: {
+        // maxAge: 86400000, // Expiration time, the default one day
+        maxAge: 5, // Expiration time, the default one day
+        paths: 'auto',
+        placeholder: 'Type to search',
+        noData: 'No Results!',
+        // Headline depth, 1 - 6
+        depth: 6,
+        hideOtherSidebarContent: false, // whether or not to hide other sidebar content
+      },
+      // banner config - testihng
+      // https://github.com/Plugin-contrib/docsify-plugin/tree/master/packages/docsify-top-banner-plugin
+      // topBanner: {
+      //   content: 'yay - banner!'
+      // },
+      plugins: [
+        function (hook, vm) {
+          hook.beforeEach(function (html) {
+
+            // var editHtml = '[:memo: Edit Document](' + url + ')\n'
+            return html
+              + '\n\n----\n\n'
+              + '<a href="https://docsify.js.org" target="_blank" style="color: inherit; font-weight: normal; text-decoration: none;">Powered by docsify</a>'
+            // })
+            // hook.afterEach(function (html){
+            //   if(vm.route.path === '/'){
+            //     return html
+            //   }
+            //   return `${html}<br/> <i>Vercel</i> has given us a Pro account <br/> <a href="https://vercel.com/?utm_source=docsifyjsdocs" target="_blank"><img src="_media/vercel_logo.svg" alt="Vercel" width="100" height="64"></a>`
+          })
+        }
+      ]
+    }
+  </script>
+
+  <script src="assets/main.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-nginx.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-jq.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-tcl.js"></script>
+  
+  <!-- banner plugin - testing -->
+  <!-- <script src="//cdn.jsdelivr.net/npm/docsify-top-banner-plugin@latest/dist/index.js"></script> -->
+
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/external-script.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
+
+</body>
+
+</html>

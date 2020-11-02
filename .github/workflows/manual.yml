@@ -1,0 +1,27 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow
+
+on:
+  release:
+    # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+    types: [published, created, edited]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  greet:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: npm ci
+    - name: Publish VS Code Extension
+      uses: HaaLeo/publish-vscode-extension@v0
+      with:
+        pat: ${{ secrets.OPEN_VSX_TOKEN }}

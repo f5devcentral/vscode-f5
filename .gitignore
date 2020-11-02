@@ -20,3 +20,5 @@ atc_ilx_rpm_cache
 
 # ignore f5 iApp template files
 *.tmpl
+# ignore temp mini_ucs for config explorere (corkscrew)
+mini_ucs.tar.gz

@@ -15,7 +15,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	getTreeItem(element: FastTreeItem): vscode.TreeItem {
@@ -199,28 +199,13 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 export class FastTreeItem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		public version: string,
-		private toolTip: string,
-		private context: string,
+		public description: string,
+		public tooltip: string,
+		public context: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 	}
-
-	get tooltip(): string {
-		return this.toolTip;
-	}
-
-	get description(): string {
-		return this.version;
-	}
-
-	// iconPath = {
-	// 	light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-	// 	dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	// };
-
     contextValue = this.context;
-    
 }

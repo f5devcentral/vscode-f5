@@ -1,9 +1,9 @@
 {
-	"name": "vscode-f5-fast",
-	"displayName": "F5 Networks FAST",
-	"description": "(F)5 Networks (A)pplication (S)ervices (T)emplate engine extension",
-	"publisher": "DumpySquare",
-	"version": "2.4.0",
+	"name": "vscode-f5",
+	"displayName": "The F5 Extension",
+	"description": "Supercharge your F5 automation development",
+	"publisher": "F5DevCentral",
+	"version": "2.8.1-beta",
 	"keywords": [
 		"f5",
 		"f5networks",
@@ -11,6 +11,9 @@
 		"FAST",
 		"DO",
 		"TS",
+		"TCL",
+		"iRules",
+		"iApps",
 		"bigip",
 		"big-ip",
 		"Snippets"
@@ -19,7 +22,7 @@
 		"vscode": "^1.42.0"
 	},
 	"bugs": {
-		"url": "https://github.com/DumpySquare/vscode-f5-fast/issues"
+		"url": "https://github.com/f5devcentral/vscode-f5/issues"
 	},
 	"license": "SEE LICENSE IN LICENSE.txt",
 	"icon": "images/f5.png",
@@ -27,10 +30,10 @@
 		"color": "#DCDCDC",
 		"theme": "light"
 	},
-	"homepage": "https://github.com/DumpySquare/vscode-f5-fast/blob/master/README.md",
+	"homepage": "https://github.com/f5devcentral/vscode-f5/blob/master/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/DumpySquare/vscode-f5-fast.git"
+		"url": "https://github.com/f5devcentral/vscode-f5.git"
 	},
 	"categories": [
 		"Formatters",
@@ -51,8 +54,8 @@
 		],
 		"yamlValidation": [
 			{
-			  "fileMatch": "*.fast.yml",
-			  "url": "https://github.com/f5devcentral/f5-fast-core/blob/master/schema/template.json"
+				"fileMatch": "*.fast.yml",
+				"url": "https://github.com/f5devcentral/f5-fast-core/blob/master/schema/template.json"
 			}
 		],
 		"jsonValidation": [
@@ -102,6 +105,11 @@
 				{
 					"id": "decExamples",
 					"name": "Documentation/Examples"
+				},
+				{
+					"id": "cfgTree",
+					"when": "f5.cfgTreeContxt",
+					"name": "Config Explorer"
 				}
 			]
 		},
@@ -118,7 +126,7 @@
 								"device": {
 									"type": "string",
 									"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format",
-									"pattern": "^([^@]+@)?[a-z0-9-.]+(:[0-9]+)?$",
+									"pattern": "^[\\w-.]+@[\\w-.]+(:[0-9]+)?$",
 									"examples": [
 										"admin@192.168.1.254",
 										"usr1@10.40.40.20:8443",
@@ -226,7 +234,7 @@
 					},
 					"f5.tcl": {
 						"type": "boolean",
-						"default": false,
+						"default": true,
 						"scope": "resource",
 						"description": "Enable tcl/irule/iapp functionality."
 					},
@@ -268,8 +276,28 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.cfgExploreOnConnect",
+				"title": "Explore Config",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExploreClear",
+				"title": "Clear",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExplore-show",
+				"title": "Show Apps",
+				"category": "F5"
+			},
+			{
 				"command": "f5.addHost",
 				"title": "Add Host",
+				"category": "F5"
+			},
+			{
+				"command": "f5.deviceImport",
+				"title": "Import Devices",
 				"category": "F5"
 			},
 			{
@@ -285,6 +313,11 @@
 			{
 				"command": "f5.makeRequest",
 				"title": "Make HTTP Request",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExplore",
+				"title": "Explore TMOS Config",
 				"category": "F5"
 			},
 			{
@@ -560,7 +593,14 @@
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
+					"command": "f5.cfgExplore",
+					"group": "F5"
+				},
+				{
+					"command": "f5.deviceImport",
+					"group": "F5"
+				},
+				{
 					"command": "f5-fast.deployApp",
 					"group": "F5"
 				},
@@ -569,17 +609,18 @@
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
+					"command": "f5.injectSchemaRef",
+					"group": "F5"
+				},
+				{
 					"command": "f5-as3.postDec",
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
 					"command": "f5-do.postDec",
 					"group": "F5"
 				},
 				{
-					"when": "editorHasSelection",
 					"command": "f5-ts.postDec",
 					"group": "F5"
 				},
@@ -609,22 +650,15 @@
 					"group": "F5"
 				}
 			],
-			"editor/title": [
-				{
-					"command": "f5-as3.postDec",
-					"group": "F5"
-				}
-			],
-			"editor/title/context": [
-				{
-					"command": "f5-do.postDec",
-					"group": "F5"
-				}
-			],
 			"explorer/context": [
 				{
 					"when": "f5.device && resourceExtname == .rpm",
 					"command": "f5.installRPM",
+					"group": "F5"
+				},
+				{
+					"when": "resourceExtname =~ /\\.(conf|ucs|qkview)/",
+					"command": "f5.cfgExplore",
 					"group": "F5"
 				},
 				{
@@ -667,6 +701,11 @@
 				{
 					"command": "f5.refreshTclTree",
 					"when": "view == as3Tasks",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.cfgExploreClear",
+					"when": "view == cfgTree",
 					"group": "navigation"
 				},
 				{
@@ -893,6 +932,14 @@
 					"when": "view == f5Hosts"
 				},
 				{
+					"command": "f5.cfgExploreOnConnect",
+					"when": "view == f5Hosts"
+				},
+				{
+					"command": "f5.cfgExplore-show",
+					"when": "view == cfgTree && viewItem == cfgAppItem"
+				},
+				{
 					"command": "f5-tcl.deleteRule",
 					"when": "view == as3Tasks && viewItem == rule"
 				},
@@ -945,7 +992,9 @@
 		"lint": "eslint src --ext ts",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
+		"refresh-corkscrew": "rm -rf node_modules/f5-corkscrew && npm install https://github.com/f5devcentral/f5-corkscrew.git"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
@@ -965,6 +1014,7 @@
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"@types/js-yaml": "^3.12.5",
 		"axios": "^0.19.2",
+		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git",
 		"js-yaml": "^3.14.0",
 		"keytar": "^6.0.1"
 	}

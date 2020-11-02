@@ -93,10 +93,11 @@ export async function makeAuth(
 
                 // if user/pass failed - clear cached password
                 if(message === "Authentication failed.") {
-                    console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
+                    console.error('401 - makeAuth failed!!!!!!  +++ clearning cached password +++');
                     vscode.window.showErrorMessage('Authentication Failed - clearing password');
                     // clear cached password and disconnect
-                    ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
+                    // ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
+                    ext.mgmtClient?.clearPassword();
                     // todo: this should probably call the main extension disconnect command
                     //      and all it's functionality moved to the mgmtClient.disconnect function
                     //      so everything uses the same end to end flow
@@ -172,7 +173,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     .then( resp => {
         // the following log may cause some problems, mainly the resp.data,
         //      if it's circular...
-        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`, resp.data);
+        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
         // logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
         return {
             data: resp.data,
@@ -202,7 +203,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
 
             // if user/pass failed - clear cached password
             if(message === "Authentication failed.") {
-                console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
+                console.error('401 - makeReqAXnew auth failed!!!!!!  +++ clearning cached password +++');
                 vscode.window.showErrorMessage('Authentication Failed - clearing password');
                 // clear cached password and disconnect
                 // ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
@@ -246,6 +247,67 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     });
     return httpResponse;
 };
+
+
+/**
+ *  just a placeholder
+ * @param url to get file
+ * @param dest path/file name (./path/test.tar.gz)
+ * @param host ip/fqdn where to get file
+ * @param port 
+ * @param token bigip auth token
+ */
+export async function download(file: string, dest: string, host: string, port: number, token: string) {
+    /**
+     * to be used for downloading 
+     * https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
+     * 
+     */
+
+    const writer = fs.createWriteStream(dest);
+    const url = `/mgmt/cm/autodeploy/software-image-downloads/${file}`;
+
+    const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'stream',
+        baseURL: `https://${host}:${port}`,
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        }),
+        headers: {
+            'X-F5-Auth-Token': token,
+        },
+    });
+
+    response.data.pipe(writer);
+
+    return new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+    });
+
+    /**
+     * was trying to get a better understanding of error handling
+     * by default, if successful, just resolve the promise with no return data
+     *      or fail and provide the failure reason from axios
+     *
+     * the following fed some of the axios response details back
+     *  but I could not get it to return a custom error message
+     */
+    // return new Promise((resolve, reject) => {
+    //     writer.on('finish', x => {
+    //         return resolve({
+    //             x,
+    //             status: response.status,
+    //             statusText: response.statusText
+    //         });
+    //     });
+    //     writer.on('error', x => {
+    //         return reject('file download failed');
+    //     });
+    // });
+}
 
 
 
