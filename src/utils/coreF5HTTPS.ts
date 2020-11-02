@@ -93,10 +93,11 @@ export async function makeAuth(
 
                 // if user/pass failed - clear cached password
                 if(message === "Authentication failed.") {
-                    console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
+                    console.error('401 - makeAuth failed!!!!!!  +++ clearning cached password +++');
                     vscode.window.showErrorMessage('Authentication Failed - clearing password');
                     // clear cached password and disconnect
-                    ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
+                    // ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
+                    ext.mgmtClient?.clearPassword();
                     // todo: this should probably call the main extension disconnect command
                     //      and all it's functionality moved to the mgmtClient.disconnect function
                     //      so everything uses the same end to end flow
@@ -202,7 +203,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
 
             // if user/pass failed - clear cached password
             if(message === "Authentication failed.") {
-                console.error('401 - auth failed!!!!!!  +++ clearning cached password +++');
+                console.error('401 - makeReqAXnew auth failed!!!!!!  +++ clearning cached password +++');
                 vscode.window.showErrorMessage('Authentication Failed - clearing password');
                 // clear cached password and disconnect
                 // ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);

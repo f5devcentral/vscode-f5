@@ -16,7 +16,7 @@ Select the declaration text to send or it will capture the entire editor window
 
 To delete a tenant, right click the tenant in the AS3 Tenant TreeView on the left and select "Delete"
 
-<!-- [AS3 Management](./README_docs/images/as3GetPostDeleteTask_5.18.2020.gif) -->
+!> As of 11.1.2020 v2.5+ most of these commands are accessible via right click in the editor
 <img src="./media/as3GetPostDeleteTask_5.18.2020.gif" alt="drawing" width="80%"/>
 
 

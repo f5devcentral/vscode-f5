@@ -88,7 +88,8 @@ Enable TCL functionality under `F5: Tcl`.  This is disabled by default (now enab
 
 !> As of 10.28.2020 - v2.7.+ this is enabled by default now
 
-![TCL setting](./media/tcl_setting_8.21.2020.PNG)
+<!-- ![TCL setting](./media/tcl_setting_8.21.2020.PNG) -->
+<img src="./media/tcl_setting_8.21.2020.PNG" alt="drawing" width="80%"/>
 
 
 ## Commands

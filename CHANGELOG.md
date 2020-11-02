@@ -8,11 +8,28 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [2.8.0] - (10-21-2020)
+## [2.8.1] - (11-02-2020)
+
+### Modified
+- Fixed where clearing of password was not happening in all scenarios
+- Fixed fast template uploading from non-windows based file systems
+- Fixed config explore tree refresh when new config is 'explored'
+
+
+---
+
+## [2.8.0] - (10-30-2020)
 
 ### Added
 - function to attempt to remove old extension if detected
   - the functions/settings it provides will conflict with new/reBranded extension
+- Finished function to inject/remove schema reference from declaration
+  - Accessable via right-click in editor
+  - if a schema reference is present, it will remove it
+  - if no schema is present, it will attempt to discover the declaration type (as3/do/ts) and inject the appropriate schema reference
+  - If the declaration is not a valid json object or it is not able to figure out what kind of ATC declaration it is, then it will prompt a given selection to inject anyway
+  - https://f5devcentral.github.io/vscode-f5/#/schema_validation?id=injectremove-schema-reference-command
+
 
 ---
 

@@ -1,4 +1,19 @@
-import { TreeDataProvider, TreeItem, TreeItemCollapsibleState, Event, commands, EventEmitter, Uri, Command, window, ViewColumn, Position, workspace, TextDocument, Range }  from 'vscode';
+import { 
+    TreeDataProvider, 
+    TreeItem, 
+    TreeItemCollapsibleState, 
+    Event, 
+    commands, 
+    EventEmitter, 
+    Uri, 
+    Command, 
+    window, 
+    ViewColumn, 
+    Position,
+    workspace, 
+    TextDocument, 
+    Range
+ }  from 'vscode';
 import { ext } from '../extensionVariables';
 
 import { BigipConfObj, ConfigFiles, Explosion, TmosApp } from 'f5-corkscrew';
@@ -24,6 +39,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         this.bigipConfs = configs;
         this.confObj = cfgObj;
         this.explosion = explosion;
+        this.refresh();
     }
 
 	refresh(): void {
@@ -37,6 +53,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         this.bigipConfs = [];
         this.confObj = undefined;
         this.explosion = undefined;
+        this.refresh();
     }
 
     getTreeItem(element: CfgApp): TreeItem {

@@ -1,7 +1,7 @@
 'use strict';
+
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
 import logger from './logger';
@@ -11,12 +11,7 @@ most of these functions are extracted from f5-fast-core cli
 https://github.com/f5devcentral/f5-fast-core/blob/develop/cli.js
 */
 
-// const path = require('path');
-// import { displayWebView } from './fastHtmlPreveiwWebview';
-
 const fast = require('@f5devcentral/f5-fast-core');
-
-
 
 /**
  * single fast template validate, zip, upload and import function
@@ -65,13 +60,9 @@ export async function zipPostTemplate (doc: string) {
         }
         
         
-        // const coreDir = ext.context.globalStoragePath;
-        // --- set extension context directory, ie-windows10: c:\Users\TestUser\vscode-f5-fast\
         const coreDir = ext.context.extensionPath; 
-        // const tmpDir = fastTemplateFolderName;
         const fullTempDir = path.join(coreDir, 'fastTemplateFolderUploadTemp');
         const zipOut = path.join(coreDir, `${fastTemplateFolderName}.zip`);
-        // const zipOut = path.join(coreDir, 'dummy.txt');
         
         logger.debug('fast Template Folder Name: ', fastTemplateFolderName);
         logger.debug('fast Template Name: ', fastTemplateName);
@@ -95,19 +86,13 @@ export async function zipPostTemplate (doc: string) {
 
         fs.writeFileSync(path.join(fullTempDir, `${fastTemplateName}.mst`), doc);
         
-        // debugger;
-        // const tempZip = packageTemplateSet(fullTempDir);
         const zipedTemplates = await packageTemplateSet2(fullTempDir, zipOut);
-        // logger.debug(package1);
-        // logger.debug('zipOut', zipOut);
 
         //f5-sdk-js version
         progress.report({ message: `Uploading Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
-        // const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
+
         const uploadStatus = await ext.mgmtClient?.upload(zipOut);
-        // logger.debug('sdk upload response', uploadStatus);
-        
 
         progress.report({ message: `Installing Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
@@ -118,14 +103,14 @@ export async function zipPostTemplate (doc: string) {
                 name: fastTemplateFolderName
             }
         });
-        // logger.debug('template import status: ', importStatus);
         
         progress.report({ message: `Deleting temporary files`});
         logger.debug(`Pending Delete of Temporary folder/files`);
         // if the temp directory is there, list contents, delete all files, then delete the directory
         if (fs.existsSync(fullTempDir)) {
+
             const dirContents = fs.readdirSync(fullTempDir);
-            // debugger;
+
             dirContents.map( item => {
                 const pathFile = path.join(fullTempDir, item);
                 logger.debug(`Deleting file: ${pathFile}`);
@@ -162,19 +147,12 @@ export async function zipPostTempSet (folder: string) {
             return new Error(`User canceled the template set`);
         });
 
-        // const basePath = folder.match(/(.*)[\/\\]/)[0]||'';
-        // const basePath = folder.substring(0, folder.lastIndexOf('/'));
-        // const justFolderName = folder.substring((folder.lastIndexOf('/')+1));
-        const basePath = folder.substring(0, folder.lastIndexOf('\\'));
-        const justFolderName = folder.substring((folder.lastIndexOf('\\')+1));
+
+        const parsedFolder = path.parse(folder);
+        const zipOut = path.join(parsedFolder.dir, `${parsedFolder.base}.zip`);
         
-        const zipOut = path.join(basePath, `${justFolderName}.zip`);
-        // const zipOut = path.join(coreDir, 'dummy.txt');
-        
-        logger.debug('fast Template Folder Name: ', justFolderName);
-        // logger.debug('fast Template Name: ', fastTemplateName);
-        logger.debug('base directory: ', basePath);
-        // logger.debug('full Temp directory: ', fullTempDir);
+        logger.debug('fast Template Folder Name: ', folder);
+        logger.debug('base directory: ', parsedFolder.dir);
         logger.debug('zip output dir/fileName: ', zipOut);
 
 
@@ -183,32 +161,25 @@ export async function zipPostTempSet (folder: string) {
 
         const zipedTemplates = await packageTemplateSet2(folder, zipOut);
         logger.debug('zipedTempaltes', zipedTemplates);
-        // debugger;
 
         /**
          * if we have gotten this far, it's time to get ready for POST
          */
 
-        // //f5-sdk-js version
+        //f5-sdk-js version
         progress.report({ message: `Uploading Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
-        // const uploadStatus = await multiPartUploadSDK(zipOut, host, authToken);
         const uploadStatus = await ext.mgmtClient?.upload(zipOut);
-        // logger.debug('sdk upload response', uploadStatus);
         
-
-
-        // debugger;
         progress.report({ message: `Installing Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
         const importStatus: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/fast/templatesets', {
             method: 'POST',
             body: {
-                name: justFolderName
+                name: parsedFolder.base
             }
         });
-        // logger.debug('template import status: ', importStatus);
         
         progress.report({ message: `${importStatus.statusText} - Removing Temporary Files...`});
         logger.debug(`Deleting zip: ${zipOut}`);
@@ -234,10 +205,6 @@ async function packageTemplateSet2(tsPath: string, dst: string) {
         const tsName = path.basename(tsPath);
         const tsDir = path.dirname(tsPath);
         const provider = new fast.FsTemplateProvider(tsDir, [tsName]);
-        // logger.debug('provider object below \\/\\/', provider);
-
-        // dst = dst || `./${tsName}.zip`;
-        // logger.debug('dest file name', dst);
         
         const fastPackage = await provider.buildPackage(tsName, dst)
             .then(() => {
@@ -278,10 +245,10 @@ async function loadTemplate(templatePath: string) {
         });
 };
 
-const validateTemplate = (templatePath: string) => loadTemplate(templatePath)
-    .then(() => {
-        logger.debug(`template source at ${templatePath} is valid`);
-    });
+// const validateTemplate = (templatePath: string) => loadTemplate(templatePath)
+//     .then(() => {
+//         logger.debug(`template source at ${templatePath} is valid`);
+//     });
 
 
 /**
