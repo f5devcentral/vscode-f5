@@ -11,7 +11,7 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
     getTreeItem(element: ExampleDec): TreeItem {
@@ -53,7 +53,7 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 			let link: Uri;
 			let comment: string;
 
-			link = Uri.parse('https://github.com/DumpySquare/vscode-f5-fast');
+			link = Uri.parse('https://github.com/f5devcentral/vscode-f5');
 			comment = 'Main vscode-f5-fast repo for documentation and issues';
 			treeItems.push(new ExampleDec('vscode-f5-fast repo', comment, TreeItemCollapsibleState.None,
 				{command: 'vscode.open', title: '', arguments: [link]}));
@@ -128,15 +128,10 @@ async function getTSexamples(){
 export class ExampleDec extends TreeItem {
 	constructor(
 		public readonly label: string,
-		// private version: string,
-		private toolTip: string,
+		public tooltip: string,
 		public readonly collapsibleState: TreeItemCollapsibleState,
 		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
-	}
-
-	get tooltip(): string {
-		return this.toolTip;
 	}
 }

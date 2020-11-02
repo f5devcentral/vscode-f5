@@ -147,7 +147,7 @@ export class FastWebView {
     document.vscode = vscode;
 })();
 </script>
-<button onclick="vscode.postMessage(editor.getValue())">Submit</button>
+<button onclick="vscode.postMessage(editor.getValue())">Render</button>
 <p></p>
         `;
 

@@ -1,4 +1,5 @@
 'use strict';
+
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { downloadToFile } from './coreF5HTTPS';
@@ -72,7 +73,7 @@ export async function installedRPMs () {
         return installed;
     } else {
         // todo:  setup fail condition?
-        console.warn('getting installedRPMs failed', tasks.status, tasks.statusText);
+        logger.warn('getting installedRPMs failed', tasks.status, tasks.statusText);
     }
 }
 

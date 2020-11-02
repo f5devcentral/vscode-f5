@@ -1,8 +1,12 @@
 .vscode/**
 .vscode-test/**
 out/test/**
+# ignore new documentation site
+docs/**
+# ignore source typescript files
 src/**
 .gitignore
+# ignore original readme docs
 README_docs/**
 vsc-extension-quickstart.md
 **/tsconfig.json
@@ -12,4 +16,5 @@ vsc-extension-quickstart.md
 # **/*.gif
 atc_ilx_rpm_cache/**
 fastTemplateFolderUploadTemp/**
-restTests/**
+# ignore test seed file
+.vscode-f5.json

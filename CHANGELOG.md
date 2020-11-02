@@ -2,13 +2,99 @@
 
 [BACK TO MAIN README](README.md)
 
-All notable changes to the "vscode-f5-fast" extension will be documented in this file.
+All notable changes to the "vscode-f5" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ---
 
-## [2.4.0] - (10-5-2020)
+## [2.8.1] - (11-02-2020)
+
+### Modified
+- Fixed where clearing of password was not happening in all scenarios
+- Fixed fast template uploading from non-windows based file systems
+- Fixed config explore tree refresh when new config is 'explored'
+
+
+---
+
+## [2.8.0] - (10-30-2020)
+
+### Added
+- function to attempt to remove old extension if detected
+  - the functions/settings it provides will conflict with new/reBranded extension
+- Finished function to inject/remove schema reference from declaration
+  - Accessable via right-click in editor
+  - if a schema reference is present, it will remove it
+  - if no schema is present, it will attempt to discover the declaration type (as3/do/ts) and inject the appropriate schema reference
+  - If the declaration is not a valid json object or it is not able to figure out what kind of ATC declaration it is, then it will prompt a given selection to inject anyway
+  - https://f5devcentral.github.io/vscode-f5/#/schema_validation?id=injectremove-schema-reference-command
+
+
+---
+
+## [2.7.0] - (10-21-2020)
+
+### Added
+
+- Device import function
+  - Detect seed file, prompt for import at startup
+    - `Yes` to just import, or `Yes-Consume` will delete the file after contents have been read (devices imported)
+  - Command to import seed/device details
+  - Seed file supports object with properties or array or string (see documentation)
+
+### Modified
+
+- Changed TCL visibility setting to default on
+  - way past the initial beta of this feature set and haven't seen any bugs since
+- Updated config device regex to match the device add function
+- Opened editor actions to allow declaration post without highligh (FAST/AS3/DO/TS)
+  - When no highlighted text to capture, it will capture the entire editor text
+- Updated corkscrew integration (v0.4.0) including:
+  - latest corkscrew ouput
+  - More view device details
+  - Object counts for many view items
+- Delete mini_ucs after mini_ucs is collected and exploded by corkscrew
+- Updated logging OUTPUT to be visible when launching
+- Fixed f5 terminal creation from happening every connect and taking focus
+  - This should only happen if configuration for the feature is present
+
+---
+
+## [2.6.0] - (10-21-2020)
+
+### Modified
+
+- Updated corkscrew to new project name (f5-corkscrew) and version 0.3.0 which includes support for extracting pool configs when reference by a local traffic policy
+
+---
+
+## [2.5.1] - (10-7-2020)
+
+### Modified
+- TMOS Config Explorer
+  - Updates for corkscrew v2
+    - Includes faster processing, mini_ucs fetch of connected device, Base config (vlans/Selfs), all partitions configs
+    - Add right click to process local ucs/qkview
+  - Added "Clear" button to clear config explorer results and remove from view.  
+
+---
+
+## [2.5.0] - (10-5-2020)
+
+### Added
+
+- TMOS config explorer functionality (beta)
+  - Currently parses bigip.conf for individual applications and supporting configuration
+  - Supports most common configuration items refeneced by virtual server, ie: pool, monitors, nodes, primary/fallback persistense, local traffic policies, snat pools, irules, and profiles (http, tcp, udp, client/server-ssl, ... everything referenced under the "profiles" section of the virtual server)
+  - tested to be working on v14/v15
+  - Can get bigip.conf from connected device or parse a local file
+  - Includes different structures for viewing the tmos config
+  - Includes a parsing log for feedback on the extraction process
+
+---
+
+## [2.4.0] - (9-30-2020)
 
 
 ### Modified
@@ -83,7 +169,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
       - included options for redeploying iApp-App with current paramters and deleting an iApp-App
   - `Merge TCL/TMOS` can be used to merge ANY TMOS config item
 
-Documentation: https://github.com/DumpySquare/vscode-f5-fast/blob/master/README_docs/tcl.md
+Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs/tcl.md
 
 ### Modified
 - extension now has dynamic config-settings changes, meaning, when an extension setting is changed, it is applied to extension without reload of workspace
@@ -271,7 +357,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
   - This was to allow for more robust error handling for async post operations
 - Updated password prompt to provide more clarity of what is expected
 - Refined conditions that clear cached passwords
-  - [issue #19]https://github.com/DumpySquare/vscode-f5-fast/issues/19
+  - [issue #19]https://github.com/f5devcentral/vscode-f5/issues/19
 
 ### Added
 - Auto-refresh AS3 trees after tenant delete or declaration post
@@ -297,7 +383,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ### Modified
 - Device add/modify
   - Relaxed regex to allow :port for single nic ve
-  - [issue #5] https://github.com/DumpySquare/vscode-f5-fast/issues/5
+  - [issue #5] https://github.com/f5devcentral/vscode-f5/issues/5
 
 ---
 

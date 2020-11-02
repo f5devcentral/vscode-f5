@@ -6,35 +6,6 @@ import * as fs from 'fs';
 import * as os from 'os';
 import logger from '../utils/logger';
 
-/**
- * The following has an example/explaination of using onWillSaveTextDocument event
- * https://vscode.rocks/decorations/
- * 
- * This can be used to catch when the user tries to save the file 
- * 	and possiby get find the information needed to post the change back to device
- * 
- * 
- * in order to get all the functionality needed, like create and better update, gonna need a way to associate the
- * 	details in the open editor with the details on how/where the editor contents came from, like fullPath to patch
- * 	back to the same irule on the f5
- * 
- * Right now, we instert a tag into the begging on of the irule in the editor, then remove the tag as part of the patch to f5.
- * This works, but it hackey and error prone.  There are some ways I'm seeing stuff like this handled.
- * 
- * Something from a simple virtual document provider; but it seems like the content if more for static hosting
- * https://github.com/microsoft/vscode-extension-samples/blob/master/virtual-document-sample/README.md
- * 
- * to maybe a content provider:
- * https://github.com/microsoft/vscode-extension-samples/blob/master/contentprovider-sample/README.md
- * 
- * or a full blown virtual file system:
- * https://github.com/microsoft/vscode-extension-samples/blob/master/tree-view-sample/src/fileExplorer.ts
- * 
- * K11799414: Managing iRules using the iControl REST API
- * https://support.f5.com/csp/article/K11799414
- * 
- */
-
 
 export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
@@ -49,7 +20,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	getTreeItem(element: TCLitem): vscode.TreeItem {
@@ -452,22 +423,13 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 class TCLitem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		private version: string,
-		private toolTip: string,
+		public description: string,
+		public toolTip: string,
 		public context: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 	}
-
-	get tooltip(): string {
-		return this.toolTip;
-	}
-
-	get description(): string {
-		return this.version;
-	}
-
 	contextValue = this.context;
 }

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { isArray } from 'util';
+// import { isArray } from 'util';
 
 
 export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
@@ -16,7 +16,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 	}
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	getTreeItem(element: AS3item): vscode.TreeItem {
@@ -109,7 +109,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 		/**
 		 * got an array, so this should be a bigiq list of devices with tenant information
 		 */
-		if(isArray(tenCall.data)) {
+		if(Array.isArray(tenCall.data)) {
 				this._bigiqTenants = tenCall.data.map( (el: any) => {
 				
 				const target = el.target.address; // got target bigip
@@ -162,22 +162,13 @@ function isObject(x: any) {
 class AS3item extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
-		private version: string,
-		private toolTip: string,
+		public description: string,
+		public tooltip: string,
 		public context: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command: vscode.Command,
 	) {
 		super(label, collapsibleState);
 	}
-
-	get tooltip(): string {
-		return this.toolTip;
-	}
-
-	get description(): string {
-		return this.version;
-	}
-
 	contextValue = this.context;
 }
