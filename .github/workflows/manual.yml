@@ -24,11 +24,9 @@ jobs:
       uses: HaaLeo/publish-vscode-extension@v0
       with:
         pat: ${{ secrets.OPEN_VSX_TOKEN }}
-        # dryRun: true
     - name: Publish to Visual Studio Marketplace
       uses: HaaLeo/publish-vscode-extension@v0
       with:
         pat: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
         registryUrl: https://marketplace.visualstudio.com
         extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
-        # dryRun: true
