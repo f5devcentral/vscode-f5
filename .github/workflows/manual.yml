@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build_Publish:d
+  Build_Publish:
     runs-on: ubuntu-latest
 
     steps:
