@@ -1,30 +1,75 @@
 # This is a basic workflow that is manually triggered
 
-name: Publish Extensions
+name: Publish Release
+# author: Ben Gordon
 
 # on:
 #   release:
 #     # Only use the types keyword to narrow down the activity types that will trigger your workflow.
 #     types: [published, created, edited]
 
+#  curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url
+# "https://github.com/f5devcentral/vscode-f5/releases/download/v2.3.0/vscode-f5-fast-2.3.0.vsix"
+
+# single line command to download latest release
+# curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget
+
+
 on:
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "greet"
-  publishJ:
-    # The type of runner that the job will run on
+  Build_Publish:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: 12
-    - run: npm ci
-    - name: Publish VS Code Extension
+
+    - name: get latest release name
+      id: get_release_name
+      run: echo "::set-output name=name::$(curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].name)"
+        # outputs: 
+        #   releaseName:
+        #     description: 'full name of the release'
+
+    - name: display release name from output
+      # run: echo ${{ outputs.releaseName.value }}
+      run: echo ${{ steps.get_release_name.outputs.name }}
+
+    - name: download latest release
+      run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
+      shell: bash
+
+    - name: list directory
+      run: ls -la
+      shell: bash
+      
+    - name: npm install everything
+      run: npm install
+
+    - name: Publish to Open VSX Registry
+      id: publishToOpenVSX
       uses: HaaLeo/publish-vscode-extension@v0
       with:
         pat: ${{ secrets.OPEN_VSX_TOKEN }}
+        extensionFile: ${{ steps.get_release_name.outputs.name }}
+        packagePath: ''
+        dryRun: true
+
+    - name: display open vsx output
+      run: 
+        echo ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+        echo ${{ steps.get_release_name.outputs.name }}
+
+    - name: Publish to Visual Studio Marketplace
+      uses: HaaLeo/publish-vscode-extension@v0
+      with:
+        pat: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
+        registryUrl: https://marketplace.visualstudio.com
+        # extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+        extensionFile: ${{ steps.get_release_name.outputs.name }}
+        packagePath: ''
+        dryRun: true

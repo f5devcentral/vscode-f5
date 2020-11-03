@@ -3,10 +3,10 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "2.8.1-beta",
+	"version": "2.8.1",
 	"keywords": [
-		"f5",
-		"f5networks",
+		"F5",
+		"F5Networks",
 		"AS3",
 		"FAST",
 		"DO",
@@ -1014,7 +1014,7 @@
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"@types/js-yaml": "^3.12.5",
 		"axios": "^0.19.2",
-		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git",
+		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git#a15106ccc6e7d502986a272c4f0c4fe13ff1d578",
 		"js-yaml": "^3.14.0",
 		"keytar": "^6.0.1"
 	}

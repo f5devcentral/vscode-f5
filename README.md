@@ -12,8 +12,8 @@ Any comments, questions or feature requests, please open a github repository iss
 
 
 
-### Download via the Microsoft extension marketplace or directly from within VSCode
-> to be updated when with next release!
+### New documentation site!!!
+!> https://f5devcentral.github.io/vscode-f5/#/
 
 ---
 
