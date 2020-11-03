@@ -3,10 +3,10 @@
 name: Publish Release
 # author: Ben Gordon
 
-on:
-  release:
-    # Only use the types keyword to narrow down the activity types that will trigger your workflow.
-    types: [published, created, edited]
+# on:
+#   release:
+#     # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+#     types: [published, created, edited]
 
 #  curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url
 # "https://github.com/f5devcentral/vscode-f5/releases/download/v2.3.0/vscode-f5-fast-2.3.0.vsix"
@@ -15,11 +15,11 @@ on:
 # curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget
 
 
-# on:
-#   workflow_dispatch:
+on:
+  workflow_dispatch:
 
 jobs:
-  Build_Publish:
+  Build_Publish:d
     runs-on: ubuntu-latest
 
     steps:
