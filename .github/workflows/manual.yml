@@ -1,7 +1,6 @@
 # This is a basic workflow that is manually triggered
 
 name: Publish Release
-author: Ben Gordon
 
 # on:
 #   release:
