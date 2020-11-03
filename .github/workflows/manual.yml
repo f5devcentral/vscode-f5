@@ -59,7 +59,9 @@ jobs:
         dryRun: true
 
     - name: display open vsx output
-      run: echo ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+      run: 
+        echo ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+        echo ${{ steps.get_release_name.outputs.name }}
 
     - name: Publish to Visual Studio Marketplace
       uses: HaaLeo/publish-vscode-extension@v0
