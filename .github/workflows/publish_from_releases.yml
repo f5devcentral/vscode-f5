@@ -1,0 +1,47 @@
+# This is a basic workflow that is manually triggered
+
+name: Publish Extensions
+
+# on:
+#   release:
+#     # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+#     types: [published, created, edited]
+
+#  curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url
+# "https://github.com/f5devcentral/vscode-f5/releases/download/v2.3.0/vscode-f5-fast-2.3.0.vsix"
+
+# single line command to download latest release
+# curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget
+
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Build_Publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    # - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: download latest release
+      run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
+      shell: bash
+    - name: list directory
+      run: ls -la
+      shell: bash
+    # - run: npm install
+    # - name: Publish to Open VSX Registry
+    #   uses: HaaLeo/publish-vscode-extension@v0
+    #   with:
+    #     pat: ${{ secrets.OPEN_VSX_TOKEN }}
+    #     # dryRun: true
+    # - name: Publish to Visual Studio Marketplace
+    #   uses: HaaLeo/publish-vscode-extension@v0
+    #   with:
+    #     pat: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
+    #     registryUrl: https://marketplace.visualstudio.com
+    #     extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+    #     # dryRun: true
