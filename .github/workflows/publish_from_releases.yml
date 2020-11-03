@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Publish Extensions
+name: Publish Release
 
 # on:
 #   release:
