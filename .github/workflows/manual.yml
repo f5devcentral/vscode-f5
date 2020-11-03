@@ -30,7 +30,7 @@ jobs:
 
     - name: get latest release name
       id: get_release_name
-      run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].name"
+      run: echo "::set-output name=var1::curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].name"
         # outputs: 
         #   releaseName:
         #     description: 'full name of the release'
@@ -39,13 +39,13 @@ jobs:
       # run: echo ${{ outputs.releaseName.value }}
       run: echo ${{ steps.get_release_name.outputs }}
 
-    - name: download latest release
-      run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
-      shell: bash
+    # - name: download latest release
+    #   run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
+    #   shell: bash
 
-    - name: list directory
-      run: ls -la
-      shell: bash
+    # - name: list directory
+    #   run: ls -la
+    #   shell: bash
 
       
     # - run: npm install
