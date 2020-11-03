@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    # - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: 12
@@ -35,20 +35,20 @@ jobs:
         #   releaseName:
         #     description: 'full name of the release'
 
-    # - name: display release name from output
-    #   # run: echo ${{ outputs.releaseName.value }}
-    #   run: echo ${{ steps.get_release_name.outputs.name }}
+    - name: display release name from output
+      # run: echo ${{ outputs.releaseName.value }}
+      run: echo ${{ steps.get_release_name.outputs.name }}
 
     - name: download latest release
       run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
       shell: bash
 
-    # - name: list directory
-    #   run: ls -la
-    #   shell: bash
+    - name: list directory
+      run: ls -la
+      shell: bash
       
-    - name: npm install everything
-      run: npm install
+    # - name: npm install everything
+    #   run: npm install
 
     - name: Publish to Open VSX Registry
       id: publishToOpenVSX
