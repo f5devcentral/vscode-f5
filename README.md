@@ -13,7 +13,7 @@ Any comments, questions or feature requests, please open a github repository iss
 
 
 ### New documentation site!!!
-!> https://f5devcentral.github.io/vscode-f5/#/
+> https://f5devcentral.github.io/vscode-f5/#/
 
 ---
 
