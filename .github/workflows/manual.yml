@@ -68,6 +68,6 @@ jobs:
       with:
         pat: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
         registryUrl: https://marketplace.visualstudio.com
-        # extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
-        extensionFile: ${{ steps.get_release_name.outputs.name }}
+        extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+        # extensionFile: ${{ steps.get_release_name.outputs.name }}
         dryRun: true
