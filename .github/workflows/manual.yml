@@ -70,4 +70,5 @@ jobs:
         registryUrl: https://marketplace.visualstudio.com
         extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
         # extensionFile: ${{ steps.get_release_name.outputs.name }}
+        packagePath: ''
         dryRun: true
