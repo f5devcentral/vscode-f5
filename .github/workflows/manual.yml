@@ -1,7 +1,7 @@
 # This is a basic workflow that is manually triggered
 
 name: Publish Release
-author: Ben Gordon
+# author: Ben Gordon
 
 # on:
 #   release:
@@ -36,9 +36,8 @@ jobs:
           description: 'full name of the release'
 
     - name: display release name from output
-      run: |
-      echo ${{ outputs.releaseName.value }}
-      echo ${{ steps.get_release_name.output }}
+      run: echo ${{ outputs.releaseName.value }}
+      run: echo ${{ steps.get_release_name.output }}
 
     - name: download latest release
       run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
