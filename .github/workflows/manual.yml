@@ -31,13 +31,13 @@ jobs:
     - name: get latest release name
       id: get_release_name
       run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].name"
-      # outputs: 
-      #   releaseName:
-      #     description: 'full name of the release'
+      outputs: 
+        releaseName:
+          description: 'full name of the release'
 
     - name: display release name from output
       # run: echo ${{ outputs.releaseName.value }}
-      run: echo ${{ steps.get_release_name.output }}
+      run: echo ${{ steps.get_release_name.outputs }}
 
     - name: download latest release
       run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
