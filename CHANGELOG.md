@@ -15,6 +15,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Modified
 - Major documentation updates for new doc site and features
+- Tweaked some error handling for exiting mid device mgmt workflows
+- Updated Documentation view with latest changes
 
 ---
 

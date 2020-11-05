@@ -12,10 +12,10 @@
 - [ATC RPM Mgmt](atc_rpm_mgmt.md)
 - [Generic Rest Calls](generic_rest_calls.md)
 - [Utilities](utilities.md)
-- [Research](research.md)
 - [Change Log](/changelog)
 
 &nbsp;
 
 - **Links**
-- [![Github](media/github.svg)Github](https://github.com/f5devcentral/vscode-f5)
+- [![Github](media/github.svg)Github: vscode-f5](https://github.com/f5devcentral/vscode-f5)
+- [![Github](media/github.svg)Github: f5-appsvcs-extension](https://github.com/F5Networks/f5-appsvcs-extension)
