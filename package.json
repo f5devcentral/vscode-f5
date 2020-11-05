@@ -367,7 +367,7 @@
 			},
 			{
 				"command": "f5.installRPM",
-				"title": "Install/Update RPM",
+				"title": "Install RPM",
 				"category": "F5",
 				"enablement": "f5.device"
 			},
@@ -380,6 +380,15 @@
 			{
 				"command": "f5.refreshHostsTree",
 				"title": "Refresh Devices",
+				"category": "F5",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5.cfgExploreRefresh",
+				"title": "Refresh Config Explorer",
 				"category": "F5",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -704,6 +713,11 @@
 					"group": "navigation"
 				},
 				{
+					"command": "f5.cfgExploreRefresh",
+					"when": "view == cfgTree",
+					"group": "navigation"
+				},
+				{
 					"command": "f5.cfgExploreClear",
 					"when": "view == cfgTree",
 					"group": "navigation"
@@ -993,6 +1007,7 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
+		"docs": "docsify serve docs",
 		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
 		"refresh-corkscrew": "rm -rf node_modules/f5-corkscrew && npm install https://github.com/f5devcentral/f5-corkscrew.git"
 	},

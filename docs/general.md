@@ -73,6 +73,7 @@ When utilizing external auth provider on a regular BIG-IQ (not bigiq), regardles
 As of the v2.3.0 most logs are now sent to the OUTPUT tab of the bottom pane.  This should provide easier access to what the extension is doing.
 
 !> as of 10.28.2020 v2.7.+, this OUTPUT chanel is now called "f5" as part of the new name changes
+
 <img src="./media/OUTPUT_logging_9.9.2020.PNG" alt="drawing" width="80%"/>
 
 

@@ -1186,6 +1186,10 @@ export async function activate(context: ExtensionContext) {
 		cfgProvider.clear();
 	}));
 
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreRefresh', async (text) => {
+		cfgProvider.refresh();
+	}));
+
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore-show', async (text) => {
 		const x = cfgView.selection;
 		let full: string[] = [];

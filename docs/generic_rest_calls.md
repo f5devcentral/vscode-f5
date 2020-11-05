@@ -8,6 +8,7 @@ Highlight text, right-click, select: `Make HTTPS Request`
 
 
 ## Calls without "http" in url
+
 This assumes the request is intented for the currently connected device, of which host details are already known.
 
 K13225405: Common iControl REST API command examples
@@ -17,6 +18,7 @@ How to use postman api for external tests like post
 - https://docs.postman-echo.com/?version=latest
 
 
+>The underlying HTTP client is AXIOS, so most AXIOS parameters should work
 https://www.npmjs.com/package/axios
 
 ### simple url as string

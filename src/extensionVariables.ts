@@ -70,7 +70,7 @@ export async function loadConfig() {
 
 
     // irule view stuff - in progress
-    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', false);
+    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', true);
     if(ext.settings.irulesEnabled && ext.iRulesAble){
         commands.executeCommand('setContext', 'f5.tcl', true);
     } else {

@@ -1,41 +1,31 @@
 
 # TCL/iRules/iApps
 
-## irules
+This VSCode extension now supports the management of TCL/TMOS objects, including iRules/iApps.  iRules and iApps are listed/viewed via the API, but merged with the running config when uploaded/updated.  
 
-### irule language extension
+This functionality can also be used for creating/modifying or migrating applictions
 
+While this extension does help with the managment of iRules/iApps, it does not provide any validation or language features like syntax checking or auto-complete.  For language features, it is highly recommended to utilize the following extensions.
 
-## iapps
+All these extension combined provide a very power platform for writing and deploying iRule/iApps.
 
+!> NOTE:  Be cautious of editing iRules in a production environment since any changes can affect client connections.
 
-## merge config
+## iRules
 
-
-
-The extension can manage TCL configurations including iRules and iApps!
-
---- 
-
-&nbsp; &nbsp; 
-
-## Install F5 Networks iRules extension by bitwisecook
+Recommended iRule language extension
 
 https://marketplace.visualstudio.com/items?itemName=bitwisecook.irule
 
-Also check out the iApp version:
+
+## iApps
+
+Recommended iApp language extension
+
 https://marketplace.visualstudio.com/items?itemName=bitwisecook.iapp
-
-&nbsp;
-
----
-
-&nbsp;
 
 
 ## Commands
-
-&nbsp;
 
 * `F5: Merge TCL/TMOS`: Used to merge editor/highlighted text with running connfig of connected bigip
   - Use this to push a new TMOS config object or after modifing an existing irule (format is a tmos object)
@@ -73,23 +63,17 @@ https://marketplace.visualstudio.com/items?itemName=bitwisecook.iapp
 * `F5: POST iApp Template .tmpl`: Uploads and imports iApp template
   - Available: right-click in editor and right-click on explorer file with .tmpl extension
 
-&nbsp;
 
 ---
 
-&nbsp;
-
 ## Create/Modify/Delete iRule
-
-&nbsp;
 
 ![create/modify/delete iRule](./media/tcl_createModifyDelete_rule_8.21.2020.gif)
 
 &nbsp;
 
----
 
-&nbsp;
+---
 
 ## iApp Template Management
 
@@ -98,24 +82,21 @@ https://marketplace.visualstudio.com/items?itemName=bitwisecook.iapp
 * Modify existing iApp
 * Delete iApp
 
-&nbsp;
-
 ![create/modify/delete iRule](./media/tcl_createModifyDelete_rule_8.21.2020.gif)
 
 &nbsp;
 
 ---
 
-&nbsp;
+## Config Migration
 
-## Config migration work flow?
+The following workflow shows how an application can be extracted from a config and merged with the running config of another device
 
-!> update this content to include new config explorer functionality
+!> Be aware of configuration object parameters which are not user settable like the `last-modified-time` of the virtual server.  They will need to be removed before merge.
 
-- get bigip.conf from bigip
-  - `Remote Command Execute` -> 'cat /config/bigip.con'
-  - disconnect from bigip
-- extract configuration objects to new editor as needed
-- connet to new device, merge TCL from new editors with extracted/modified configurations
+!> It is recommended to only merge configurations items that are sourced from the same TMOS version
+
+<img src="./media/appMove_tclMerge_11.04.2020.gif" alt="drawing" width="80%"/>
+
 
 
