@@ -55,7 +55,7 @@ jobs:
       uses: HaaLeo/publish-vscode-extension@v0
       with:
         pat: ${{ secrets.OPEN_VSX_TOKEN }}
-        extensionFile: ${{ steps.get_release_name.outputs.name }}
+        extensionFile: echo ${{ steps.get_release_name.outputs.name }}
         packagePath: ''
         # dryRun: true
 
@@ -70,6 +70,6 @@ jobs:
         pat: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
         registryUrl: https://marketplace.visualstudio.com
         # extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
-        extensionFile: ${{ steps.get_release_name.outputs.name }}
+        extensionFile: echo ${{ steps.get_release_name.outputs.name }}
         packagePath: ''
         # dryRun: true
