@@ -1,12 +1,10 @@
-# vscode-f5
+# The F5 VSCode Extension
 
 We'ved moved and renamed!!!
 
 Formerly the F5 (A)pplication (S)ervices (T)emplates(FAST), "vscode-f5-fast" extension, now just "The F5 VSCode" Extension (vscode-f5). 
 
 Not only not it fully integrate with the (A)utomated (T)ool (C)hain but also support TCL/iRules/iApps and much more!!!
-
-More to come over the next couple of weeks as we finalize the move and prepare for the next release.  Please stay tuned.
 
 Any comments, questions or feature requests, please open a github repository issue!!!
 
@@ -15,38 +13,73 @@ Any comments, questions or feature requests, please open a github repository iss
 ### New documentation site!!!
 > https://f5devcentral.github.io/vscode-f5/#/
 
+> this page is in progress as we transition documents to the new site above
+
+
+
+If you mention the words "F5" and "API" with any sort of consistency, then you need to be using The F5 VSCode Extension...
+
+The F5 VSCode Extension will not only only supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, but also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
+
+If that wasn't enough to get your attention, the extension can also...
+
+- GET/POST/DELETE of all ATC services, including FAST/AS3/DO/TS
+- links to quickly open related ATC documentation
+- Direct access to ATC examples from git repo
+- Install/UnInstall of ATC rpms
+- Convert JSON <-> YAML
+- Encode/Decode base64 strings
+- Craft generic HTTP REST calls to connected device or external
+- Extract TMOS applications (per virtual server)
+- Write, deploy and modify iRules/iApps (with vscode-irule extension for language support)
+
+## Getting the extension
+
+The best path is to install Visual Studio Code from: https://code.visualstudio.com/
+
+Then install the extension following the steps below:
+
+Select the extensions view 
+
+<img src="./docs/media/vscode_extensions_icon.PNG" alt="drawing" width="5%"/>
+
+Search for `F5`, select the extension "The F5 Extension", then `Install`
+
+<img src="./docs/media/installWithinCode_11.04.2020.gif" alt="drawing" width="80%"/>
+
+## Create a device and connect
+
+Select `Add Host` in the `F5: Hosts` view.  Then type in device details in the \<user\>@x.x.x.x format, hit `Enter` to submit
+
+<img src="./docs/media/addDeviceConnect_11.04.2020.gif" alt="drawing" width="80%"/>
+
+## Deploy example as3 app
+
+Click on the hostname of the connected device at the bottom of the window.
+
+> This is the easiest way to get an editor window for JSON files and it also demontrates how to get device details
+
+Now that we have a json editor, select all text (`control + a`), then `delete`.
+
+Type `as3` to get the example AS3 snippet, press `Enter`.
+
+This should insert a sample AS3 declaration into the editor
+
+> Note the declaration schema reference at the top.  This provides instant feedback and validation for any necssary modifications.  Please see [Schema Validation](schema_validation.md) for more details
+
+Right-click in the editor and select `POST as AS3 Declaration`.  This should post the declaration to the currently connected device
+
+!> Please be sure to have the AS3 service installed prior.  See [ATC RPM Mgmt](atc_rpm_mgmt.md) for assistance with getting a service installed
+
+<img src="./docs/media/as3SnippetDemo_11.04.2020.gif" alt="drawing" width="80%"/>
+
+
+
 ---
 
-## Index
+### To delete deployed AS3 tenant from device
 
-### This page
-
-* [Extension Commands](https://github.com/f5devcentral/vscode-f5#extension-commands)
-* [Basic device management](https://github.com/f5devcentral/vscode-f5#basic-device-management-addeditdelete-connectdisconnect)
-* [Connecting/Disconnecting and password caching](https://github.com/f5devcentral/vscode-f5#connectingdisconnecting-and-password-caching)
-* [Extension Commands](https://github.com/f5devcentral/vscode-f5#extension-commands)
-
-
-### Other Pages
-
-* [CHANGELOG](CHANGELOG.md)
-<!-- * [Research](./README_docs/research.md) -->
-<!-- * [Schema Validation](./README_docs/schemaValidation.md) -->
-<!-- * [Crafting raw API calls](https://github.com/DumpySquare/f5-fasting/blob/master/makeHTTPsTesting.md)
-    > hosted in the f5-fasting repo that is used to document and demonstrate fast/extension functionality for demos -->
-<!-- * [ATC ILX rpm package management](./README_docs/rpmMgmt.md) -->
-<!-- * [TCL/iRules/iApps](./README_docs/tcl.md) -->
-<!-- * [FAST information and How-To's](./README_docs/fast.md) -->
-<!-- * [Additional Tools](./README_docs/tools.md) -->
-
-
-Future extension features and enhancements have been moved to the repo issues(enhancements) for better tracking
-* [repo issues and enhancements](https://github.com/f5devcentral/vscode-f5/issues)
-
----
-
-
-
+Right-click on the tenant in the AS3 view on the left, then select `Delete Tenant`
 
 ## Known Issues
 

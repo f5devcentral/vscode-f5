@@ -209,7 +209,9 @@ export async function activate(context: ExtensionContext) {
 			logger.debug('user input', input);
 
 			if (input === undefined || bigipHosts === undefined) {
-				throw new Error('Update device inputBox cancelled');
+				// throw new Error('Update device inputBox cancelled');
+				logger.warn('Update device inputBox cancelled');
+				return;
 			}
 
 			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
@@ -256,7 +258,9 @@ export async function activate(context: ExtensionContext) {
 			logger.debug('user input', input);
 
 			if (input === undefined || bigipHosts === undefined) {
-				throw new Error('Update device inputBox cancelled');
+				// throw new Error('Update device inputBox cancelled');
+				logger.warn('Update device inputBox cancelled');
+				return;
 			}
 
 			if (input === 'custom for bigiq') {
@@ -1184,6 +1188,10 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.cfgExploreClear', async (text) => {
 		cfgProvider.clear();
+	}));
+
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreRefresh', async (text) => {
+		cfgProvider.refresh();
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore-show', async (text) => {

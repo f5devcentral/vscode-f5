@@ -8,6 +8,18 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.8.2] - (11-05-2020)
+
+### Added
+- Refresh command for Config Explerer view
+
+### Modified
+- Major documentation updates for new doc site and features
+- Tweaked some error handling for exiting mid device mgmt workflows
+- Updated Documentation view with latest changes
+
+---
+
 ## [2.8.1] - (11-02-2020)
 
 ### Modified

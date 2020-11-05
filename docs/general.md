@@ -27,27 +27,22 @@
   - Delete device from the F5 HOSTS view
     - 'Right-Click`, select "DELETE" from the menu that appears next to the host entry in the "F5 HOSTS" view
 
-<!-- ## Device Mgmt (add, modify, delete devices) -->
 ![Device Management](./media/deviceMgmt_5.18.2020.gif)
 
 ---
 
-## Connecting/Disconnecting and password caching
+## Connecting/Disconnecting
 
 Connect means to select a device to work with.  When connected, commands/api calls will be executed on that device.
 
-Passwords are cached automatically.  They can be cleared with the "F5: Disconnect and Clear ALL Passwords"
-
-No need to disconnect when switching devices
-
-If authentication to a device ever failes (401 response), password cache for that device will be cleared and prompt for a new one
-
-*** passwords are cached using system encryption with KeyTar ***
+>No need to disconnect when switching devices
 
 - To connect to a device:
   - Select the device in the 'F5 Hosts' view on the left
     - -- or --
   - Press `F1`, type `f5`, select "F5: Connect to Device", select device from prompt
+
+  > Can also click the `F5 -> Connect!` at the bottom of the window to connect
 
 - To Disconnect from a device:
   - Click on the user@device object in the status bar at the bottom
@@ -57,9 +52,24 @@ If authentication to a device ever failes (401 response), password cache for tha
 ![Device Connecting](./media/connectDisPassCache_5.18.2020.gif)
 
 
+## Password caching
+
+Passwords are cached using system encryption with KeyTar
+
+https://github.com/atom/node-keytar
+
+If an HTTP call to a device ever failes (401 response), password cache for that device will be cleared and prompt for a new one at the next connection attempt
+
+There is also a command to clear the password for a selected device, which can be access via righ-click on a device in the `F5: HOSTS` view, then select `Clear Password`
+
+> A cached device password should also be deleted with the device is removed from the list through the UI
+
+
 ## Authentication provider
 
-Details about how to setup the authentication provider
+The extension supports remote administration authentication of the destination F5 device.
+
+By default, the provider is set to `local`, but can be changed by right-clicking on the device in the `F5: HOSTS` view and selecting `Edit Logon Provider`.  This should present predefined options that regular TMOS devices support.
 
 
 ## local vs tmos for BIGIP autProvider
@@ -68,11 +78,19 @@ When utilizing external auth provider on a regular BIG-IQ (not bigiq), regardles
 
 !> Summary -> if your connecting to a bigip and getting 401 invalid logon provider, the two main options to try should be 'local' or 'tmos'.  In my testing, no other options worked.
 
+
+## BIG-IQ AuthProvider
+
+BIG-IQ supports multiple authentication providers, which are all unique.  This can be configured through the same right-click on the device in the `F5: HOSTS` view, selecting `Edit Logon Provider`, select `custome for bigiq`, then provide the name of the authentication provider.
+
+
+
 ## OUTPUT logging
 
 As of the v2.3.0 most logs are now sent to the OUTPUT tab of the bottom pane.  This should provide easier access to what the extension is doing.
 
 !> as of 10.28.2020 v2.7.+, this OUTPUT chanel is now called "f5" as part of the new name changes
+
 <img src="./media/OUTPUT_logging_9.9.2020.PNG" alt="drawing" width="80%"/>
 
 

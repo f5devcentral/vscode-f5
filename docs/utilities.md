@@ -3,19 +3,26 @@
 
 ## JSON <-> YAML converter
 
-Information about how to use the json <-> yaml converter right-click
+There is a json <-> yaml converter via right-click in the editor as shown below:
+
+<img src="./media/json_yaml_coverter_11.04.2020.gif" alt="drawing" width="80%"/>
 
 ## Base64 encode/decode
 
-details here
+Right-click in an editor will also present the option to base64 encode/decode
+
+<img src="./media/json_yaml_coverter_11.04.2020.gif" alt="drawing" width="80%"/>
 
 ## onConnect/onDisconnect Commands
 
-Details about this configuraton option
+The onConnect and onDisconnect commands are configurable via the user settings json file for the extension.  This feature allows commands to be executed on connect and on disconnect of the related device.  
+
+This feature is useful for workflows like automatically connecting over ssh and tailing the logs for a specific device
+
+<img src="./media/onConnect_11.05.2020.gif" alt="drawing" width="80%"/>
 
 ## Remote Command Execute
 
 Command to issue on the remote device.  Good for quickly getting information while building declarations!
 
-<!-- ![Remote Command Execute](./README_docs/images/remoteCMD_5.18.2020.gif) -->
 <img src="./media/remoteCMD_5.18.2020.gif" alt="drawing" width="80%"/>

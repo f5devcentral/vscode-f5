@@ -36,6 +36,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     async explodeConfig(configs: ConfigFiles, cfgObj: BigipConfObj, explosion: Explosion){
         // set context to make view visible
         commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
+        // this.clear();
         this.bigipConfs = configs;
         this.confObj = cfgObj;
         this.explosion = explosion;
