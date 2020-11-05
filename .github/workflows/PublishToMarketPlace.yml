@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Publish Release
+name: Publish to Marketplace
 
 # on:
 #   release:
@@ -27,37 +27,18 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 12
-
-    # - name: get latest release name
-    #   id: get_release_name
-    #   run: echo ::set-output name=name::$(curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].name)
-    #     # outputs: 
-    #     #   releaseName:
-    #     #     description: 'full name of the release'
-
-    # - name: display release name from output
-    #   # run: echo ${{ outputs.releaseName.value }}
-    #   run: echo ${{ steps.get_release_name.outputs.name }}
-
-    # - name: download latest release
-    #   run: "curl -sL https://api.github.com/repos/f5devcentral/vscode-f5/releases/latest | jq .assets[0].browser_download_url | xargs wget"
-    #   shell: bash
-
-    # - name: list directory
-    #   run: ls -la
-    #   shell: bash
       
     - name: npm install everything
       run: npm install
 
-    - name: Publish to Open VSX Registry
-      id: publishToOpenVSX
-      uses: HaaLeo/publish-vscode-extension@v0
-      with:
-        pat: ${{ secrets.OPEN_VSX_TOKEN }}
-        # extensionFile: ${{ steps.get_release_name.outputs.name }}
-        # packagePath: ''
-        # dryRun: true
+    # - name: Publish to Open VSX Registry
+    #   id: publishToOpenVSX
+    #   uses: HaaLeo/publish-vscode-extension@v0
+    #   with:
+    #     pat: ${{ secrets.OPEN_VSX_TOKEN }}
+    #     # extensionFile: ${{ steps.get_release_name.outputs.name }}
+    #     # packagePath: ''
+    #     # dryRun: true
 
     # - name: display open vsx output
     #   run: 
@@ -69,7 +50,7 @@ jobs:
       with:
         pat: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
         registryUrl: https://marketplace.visualstudio.com
-        extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+        # extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
         # extensionFile: ${{ steps.get_release_name.outputs.name }}
-        packagePath: ''
+        # packagePath: ''
         # dryRun: true
