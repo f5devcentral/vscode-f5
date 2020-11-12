@@ -99,6 +99,9 @@ body:
   command: save
 ```
 
+
+
+
 ---
 
 ## Calls for outside f5
@@ -147,51 +150,46 @@ data:
 ```
 
 
-### raw get to external F5 using basic auth - DEV
+## External Calls to another F5
+
+The following calls show the outline of how to interact with another f5 while currently connected to an F5
+
+
+### Get F5 Auth Token
 ```json
 {
-  "url": "https://192.168.200.131/mgmt/tm/sys/ntp",
-  "auth": {
-      "username": "admin",
-      "password": "yayPassword!",
-      "sendImmediately": "true"
-  }
-}
-```
-
-
-
-### raw get to external F5 using basic auth - DEV
-```json
-{
-  "url": "https://192.168.200.131/mgmt/tm/sys/ntp",
-  "data": {
-      "username": "admin",
-      "password": "yayPassword!",
-      "sendImmediately": "true"
-  }
-}
-```
-
-
-### get f5 auth token
-```json
-{
-  "url": "https://10.200.244.110:8443/mgmt/shared/authn/login",
+  "url": "https://192.168.200.131/mgmt/shared/authn/login",
   "method": "POST",
+  "rejectUnauthorized": "false",
   "data": {
     "username":"admin",
-    "password":"passss!"
+    "password":"*******",
+    "loginProviderName": "tmos"
   }
 }
 ```
 
 
-### get f5 auth token
-```yaml
-url: 'https://10.200.244.110:8443/mgmt/tm/auth/source'
-headers:
-    Content-Type: application/json
-    X-F5-Auth-Token: ZM2MKZCDJ5FSDIPDVAVQIW7IBQ
+### Get All Tokens
+```json
+{
+    "url": "https://192.168.200.131/mgmt/shared/authz/tokens/",
+    "rejectUnauthorized": "false",
+    "headers": {
+        "Content-Type": "application/json",
+        "X-F5-Auth-Token": "UJ6OX3WUSRBIHJMPH7EBFKRODW"
+    }
+}
+```
 
+### get nodes
+```json
+{
+    "url": "https://192.168.200.131/mgmt/tm/ltm/node",
+    "rejectUnauthorized": "false",
+    "headers": {
+        "Content-Type": "application/json",
+        "X-F5-Auth-Token": "QL2HLEO6DSWS2DVT5BFNJYWGBA"
+    }
+}
 ```

@@ -1,12 +1,17 @@
-import * as vscode from 'vscode';
+import { 
+	Command, 
+	Event, 
+	EventEmitter, 
+	TreeDataProvider, 
+	TreeItem, 
+	TreeItemCollapsibleState 
+} from 'vscode';
 import { ext } from '../extensionVariables';
-// import { isArray } from 'util';
 
+export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
-export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
-
-	private _onDidChangeTreeData: vscode.EventEmitter<AS3item | undefined> = new vscode.EventEmitter<AS3item | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<AS3item | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<AS3item | undefined> = new EventEmitter<AS3item | undefined>();
+	readonly onDidChangeTreeData: Event<AS3item | undefined> = this._onDidChangeTreeData.event;
 
 	private _tenants: string[] = [];  
 	private _bigiqTenants: any = [];  
@@ -16,10 +21,13 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 	}
 
 	refresh(): void {
+		this._bigiqTenants = [];
+		this._tenants = [];
+		this._tasks = [];
 		this._onDidChangeTreeData.fire(undefined);
 	}
 
-	getTreeItem(element: AS3item): vscode.TreeItem {
+	getTreeItem(element: AS3item): TreeItem {
 		return element;
 	}
 
@@ -32,22 +40,22 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 
 				const targetTenCount = this._bigiqTenants.length.toString();
 
-				treeItems = this._bigiqTenants.map( (el: { target: string; tensList: any; }) => {
-					return new AS3item(el.target, targetTenCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+				treeItems = this._bigiqTenants.map( (el: { target: string; tensList: any[]; }) => {
+					return new AS3item(el.target, targetTenCount, '', '', TreeItemCollapsibleState.Collapsed, 
 						{ command: '', title: '', arguments: el.tensList });
 				});
 
 			} else if(element.label === 'Tenants'){
 				
 				treeItems = this._tenants.map( el => {
-					return new AS3item(el, '', '', 'as3Tenant', vscode.TreeItemCollapsibleState.None, 
+					return new AS3item(el, '', '', 'as3Tenant', TreeItemCollapsibleState.None, 
 						{ command: 'f5-as3.getDecs', title: 'Get Tenant Declaration', arguments: [el] });
 				});
 				
 			} else if (element.label === 'Tasks'){
 				
 				treeItems = this._tasks.map( (task: any) => {
-					return new AS3item(task.iId.split('-').pop(), task.timeStamp, '', '', vscode.TreeItemCollapsibleState.None,
+					return new AS3item(task.iId.split('-').pop(), task.timeStamp, '', '', TreeItemCollapsibleState.None,
 						{ command: 'f5-as3.getTask', title: '', arguments: [task.iId] });
 				});
 			} else {
@@ -56,7 +64,7 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 				 */
 
 				const x = element.command?.arguments?.map( el => {
-					return new AS3item(el, '', '', '', vscode.TreeItemCollapsibleState.None, 
+					return new AS3item(el.label, '', '', '', TreeItemCollapsibleState.None, 
 					{ command: 'f5-as3.getDecs', title: 'Get Tenant Declaration', arguments: [el] });
 				});
 				treeItems = x ? x : [];
@@ -75,10 +83,10 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 			const tenCount = this._tenants.length !== 0 ? this._tenants.length.toString() : '';
 			const taskCount = this._tasks.length !== 0 ? this._tasks.length.toString() : '';
 
-			// if we have bigiq...
+			// if we have bigiQ...
 			if(this._bigiqTenants.length > 0){
 				treeItems.push(
-					new AS3item('Targets', targetCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+					new AS3item('Targets', targetCount, '', '', TreeItemCollapsibleState.Collapsed, 
 						{ command: '', title: '', arguments: [''] })
 				);
 			}
@@ -86,19 +94,21 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 			// if we have bigip
 			if(this._tenants.length > 0){
 				treeItems.push(
-					new AS3item('Tenants', tenCount, 'Get All Tenants', '', vscode.TreeItemCollapsibleState.Collapsed, 
+					new AS3item('Tenants', tenCount, 'Get All Tenants', '', TreeItemCollapsibleState.Collapsed, 
 						{ command: 'f5-as3.getDecs', title: '', arguments: [''] })
 				);
 			}
 
 
 			treeItems.push(
-				new AS3item('Tasks', taskCount, 'Get All Tasks', '', vscode.TreeItemCollapsibleState.Collapsed,
+				new AS3item('Tasks', taskCount, 'Get All Tasks', '', TreeItemCollapsibleState.Collapsed,
 					{ command: 'f5-as3.getTask', title: '', arguments: [''] })
 			);
 		}
         return Promise.resolve(treeItems);
 	}
+
+
 
 	private async getTenants() {
 		this._tenants = [];	// clear current tenant list
@@ -110,17 +120,34 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 		 * got an array, so this should be a bigiq list of devices with tenant information
 		 */
 		if(Array.isArray(tenCall.data)) {
-				this._bigiqTenants = tenCall.data.map( (el: any) => {
-				
-				const target = el.target.address; // got target bigip
 
-				// now loop through to get all tenants
-				const tensList: string[] = [];
+			// loop through targets/devices
+			this._bigiqTenants = tenCall.data.map( (el: any) => {
+				
+				const target = el.target.address; // get target bigip
+
+				const tensList: any[] = [];
 				Object.entries(el).forEach(([key, val]) => {
-					if (isObject(val) && key !== 'target'){
-						tensList.push(key);
+					if (isObject(val) && key !== 'target' && key !== 'controls'){
+
+						tensList.push({ 
+							label: key, 
+							dec: val,
+							target: el.target,
+							id: el.id,
+							schemaVersion: el.schemaVersion,
+							updateMode: el.updateMode
+						});
 					}
 				});
+
+				// // now loop through to get all tenants
+				// const tensList: string[] = [];
+				// Object.entries(el).forEach(([key, val]) => {
+				// 	if (isObject(val) && key !== 'target' && key !== 'controls'){
+				// 		tensList.push(key);
+				// 	}
+				// });
 
 				return { target, tensList };
 			});
@@ -159,14 +186,14 @@ function isObject(x: any) {
 	return x === Object(x);
 }
 
-class AS3item extends vscode.TreeItem {
+class AS3item extends TreeItem {
 	constructor(
 		public readonly label: string,
 		public description: string,
 		public tooltip: string,
 		public context: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command: vscode.Command,
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command: Command,
 	) {
 		super(label, collapsibleState);
 	}

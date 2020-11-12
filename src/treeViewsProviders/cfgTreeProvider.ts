@@ -63,7 +63,13 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
 	async getChildren(element?: CfgApp): Promise<CfgApp[]> {
 
-		var treeItems: CfgApp[] = [];
+        var treeItems: CfgApp[] = [];
+        
+        // resolve promise with nothing since we have nothing to show
+        if(this.bigipConfs.length <= 0 || !this.explosion ) {
+            return Promise.resolve([]);
+        }
+
 		if(element) {
             
             if (element.label === 'Apps') {

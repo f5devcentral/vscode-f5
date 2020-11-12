@@ -789,8 +789,24 @@ export async function activate(context: ExtensionContext) {
 		// set blank value if not defined -> get all tenants dec
 		tenant = tenant ? tenant : '';
 
-		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
-		ext.panel.render(resp);
+		// bigiq target single tenant 
+		if (tenant?.dec && tenant?.label && tenant.id) {
+
+			// rebuild the target tenant declaration so it can be resent if needed
+			const obj3 = {
+				class: 'ADC',
+				target: tenant.target,
+				schemaVersion: tenant.schemaVersion,
+				id: tenant.id,
+				[tenant.label]: tenant.dec
+			};
+			ext.panel.render(obj3);
+		} else {
+
+			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
+			ext.panel.render(resp);
+		}
+
 	}));
 
 

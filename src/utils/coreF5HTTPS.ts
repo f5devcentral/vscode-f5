@@ -250,7 +250,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
 
 
 /**
- *  just a placeholder
+ *  download file from f5
  * @param url to get file
  * @param dest path/file name (./path/test.tar.gz)
  * @param host ip/fqdn where to get file
@@ -314,6 +314,7 @@ export async function download(file: string, dest: string, host: string, port: n
 
 /**
  * multi part upload from f5-sdk-js - testing - work in progress
+ * used to upload large files to bigip
  * modified from:
  * https://github.com/f5devcentral/f5-sdk-js/blob/master/src/bigip/extension/package.ts
  * @param file ?
@@ -397,7 +398,7 @@ export async function multiPartUploadSDK(file: string, host: string, port: numbe
 /**
  * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
  * 
- * Download HTTP payload to file
+ * external Download HTTP payload to file
  *
  * @param url  url
  * @param file local file location where the downloaded contents should go
