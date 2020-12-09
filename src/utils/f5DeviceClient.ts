@@ -6,6 +6,8 @@ import { ext, loadConfig } from '../extensionVariables';
 import * as utils from './utils';
 import logger from './logger';
 
+// import { F5Client } from 'f5-conx-core';
+
 export interface Device {
     device: string,
     provider?: string,
@@ -13,25 +15,26 @@ export interface Device {
     onDisconnect?: string[]
 }
 
-/**
- *
- * Basic Example:
- * 
- * ```
- * const mgmtClient = new ManagementClient({
- *      host: '192.0.2.1',
- *      port: 443,
- *      user: 'admin',
- *      password: 'admin'
- * });
- * const variable = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
- * ```
- */
+// /**
+//  *
+//  * Basic Example:
+//  * 
+//  * ```
+//  * const mgmtClient = new ManagementClient({
+//  *      host: '192.0.2.1',
+//  *      port: 443,
+//  *      user: 'admin',
+//  *      password: 'admin'
+//  * });
+//  * const variable = await mgmtClient.makeRequest('/mgmt/tm/sys/version');
+//  * ```
+//  */
 export class MgmtClient {
     device: string;
     host: string;
     port: number | 443;
     provider: string;
+    // f5Client: F5Client;
     protected _user: string;
     protected _password: string;
     protected _token: any;
@@ -59,6 +62,20 @@ export class MgmtClient {
         this.provider = options['provider'];
         this._user = options['user'];
         this._password = options['password'];
+
+        const newOpts = {
+            port: options?.port,
+            provider: options?.provider,
+            logger
+        };
+
+        // this.f5Client = new F5Client(
+        //     options.host,
+        //     options.user,
+        //     options.password,
+        //     newOpts
+        // );
+
         this.getConfig();
     }
 

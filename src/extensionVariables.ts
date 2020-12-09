@@ -8,6 +8,7 @@ import * as keyTarType from "keytar";
 import { MgmtClient } from './utils/f5DeviceClient';
 import logger from "./utils/logger";
 import { TextDocumentView } from './editorViews/editorView';
+import { F5Client } from "./f5Client";
 
 type KeyTar = typeof keyTarType;
 
@@ -18,6 +19,7 @@ type KeyTar = typeof keyTarType;
 export namespace ext {
     export let context: ExtensionContext;
     export let mgmtClient: MgmtClient | undefined;
+    export let f5Client: F5Client | undefined;
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
     export let hostNameBar: StatusBarItem;

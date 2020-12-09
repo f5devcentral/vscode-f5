@@ -182,8 +182,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
              *  device passwords got cleared
              */
 		}
-    }
-
+	}
 }
 
 export class F5Host extends vscode.TreeItem {

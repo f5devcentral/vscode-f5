@@ -100,9 +100,9 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
         });
 
         // post initial dec
-        let resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare?${postParam}`, {
+        let resp = await ext.f5Client.https(`/mgmt/shared/appsvcs/declare?${postParam}`, {
             method: 'POST',
-            body: dec
+            data: dec
         });
 
         // if bad dec, return response
@@ -129,7 +129,7 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
             // get got a 202 and a taskId (single dec), check task status till complete
             while(taskId) {
                 // resp = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${taskId}`, authToken);
-                resp = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${taskId}`);
+                resp = await ext.f5Client.https(`/mgmt/shared/appsvcs/task/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
                 if(resp.data.results[0].message !== 'in progress'){
