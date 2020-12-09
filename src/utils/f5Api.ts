@@ -100,39 +100,39 @@ export async function postAS3Dec(postParam: string = '', dec: object) {
         });
 
         // post initial dec
-        let resp = await ext.f5Client.https(`/mgmt/shared/appsvcs/declare?${postParam}`, {
+        let resp = await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare?${postParam}`, {
             method: 'POST',
             data: dec
         });
 
         // if bad dec, return response
-        if(resp.status === 422) {
+        if(resp?.status === 422) {
             return resp;
         }
 
         // if post has multiple decs it will return with an array of status's for each
         //      so we just stick with "processing"
-        if(resp.data.hasOwnProperty('items')){
+        if(resp?.data.hasOwnProperty('items')){
             progress.report({ message: `  processing multiple declarations...`});
             await new Promise(resolve => { setTimeout(resolve, 1000); });
         } else {
             // single dec detected...
-            progress.report({ message: `${resp.data.results[0].message}`});
+            progress.report({ message: `${resp?.data.results[0].message}`});
             await new Promise(resolve => { setTimeout(resolve, 1000); });
         }
 
     
         let taskId: string | undefined;
-        if(resp.status === 202) {
+        if(resp?.status === 202) {
             taskId = resp.data.id;
 
             // get got a 202 and a taskId (single dec), check task status till complete
             while(taskId) {
                 // resp = await callHTTP('GET', host, `/mgmt/shared/appsvcs/task/${taskId}`, authToken);
-                resp = await ext.f5Client.https(`/mgmt/shared/appsvcs/task/${taskId}`);
+                resp = await ext.f5Client?.https(`/mgmt/shared/appsvcs/task/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
-                if(resp.data.results[0].message !== 'in progress'){
+                if(resp?.data.results[0].message !== 'in progress'){
                     taskId = undefined;
                     return resp;
                 }

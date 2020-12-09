@@ -29,6 +29,7 @@ import { unInstallOldExtension } from './extMigration';
 import { injectSchema } from './atcSchema';
 
 import { F5Client } from './f5Client';
+import { Device } from './models';
 
 
 export async function activate(context: ExtensionContext) {
@@ -99,17 +100,17 @@ export async function activate(context: ExtensionContext) {
 
 		logger.info('selected device', device);  // preferred at the moment
 
-		if (ext.mgmtClient) {
-			ext.mgmtClient.disconnect();
+		if (ext.f5Client) {
+			ext.f5Client.disconnect();
 		}
 
-		type devObj = {
-			device: string,
-			provider: string
-		};
+		// type devObj = {
+		// 	device: string,
+		// 	provider: string
+		// };
 
 		if (!device) {
-			const bigipHosts: Array<devObj> | undefined = await workspace.getConfiguration().get('f5.hosts');
+			const bigipHosts: Device[] | undefined = await workspace.getConfiguration().get('f5.hosts');
 
 			if (bigipHosts === undefined) {
 				throw new Error('no hosts in configuration');
@@ -137,14 +138,6 @@ export async function activate(context: ExtensionContext) {
 
 		const password: string = await utils.getPassword(device.device);
 
-		// ext.mgmtClient = new MgmtClient( device.device, {
-		// 	host,
-		// 	port,
-		// 	user,
-		// 	provider: device.provider,
-		// 	password
-		// });
-
 		ext.f5Client = new F5Client(device, host, user, password, {
 			port,
 			provider: device.provider,
@@ -163,9 +156,8 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {
-		// const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/auth/source');
 
-		ext.f5Client.https('/mgmt/tm/auth/source')
+		ext.f5Client?.https('/mgmt/tm/auth/source')
 			.then(resp => ext.panel.render(resp));
 
 	}));
@@ -174,18 +166,25 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5.getF5HostInfo', async () => {
 
 		// can can be updated to return the same details collected at discovery
-		var device: string | undefined = ext.hostStatusBar.text;
+		// var device: string | undefined = ext.hostStatusBar.text;
 
-		if (!device) {
-			device = await commands.executeCommand('f5.connectDevice');
+		// if (!device) {
+		// 	device = await commands.executeCommand('f5.connectDevice');
+		// }
+
+		// if (device === undefined) {
+		// 	throw new Error('no hosts in configuration');
+		// }
+
+		if (!ext.f5Client) {
+			await commands.executeCommand('f5.connectDevice');
 		}
 
-		if (device === undefined) {
-			throw new Error('no hosts in configuration');
+		if (ext.f5Client){
+			await ext.f5Client.https('/mgmt/shared/identified-devices/config/device-info')
+			.then( resp => ext.panel.render(resp));
 		}
 
-		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/identified-devices/config/device-info');
-		ext.panel.render(resp);
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.disconnect', () => {
@@ -831,7 +830,7 @@ export async function activate(context: ExtensionContext) {
 			// got a simple tenant name as string with uri parameter,
 			// this is typically for extended information
 			// so fetch fresh information with param
-			await ext.f5Client.https(`/mgmt/shared/appsvcs/declare/${tenant}`)
+			await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare/${tenant}`)
 				.then(resp => ext.panel.render(resp.data))
 				.catch(err => logger.error('get as3 tenant with param failed:', err));
 		}
@@ -859,7 +858,7 @@ export async function activate(context: ExtensionContext) {
 
 			// the following method works across both regular LTM/TMOS/AS3 and BIGIQ/AS3/Targets, just need to make sure we have all the right details to make it work...
 
-			await ext.f5Client.https(`/mgmt/shared/appsvcs/declare`, {
+			await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare`, {
 				method: 'POST',
 				data: {
 					class: 'AS3',
@@ -904,7 +903,7 @@ export async function activate(context: ExtensionContext) {
 			title: `Getting AS3 Task`
 		}, async () => {
 
-			await ext.f5Client.https(`/mgmt/shared/appsvcs/task/${id}`)
+			await ext.f5Client?.https(`/mgmt/shared/appsvcs/task/${id}`)
 				.then(resp => ext.panel.render(resp))
 				.catch(err => logger.error('as3 get task failed:', err));
 			// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
@@ -1464,7 +1463,7 @@ export async function activate(context: ExtensionContext) {
 					// 	method: text.method,
 					// 	body: text.body
 					// });
-					return await ext.f5Client.https(text.url, {
+					return await ext.f5Client?.https(text.url, {
 						method: text.method,
 						data: text.body
 					})

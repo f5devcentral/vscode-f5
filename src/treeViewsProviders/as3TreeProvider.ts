@@ -34,7 +34,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 	async getChildren(element?: AS3item) {
 		let treeItems: AS3item[] = [];
 
-		if (ext.f5Client.as3) {
+		if (ext.f5Client?.as3) {
 
 			if (element) {
 
@@ -49,11 +49,11 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 				} else if(element.label === 'Tenants'){
 					
+					let tenant: string;
 					treeItems = this._tenants.map( el => {
 
 						// loop through the items in the object, find the declaration,
 						// 	return the tenant (should only be one)
-						let tenant;
 						Object.entries(el).forEach(([key, val]) => {
 							if (isObject(val)){
 								tenant = key;
@@ -127,7 +127,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 		this._tenants = [];	// clear current tenant list
 		this._bigiqTenants = [];	// clear current bigiq tenant list
 		
-		await ext.f5Client.https(`/mgmt/shared/appsvcs/declare/`)
+		await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare/`)
 		.then( resp => {
 			/**
 			 * got an array, so this should be a bigiq list of devices with tenant information
@@ -186,7 +186,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 	private async getTasks() {
 		// const tasks: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/`);
 
-		await ext.f5Client.https(`/mgmt/shared/appsvcs/task/`)
+		await ext.f5Client?.https(`/mgmt/shared/appsvcs/task/`)
 		.then( resp => {
 			
 			this._tasks = [];	// clear current tenant list

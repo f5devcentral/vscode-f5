@@ -171,7 +171,7 @@ export class F5Client extends _F5Client {
     private termConnect() {
 
         // if we have configuration in the onConnect
-        if (this.device.onConnect.length > 0) {
+        if (this.device?.onConnect && this.device?.onConnect.length > 0) {
 
             // if we don't already have a terminal, create one
             if (!this.terminal) {
@@ -180,7 +180,7 @@ export class F5Client extends _F5Client {
             }
 
             // loop through onConnect commands and issue them
-            this.device.onConnect?.forEach((el: string) => {
+            this.device.onConnect.forEach((el: string) => {
 
                 // swap out variable as needed
                 el = el.replace(/\${this.device}/, `${this.device}`);
