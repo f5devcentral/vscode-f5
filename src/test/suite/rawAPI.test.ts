@@ -8,7 +8,7 @@ import nock from 'nock';
 import * as utils from '../../utils/utils';
 import { ext } from '../../extensionVariables';
 import * as extApi from '../../utils/externalAPIs';
-import { MgmtClient } from '../../utils/f5DeviceClient';
+// import { MgmtClient } from '../../utils/f5DeviceClient.ts.old';
 
 
 

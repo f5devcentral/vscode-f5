@@ -22,3 +22,5 @@ atc_ilx_rpm_cache
 *.tmpl
 # ignore temp mini_ucs for config explorere (corkscrew)
 mini_ucs.tar.gz
+# any "old" files I'm pending removal...
+*.old

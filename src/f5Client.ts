@@ -2,16 +2,18 @@
 
 'use strict';
 
-import { Terminal, window, workspace, ProgressLocation, StatusBarAlignment, commands } from 'vscode';
+import { Terminal, window, ProgressLocation, commands } from 'vscode';
 import { ext, loadConfig } from './extensionVariables';
 import * as utils from './utils/utils';
 import { F5Client as _F5Client } from 'f5-conx-core';
 import { Device } from './models';
+import Logger from './utils/logger';
 
 
 
 
 export class F5Client extends _F5Client {
+    logger: typeof Logger;
     device: Device;
     private terminal: Terminal | undefined;
 
@@ -23,14 +25,11 @@ export class F5Client extends _F5Client {
         options?: {
             port?: number;
             provider?: string;
-            logger?: any;
         }
     ) {
         super(host, user, password, options);
         this.device = device;
-        // this._password = password;
-        // this.getConfig();
-
+        this.logger = Logger;
     }
 
     /**
@@ -47,7 +46,7 @@ export class F5Client extends _F5Client {
         }, async (progress, token) => {
             token.onCancellationRequested(() => {
                 // this logs but doesn't actually cancel...
-                this.logger.debug("User canceled device connect");
+                this.events.emit('log-info', "User canceled device connect");
                 return new Error(`User canceled device connect`);
             });
             let returnInfo: string[] = [];
@@ -65,17 +64,14 @@ export class F5Client extends _F5Client {
                     this.host.version, 
                     this.host.product
                     );
+
+                //********** enable irules view **********/
+                this.host.product === 'BIG-IP' ?
+                commands.executeCommand('setContext', 'f5.tcl', true) :
+                commands.executeCommand('setContext', 'f5.tcl', false);
             }
 
-            // //********** enable irules view **********/
-            // const iRules: any = await this.makeRequest('/mgmt/tm/ltm/rule/');
 
-            // if(iRules.status === 200) {
-            //     // if irules detected, device is iRulesAble, so set that flag, 
-            //     //  then reload the config to make the view show
-            //     ext.iRulesAble = true;
-            //     loadConfig();
-            // }
 
             //********** FAST info **********/
             if (this.fast) {

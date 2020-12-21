@@ -5,12 +5,22 @@
 
 import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands, TextDocument } from "vscode";
 import * as keyTarType from "keytar";
-import { MgmtClient } from './utils/f5DeviceClient';
+// import { MgmtClient } from './utils/f5DeviceClient.ts.old';
 import logger from "./utils/logger";
 import { TextDocumentView } from './editorViews/editorView';
 import { F5Client } from "./f5Client";
+import * as path from 'path';
+import * as fs from 'fs';
 
 type KeyTar = typeof keyTarType;
+
+// export interface f5Context extends ExtensionContext {
+//     tmpDir: typeof path,
+
+// }
+
+
+// path.join(ext.context.extensionPath, 'cache')
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -18,7 +28,7 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
-    export let mgmtClient: MgmtClient | undefined;
+    // export let mgmtClient: MgmtClient | undefined;
     export let f5Client: F5Client | undefined;
     export let keyTar: KeyTar;
     export let hostStatusBar: StatusBarItem;
@@ -28,10 +38,11 @@ export namespace ext {
     export let doBar: StatusBarItem;
     export let tsBar: StatusBarItem;
     export let connectBar: StatusBarItem;
-    export let iRulesAble: boolean = false;
+    // export let iRulesAble: boolean = false;
     export let as3AsyncPost: boolean | undefined;
     export let panel: TextDocumentView;
     export let tsExampleView: object | undefined;
+    export let cacheDir: string;
     
     export namespace settings {
         export let as3PostAsync: boolean;
@@ -71,13 +82,26 @@ export async function loadConfig() {
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
 
 
-    // irule view stuff - in progress
-    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', true);
-    if(ext.settings.irulesEnabled && ext.iRulesAble){
-        commands.executeCommand('setContext', 'f5.tcl', true);
-    } else {
-        commands.executeCommand('setContext', 'f5.tcl', false);
-    }
+    // // irule view stuff
+    // // need to 
+    // ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', true);
+    // if(ext.settings.irulesEnabled && ext.iRulesAble){
+    //     commands.executeCommand('setContext', 'f5.tcl', true);
+    // } else {
+    //     commands.executeCommand('setContext', 'f5.tcl', false);
+    // }
+
+
+
+    const cacheDir = path.join(ext.context.extensionPath, 'cache');
+
+    if (!fs.existsSync(cacheDir)) {
+        logger.debug('CREATING CACHE DIRECTORY');
+        ext.cacheDir = cacheDir;
+        fs.mkdirSync(cacheDir);
+    } else { 
+        logger.debug(`existing cache directory detected: ${cacheDir}`);
+    };
 }
 
 
@@ -104,6 +128,8 @@ function parseColumn(value: string): ViewColumn {
             return ViewColumn.Beside;
     }
 }
+
+
 
 
 /*

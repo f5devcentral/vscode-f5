@@ -30,7 +30,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	async getChildren(element?: TCLitem) {
 		let treeItems: any[] = [];
 
-		if (!ext.mgmtClient) {
+		if (!ext.f5Client) {
 			// return nothing if not connected yet
 			return Promise.resolve([]);
 		}
@@ -90,9 +90,12 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 */
 	private async getIrules() {
         this._iRules = [];	// clear current irule list
-		const iRules: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule`);
-		const miRules = iRules.data.items.map( (el: any) => el);
-        this._iRules = miRules ? miRules : [];
+		// const iRules = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule`);
+		// const miRules = iRules.data.items.map( (el: any) => el);
+		// this._iRules = miRules ? miRules : [];
+		
+		await ext.f5Client?.https(`/mgmt/tm/ltm/rule`)
+		.then( resp => this._iRules = resp.data.items );
 	}
 
 	/**
@@ -100,9 +103,12 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 */
 	private async getApps() {
 		this._apps = [];	// clear current list
-		const apps: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service`);
-		const mApps = apps.data?.items?.map( (el: any) => el);
-		this._apps = mApps ? mApps : [];
+		// const apps: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service`);
+		// const mApps = apps.data?.items?.map( (el: any) => el);
+		// this._apps = mApps ? mApps : [];
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/service`)
+		.then( resp => this._apps = resp.data.items );
 	}
 
 	/**
@@ -110,9 +116,12 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 */
 	private async getTemplates() {
 		this._iAppTemplates = [];	// clear current list
-		const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template?expandSubcollections=true`);
-		const mTemplates = templates.data.items.map( (el: any) => el);
-		this._iAppTemplates = mTemplates ? mTemplates : [];
+		// const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template?expandSubcollections=true`);
+		// const mTemplates = templates.data.items.map( (el: any) => el);
+		// this._iAppTemplates = mTemplates ? mTemplates : [];
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/template?expandSubcollections=true`)
+		.then( resp => this._iAppTemplates = resp.data.items );
 	}
 
 	/**
@@ -146,13 +155,17 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 		const name = this.name2uri(item.label);
 
-		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule/${name}`, {
-			method: 'DELETE'
-		});
+		// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule/${name}`, {
+		// 	method: 'DELETE'
+		// });
 
-		// logger.debug('deteleRule response: ', resp.data);
-		setTimeout( () => { this.refresh();}, 500);	// refresh after update
-		return `${resp.status}-${resp.statusText}`;
+		const resp = await ext.f5Client?.https(`/mgmt/tm/ltm/rule/${name}`, {
+			method: 'DELETE'
+		})
+		.then (resp => {
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
+			return `${resp.status}-${resp.statusText}`;
+		});
 	}
 
 	/**
@@ -178,16 +191,24 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	async getTMPL(tempName: any) {
 		logger.debug('tempName', tempName);
 
-		const getTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+		// const getTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+		// 	method: 'POST',
+		// 	body: {
+		// 		command: 'run',
+		// 		utilCmdArgs: `-c 'tmsh list sys application template ${tempName.fullPath}'`
+		// 	}
+		// });
+
+		const getTMPL = await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
 			method: 'POST',
-			body: {
+			data: {
 				command: 'run',
 				utilCmdArgs: `-c 'tmsh list sys application template ${tempName.fullPath}'`
 			}
 		});
 
 		let text;
-		if(getTMPL.data.commandResult) {
+		if(getTMPL?.data.commandResult) {
 			// got a response, removing necessary fields for re-import
 			text = getTMPL.data.commandResult;
 
@@ -243,16 +264,20 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		fs.writeFileSync(dstFilePath, text);
 
 		// upload .tmpl file
-		if(ext.mgmtClient) {
-			const upload: any = await ext.mgmtClient.upload(dstFilePath);
-			logger.debug('tcl upload complete -> moving to /tmp/ location', upload);
+		if(ext.f5Client) {
+			// const upload: any = await ext.mgmtClient.upload(dstFilePath);
+
+			await ext.f5Client.upload(dstFilePath, 'FILE')
+			.then (resp => {
+				logger.debug('tcl upload complete -> moving to /tmp/ location', resp.data);
+			});
 
 			await new Promise(r => setTimeout(r, 100)); // pause to finish upload
 			
 			// move file to temp location - required for tmsh merge command
-			const move: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/unix-mv`, {
+			const move: any = await ext.f5Client?.https(`/mgmt/tm/util/unix-mv`, {
 				method: 'POST',
-				body: {
+				data: {
 					command: 'run',
 					utilCmdArgs: `/var/config/rest/downloads/${tmpFile} /tmp/${tmpFile}`
 				}
@@ -261,9 +286,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			await new Promise(r => setTimeout(r, 100)); // pause to finish move
 			logger.debug('tcl upload complete -> merging with running config', move.data);
 	
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
+			const resp: any = await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
 				method: 'POST',
-				body: {
+				data: {
 					command: 'run',
 					utilCmdArgs: `-c 'tmsh load sys config merge file /tmp/${tmpFile}'`
 				}
@@ -348,24 +373,38 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		 }
 
 		// upload .tmpl file
-		if(ext.mgmtClient) {
-			const upload = await ext.mgmtClient.upload(filePath);
-			logger.debug('iApp upload complete -> importing iApp via tmsh bash api', upload);
-	
-			const importTMPL: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
-				method: 'POST',
-				body: {
-					command: 'run',
-					utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
-				}
-			});
+		if(ext.f5Client) {
+			// const upload = await ext.mgmtClient.upload(filePath);
+			return await ext.f5Client.upload(filePath, 'FILE')
+			.then ( async resp => {
+				logger.debug('iApp upload complete -> importing iApp via tmsh bash api', resp.data);
 
-			if(cleanUp) {
-				logger.debug('deleting iApp temp file at:', cleanUp);
-				fs.unlinkSync(cleanUp);
-			}
-			setTimeout( () => { this.refresh();}, 500);	// refresh after update
-			return importTMPL.data.commandResult;
+				return await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
+					method: 'POST',
+					data: {
+						command: 'run',
+						utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
+					}
+				})
+				.then ( resp => {
+					if(cleanUp) {
+						logger.debug('deleting iApp temp file at:', cleanUp);
+						fs.unlinkSync(cleanUp);
+					}
+					setTimeout( () => { this.refresh();}, 500);	// refresh after update
+				});
+			});
+	
+			// const importTMPL: any = await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
+			// 	method: 'POST',
+			// 	data: {
+			// 		command: 'run',
+			// 		utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
+			// 	}
+			// });
+
+
+			// return importTMPL.data.commandResult;
 		} else {
 			console.error('iApp .tmpl upload: no connected device, connect to issue command');
 		}
@@ -379,13 +418,21 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		logger.debug('iAppRedeploy: ', item);
 		// const urlName = item.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
-		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// 	method: 'PATCH',
+		// 	body: {
+		// 		'execute-action': 'definition'
+		// 	}
+		// });
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/service/${urlName}`, {
 			method: 'PATCH',
-			body: {
+			data: {
 				'execute-action': 'definition'
 			}
-		});
-		logger.debug('iAppReDeploy: resp-> ', resp);
+		})
+		.then( resp => logger.debug('iAppReDeploy: resp-> ', resp));
+		
 	}
 
 	/**
@@ -396,11 +443,17 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		logger.debug('iAppDelete: ', item);
 		// const urlName = item.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
-		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// 	method: 'DELETE'
+		// });
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/service/${urlName}`, {
 			method: 'DELETE'
+		})
+		.then( resp => {
+			logger.debug('iAppDelete: resp-> ', resp);
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
 		});
-		logger.debug('iAppDelete: resp-> ', resp);
-		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 
 	/**
@@ -411,11 +464,17 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		logger.debug('deleteTMPL: ', item);
 		// const urlName = template.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
-		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
+		// const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
+		// 	method: 'DELETE'
+		// });
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/template/${urlName}`, {
 			method: 'DELETE'
+		})
+		.then( resp => {
+			logger.debug('deleteTMPL: resp-> ', resp);
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
 		});
-		logger.debug('deleteTMPL: resp-> ', resp);
-		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 }
 

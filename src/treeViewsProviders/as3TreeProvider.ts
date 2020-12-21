@@ -40,9 +40,9 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 				if(element.label === 'Targets'){
 
-					const targetTenCount = this._bigiqTenants.length.toString();
-
+					
 					treeItems = this._bigiqTenants.map( (el: { target: string; tensList: any[]; }) => {
+						const targetTenCount = el.tensList.length.toString();
 						return new AS3item(el.target, targetTenCount, '', 'as3Tenant', TreeItemCollapsibleState.Collapsed, 
 							{ command: '', title: '', arguments: el.tensList });
 					});
@@ -71,10 +71,9 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 							{ command: 'f5-as3.getTask', title: '', arguments: [task.iId] });
 					});
 				} else {
-					/**
-					 * this should happen when a target is selected
-					 */
-
+					
+					// this should happen when a target is selected
+					
 					const x = element.command?.arguments?.map( el => {
 						return new AS3item(el.label, '', '', 'as3Tenant', TreeItemCollapsibleState.None, 
 						{ command: 'f5-as3.getDecs', title: 'Get Tenant Declaration', arguments: [el] });
@@ -127,11 +126,11 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 		this._tenants = [];	// clear current tenant list
 		this._bigiqTenants = [];	// clear current bigiq tenant list
 		
-		await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare/`)
+		await ext.f5Client?.as3?.getDecs()
 		.then( resp => {
-			/**
-			 * got an array, so this should be a bigiq list of devices with tenant information
-			 */
+			
+			// got an array, so this should be a bigiq list of devices with tenant information
+			
 			if(Array.isArray(resp.data)) {
 
 				// loop through targets/devices
@@ -179,16 +178,12 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				}
 			}
 		});
-
-		
 	}
 
 	private async getTasks() {
-		// const tasks: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/`);
 
-		await ext.f5Client?.https(`/mgmt/shared/appsvcs/task/`)
+		await ext.f5Client?.as3?.getTasks()
 		.then( resp => {
-			
 			this._tasks = [];	// clear current tenant list
 			this._tasks = resp.data.items.map((item:any) => {
 				// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
@@ -196,7 +191,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				const iId = item.id;
 	
 				return { iId, timeStamp };
-				});
+			});
 		});
 	}
 

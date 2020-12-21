@@ -486,12 +486,6 @@
 				"enablement": "f5.as3Installed"
 			},
 			{
-				"command": "f5-as3.fullTenant",
-				"title": "Full Tenant",
-				"category": "F5-AS3",
-				"enablement": "view == as3Tenants"
-			},
-			{
 				"command": "f5-as3.expandedTenant",
 				"title": "Expanded Tenant",
 				"category": "F5-AS3",
@@ -546,7 +540,7 @@
 				"command": "f5-ts.postDec",
 				"title": "Post as TS Declaration",
 				"category": "F5-TS",
-				"enablement": "f5.doInstalled"
+				"enablement": "f5.tsInstalled"
 			},
 			{
 				"command": "f5.editHost",
@@ -863,10 +857,6 @@
 					"when": "none"
 				},
 				{
-					"command": "f5-as3.fullTenant",
-					"when": "none"
-				},
-				{
 					"command": "f5-as3.expandedTenant",
 					"when": "none"
 				},
@@ -918,36 +908,36 @@
 			"view/item/context": [
 				{
 					"command": "f5.editHost",
-					"when": "view == f5Hosts",
+					"when": "view == f5Hosts && viewItem == f5Host",
 					"group": "inline"
 				},
 				{
 					"command": "f5.editHost",
-					"when": "view == f5Hosts"
+					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
 					"command": "f5.editDeviceProvider",
-					"when": "view == f5Hosts"
+					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
 					"command": "f5.getProvider",
-					"when": "view == f5Hosts"
+					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
 					"command": "f5.removeHost",
-					"when": "view == f5Hosts"
+					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
 					"command": "f5.clearPassword",
-					"when": "view == f5Hosts"
+					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
 					"command": "f5.getF5HostInfo",
-					"when": "view == f5Hosts"
+					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
 					"command": "f5.cfgExploreOnConnect",
-					"when": "view == f5Hosts"
+					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
 					"command": "f5.cfgExplore-show",
@@ -984,10 +974,6 @@
 				{
 					"command": "f5-fast.renderHtmlPreview",
 					"when": "view == fastView && viewItem == fastTemplate"
-				},
-				{
-					"command": "f5-as3.fullTenant",
-					"when": "view == as3Tenants && viewItem == as3Tenant"
 				},
 				{
 					"command": "f5-as3.expandedTenant",

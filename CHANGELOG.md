@@ -10,7 +10,41 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [2.9.0] - (11-12-2020)
 
+** toying with the idea of completeing the f5-conx-core rewrite and re-integrate all changes with all enhancements
+- full qkview/ucs create/download/delete
+
+
+### Added
+- iHealth view
+  - collect/save creds
+  - list/upload/download
+  - 
+
+- setup full 'cache' directory
+  - this would be the catch-all for everything
+  - possibly add functions to open folder as workspace or even clearing cache
+
+- extraction and collection of connection timing stats
+  - would like to provide some analytics or flame charts with them
+  - alert user if timing for a particular device/call slows down so much over a given timeframe
+
+
+- extended device view details
+  - icon for bigip vs bigip vs nginx?
+  - adding hostname/tmos version to hover?
+    - cache details in configuration device details, to be refreshed at every connect
+  - When connected, the connected device in the device view, gains the ability to expand menus for managing things like:
+    - UCS create/download/delete (includes mini_ucs)
+    - QKVIEW create/download/delete
+    - ATC module list
+      - versions list for each modules
+      - install/un-install
+
 ### Modified
+- rebase with new f5-conx-core
+  - extracts connectivity functions for use in other projects
+    - and external testing
+- config explorer update (wasn't processing some ucs/qkviews)
 - Clearing Config Explorer breaks it
 - single tenant from bigiq as3 target
 - Updated docs:
