@@ -6,8 +6,9 @@ out.old
 # ignore directory that holds node_modules, these should be installed when npm installs the necessary packages from the package.json file
 node_modules
 
-# ignore ilx rpm cache directory
-atc_ilx_rpm_cache
+# ignore cache directory
+cache
+
 .vscode-test/
 # ignore any extension install files and zips
 *.vsix

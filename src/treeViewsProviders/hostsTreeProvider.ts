@@ -1,60 +1,399 @@
+/*
+ * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
+ * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
+ * may copy and modify this software product for its internal business purposes.
+ * Further, Licensee may upload, publish and distribute the modified version of
+ * the software product on devcentral.f5.com.
+ */
+
+'use strict';
+
 import * as vscode from 'vscode';
 import path from 'path';
 import { TreeItemCollapsibleState } from 'vscode';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
+import { atcMetaData, AtcMetaData, AtcRelease } from 'f5-conx-core';
+
+export type atcVersion = {
+	downloadUrl: string,
+	latest: boolean,
+	packageName: string
+};
+
+export type atcType = {
+	installed?: string,
+	latest: string,
+	version: atcVersion[]
+};
+
+
+export type GitRelease = {
+	tag_name: string,
+	id: number,
+	assets: Asset[]
+};
+
+export type Asset = {
+	name: string,
+	id: number,
+	size: number,
+	browser_download_url: string
+};
+
+export type AtcMeta = {
+	releases?: AtcRelease[];
+	latest?: string;
+};
+
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	private _onDidChangeTreeData: vscode.EventEmitter<F5Host | undefined> = new vscode.EventEmitter<F5Host | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<F5Host | undefined> = this._onDidChangeTreeData.event;
 
+	// atcMetaData: AtcMetaData | undefined;
+	fast: AtcMeta | undefined;
+	as3: AtcMeta | undefined;
+	do: AtcMeta | undefined;
+	ts: AtcMeta | undefined;
+	cf: AtcMeta | undefined;
+
+	private orangeDot = ext.context.asAbsolutePath(path.join("images", "orangeDot.svg"));
+	private greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
+	private greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
+
+
 	private ucsList = [];
+	private qkviewList = [];
 
 	constructor(private workspaceRoot: string) {
 	}
 
-	refresh(): void {
+	async refresh(): Promise<void> {
 		this._onDidChangeTreeData.fire(undefined);
+		
+		if (ext.f5Client) {
+			// start getting ucs/qkview 
+			await ext.f5Client.connect();
+			await ext.f5Client.ucs.list()
+			.then(resp => this.ucsList = resp.data.items);
+			
+			await ext.f5Client.qkview.list()
+			.then(resp => this.qkviewList = resp.data.items);
+		}
+		
+		this._onDidChangeTreeData.fire(undefined);
+		
 	}
 
 	getTreeItem(element: F5Host): vscode.TreeItem {
 		return element;
 	}
 
+	/**
+	 * loads all the release information for each ATC service
+	 * - this should be async to complete in the background as the extention loads
+	 */
+	async loadAtcMetaData(): Promise<void> {
+
+		// todo: move this function back into f5-conx-core
+
+		// at launch of extension, load all the latest atc metadata
+		ext.extHttp.makeRequest({ url: atcMetaData.fast.gitReleases })
+			.then(resp => {
+				// loop through reach release and build 
+				const latest: string[] = [];
+				const releases = resp.data.map((el: GitRelease) => {
+					const assets = el.assets.map((asset: Asset) => {
+						return {
+							name: asset.name,
+							id: asset.id,
+							size: asset.size,
+							browser_download_url: asset.browser_download_url
+						};
+					});
+					const version = el.tag_name.replace(/v/, '');
+					latest.push(version);
+					return {
+						version,
+						id: el.id,
+						assets
+					};
+				});
+				this.fast = {
+					releases,
+					latest: latest.sort(cmp)[latest.length - 1]
+				};
+			}).catch(_ => _);
+
+
+		ext.extHttp.makeRequest({ url: atcMetaData.as3.gitReleases })
+			.then(resp => {
+				// loop through reach release and build 
+				const latest: string[] = [];
+				const releases = resp.data.map((el: GitRelease) => {
+					const assets = el.assets.map((asset: Asset) => {
+						return {
+							name: asset.name,
+							id: asset.id,
+							size: asset.size,
+							browser_download_url: asset.browser_download_url
+						};
+					});
+					const version = el.tag_name.replace(/v/, '');
+					latest.push(version);
+					return {
+						version,
+						id: el.id,
+						assets
+					};
+				});
+				this.as3 = {
+					releases,
+					latest: latest.sort(cmp)[latest.length - 1]
+				};
+			}).catch(_ => _);
+
+
+		ext.extHttp.makeRequest({ url: atcMetaData.do.gitReleases })
+			.then(resp => {
+				// loop through reach release and build 
+				const latest: string[] = [];
+				const releases = resp.data.map((el: GitRelease) => {
+					const assets = el.assets.map((asset: Asset) => {
+						return {
+							name: asset.name,
+							id: asset.id,
+							size: asset.size,
+							browser_download_url: asset.browser_download_url
+						};
+					});
+					const version = el.tag_name.replace(/v/, '');
+					latest.push(version);
+					return {
+						version,
+						id: el.id,
+						assets
+					};
+				});
+				this.do = {
+					releases,
+					latest: latest.sort(cmp)[latest.length - 1]
+				};
+			})
+			.catch(_ => _);
+
+
+
+		ext.extHttp.makeRequest({ url: atcMetaData.ts.gitReleases })
+			.then(resp => {
+				// loop through reach release and build 
+				const latest: string[] = [];
+				const releases = resp.data.map((el: GitRelease) => {
+					const assets = el.assets.map((asset: Asset) => {
+						return {
+							name: asset.name,
+							id: asset.id,
+							size: asset.size,
+							browser_download_url: asset.browser_download_url
+						};
+					});
+					const version = el.tag_name.replace(/v/, '');
+					latest.push(version);
+					return {
+						version,
+						id: el.id,
+						assets
+					};
+				});
+				this.ts = {
+					releases,
+					latest: latest.sort(cmp)[latest.length - 1]
+				};
+			}).catch(_ => _);
+
+		ext.extHttp.makeRequest({ url: atcMetaData.cf.gitReleases })
+			.then(resp => {
+				// loop through reach release and build 
+				const latest: string[] = [];
+				const releases = resp.data.map((el: GitRelease) => {
+					const assets = el.assets.map((asset: Asset) => {
+						return {
+							name: asset.name,
+							id: asset.id,
+							size: asset.size,
+							browser_download_url: asset.browser_download_url
+						};
+					});
+					const version = el.tag_name.replace(/v/, '');
+					latest.push(version);
+					return {
+						version,
+						id: el.id,
+						assets
+					};
+				});
+				this.cf = {
+					releases,
+					latest: latest.sort(cmp)[latest.length - 1]
+				};
+			}).catch(_ => _);
+	}
+
 	async getChildren(element?: F5Host): Promise<F5Host[]> {
 
 		if (element) {
-			// if tree item is expandible (should only be one)
-			// then return items for extended details
-			// - ATC
-			// - UCS
-			// - QKVIEW
 			const treeItems: F5Host[] = [];
 
 			// if the item is the device we are connected to
 			if (element.label === ext.f5Client?.device.device) {
 
+				// const atcDesc = Object.keys(this.latest);
+				const atcDesc = [
+					ext.f5Client.fast ? 'fast' : undefined,
+					ext.f5Client.as3 ? 'as3' : undefined,
+					ext.f5Client.do ? 'do' : undefined,
+					ext.f5Client.ts ? 'ts' : undefined,
+					ext.f5Client.cf ? 'cf' : undefined,
+				].filter(Boolean);
+
+
 				// to be used when conx has ATC ILX mgmt
 				treeItems.push(...[
-					new F5Host('ATC', 'services', '', '', TreeItemCollapsibleState.Collapsed),
-					new F5Host('UCS', 'num', '', '', TreeItemCollapsibleState.Collapsed),
-					new F5Host('QKVIEW', 'num', '', '', TreeItemCollapsibleState.Collapsed),
+					new F5Host('ATC', `(${atcDesc.join('/')})`, '', '', '', TreeItemCollapsibleState.Collapsed),
+					new F5Host('UCS', this.ucsList.length.toString(), '', '', 'ucsHeader', TreeItemCollapsibleState.Collapsed),
+					new F5Host('QKVIEW', this.qkviewList.length.toString(), '', '', 'qkviewHeader', TreeItemCollapsibleState.Collapsed),
 				]);
 
 			} else if (element.label === 'ATC') {
 
+
+				const fastIcon
+					= ext.f5Client?.fast?.version.version === this.fast?.latest ? this.greenDot
+						: ext.f5Client?.fast ? this.orangeDot
+							: '';
+				const as3Icon
+					= ext.f5Client?.as3?.version.version === this.as3?.latest ? this.greenDot
+						: ext.f5Client?.as3 ? this.orangeDot
+							: '';
+				const doIcon
+					= ext.f5Client?.do?.version.version === this.do?.latest ? this.greenDot
+						: ext.f5Client?.do ? this.orangeDot
+							: '';
+				const tsIcon
+					= ext.f5Client?.ts?.version.version === this.ts?.latest ? this.greenDot
+						: ext.f5Client?.ts ? this.orangeDot
+							: '';
+				const cfIcon
+					= ext.f5Client?.cf?.version.version === this.cf?.latest ? this.greenDot
+						: ext.f5Client?.cf ? this.orangeDot
+							: '';
+
+
 				treeItems.push(...[
-					new F5Host('FAST', 'v', '', '', TreeItemCollapsibleState.Collapsed),
-					new F5Host('AS3', 'v', '', '', TreeItemCollapsibleState.Collapsed),
-					new F5Host('DO', 'v', '', '', TreeItemCollapsibleState.Collapsed),
-					new F5Host('TS', 'v', '', '', TreeItemCollapsibleState.Collapsed),
-					new F5Host('CF', 'v', '', '', TreeItemCollapsibleState.Collapsed),
+					new F5Host('FAST', '', 'f5-appsvcs-templates', fastIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
+
+					new F5Host('AS3', '', 'f5-appsvcs', as3Icon, 'atcService', TreeItemCollapsibleState.Collapsed),
+
+					new F5Host('DO', '', 'f5-declarative-onboarding', doIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
+
+					new F5Host('TS', '', 'f5-telemetry', tsIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
+
+					new F5Host('CF', '', 'f5-cloud-failover', cfIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
 				]);
 
-			} else if (element.label === 'UCS') {
 
-				// if(this.ucsList.length === 0)
+			} else if (element.label === 'FAST') {
+
+				this.fast?.releases?.forEach((el: AtcRelease) => {
+
+					const desc = [
+						el.version === this.fast?.latest ? 'Latest' : '',
+						el.version === ext.f5Client?.fast?.version.version ? 'Installed' : ''
+					].filter(Boolean);
+
+					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
+						command: 'f5.installRPM',
+						title: '',
+						arguments: [el.assets]
+					}));
+				});
+
+
+			} else if (element.label === 'AS3') {
+
+				this.as3?.releases?.forEach((el: AtcRelease) => {
+
+					const desc = [
+						el.version === this.as3?.latest ? 'Latest' : '',
+						el.version === ext.f5Client?.as3?.version.version ? 'Installed' : ''
+					].filter(Boolean);
+
+					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
+						command: 'f5.installRPM',
+						title: '',
+						arguments: [el.assets]
+					}));
+				});
+
+
+			} else if (element.label === 'DO') {
+
+				this.do?.releases?.forEach((el: AtcRelease) => {
+
+					const desc = [
+						el.version === this.do?.latest ? 'Latest' : '',
+						el.version === ext.f5Client?.do?.version.version ? 'Installed' : ''
+					].filter(Boolean);
+
+					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
+						command: 'f5.installRPM',
+						title: '',
+						arguments: [el.assets]
+					}));
+				});
+
+
+
+			} else if (element.label === 'TS') {
+
+				this.ts?.releases?.forEach((el: AtcRelease) => {
+
+					const desc = [
+						el.version === this.ts?.latest ? 'Latest' : '',
+						el.version === ext.f5Client?.ts?.version.version ? 'Installed' : ''
+					].filter(Boolean);
+
+					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
+						command: 'f5.installRPM',
+						title: '',
+						arguments: [el.assets]
+					}));
+				});
+
+
+
+			} else if (element.label === 'CF') {
+
+				this.cf?.releases?.forEach((el: AtcRelease) => {
+
+					const desc = [
+						el.version === this.cf?.latest ? 'Latest' : '',
+						el.version === ext.f5Client?.cf?.version.version ? 'Installed' : ''
+					].filter(Boolean);
+
+					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
+						command: 'f5.installRPM',
+						title: '',
+						arguments: [el.assets]
+					}));
+				});
+
+
+
+
+			} else if (element.label === 'UCS') {
 
 				// get list of ucs, list as items
 				treeItems.push(...
@@ -65,43 +404,26 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 							`version: ${el.apiRawValues.version}`,
 							`encrypted: ${el.apiRawValues.encrypted}`,
 						].join('\r\n');
-						// const tipString = tip.join('\r\n');
 						const fileName = path.parse(el.apiRawValues.filename).base;
 
-						return new F5Host(fileName, '', tip, 'ucsItem', TreeItemCollapsibleState.None);
+						return new F5Host(fileName, '', tip, '', 'ucsItem', TreeItemCollapsibleState.None, {
+							command: 'f5.downloadUCS',
+							title: '',
+							arguments: [fileName]
+						});
 					})
 				);
 
-				const tmpUcsListResp = {
-					"kind": "tm:sys:ucs:ucscollectionstate",
-					"selfLink": "https://localhost/mgmt/tm/sys/ucs?ver=14.1.2.6",
-					"items": [
-						{
-							"kind": "tm:sys:ucs:ucsstate",
-							"generation": 0,
-							"apiRawValues": {
-								"base_build": "0.0.2",
-								"build": "0.0.2",
-								"built": "200605113646",
-								"changelist": "3327837",
-								"edition": "Point Release 6",
-								"encrypted": "no",
-								"file_created_date": "2020-08-01T12:57:21Z",
-								"file_size": "281800911 (in bytes)",
-								"filename": "/var/local/ucs/coreltm01_8.1.2020.ucs",
-								"install_date": "Fri Jun  5 11:36:46 PDT 2020",
-								"job_id": "1204782",
-								"product": "BIG-IP",
-								"sequence": "14.1.2.6-0.0.2.0",
-								"version": "14.1.2.6"
-							}
-						}
-					]
-				};
+
 
 			} else if (element.label === 'QKVIEW') {
 				// get list of qkviews, list as items
-
+				treeItems.push(...
+					this.qkviewList.map((el: any) => {
+						const label = path.parse(el.name).name;
+						return new F5Host(label, '', '', '', 'qkviewItem', TreeItemCollapsibleState.None);
+					})
+				);
 			}
 
 
@@ -159,21 +481,19 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 				}
 
 				// if device is connected device, make it expandable
-
 				let itemCollapsibleStat = TreeItemCollapsibleState.None;
 				if (item.device === ext.f5Client?.device.device) {
 					logger.debug('hostsTreeProvider, These devices are equal!');
 					itemCollapsibleStat = TreeItemCollapsibleState.Expanded;
-					// start getting ucs/qkview details
 
-					ext.f5Client.ucs?.list()
-						.then(resp => this.ucsList = resp.data.items);
-
+					// refresh/get atcMetaData
+					// this.atcMetaData = ext.f5Client?.atcMetaData;
 				}
 
 				const treeItem = new F5Host(
 					item.device,
 					item.provider,
+					'',
 					'',
 					'f5Host',
 					itemCollapsibleStat,
@@ -285,17 +605,81 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			 */
 		}
 	}
+
+
+
+
+	private async parseAtcMeta() {
+
+
+	}
 }
+
 
 export class F5Host extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		public description: string,
 		public tooltip: string,
+		public iconPath: string,
 		public contextValue: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
+		// public rpm?: {
+		// 	downloadUrl: string,
+		// 	latest: boolean,
+		// 	packageName: string
+		// },
+		public readonly command?: vscode.Command,
 	) {
 		super(label, collapsibleState);
 	}
 }
+
+/**
+ * compares semver
+ * 
+ * https://github.com/substack/semver-compare
+ * 
+ * @param a 
+ * @param b 
+ */
+export function cmp(a: string, b: string) {
+	var pa = a.split('.');
+	var pb = b.split('.');
+	for (var i = 0; i < 3; i++) {
+		var na = Number(pa[i]);
+		var nb = Number(pb[i]);
+		if (na > nb) { return 1; }
+		if (nb > na) { return -1; }
+		if (!isNaN(na) && isNaN(nb)) { return 1; }
+		if (isNaN(na) && !isNaN(nb)) { return -1; }
+	}
+	return 0;
+};
+
+const tmpUcsListResp = {
+	"kind": "tm:sys:ucs:ucscollectionstate",
+	"selfLink": "https://localhost/mgmt/tm/sys/ucs?ver=14.1.2.6",
+	"items": [
+		{
+			"kind": "tm:sys:ucs:ucsstate",
+			"generation": 0,
+			"apiRawValues": {
+				"base_build": "0.0.2",
+				"build": "0.0.2",
+				"built": "200605113646",
+				"changelist": "3327837",
+				"edition": "Point Release 6",
+				"encrypted": "no",
+				"file_created_date": "2020-08-01T12:57:21Z",
+				"file_size": "281800911 (in bytes)",
+				"filename": "/var/local/ucs/coreltm01_8.1.2020.ucs",
+				"install_date": "Fri Jun  5 11:36:46 PDT 2020",
+				"job_id": "1204782",
+				"product": "BIG-IP",
+				"sequence": "14.1.2.6-0.0.2.0",
+				"version": "14.1.2.6"
+			}
+		}
+	]
+};

@@ -11,64 +11,64 @@ import logger from './utils/logger';
 
 
 
-export async function getMiniUcs (): Promise<string|undefined> {
+// export async function getMiniUcs (): Promise<string|undefined> {
 
-    return await window.withProgress({
-        location: ProgressLocation.Notification,
-        title: `Getting Configuration from BIG-IP`,
-        cancellable: true
-    }, async (progress, token) => {
-        token.onCancellationRequested(() => {
-            // this logs but doesn't actually cancel...
-            logger.debug("User canceled External API Request");
-            return new Error(`User canceled External API Request`);
-        });
+//     return await window.withProgress({
+//         location: ProgressLocation.Notification,
+//         title: `Getting Configuration from BIG-IP`,
+//         cancellable: true
+//     }, async (progress, token) => {
+//         token.onCancellationRequested(() => {
+//             // this logs but doesn't actually cancel...
+//             logger.debug("User canceled External API Request");
+//             return new Error(`User canceled External API Request`);
+//         });
 
-        progress.report({ message: `Saving config on device`});
-        logger.debug('Saving config on F5 using bash api, "tmsh save sys config"');
+//         progress.report({ message: `Saving config on device`});
+//         logger.debug('Saving config on F5 using bash api, "tmsh save sys config"');
         
-        // /**
-        //  * save config before capturing mini_ucs!!!
-        //  *  over bash api: tmsh save sys config
-        //  * 	or POST /mgmt/tm/sys/config { "command":"save" }
-        //  */
-        await ext.mgmtClient?.makeRequest('/mgmt/tm/sys/config', {
-            method: 'POST',
-            body: {
-                command: 'save'
-            }
-        });
+//         // /**
+//         //  * save config before capturing mini_ucs!!!
+//         //  *  over bash api: tmsh save sys config
+//         //  * 	or POST /mgmt/tm/sys/config { "command":"save" }
+//         //  */
+//         await ext.mgmtClient?.makeRequest('/mgmt/tm/sys/config', {
+//             method: 'POST',
+//             body: {
+//                 command: 'save'
+//             }
+//         });
         
         
-        const tempFile = `mini_ucs.tar.gz`;
+//         const tempFile = `mini_ucs.tar.gz`;
         
-        progress.report({ message: `Collecting -> Downloading configs`});
+//         progress.report({ message: `Collecting -> Downloading configs`});
         
-        // build mini ucs
-        const ucsCmd = 'tar -czf /shared/images/${tempFile} /config/bigip.conf /config/bigip_base.conf /config/partitions';
-        logger.debug(`building mini_ucs on device with following command over bash api: ${ucsCmd}`);
-        await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
-            method: 'POST',
-            body: {
-                command: 'run',
-                utilCmdArgs: `-c '${ucsCmd}'`
-            }
-        });
+//         // build mini ucs
+//         const ucsCmd = 'tar -czf /shared/images/${tempFile} /config/bigip.conf /config/bigip_base.conf /config/partitions';
+//         logger.debug(`building mini_ucs on device with following command over bash api: ${ucsCmd}`);
+//         await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+//             method: 'POST',
+//             body: {
+//                 command: 'run',
+//                 utilCmdArgs: `-c '${ucsCmd}'`
+//             }
+//         });
         
-        const coreDir = ext.context.extensionPath;
-        const zipDown = path.join(coreDir, tempFile);
+//         const coreDir = ext.context.extensionPath;
+//         const zipDown = path.join(coreDir, tempFile);
 
-        try {
-            const resp = await ext.mgmtClient?.download(tempFile, zipDown);
-            logger.debug(`Should have downloaded new mini_ucs: ${zipDown}`);
-            return zipDown;
-        } catch (e) {
-            logger.error('mini_ucs download error', e.message);
-            return undefined;
-        }
-    });
+//         try {
+//             const resp = await ext.mgmtClient?.download(tempFile, zipDown);
+//             logger.debug(`Should have downloaded new mini_ucs: ${zipDown}`);
+//             return zipDown;
+//         } catch (e) {
+//             logger.error('mini_ucs download error', e.message);
+//             return undefined;
+//         }
+//     });
 
-} 
+// } 
 
 export async function makeExplosion (file: string) {
 

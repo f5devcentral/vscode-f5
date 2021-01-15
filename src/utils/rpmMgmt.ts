@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { downloadToFile } from './coreF5HTTPS';
+// import { downloadToFile } from './coreF5HTTPS';
 // import { callHTTPS } from '../utils/externalAPIs';
 import axios from 'axios';
 // import * as utils from './utils';
@@ -44,9 +44,9 @@ export async function installedRPMs () {
      */
     
     // start installed pkgs query
-    const query: any = await ext.mgmtClient?.makeRequest(PKG_MGMT_URI, {
+    const query: any = await ext.f5Client?.https(PKG_MGMT_URI, {
             method: 'POST',
-            body: { 
+            data: { 
                 operation: 'QUERY' 
             }
         }
@@ -57,7 +57,7 @@ export async function installedRPMs () {
     await new Promise(resolve => { setTimeout(resolve, 1000); });
  
     // query task to get installed rpms
-    const tasks: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${query.data.id}`);
+    const tasks: any = await ext.f5Client?.https(`${PKG_MGMT_URI}/${query.data.id}`);
 
     // not sure if this error logic is even needed...
     if(tasks.status === 200) {
@@ -95,9 +95,9 @@ export async function unInstallRpm (packageName: string) {
         });
         
         // start unInstall job
-        const start: any = await ext.mgmtClient?.makeRequest(PKG_MGMT_URI, {
+        const start: any = await ext.f5Client?.https(PKG_MGMT_URI, {
             method: 'POST',
-            body: {
+            data: {
                 operation: 'UNINSTALL',
                 packageName
             }
@@ -116,7 +116,7 @@ export async function unInstallRpm (packageName: string) {
         // use taskId to control loop
         while(taskId && i < 10) {
 
-            const resp: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
+            const resp: any = await ext.f5Client?.https(`${PKG_MGMT_URI}/${taskId}`);
 
             progress.report({ message: `${resp.data.status}`});
             logger.debug('rpm uninstall task in progress', taskId, resp.status, resp.data.status);
@@ -250,16 +250,16 @@ export async function rpmInstaller (rpm: string) {
         await new Promise(resolve => { setTimeout(resolve, 2000); });
 
         // upload rpm to f5
-        const instA = await ext.mgmtClient?.upload(rpm);
+        const instA = await ext.f5Client?.upload(rpm, 'FILE');
         
         logger.debug('uploaded', instA);
         progress.report({ message: `installing`});
         await new Promise(resolve => { setTimeout(resolve, 2000); });
         
         // start rpm install
-        const installStart: any = await ext.mgmtClient?.makeRequest(PKG_MGMT_URI, {
+        const installStart: any = await ext.f5Client?.https(PKG_MGMT_URI, {
             method: 'POST',
-            body: {
+            data: {
                 operation: 'INSTALL',
                 packageFilePath: `/var/config/rest/downloads/${rpmName}`
             }
@@ -279,7 +279,7 @@ export async function rpmInstaller (rpm: string) {
         let i = 0;  // loop counter
         // use taskId to control loop
         while(taskId && i < 10) {
-            const resp: any = await ext.mgmtClient?.makeRequest(`${PKG_MGMT_URI}/${taskId}`);
+            const resp: any = await ext.f5Client?.https(`${PKG_MGMT_URI}/${taskId}`);
 
             logger.debug('task in progress', taskId, resp.status, resp.data.status);
             
@@ -348,7 +348,7 @@ async function getRPMgit(assetUrl: string) {
         } else {
             logger.debug(`${item.name} not found in local cache, downloading...`);
             // await rpmDownload(item.browser_download_url, destPath);
-            await downloadToFile(item.browser_download_url, destPath);
+            await ext.extHttp.download(item.browser_download_url, destPath);
         }
     });
 

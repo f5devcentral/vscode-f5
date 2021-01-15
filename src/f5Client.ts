@@ -2,7 +2,7 @@
 
 'use strict';
 
-import { Terminal, window, ProgressLocation, commands } from 'vscode';
+import { Terminal, window, ProgressLocation, commands, StatusBarItem, StatusBarAlignment } from 'vscode';
 import { ext, loadConfig } from './extensionVariables';
 import * as utils from './utils/utils';
 import { F5Client as _F5Client } from 'f5-conx-core';
@@ -17,6 +17,14 @@ export class F5Client extends _F5Client {
     device: Device;
     private terminal: Terminal | undefined;
 
+    hostStatusBar: StatusBarItem;
+    hostNameBar: StatusBarItem;
+    fastBar: StatusBarItem;
+    as3Bar: StatusBarItem;
+    doBar: StatusBarItem;
+    tsBar: StatusBarItem;
+    cfBar: StatusBarItem;
+
     constructor(
         device: Device,
         host: string,
@@ -30,6 +38,14 @@ export class F5Client extends _F5Client {
         super(host, user, password, options);
         this.device = device;
         this.logger = Logger;
+        this.hostStatusBar = window.createStatusBarItem(StatusBarAlignment.Left, 32);
+        this.hostNameBar = window.createStatusBarItem(StatusBarAlignment.Left, 31);
+        this.fastBar = window.createStatusBarItem(StatusBarAlignment.Left, 30);
+        this.as3Bar = window.createStatusBarItem(StatusBarAlignment.Left, 29);
+        this.doBar = window.createStatusBarItem(StatusBarAlignment.Left, 28);
+        this.tsBar = window.createStatusBarItem(StatusBarAlignment.Left, 27);
+        this.cfBar = window.createStatusBarItem(StatusBarAlignment.Left, 26);
+
     }
 
     /**
@@ -49,71 +65,101 @@ export class F5Client extends _F5Client {
                 this.events.emit('log-info', "User canceled device connect");
                 return new Error(`User canceled device connect`);
             });
+
             let returnInfo: string[] = [];
 
             await this.discover();
 
-
-
             if (this.host) {
-                // this should always be here if we got to this point, but just to be safe for now
-                utils.setHostStatusBar(this.device.device);    // show device bar
+
+                this.hostStatusBar.text = this.device.device;
+                this.hostStatusBar.command = 'f5.disconnect';
+                this.hostStatusBar.tooltip = 'Disconnect';
+                this.hostStatusBar.show();
+
+                this.hostNameBar.text = this.host.hostname;
+                this.hostNameBar.command = 'f5.getF5HostInfo';
+                this.hostNameBar.show();
+                
                 ext.connectBar.hide();      // hide connect bar
                 returnInfo.push(
-                    this.host.hostname, 
-                    this.host.version, 
+                    this.host.hostname,
+                    this.host.version,
                     this.host.product
-                    );
+                );
 
                 //********** enable irules view **********/
                 this.host.product === 'BIG-IP' ?
                 commands.executeCommand('setContext', 'f5.tcl', true) :
                 commands.executeCommand('setContext', 'f5.tcl', false);
+                
+                commands.executeCommand('setContext', 'f5.device', true);
+                
             }
 
 
 
             //********** FAST info **********/
             if (this.fast) {
-                const text = `FAST(${this.fast.version.version})`;
-                utils.setFastBar(text);
-                returnInfo.push(text);
+            
+                this.fastBar.command = 'f5-fast.getInfo';
+                this.fastBar.text = `FAST(${this.fast.version.version})`;
+                this.fastBar.show();
+                commands.executeCommand('setContext', 'f5.fastInstalled', true);
+                returnInfo.push(this.fastBar.text);
+            
             }
 
             //********** AS3 info **********/
             if (this.as3) {
-                const text = `AS3(${this.as3.version.version})`;
-                const tip = `CLICK FOR ALL TENANTS \r\nschemaCurrent: ${this.as3.version.schemaCurrent} `;
-                utils.setAS3Bar(text, tip);
-                returnInfo.push(text);
+            
+                this.cfBar.command = 'f5-as3.getDec';
+                this.as3Bar.text = `AS3(${this.as3.version.version})`;
+                this.as3Bar.tooltip = `CLICK FOR ALL TENANTS \r\nschemaCurrent: ${this.as3.version.schemaCurrent} `;
+                this.as3Bar.show();
+                commands.executeCommand('setContext', 'f5.as3Installed', true);
+                returnInfo.push(this.as3Bar.text);
+            
             }
 
             //********** DO info **********/
             if (this.do) {
-                // for some reason DO responds with a list for version info...
-                const text = `DO(${this.do.version.version})`;
-                const tip = `schemaCurrent: ${this.do.version.version} `;
-                utils.setDOBar(text, tip);
-                returnInfo.push(text);
+            
+                this.cfBar.command = 'f5-do.getDec';
+                this.doBar.text = `DO(${this.do.version.version})`;
+                this.doBar.tooltip = `schemaCurrent: ${this.do.version.version} `;
+                this.doBar.show();
+                commands.executeCommand('setContext', 'f5.doInstalled', true);
+                returnInfo.push(this.doBar.text);
+            
             }
 
             //********** TS info **********/
             if (this.ts) {
-                const text = `TS(${this.ts.version.version})`;
-                const tip = `nodeVersion: ${this.ts.version.version}\r\nschemaCurrent: ${this.ts.version.schemaCurrent} `;
-                utils.setTSBar(text, tip);
-                returnInfo.push(text);
+
+                this.tsBar.command = 'f5-ts.getDec';
+                this.tsBar.text = `TS(${this.ts.version.version})`;
+                this.tsBar.tooltip = `nodeVersion: ${this.ts.version.version}\r\nschemaCurrent: ${this.ts.version.schemaCurrent} `;
+                this.tsBar.show();
+                commands.executeCommand('setContext', 'f5.tsInstalled', true);
+                returnInfo.push(this.tsBar.text);
+
             }
 
             //********** CF info **********/
             if (this.cf) {
-                const text = `CF(${this.cf.version.version})`;
-                const tip = `nodeVersion: ${this.cf.version.version}\r\nschemaCurrent: ${this.cf.version.schemaCurrent} `;
-                // utils.setCFBar(text, tip);
-                // returnInfo.push(text);
+
+                this.cfBar.command = 'f5-cf.getDec';
+                this.cfBar.text = `CF(${this.cf.version.version})`;
+                this.cfBar.tooltip = `nodeVersion: ${this.cf.version.version}\r\nschemaCurrent: ${this.cf.version.schemaCurrent} `;
+                this.cfBar.show();
+                commands.executeCommand('setContext', 'f5.cfInstalled', true);
+                returnInfo.push(this.cfBar.text);
+
             }
+
             return returnInfo;
-        }); 
+        });
         this.termConnect();
         return progress;
     }
@@ -124,15 +170,23 @@ export class F5Client extends _F5Client {
     async disconnect() {
 
         // this._tokenTimeout = 0;  // zero/expire authToken
-        this._mgmtClient.clearToken();
+        this.mgmtClient.clearToken();
 
         // clear connected details status bars
-        utils.setHostStatusBar();
-        utils.setHostnameBar();
-        utils.setFastBar();
-        utils.setAS3Bar();
-        utils.setDOBar();
-        utils.setTSBar();
+        this.hostStatusBar.hide();
+        this.hostNameBar.hide();
+        this.fastBar.hide();
+        this.as3Bar.hide();
+        this.doBar.hide();
+        this.tsBar.hide();
+        this.cfBar.hide();
+
+        // utils.setHostStatusBar();
+        // utils.setHostnameBar();
+        // utils.setFastBar();
+        // utils.setAS3Bar();
+        // utils.setDOBar();
+        // utils.setTSBar();
 
         /**
          * // hide irules/iapps view
@@ -142,6 +196,12 @@ export class F5Client extends _F5Client {
          *  be a better way to do this.
          */
         commands.executeCommand('setContext', 'f5.tcl', false);
+        commands.executeCommand('setContext', 'f5.device', false);
+        commands.executeCommand('setContext', 'f5.fastInstalled', false);
+        commands.executeCommand('setContext', 'f5.as3Installed', false);
+        commands.executeCommand('setContext', 'f5.doInstalled', false);
+        commands.executeCommand('setContext', 'f5.tsInstalled', false);
+        commands.executeCommand('setContext', 'f5.cfInstalled', false);
         // ext.iRulesAble = false;
 
         // show connect status bar

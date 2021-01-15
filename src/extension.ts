@@ -1,19 +1,33 @@
 'use strict';
 
-import { window, StatusBarAlignment, commands, workspace, ExtensionContext, ConfigurationTarget, FileType, ProgressLocation, Range, ViewColumn, Uri, TextDocument, Position } from 'vscode';
+import {
+	window,
+	StatusBarAlignment,
+	commands,
+	workspace,
+	ExtensionContext,
+	ConfigurationTarget,
+	FileType,
+	ProgressLocation,
+	Range,
+	ViewColumn,
+	Uri,
+	TextDocument,
+	Position
+} from 'vscode';
 import * as jsYaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as keyTarType from 'keytar';
 
-import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
+import { Asset, F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { TclTreeProvider } from './treeViewsProviders/tclTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 import * as f5Api from './utils/f5Api';
-import * as extAPI from './utils/externalAPIs';
+// import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
 import { ext, loadConfig } from './extensionVariables';
 import { FastWebView } from './editorViews/fastWebView';
@@ -24,12 +38,13 @@ import * as rpmMgmt from './utils/rpmMgmt';
 import logger from './utils/logger';
 import { deviceImport, deviceImportOnLoad } from './deviceImport';
 import { TextDocumentView } from './editorViews/editorView';
-import { getMiniUcs, makeExplosion } from './cfgExplorer';
+import { makeExplosion } from './cfgExplorer';
 import { unInstallOldExtension } from './extMigration';
 import { injectSchema } from './atcSchema';
 
 import { F5Client } from './f5Client';
 import { Device } from './models';
+import { AtcRelease, HttpResponse, isArray } from 'f5-conx-core';
 
 
 export async function activate(context: ExtensionContext) {
@@ -39,23 +54,7 @@ export async function activate(context: ExtensionContext) {
 	// assign context to global name space
 	ext.context = context;
 
-	// Create a status bar items - // todo: move this to f5DeviceClient.ts
-	ext.hostStatusBar = window.createStatusBarItem(StatusBarAlignment.Left, 15);
-	context.subscriptions.push(ext.hostStatusBar);
-	ext.hostNameBar = window.createStatusBarItem(StatusBarAlignment.Left, 14);
-	context.subscriptions.push(ext.hostNameBar);
-	ext.fastBar = window.createStatusBarItem(StatusBarAlignment.Left, 13);
-	context.subscriptions.push(ext.fastBar);
-	ext.as3Bar = window.createStatusBarItem(StatusBarAlignment.Left, 12);
-	context.subscriptions.push(ext.as3Bar);
-	ext.doBar = window.createStatusBarItem(StatusBarAlignment.Left, 11);
-	context.subscriptions.push(ext.doBar);
-	ext.tsBar = window.createStatusBarItem(StatusBarAlignment.Left, 10);
-	context.subscriptions.push(ext.tsBar);
-
-
 	ext.connectBar = window.createStatusBarItem(StatusBarAlignment.Left, 9);
-	context.subscriptions.push(ext.connectBar);
 	ext.connectBar.command = 'f5.connectDevice';
 	ext.connectBar.text = 'F5 -> Connect!';
 	ext.connectBar.tooltip = 'Click to connect!';
@@ -93,8 +92,14 @@ export async function activate(context: ExtensionContext) {
 
 
 	const hostsTreeProvider = new F5TreeProvider('');
-	window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
+	// window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
+	window.createTreeView('f5Hosts', {
+		treeDataProvider: hostsTreeProvider,
+		showCollapseAll: true
+	});
 	commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
+
+	hostsTreeProvider.loadAtcMetaData();
 
 	context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {
 
@@ -103,11 +108,6 @@ export async function activate(context: ExtensionContext) {
 		if (ext.f5Client) {
 			ext.f5Client.disconnect();
 		}
-
-		// type devObj = {
-		// 	device: string,
-		// 	provider: string
-		// };
 
 		if (!device) {
 			const bigipHosts: Device[] | undefined = await workspace.getConfiguration().get('f5.hosts');
@@ -141,7 +141,6 @@ export async function activate(context: ExtensionContext) {
 		ext.f5Client = new F5Client(device, host, user, password, {
 			port,
 			provider: device.provider,
-			// logger
 		});
 
 
@@ -151,6 +150,8 @@ export async function activate(context: ExtensionContext) {
 			ext.f5Client?.clearPassword();
 			commands.executeCommand('f5.disconnect');
 		});
+
+		ext.f5Client.extHttp = ext.extHttp;
 
 		// hook up events to logger
 		ext.f5Client.events.on('log-debug', msg => logger.debug(msg));
@@ -169,15 +170,13 @@ export async function activate(context: ExtensionContext) {
 				hostsTreeProvider.refresh();
 			})
 			.catch(err => {
-				logger.error('Discover failed');
+				logger.error('Connect/Discover failed');
 			});
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {
-
 		ext.f5Client?.https('/mgmt/tm/auth/source')
 			.then(resp => ext.panel.render(resp));
-
 	}));
 
 
@@ -343,6 +342,54 @@ export async function activate(context: ExtensionContext) {
 
 
 
+	context.subscriptions.push(commands.registerCommand('f5.createUCS', async () => {
+		// create ucs on f5
+
+		return await window.withProgress({
+			location: ProgressLocation.SourceControl,
+		}, async () => {
+
+			return await ext.f5Client?.ucs.create()
+				.then(resp => {
+					debugger;
+
+					setTimeout(() => { hostsTreeProvider.refresh(); }, 1000);
+					return resp;
+				});
+		});
+
+	}));
+
+	context.subscriptions.push(commands.registerCommand('f5.downloadUCS', async (filename) => {
+		// download ucs from f5
+
+		return await window.withProgress({
+			location: ProgressLocation.SourceControl,
+		}, async () => {
+
+			// todo:  this ultimatelly doesn't work right now.  It downloads a file, but only the first 1Mb of the file...
+			const fUri = Uri.parse(filename);
+			const fUri2 = Uri.file(filename);
+			// let saveD = await window.showSaveDialog({defaultUri: Uri.parse(filename)});
+
+			const folder = await window.showOpenDialog({ 
+				title: 'Select Folder to Save UCS', 
+				canSelectFiles: false,
+				canSelectFolders: true,
+				canSelectMany: false
+			});
+			// fUri.path = fUri.path.replace(/^\//, '');
+			const dest = folder ? folder[0].path : ext.cacheDir;
+
+			// debugger;
+			
+			// return await ext.f5Client?.ucs.download(filename, dest);
+			return await ext.f5Client?.download(filename, dest, 'UCS');
+		});
+	}));
+
+
+
 	context.subscriptions.push(commands.registerCommand('f5.openSettings', () => {
 		//	open settings window and bring the user to the F5 section
 		return commands.executeCommand("workbench.action.openSettings", "f5");
@@ -365,56 +412,140 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.installRPM', async (selectedRPM) => {
 
+		const downloadResponses = [];
+		const upLoadResponses = [];
+		let rpm: Asset;
+		let signature;
+		let installed: HttpResponse;
 
-		if (selectedRPM) {
-			// set rpm path/location from oject return in explorer tree
-			selectedRPM = selectedRPM.fsPath;
-			logger.debug(`workspace selected rpm`, selectedRPM);
-		} else {
-			// pick atc/tool/version picker/downloader
-			selectedRPM = await rpmMgmt.rpmPicker();
-			logger.debug('downloaded rpm location', selectedRPM);
+		if (isArray(selectedRPM)) {
+
+			window.withProgress({
+				location: ProgressLocation.SourceControl
+			}, async () => {
+
+				rpm = selectedRPM.filter((el: Asset) => el.name.endsWith('.rpm'))[0];
+				signature = selectedRPM.filter((el: Asset) => el.name.endsWith('.sha256'))[0];
+
+				// setup logic to see what atc service is being installed, and compare that with what might already be installed
+				//  work through process for un-installing, then installing new package
+
+				if (rpm) {
+
+					await ext.f5Client?.atc.download(rpm.browser_download_url)
+						.then(async resp => {
+
+							// assign rpm name to variable
+							downloadResponses.push(resp);
+							await new Promise(resolve => { setTimeout(resolve, 1000); });
+
+							await ext.f5Client?.atc.uploadRpm(resp.data.file)
+								.then(async uploadResp => {
+
+									await new Promise(resolve => { setTimeout(resolve, 1000); });
+									upLoadResponses.push(uploadResp);
+									await ext.f5Client?.atc.install(rpm.name)
+										.then(resp => installed = resp);
+								});
+						})
+						.catch(err => {
+
+							// todo: setup error logging
+							debugger;
+						});
+				}
+				if (signature) {
+
+					await ext.f5Client?.atc.download(rpm.browser_download_url)
+						.then(async resp => {
+							await ext.f5Client?.atc.uploadRpm(resp.data.file);
+						})
+						.catch(err => {
+							// todo: setup error logging
+							debugger;
+						});
+				}
+
+
+				if (installed) {
+					await new Promise(resolve => { setTimeout(resolve, 500); });
+					await ext.f5Client?.connect(); // refresh connect/status bars
+					await new Promise(resolve => { setTimeout(resolve, 500); });
+					hostsTreeProvider.refresh();
+				}
+			});
+
+
 		}
 
-		// const iRpms = await rpmMgmt.installedRPMs();
-		logger.debug('selected rpm', selectedRPM);
+		// if (selectedRPM) {
+		// 	// set rpm path/location from oject return in explorer tree
+		// 	selectedRPM = selectedRPM.fsPath;
+		// 	logger.debug(`workspace selected rpm`, selectedRPM);
+		// } else {
+		// 	// pick atc/tool/version picker/downloader
+		// 	selectedRPM = await rpmMgmt.rpmPicker();
+		// 	logger.debug('downloaded rpm location', selectedRPM);
+		// }
 
-		if (!selectedRPM) {
-			debugger;
-			// probably need to setup error handling for this situation
-		}
+		// // const iRpms = await rpmMgmt.installedRPMs();
+		// logger.debug('selected rpm', selectedRPM);
 
-		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
-		logger.debug('installed rpm', installedRpm);
-		ext.f5Client?.connect(); // refresh connect/status bars
+		// if (!selectedRPM) {
+		// 	debugger;
+		// 	// probably need to setup error handling for this situation
+		// }
+
+		// const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
+		// logger.debug('installed rpm', installedRpm);
 
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.unInstallRPM', async (rpm) => {
 
-		// if no rpm sent in from update command
-		if (!rpm) {
-			// get installed packages
-			const installedRPMs = await rpmMgmt.installedRPMs();
-			// have user select package
-			rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
-		} else {
-			// rpm came from rpm update call...
-		}
+		window.withProgress({
+			location: ProgressLocation.SourceControl,
+		}, async () => {
+			// if no rpm sent in from update command
+			if (!rpm) {
+				// get installed packages
+				const installedRPMs = await rpmMgmt.installedRPMs();
+				// have user select package
+				rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
+			} else {
+				// rpm came from new rpm hosts view
+				if (rpm.label && rpm.tooltip) {
 
-		if (!rpm) {	// return error pop-up if quickPick escaped
-			return window.showWarningMessage('user exited - did not select rpm to un-install');
-		}
 
-		const status = await rpmMgmt.unInstallRpm(rpm);
-		window.showInformationMessage(`rpm ${rpm} removal ${status}`);
-		// debugger;
+					await ext.f5Client?.atc.showInstalled()
+						.then(async resp => {
+							// loop through response, find rpm that matches rpm.label, then uninstall
+							const rpmName = resp.data.queryResponse.filter((el: { name: string }) => el.name === rpm.tooltip)[0];
+							return await ext.f5Client?.atc.unInstall(rpmName.packageName);
 
-		// used to pause between uninstalling and installing a new version of the same atc
-		//		should probably put this somewhere else
-		await new Promise(resolve => { setTimeout(resolve, 2000); });
-		ext.f5Client?.connect(); // refresh connect/status bars
+						});
 
+
+
+				}
+
+			}
+
+			if (!rpm) {	// return error pop-up if quickPick escaped
+				// return window.showWarningMessage('user exited - did not select rpm to un-install');
+				logger.info('user exited - did not select rpm to un-install');
+			}
+
+			// const status = await rpmMgmt.unInstallRpm(rpm);
+			// window.showInformationMessage(`rpm ${rpm} removal ${status}`);
+			// debugger;
+
+			// used to pause between uninstalling and installing a new version of the same atc
+			//		should probably put this somewhere else
+			await new Promise(resolve => { setTimeout(resolve, 10000); });
+			await ext.f5Client?.connect(); // refresh connect/status bars
+			hostsTreeProvider.refresh();
+		});
 	}));
 
 
@@ -423,9 +554,9 @@ export async function activate(context: ExtensionContext) {
 	 * ###########################################################################
 	 * 
 	 * 				TTTTTTT    CCCCC    LL      
-		 * 				  TTT     CC    C   LL      
-		 * 				  TTT     CC        LL      
-		 * 				  TTT     CC    C   LL      
+	 * 				  TTT     CC    C   LL      
+	 * 				  TTT     CC        LL      
+	 * 				  TTT     CC    C   LL      
 	 * 				  TTT      CCCCC    LLLLLLL 
 	 * 
 	 * ############################################################################
@@ -564,8 +695,8 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5-fast.getApp', async (tenApp) => {
 
 		await ext.f5Client?.https(`/mgmt/shared/fast/applications/${tenApp}`)
-		.then (resp => ext.panel.render(resp))
-		.catch(err => logger.error('get fast app failed:', err));
+			.then(resp => ext.panel.render(resp))
+			.catch(err => logger.error('get fast app failed:', err));
 	}));
 
 
@@ -575,8 +706,8 @@ export async function activate(context: ExtensionContext) {
 		// ext.panel.render(resp);
 
 		await ext.f5Client?.https(`/mgmt/shared/fast/tasks/${taskId}`)
-		.then (resp => ext.panel.render(resp))
-		.catch(err => logger.error('get fast task failed:', err));
+			.then(resp => ext.panel.render(resp))
+			.catch(err => logger.error('get fast task failed:', err));
 	}));
 
 
@@ -586,8 +717,8 @@ export async function activate(context: ExtensionContext) {
 		// ext.panel.render(resp);
 
 		await ext.f5Client?.https(`/mgmt/shared/fast/templates/${template}`)
-		.then (resp => ext.panel.render(resp))
-		.catch(err => logger.error('get fast task failed:', err));
+			.then(resp => ext.panel.render(resp))
+			.catch(err => logger.error('get fast task failed:', err));
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.getTemplateSets', async (set) => {
@@ -596,8 +727,8 @@ export async function activate(context: ExtensionContext) {
 		// ext.panel.render(resp);
 
 		await ext.f5Client?.https(`/mgmt/shared/fast/templatesets/${set}`)
-		.then (resp => ext.panel.render(resp))
-		.catch(err => logger.error('get fast task failed:', err));
+			.then(resp => ext.panel.render(resp))
+			.catch(err => logger.error('get fast task failed:', err));
 	}));
 
 
@@ -893,20 +1024,20 @@ export async function activate(context: ExtensionContext) {
 					}
 				}
 			})
-			// await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare`, {
-			// 	method: 'POST',
-			// 	data: {
-			// 		class: 'AS3',
-			// 		declaration: {
-			// 			schemaVersion: tenant.command.arguments[0].schemaVersion,
-			// 			class: 'ADC',
-			// 			target: tenant.command.arguments[0].target,
-			// 			[tenant.label]: {
-			// 				class: 'Tenant'
-			// 			}
-			// 		}
-			// 	}
-			// })
+				// await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare`, {
+				// 	method: 'POST',
+				// 	data: {
+				// 		class: 'AS3',
+				// 		declaration: {
+				// 			schemaVersion: tenant.command.arguments[0].schemaVersion,
+				// 			class: 'ADC',
+				// 			target: tenant.command.arguments[0].target,
+				// 			[tenant.label]: {
+				// 				class: 'Tenant'
+				// 			}
+				// 		}
+				// 	}
+				// })
 				.then(resp => {
 					const resp2 = resp.data.results[0];
 					progress.report({ message: `${resp2.code} - ${resp2.message}` });
@@ -934,7 +1065,7 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5-as3.getTask', (id) => {
 
 		window.withProgress({
-			location: ProgressLocation.Notification,
+			location: ProgressLocation.Window,
 			// location: { viewId: 'as3Tenants'},
 			title: `Getting AS3 Task`
 		}, async () => {
@@ -972,15 +1103,15 @@ export async function activate(context: ExtensionContext) {
 		}, async () => {
 
 			await ext.f5Client?.as3?.postDec(JSON.parse(text))
-			.then( resp => {
-				ext.panel.render(resp);
-				as3Tree.refresh();
-			})
-			.catch( err => logger.error('as3 post dec failed:', err));
+				.then(resp => {
+					ext.panel.render(resp);
+					as3Tree.refresh();
+				})
+				.catch(err => logger.error('as3 post dec failed:', err));
 
 		});
 
-		
+
 	}));
 
 
@@ -1058,8 +1189,8 @@ export async function activate(context: ExtensionContext) {
 		}, async () => {
 
 			await ext.f5Client?.https(`/mgmt/shared/telemetry/declare`)
-			.then(resp => ext.panel.render(resp))
-			.catch(err => logger.error('get ts declaration failed:', err));
+				.then(resp => ext.panel.render(resp))
+				.catch(err => logger.error('get ts declaration failed:', err));
 
 		});
 	}));
@@ -1090,21 +1221,22 @@ export async function activate(context: ExtensionContext) {
 				method: 'POST',
 				data: JSON.parse(text)
 			})
-			.then(resp => {
-				ext.panel.render(resp);
-			})
-			.catch(err => {
-				ext.panel.render(err);
-				logger.error('post ts declaration failed:', err);
-			});
+				.then(resp => {
+					ext.panel.render(resp);
+				})
+				.catch(err => {
+					ext.panel.render(err);
+					logger.error('post ts declaration failed:', err);
+				});
 
 		});
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
 
-		const resp = await extAPI.makeRequest({ url: decUrl });
-		return ext.panel.render(resp);
+		await ext.extHttp.makeRequest({ url: decUrl })
+			.then(resp => ext.panel.render(resp))
+			.catch(err => logger.error(err));
 	}));
 
 
@@ -1134,8 +1266,8 @@ export async function activate(context: ExtensionContext) {
 			// ext.panel.render(resp);
 
 			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding`)
-			.then(resp => ext.panel.render(resp))
-			.catch(err => logger.error('get do declaration failed:', err));
+				.then(resp => ext.panel.render(resp))
+				.catch(err => logger.error('get do declaration failed:', err));
 		});
 
 
@@ -1174,8 +1306,8 @@ export async function activate(context: ExtensionContext) {
 			// ext.panel.render(resp);
 
 			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding/inspect`)
-			.then(resp => ext.panel.render(resp))
-			.catch(err => logger.error('get do inspect failed:', err));
+				.then(resp => ext.panel.render(resp))
+				.catch(err => logger.error('get do inspect failed:', err));
 
 		});
 
@@ -1193,8 +1325,8 @@ export async function activate(context: ExtensionContext) {
 			// ext.panel.render(resp);
 
 			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding/task`)
-			.then(resp => ext.panel.render(resp))
-			.catch(err => logger.error('get do tasks failed:', err));
+				.then(resp => ext.panel.render(resp))
+				.catch(err => logger.error('get do tasks failed:', err));
 		});
 	}));
 
@@ -1249,19 +1381,15 @@ export async function activate(context: ExtensionContext) {
 		 * 
 		 */
 
-		if (!ext.f5Client) {
-			await commands.executeCommand('f5.connectDevice');
-		}
 
-		//  NEW!!!
-		const x = ext.cacheDir;
+		if (!ext.f5Client) {
+			await commands.executeCommand('f5.connectDevice', item.command.arguments[0]);
+		}
 
 		// return await ext.f5Client?.ucs?.
 		return await ext.f5Client?.ucs?.get({ mini: true, localDestPathFile: ext.cacheDir })
 			.then(async resp => {
 				logger.debug('Got mini_ucs -> extracting config with corkscrew');
-
-				const x = process;
 
 				return await makeExplosion(resp.data.file)
 					.then(async cfg => {
@@ -1271,46 +1399,14 @@ export async function activate(context: ExtensionContext) {
 
 						logger.debug('Deleting mini_ucs file at', resp.data.file);
 
-						// try {
-						// 	// wait  couple seconds before we try to delete the mini_ucs
-						// 	setTimeout(() => { fs.unlinkSync(resp.data.file); }, 2000);
-						// } catch (e) {
-						// 	logger.error('Not able to delete mini_ucs at:', resp.data.file);
-						// }
+						try {
+							// wait  couple seconds before we try to delete the mini_ucs
+							setTimeout(() => { fs.unlinkSync(resp.data.file); }, 2000);
+						} catch (e) {
+							logger.error('Not able to delete mini_ucs at:', resp.data.file);
+						}
 					});
-
-
-				// return x;
 			});
-
-
-		// //   EXISTING!!!
-		// const file = await getMiniUcs();
-		// let expl: any = undefined;
-
-		// if (file) {
-		// 	logger.debug('Got mini_ucs -> extracting config with corkscrew');
-
-		// 	expl = await makeExplosion(file);
-
-		// 	if (expl) {
-		// 		await cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
-		// 	}
-
-		// 	logger.debug('Deleting mini_ucs file at', file);
-
-		// 	try {
-		// 		// wait  couple seconds before we try to delete the mini_ucs
-		// 		setTimeout(() => { fs.unlinkSync(file); }, 2000);
-		// 	} catch (e) {
-		// 		logger.error('Not able to delete mini_ucs at:', file);
-		// 	}
-		// } else {
-		// 	logger.error('Failed to retrieve mini_ucs for configuration exploration');
-		// }
-
-
-
 
 	}));
 
@@ -1525,7 +1621,10 @@ export async function activate(context: ExtensionContext) {
 
 					//external call
 					logger.debug('external call -> ', JSON.stringify(text));
-					return await extAPI.makeRequest(text);
+					// return await extAPI.makeRequest(text);
+
+					return await ext.extHttp.makeRequest(text);
+
 				});
 
 			} else {
@@ -1548,10 +1647,7 @@ export async function activate(context: ExtensionContext) {
 					}
 
 					logger.debug('generic https f5 call -> ', text);
-					// return await ext.mgmtClient?.makeRequest(text.url, {
-					// 	method: text.method,
-					// 	body: text.body
-					// });
+
 					return await ext.f5Client?.https(text.url, {
 						method: text.method,
 						data: text.body
@@ -1596,8 +1692,8 @@ export async function activate(context: ExtensionContext) {
 				utilCmdArgs: `-c '${cmd}'`
 			}
 		})
-		.then(resp => ext.panel.render(resp.data.commandResult))
-		.catch(err => logger.error('bash command failed:', err));
+			.then(resp => ext.panel.render(resp.data.commandResult))
+			.catch(err => logger.error('bash command failed:', err));
 	}));
 
 

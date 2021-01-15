@@ -26,9 +26,9 @@ export async function deployFastApp(dec: object) {
         });
 
         // post initial dec
-        let response: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/applications`, {
+        let response: any = await ext.f5Client?.https(`/mgmt/shared/fast/applications`, {
             method: 'POST',
-            body: dec
+            data: dec
         });
     
         progress.report({ message: `${response.statusText}`});
@@ -42,7 +42,7 @@ export async function deployFastApp(dec: object) {
 
             // get got a 202 and a taskId (single dec), check task status till complete
             while(taskId) {
-                response = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
+                response = await ext.f5Client?.https(`/mgmt/shared/fast/tasks/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
                 if(response.data.message !== 'in progress'){
@@ -80,7 +80,7 @@ export async function delTenApp(tenApp: string) {
         title: `Deleting FAST App: ${tenApp}`
     }, async (progress) => {
 
-        let response: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/applications/${tenApp}`, {
+        let response: any = await ext.f5Client?.https(`/mgmt/shared/fast/applications/${tenApp}`, {
             method: 'DELETE'
         });
 
@@ -91,7 +91,7 @@ export async function delTenApp(tenApp: string) {
             await new Promise(resolve => { setTimeout(resolve, 1000); });
             while(taskId) {
 
-                response = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
+                response = await ext.f5Client?.https(`/mgmt/shared/fast/tasks/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
                 if(response.data.message !== 'in progress'){
@@ -124,7 +124,7 @@ export async function delTempSet(tempSet: string) {
         title: `Deleting FAST Template Set: ${tempSet}`
     }, async (progress) => {
 
-        let response: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templatesets/${tempSet}`, {
+        let response: any = await ext.f5Client?.https(`/mgmt/shared/fast/templatesets/${tempSet}`, {
             method: 'DELETE'
         });
         
@@ -134,7 +134,7 @@ export async function delTempSet(tempSet: string) {
             
             await new Promise(resolve => { setTimeout(resolve, 1000); });
             while(taskId) {
-                response = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
+                response = await ext.f5Client?.https(`/mgmt/shared/fast/tasks/${taskId}`);
 
                 // if not 'in progress', its done, clear taskId to break loop
                 if(response.data.message !== 'in progress'){
