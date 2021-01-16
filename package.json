@@ -486,12 +486,6 @@
 				"enablement": "f5.as3Installed"
 			},
 			{
-				"command": "f5-as3.fullTenant",
-				"title": "Full Tenant",
-				"category": "F5-AS3",
-				"enablement": "view == as3Tenants"
-			},
-			{
 				"command": "f5-as3.expandedTenant",
 				"title": "Expanded Tenant",
 				"category": "F5-AS3",
@@ -860,14 +854,6 @@
 				},
 				{
 					"command": "f5-as3.deleteTenant",
-					"when": "none"
-				},
-				{	
-					"command": "f5-as3.fullTenant",	
-					"when": "none"	
-				},
-				{
-					"command": "f5-as3.fullTenant",
 					"when": "none"
 				},
 				{

@@ -8,6 +8,7 @@ node_modules
 
 # ignore ilx rpm cache directory
 atc_ilx_rpm_cache
+cache
 .vscode-test/
 # ignore any extension install files and zips
 *.vsix
