@@ -1,14 +1,14 @@
 # ignore 'out' directory which holds all the js files from TS compile
 out
-# used to build new /out directory and clear old js files from compliling output
-out.old
+# any "old" files I'm pending removal...
+.old
 
 # ignore directory that holds node_modules, these should be installed when npm installs the necessary packages from the package.json file
 node_modules
 
-# ignore cache directory
+# ignore ilx rpm cache directory
+atc_ilx_rpm_cache
 cache
-
 .vscode-test/
 # ignore any extension install files and zips
 *.vsix
@@ -23,5 +23,3 @@ cache
 *.tmpl
 # ignore temp mini_ucs for config explorere (corkscrew)
 mini_ucs.tar.gz
-# any "old" files I'm pending removal...
-*.old
