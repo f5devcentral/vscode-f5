@@ -8,6 +8,18 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.10.0] - (01-18-2021)
+
+
+### Modified
+- Clearing config explorer breaks it (pending)
+- single tenant from bigiq as3 target (pending)
+- Updated docs:
+  - Added "Edit in Github" and modified date header to each page
+  - fixed changelog reference
+
+---
+
 ## [2.8.2] - (11-05-2020)
 
 ### Added

@@ -1,14 +1,20 @@
-import * as vscode from 'vscode';
+import { 
+	Command, 
+	Event, 
+	EventEmitter, 
+	TreeDataProvider, 
+	TreeItem, 
+	TreeItemCollapsibleState 
+} from 'vscode';
 import { ext } from '../extensionVariables';
-// import { isArray } from 'util';
 
 
-export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
+export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<AS3item | undefined> = new vscode.EventEmitter<AS3item | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<AS3item | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<AS3item | undefined> = new EventEmitter<AS3item | undefined>();
+	readonly onDidChangeTreeData: Event<AS3item | undefined> = this._onDidChangeTreeData.event;
 
-	private _tenants: string[] = [];  
+	private _tenants: any[] = [];  
 	private _bigiqTenants: any = [];  
 	private _tasks: string[] = [];
 
@@ -16,86 +22,101 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 	}
 
 	refresh(): void {
+		this._bigiqTenants = [];
+		this._tenants = [];
+		this._tasks = [];
 		this._onDidChangeTreeData.fire(undefined);
 	}
 
-	getTreeItem(element: AS3item): vscode.TreeItem {
+	getTreeItem(element: AS3item): TreeItem {
 		return element;
 	}
 
 	async getChildren(element?: AS3item) {
 		let treeItems: AS3item[] = [];
-		
-		if (element) {
 
-			if(element.label === 'Targets'){
+		if (ext.as3Bar.text) {
 
-				const targetTenCount = this._bigiqTenants.length.toString();
+			if (element) {
 
-				treeItems = this._bigiqTenants.map( (el: { target: string; tensList: any; }) => {
-					return new AS3item(el.target, targetTenCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
-						{ command: '', title: '', arguments: el.tensList });
-				});
+				if(element.label === 'Targets'){
 
-			} else if(element.label === 'Tenants'){
-				
-				treeItems = this._tenants.map( el => {
-					return new AS3item(el, '', '', 'as3Tenant', vscode.TreeItemCollapsibleState.None, 
+					
+					treeItems = this._bigiqTenants.map( (el: { target: string; tensList: any[]; }) => {
+						const targetTenCount = el.tensList.length.toString();
+						return new AS3item(el.target, targetTenCount, '', 'as3Tenant', TreeItemCollapsibleState.Collapsed, 
+							{ command: '', title: '', arguments: el.tensList });
+					});
+
+				} else if(element.label === 'Tenants'){
+					
+					let tenant: string;
+					treeItems = this._tenants.map( el => {
+
+						// loop through the items in the object, find the declaration,
+						// 	return the tenant (should only be one)
+						Object.entries(el).forEach(([key, val]) => {
+							if (isObject(val)){
+								tenant = key;
+							}
+						});
+
+						return new AS3item(tenant, '', '', 'as3Tenant', TreeItemCollapsibleState.None, 
+							{ command: 'f5-as3.getDecs', title: 'Get Tenant Declaration', arguments: [el] });
+					});
+					
+				} else if (element.label === 'Tasks'){
+					
+					treeItems = this._tasks.map( (task: any) => {
+						return new AS3item(task.iId.split('-').pop(), task.timeStamp, '', '', TreeItemCollapsibleState.None,
+							{ command: 'f5-as3.getTask', title: '', arguments: [task.iId] });
+					});
+				} else {
+					
+					// this should happen when a target is selected
+					
+					const x = element.command?.arguments?.map( el => {
+						return new AS3item(el.label, '', '', 'as3Tenant', TreeItemCollapsibleState.None, 
 						{ command: 'f5-as3.getDecs', title: 'Get Tenant Declaration', arguments: [el] });
-				});
-				
-			} else if (element.label === 'Tasks'){
-				
-				treeItems = this._tasks.map( (task: any) => {
-					return new AS3item(task.iId.split('-').pop(), task.timeStamp, '', '', vscode.TreeItemCollapsibleState.None,
-						{ command: 'f5-as3.getTask', title: '', arguments: [task.iId] });
-				});
+					});
+					treeItems = x ? x : [];
+				}
+
 			} else {
+
 				/**
-				 * this should happen when a target is selected
+				 * todo:  look at moving this to the refresh function, might cut back on how often it gets called
 				 */
-
-				const x = element.command?.arguments?.map( el => {
-					return new AS3item(el, '', '', '', vscode.TreeItemCollapsibleState.None, 
-					{ command: 'f5-as3.getDecs', title: 'Get Tenant Declaration', arguments: [el] });
-				});
-				treeItems = x ? x : [];
-			}
-
-		} else {
-
-			/**
-			 * todo:  look at moving this to the refresh function, might cut back on how often it gets called
-			 */
-			await this.getTenants(); // refresh tenant information
-			await this.getTasks();	// refresh tasks information
+				await this.getTenants(); // refresh tenant information
+				await this.getTasks();	// refresh tasks information
 
 
-			const targetCount = this._bigiqTenants.length !== 0 ? this._bigiqTenants.length.toString() : '';
-			const tenCount = this._tenants.length !== 0 ? this._tenants.length.toString() : '';
-			const taskCount = this._tasks.length !== 0 ? this._tasks.length.toString() : '';
+				const targetCount = this._bigiqTenants.length !== 0 ? this._bigiqTenants.length.toString() : '';
+				const tenCount = this._tenants.length !== 0 ? this._tenants.length.toString() : '';
+				const taskCount = this._tasks.length !== 0 ? this._tasks.length.toString() : '';
 
-			// if we have bigiq...
-			if(this._bigiqTenants.length > 0){
+				// if we have bigiQ...
+				if(this._bigiqTenants.length > 0){
+					treeItems.push(
+						new AS3item('Targets', targetCount, '', '', TreeItemCollapsibleState.Collapsed, 
+							{ command: '', title: '', arguments: [''] })
+					);
+				}
+
+				// if we have bigip
+				if(this._tenants.length > 0){
+					treeItems.push(
+						new AS3item('Tenants', tenCount, 'Get All Tenants', '', TreeItemCollapsibleState.Collapsed, 
+							{ command: 'f5-as3.getDecs', title: '', arguments: [''] })
+					);
+				}
+
+
 				treeItems.push(
-					new AS3item('Targets', targetCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
-						{ command: '', title: '', arguments: [''] })
+					new AS3item('Tasks', taskCount, 'Get All Tasks', '', TreeItemCollapsibleState.Collapsed,
+						{ command: 'f5-as3.getTask', title: '', arguments: [''] })
 				);
 			}
-
-			// if we have bigip
-			if(this._tenants.length > 0){
-				treeItems.push(
-					new AS3item('Tenants', tenCount, 'Get All Tenants', '', vscode.TreeItemCollapsibleState.Collapsed, 
-						{ command: 'f5-as3.getDecs', title: '', arguments: [''] })
-				);
-			}
-
-
-			treeItems.push(
-				new AS3item('Tasks', taskCount, 'Get All Tasks', '', vscode.TreeItemCollapsibleState.Collapsed,
-					{ command: 'f5-as3.getTask', title: '', arguments: [''] })
-			);
 		}
         return Promise.resolve(treeItems);
 	}
@@ -104,52 +125,73 @@ export class AS3TreeProvider implements vscode.TreeDataProvider<AS3item> {
 		this._tenants = [];	// clear current tenant list
 		this._bigiqTenants = [];	// clear current bigiq tenant list
 		
-		const tenCall: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/`);
+		await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/`)
+		.then( (resp: any) => {
+			
+			// got an array, so this should be a bigiq list of devices with tenant information
+			
+			if(Array.isArray(resp.data)) {
 
-		/**
-		 * got an array, so this should be a bigiq list of devices with tenant information
-		 */
-		if(Array.isArray(tenCall.data)) {
-				this._bigiqTenants = tenCall.data.map( (el: any) => {
-				
-				const target = el.target.address; // got target bigip
+				// loop through targets/devices
+				this._bigiqTenants = resp.data.map( (el: any) => {
+					
+					const target = el.target.address; // get target bigip
 
-				// now loop through to get all tenants
-				const tensList: string[] = [];
-				Object.entries(el).forEach(([key, val]) => {
-					if (isObject(val) && key !== 'target'){
-						tensList.push(key);
-					}
+					const tensList: any[] = [];
+					Object.entries(el).forEach(([key, val]) => {
+						if (isObject(val) && key !== 'target' && key !== 'controls'){
+
+							tensList.push({ 
+								label: key, 
+								dec: val,
+								target: el.target,
+								id: el.id,
+								schemaVersion: el.schemaVersion,
+								updateMode: el.updateMode
+							});
+						}
+					});
+
+					return { target, tensList };
 				});
 
-				return { target, tensList };
-			});
 
+			} else {
 
-		} else {
-			/**
-			 * should be a single bigip tenants object
-			 * 	loop through, return object keys 
-			 */
-			for ( const [tenant, dec] of Object.entries(tenCall.data)) {
-				if(isObject(dec) && tenant !== 'controls' && tenant !== 'target') {
-					this._tenants.push(tenant);
+				/**
+				 * should be a single bigip tenants object
+				 * 	loop through, return object keys 
+				 */
+				for ( const [tenant, dec] of Object.entries(resp.data)) {
+					
+
+					if(isObject(dec) && tenant !== 'controls' && tenant !== 'target') {
+						// rebuild each tenant as3 dec
+						this._tenants.push({
+							class: 'AS3',
+							schemaVersion: resp.data.schemaVersion,
+							updateMode: resp.data.updateMode,
+							[tenant]: dec 
+						});
+					}
 				}
 			}
-		}
+		});
 	}
 
 	private async getTasks() {
-		const tasks: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/`);
-
-		this._tasks = [];	// clear current tenant list
-		this._tasks = tasks.data.items.map((item:any) => {
-			// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
-			const timeStamp = item.declaration.hasOwnProperty('controls') ? item.declaration.controls.archiveTimestamp : '';
-			const iId = item.id;
-
-			return { iId, timeStamp };
+		// await ext.f5Client?.as3?.getTasks()
+		await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/`)
+		.then( (resp: any) => {
+			this._tasks = [];	// clear current tenant list
+			this._tasks = resp.data.items.map((item:any) => {
+				// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
+				const timeStamp = item.declaration.hasOwnProperty('controls') ? item.declaration.controls.archiveTimestamp : '';
+				const iId = item.id;
+	
+				return { iId, timeStamp };
 			});
+		});
 	}
 
 }
@@ -159,14 +201,14 @@ function isObject(x: any) {
 	return x === Object(x);
 }
 
-class AS3item extends vscode.TreeItem {
+class AS3item extends TreeItem {
 	constructor(
 		public readonly label: string,
 		public description: string,
 		public tooltip: string,
 		public context: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command: vscode.Command,
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command: Command,
 	) {
 		super(label, collapsibleState);
 	}
