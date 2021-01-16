@@ -29,6 +29,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     private bigipConfs: ConfigFiles = [];
     private explosion: Explosion | undefined;
     private confObj: BigipConfObj | undefined;
+    viewElement: CfgApp | undefined;
 
     constructor() {
     }
@@ -59,7 +60,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
     getTreeItem(element: CfgApp): TreeItem {
 		return element;
-	}
+    }
 
 	async getChildren(element?: CfgApp): Promise<CfgApp[]> {
 
@@ -100,7 +101,8 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             const inputFileType = this.explosion?.inputFileType;
             const desc = `${inputFileType} - ${version}`;
 
-			treeItems.push(new CfgApp(title, 'Source Device Details', desc, '', TreeItemCollapsibleState.None));
+            this.viewElement = new CfgApp(title, 'Source Device Details', desc, '', TreeItemCollapsibleState.None);
+			treeItems.push(this.viewElement);
 
             const allSources = this.bigipConfs?.map((el) => el.content);
 

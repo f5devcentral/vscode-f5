@@ -1242,6 +1242,11 @@ export async function activate(context: ExtensionContext) {
 
 		if (expl) {
 			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+
+			if (cfgProvider.viewElement) {
+				await new Promise(resolve => { setTimeout(resolve, 1000); });
+				cfgView.reveal(cfgProvider.viewElement);
+			}
 			// starting to setup the ability to have the view come into focus when excuted
 			// I believe this will require enabling experimental features, so I'm tabling
 			// 	for now

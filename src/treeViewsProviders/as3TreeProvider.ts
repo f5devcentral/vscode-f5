@@ -121,10 +121,13 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
         return Promise.resolve(treeItems);
 	}
 
+
+
 	private async getTenants() {
 		this._tenants = [];	// clear current tenant list
 		this._bigiqTenants = [];	// clear current bigiq tenant list
 		
+		// await ext.f5Client?.as3?.getDecs()
 		await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/`)
 		.then( (resp: any) => {
 			
