@@ -1,13 +1,13 @@
 
-// 'use strict';
-// import * as vscode from 'vscode';
-// import { request } from 'https';
-// var https = require('https');
-// import * as fs from 'fs';
-// import { ext } from '../extensionVariables';
-// import * as path from 'path';
-// import axios from 'axios';
-// import logger from './logger';
+'use strict';
+import * as vscode from 'vscode';
+import { request } from 'https';
+var https = require('https');
+import * as fs from 'fs';
+import { ext } from '../extensionVariables';
+import * as path from 'path';
+import axios from 'axios';
+import logger from './logger';
 
 
 
