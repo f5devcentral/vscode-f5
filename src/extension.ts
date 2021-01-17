@@ -897,9 +897,9 @@ export async function activate(context: ExtensionContext) {
 		}, async () => {
 
 			return await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${id}`)
-			// await ext.f5Client?.as3?.getTasks(id)
-			.then(resp => ext.panel.render(resp))
-			.catch(err => logger.error('as3 get task failed:', err));
+				// await ext.f5Client?.as3?.getTasks(id)
+				.then(resp => ext.panel.render(resp))
+				.catch(err => logger.error('as3 get task failed:', err));
 		});
 
 	}));
@@ -1228,16 +1228,24 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore', async (item) => {
 
 		let expl;
-		if (item._fsPath) {
+
+		if (!item) {
+			// no input means we need to browse for a local file
+			item = await window.showOpenDialog();
+		}
+
+		if (item?._fsPath) {
 			// I think this is the better way for windows?
 			logger.debug('f5.cfgExplore got _fsPath:', item._fsPath);
 			expl = await makeExplosion(item._fsPath);
-		} else if (item.path) {
+		} else if (item?.path) {
 			// only path is seen when working in wsl2
 			logger.debug('f5.cfgExplore got path:', item.path);
 			expl = await makeExplosion(item.path);
 		} else {
 			return logger.error('f5.cfgExplore -> Neither path supplied was valid', JSON.stringify(item));
+
+
 		}
 
 		if (expl) {

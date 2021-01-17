@@ -36,7 +36,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
     async explodeConfig(configs: ConfigFiles, cfgObj: BigipConfObj, explosion: Explosion){
         // set context to make view visible
-        commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
+        // commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
         // this.clear();
         this.bigipConfs = configs;
         this.confObj = cfgObj;
@@ -50,7 +50,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     
     clear(): void {
         // hide view from being visible
-        commands.executeCommand('setContext', 'f5.cfgTreeContxt', false);
+        // commands.executeCommand('setContext', 'f5.cfgTreeContxt', false);
         // clear all the data
         this.bigipConfs = [];
         this.confObj = undefined;
@@ -62,7 +62,15 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 		return element;
     }
 
+    // getParent(): TreeItem {
+    //     return
+    // }
+
 	async getChildren(element?: CfgApp): Promise<CfgApp[]> {
+
+        if(!this.explosion) {
+            return Promise.resolve([]);
+        }
 
 		var treeItems: CfgApp[] = [];
 		if(element) {

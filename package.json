@@ -81,6 +81,12 @@
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view": "cfgTree",
+				"contents": "Import TMOS Config to explore [learn more](https://f5devcentral.github.io/vscode-f5/#/config_explorer).\n[Import from local file](command:f5.cfgExplore)"
+			}
+		],
 		"views": {
 			"f5-view-container": [
 				{
@@ -108,7 +114,6 @@
 				},
 				{
 					"id": "cfgTree",
-					"when": "f5.cfgTreeContxt",
 					"name": "Config Explorer"
 				}
 			]
