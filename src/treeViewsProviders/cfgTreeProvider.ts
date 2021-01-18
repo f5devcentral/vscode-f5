@@ -26,25 +26,25 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 	private _onDidChangeTreeData: EventEmitter<CfgApp | undefined> = new EventEmitter<CfgApp | undefined>();
     readonly onDidChangeTreeData: Event<CfgApp | undefined> = this._onDidChangeTreeData.event;
     
-    private bigipConfs: ConfigFiles = [];
     private explosion: Explosion | undefined;
-    private confObj: BigipConfObj | undefined;
+    bigipConfs: ConfigFiles = [];
+    confObj: BigipConfObj | undefined;
     viewElement: CfgApp | undefined;
 
     constructor() {
     }
 
-    async explodeConfig(configs: ConfigFiles, cfgObj: BigipConfObj, explosion: Explosion){
+    async explodeConfig(explosion: Explosion){
         // set context to make view visible
         // commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
         // this.clear();
-        this.bigipConfs = configs;
-        this.confObj = cfgObj;
+        // this.bigipConfs = configs;
+        // this.confObj = cfgObj;
         this.explosion = explosion;
-        this.refresh();
+        // await this.refresh();
     }
 
-	refresh(): void {
+	async refresh(): Promise<void> {
         this._onDidChangeTreeData.fire(undefined);
     }
     
@@ -57,14 +57,14 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         this.explosion = undefined;
         this.refresh();
     }
-
+    
+ 
+    getParent(element: CfgApp): CfgApp {
+		return element;
+    }
     getTreeItem(element: CfgApp): TreeItem {
 		return element;
     }
-
-    // getParent(): TreeItem {
-    //     return
-    // }
 
 	async getChildren(element?: CfgApp): Promise<CfgApp[]> {
 

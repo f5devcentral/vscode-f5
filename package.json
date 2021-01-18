@@ -84,7 +84,7 @@
 		"viewsWelcome": [
 			{
 				"view": "cfgTree",
-				"contents": "Import TMOS Config to explore [learn more](https://f5devcentral.github.io/vscode-f5/#/config_explorer).\n[Import from local file](command:f5.cfgExplore)"
+				"contents": "Import TMOS Config to explore.\n[Documenation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Import Corkscrew output](command:f5.cfgExploreCorkscrew)"
 			}
 		],
 		"views": {
@@ -262,6 +262,11 @@
 			{
 				"command": "f5.connectDevice",
 				"title": "Connect to Device",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExploreReveal",
+				"title": "Reveal Config Explorer",
 				"category": "F5"
 			},
 			{

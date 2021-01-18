@@ -1202,11 +1202,16 @@ export async function activate(context: ExtensionContext) {
 			expl = await makeExplosion(file);
 
 			if (expl) {
-				await cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+				await cfgProvider.explodeConfig(expl.explosion);
+
+				// inject the config files (not included in explosion output by default)
+				cfgProvider.bigipConfs = expl.config;
+				// inject the config object (just for looks...)
+				cfgProvider.confObj = expl.obj;
 			}
-
+			
 			logger.debug('Deleting mini_ucs file at', file);
-
+			
 			try {
 				// wait  couple seconds before we try to delete the mini_ucs
 				setTimeout(() => { fs.unlinkSync(file); }, 2000);
@@ -1216,14 +1221,16 @@ export async function activate(context: ExtensionContext) {
 		} else {
 			logger.error('Failed to retrieve mini_ucs for configuration exploration');
 		}
-
-
-
-
+		
+		
+		
+		
+		cfgProvider.refresh();	// refresh with the new information
 	}));
 
 	/**
 	 * this command is exposed via right click in editor so user does not have to connect to F5
+	 * this flow assumes the file is local
 	 */
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore', async (item) => {
 
@@ -1231,7 +1238,15 @@ export async function activate(context: ExtensionContext) {
 
 		if (!item) {
 			// no input means we need to browse for a local file
-			item = await window.showOpenDialog();
+			item = await window.showOpenDialog({
+				canSelectMany: false
+			});
+
+			// if we got a file from the showOpenDialog, it comes in an array, even though we told it to only allow single item selection -> return the single array item
+			if (Array.isArray(item)) {
+				item = item[0];
+
+			}
 		}
 
 		if (item?._fsPath) {
@@ -1249,25 +1264,42 @@ export async function activate(context: ExtensionContext) {
 		}
 
 		if (expl) {
-			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+			await cfgProvider.explodeConfig(expl.explosion);
 
-			if (cfgProvider.viewElement) {
-				await new Promise(resolve => { setTimeout(resolve, 1000); });
-				cfgView.reveal(cfgProvider.viewElement);
-			}
+				// inject the config files (not included in explosion output by default)
+				cfgProvider.bigipConfs = expl.config;
+				// inject the config object (just for looks...)
+				cfgProvider.confObj = expl.obj;
+			
+			
 			// starting to setup the ability to have the view come into focus when excuted
 			// I believe this will require enabling experimental features, so I'm tabling
 			// 	for now
 			// cfgView.reveal('Apps', { focus: true, select: false, expand: true } );
-
+			
 			// // cfgView.title = 'yay!!!';
 			// cfgView.description = 'descrrrrr';
 			// cfgView.message = 'messsg';
 			// cfgView.selection;
 			// cfgView.visible
 		}
-
+		
+		cfgProvider.refresh();	// refresh with the new information
+		// commands.executeCommand('f5.cfgExploreReveal');
 	}));
+	
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreReveal', async (text) => {
+		// await new Promise(resolve => { setTimeout(resolve, 2000); });
+		if (cfgProvider.viewElement) {
+			cfgView.reveal(cfgProvider.viewElement, {
+				select: true,
+				focus: true,
+				expand: true
+			});
+		}
+	}));
+
+
 
 	context.subscriptions.push(commands.registerCommand('f5.cfgExploreClear', async (text) => {
 		cfgProvider.clear();

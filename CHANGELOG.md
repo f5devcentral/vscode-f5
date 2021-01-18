@@ -12,8 +12,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 
 ### Modified
-- Clearing config explorer breaks it (pending)
-- single tenant from bigiq as3 target (pending)
+- corkscrew updates (pending)
+- Config Explorer
+  - Clearing config explorer no longer makes it inoperable
+  - Config explorer view is now always visible and has welcome options for accesing documentation and importing local files
+  - Now supports browsing and importing files through local file system
+- bigiq/as3 integration
+  - displays targets/tenants appropriately
+  - get/modify/repost declaration for target tenant
 - Updated docs:
   - Added "Edit in Github" and modified date header to each page
   - fixed changelog reference

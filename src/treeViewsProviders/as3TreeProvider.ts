@@ -44,7 +44,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 					
 					treeItems = this._bigiqTenants.map( (el: { target: string; tensList: any[]; }) => {
 						const targetTenCount = el.tensList.length.toString();
-						return new AS3item(el.target, targetTenCount, '', 'as3Tenant', TreeItemCollapsibleState.Collapsed, 
+						return new AS3item(el.target, targetTenCount, '', '', TreeItemCollapsibleState.Collapsed, 
 							{ command: '', title: '', arguments: el.tensList });
 					});
 
