@@ -82,7 +82,7 @@
                 '</tr>',
               '</table>'
             ].join('');
-            return header + content + '\n----\n' + 'Last modified {docsify-updated}';
+            return header + content + '\n----\n' + 'Last modified (DD.MM.YYYY) - {docsify-updated}';
           });
 
           hook.afterEach(function (html) {

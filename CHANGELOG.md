@@ -8,11 +8,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [2.10.0] - (01-18-2021)
-
+## [2.10.1] - (01-20-2021)
 
 ### Modified
-- corkscrew updates (pending)
+- fixed problem where single bigiq as3 target did not track target details and looked like local as3 declaration
+  - this included adding an object description noting it's target 
+
+---
+
+## [2.10.0] - (01-19-2021)
+
+### Modified
+- corkscrew updates
+  - corkscrew returns source config files in explosion output to more easily import into extension view
 - Config Explorer
   - Clearing config explorer no longer makes it inoperable
   - Config explorer view is now always visible and has welcome options for accesing documentation and importing local files
@@ -23,6 +31,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Updated docs:
   - Added "Edit in Github" and modified date header to each page
   - fixed changelog reference
+  - Reference repo README.MD instead of copied README in docs dir
 
 ---
 
