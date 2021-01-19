@@ -27,7 +27,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     readonly onDidChangeTreeData: Event<CfgApp | undefined> = this._onDidChangeTreeData.event;
     
     private explosion: Explosion | undefined;
-    bigipConfs: ConfigFiles = [];
+    // bigipConfs: ConfigFiles = [];
     confObj: BigipConfObj | undefined;
     viewElement: CfgApp | undefined;
 
@@ -38,7 +38,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         // set context to make view visible
         // commands.executeCommand('setContext', 'f5.cfgTreeContxt', true);
         // this.clear();
-        // this.bigipConfs = configs;
+        // this.bigipConfs = explosion.config.sources;
         // this.confObj = cfgObj;
         this.explosion = explosion;
         // await this.refresh();
@@ -52,7 +52,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         // hide view from being visible
         // commands.executeCommand('setContext', 'f5.cfgTreeContxt', false);
         // clear all the data
-        this.bigipConfs = [];
+        // this.bigipConfs = [];
         this.confObj = undefined;
         this.explosion = undefined;
         this.refresh();
@@ -87,7 +87,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                                 
 			} else if (element.label === 'Sources') {
                 
-                treeItems = this.bigipConfs?.map((el: any) => {
+                treeItems = this.explosion.config.sources.map((el: any) => {
                     return new CfgApp(el.fileName, '', '', '', TreeItemCollapsibleState.None,
                         {command: 'f5.cfgExplore-show', title: '', arguments: [el.content]});
                 });
@@ -112,9 +112,9 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             this.viewElement = new CfgApp(title, 'Source Device Details', desc, '', TreeItemCollapsibleState.None);
 			treeItems.push(this.viewElement);
 
-            const allSources = this.bigipConfs?.map((el) => el.content);
+            const allSources = this.explosion.config.sources.map((el) => el.content);
 
-			treeItems.push(new CfgApp('Sources', '', this.bigipConfs.length.toString(), '', TreeItemCollapsibleState.Collapsed,
+			treeItems.push(new CfgApp('Sources', '', this.explosion.config.sources.length.toString(), '', TreeItemCollapsibleState.Collapsed,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [allSources]}));
 
             // treeItems.push(new CfgApp('bigip_base.conf', 'just idea to add...', TreeItemCollapsibleState.None,
@@ -142,8 +142,10 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             treeItems.push(new CfgApp('Logs', '', logTotal, '', TreeItemCollapsibleState.None,
                 {command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion?.logs]}));
 
-            treeItems.push(new CfgApp('Config Object', '', '', '', TreeItemCollapsibleState.None,
-                {command: 'f5.cfgExplore-show', title: '', arguments: [this.confObj]}));
+            if(this.confObj) {
+                treeItems.push(new CfgApp('Config Object', '', '', '', TreeItemCollapsibleState.None,
+                    {command: 'f5.cfgExplore-show', title: '', arguments: [this.confObj]}));
+            }
             
 		}
         return Promise.resolve(treeItems);

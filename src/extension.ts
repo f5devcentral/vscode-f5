@@ -1205,7 +1205,7 @@ export async function activate(context: ExtensionContext) {
 				await cfgProvider.explodeConfig(expl.explosion);
 
 				// inject the config files (not included in explosion output by default)
-				cfgProvider.bigipConfs = expl.config;
+				// cfgProvider.bigipConfs = expl.config;
 				// inject the config object (just for looks...)
 				cfgProvider.confObj = expl.obj;
 			}
@@ -1267,7 +1267,7 @@ export async function activate(context: ExtensionContext) {
 			await cfgProvider.explodeConfig(expl.explosion);
 
 				// inject the config files (not included in explosion output by default)
-				cfgProvider.bigipConfs = expl.config;
+				// cfgProvider.bigipConfs = expl.config;
 				// inject the config object (just for looks...)
 				cfgProvider.confObj = expl.obj;
 			
@@ -1288,6 +1288,32 @@ export async function activate(context: ExtensionContext) {
 		// commands.executeCommand('f5.cfgExploreReveal');
 	}));
 	
+
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
+			// no input means we need to browse for a local file
+			const file = await window.showOpenDialog({
+				canSelectMany: false
+			}).then( x => {
+				if(Array.isArray(x)) { 
+					return x[0];
+				}
+			});
+
+			if (file) {
+				try {
+					const read = fs.readFileSync(file.path, 'utf-8');
+					const read2 = JSON.parse(read);
+					await cfgProvider.explodeConfig(read2);
+				} catch (e) {
+					logger.error('cfg explorer raw corkscrew import failed', e);
+				}
+			}
+
+			cfgProvider.refresh();	// refresh with the new information
+	}));
+
+
+
 	context.subscriptions.push(commands.registerCommand('f5.cfgExploreReveal', async (text) => {
 		// await new Promise(resolve => { setTimeout(resolve, 2000); });
 		if (cfgProvider.viewElement) {

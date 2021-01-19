@@ -114,7 +114,7 @@ export async function makeExplosion (file: string) {
         const explosion = bigipConf.explode();
         logger.debug(`Corkscrew -> explosion stats:`, JSON.stringify(explosion.stats, undefined, 4));
 
-        return { config: bigipConf.configFiles, obj: bigipConf.configObject, explosion };
+        return { obj: bigipConf.configObject, explosion };
     });
     // });
 }
