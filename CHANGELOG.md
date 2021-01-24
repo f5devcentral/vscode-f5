@@ -8,6 +8,21 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.10.2] - (01-20-2021)
+
+### Modified
+- updated f5-corkscrew to v0.6.0
+  - fixed a bug where extracted irules were missing a closing bracket
+  - fixed a bug that was causing application extractions to fail
+    - removed logic that attempted to discover pools reference via variables in irules
+  - improved speed by removing some unecessary JSON.stringify/parsing
+  - converted most functions to async
+    - this allows errors to bubble up from deep within the code
+  - added extractApp events
+    - This was feed back into the OUTPUT for better understanding where processing is and possibly where it failed
+
+---
+
 ## [2.10.1] - (01-20-2021)
 
 ### Modified

@@ -157,7 +157,7 @@ Different ways to install vsix:
 - Clone and install dependencies:
     ```bash
     git clone https://github.com/f5devcentral/vscode-f5.git
-    cd cd vscode-f5-fast/
+    cd vscode-f5-fast/
     npm install
     code .
     ```
