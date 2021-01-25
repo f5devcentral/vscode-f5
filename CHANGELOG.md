@@ -8,10 +8,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [2.10.2] - (01-20-2021)
+## [2.10.2] - (01-25-2021)
 
 ### Modified
-- updated f5-corkscrew to v0.6.0
+- updated f5-corkscrew to v0.7.0
   - fixed a bug where extracted irules were missing a closing bracket
   - fixed a bug that was causing application extractions to fail
     - removed logic that attempted to discover pools reference via variables in irules

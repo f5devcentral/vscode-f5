@@ -124,16 +124,17 @@ export async function makeExplosion(file: string) {
                     .then(async () => {
 
                         // then extract apps
-                        const explosion = await bigipConf.explode()
-                            .then(exp => {
-                                logger.debug(`Corkscrew -> explosion stats:`, JSON.stringify(exp.stats, undefined, 4));
-                                return exp;
+                        return await bigipConf.explode()
+                            .then(explosion => {
+                                logger.debug(`Corkscrew -> explosion stats:`, JSON.stringify(explosion.stats, undefined, 4));
+                                // return exp;
+                                return { obj: bigipConf.configObject, explosion };
                             })
                             .catch(err => {
                                 logger.error(err);
+                                throw err;
                             });
 
-                        return { obj: bigipConf.configObject, explosion };
                     });
             });
     });

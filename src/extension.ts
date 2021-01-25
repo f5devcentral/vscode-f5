@@ -1250,10 +1250,12 @@ export async function activate(context: ExtensionContext) {
 
 		if (item?._fsPath) {
 
+			logger.info(`f5.cfgExplore _fsPath recieved:`, item._fsPath);
 			filePath = item._fsPath;
-
+			
 		} else if (item?.path) {
-
+			
+			logger.info(`f5.cfgExplore path revieved:`, item.path);
 			filePath = item.path;
 
 		} else {
@@ -1272,7 +1274,10 @@ export async function activate(context: ExtensionContext) {
 			logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
 			filePath = filePath.substr(1);
 		}
-
+		
+		
+		
+		logger.info(`f5.cfgExplore: exploding config @ ${filePath}`);
 
 		await makeExplosion(filePath)
 			.then(async expl => {
