@@ -1209,9 +1209,9 @@ export async function activate(context: ExtensionContext) {
 				// inject the config object (just for looks...)
 				cfgProvider.confObj = expl.obj;
 			}
-			
+
 			logger.debug('Deleting mini_ucs file at', file);
-			
+
 			try {
 				// wait  couple seconds before we try to delete the mini_ucs
 				setTimeout(() => { fs.unlinkSync(file); }, 2000);
@@ -1221,10 +1221,10 @@ export async function activate(context: ExtensionContext) {
 		} else {
 			logger.error('Failed to retrieve mini_ucs for configuration exploration');
 		}
-		
-		
-		
-		
+
+
+
+
 		cfgProvider.refresh();	// refresh with the new information
 	}));
 
@@ -1234,7 +1234,7 @@ export async function activate(context: ExtensionContext) {
 	 */
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore', async (item) => {
 
-		let expl;
+		let filePath: string;
 
 		if (!item) {
 			// no input means we need to browse for a local file
@@ -1245,71 +1245,76 @@ export async function activate(context: ExtensionContext) {
 			// if we got a file from the showOpenDialog, it comes in an array, even though we told it to only allow single item selection -> return the single array item
 			if (Array.isArray(item)) {
 				item = item[0];
-
 			}
 		}
 
 		if (item?._fsPath) {
-			// I think this is the better way for windows?
-			logger.debug('f5.cfgExplore got _fsPath:', item._fsPath);
-			expl = await makeExplosion(item._fsPath);
+
+			filePath = item._fsPath;
+
 		} else if (item?.path) {
-			// only path is seen when working in wsl2
-			logger.debug('f5.cfgExplore got path:', item.path);
-			expl = await makeExplosion(item.path);
+
+			filePath = item.path;
+
 		} else {
+
 			return logger.error('f5.cfgExplore -> Neither path supplied was valid', JSON.stringify(item));
 
-
 		}
 
-		if (expl) {
-			await cfgProvider.explodeConfig(expl.explosion);
-
-				// inject the config files (not included in explosion output by default)
-				// cfgProvider.bigipConfs = expl.config;
-				// inject the config object (just for looks...)
-				cfgProvider.confObj = expl.obj;
-			
-			
-			// starting to setup the ability to have the view come into focus when excuted
-			// I believe this will require enabling experimental features, so I'm tabling
-			// 	for now
-			// cfgView.reveal('Apps', { focus: true, select: false, expand: true } );
-			
-			// // cfgView.title = 'yay!!!';
-			// cfgView.description = 'descrrrrr';
-			// cfgView.message = 'messsg';
-			// cfgView.selection;
-			// cfgView.visible
+		try {
+			// test that we can access the file
+			const x = fs.statSync(filePath);
+		} catch (e) {
+			// if we couldn't get to the file, trim leading character
+			// remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
+			// filePath = filePath.replace(/^(\\|\/)/, '');
+			logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
+			filePath = filePath.substr(1);
 		}
-		
-		cfgProvider.refresh();	// refresh with the new information
-		// commands.executeCommand('f5.cfgExploreReveal');
-	}));
-	
 
-	context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
-			// no input means we need to browse for a local file
-			const file = await window.showOpenDialog({
-				canSelectMany: false
-			}).then( x => {
-				if(Array.isArray(x)) { 
-					return x[0];
+
+		await makeExplosion(filePath)
+			.then(async expl => {
+
+				if (expl.explosion) {
+					await cfgProvider.explodeConfig(expl.explosion);
 				}
+
+				if (expl.obj) {
+					// inject the config object (just for looks...)
+					cfgProvider.confObj = expl.obj;
+				}
+				cfgProvider.refresh();	// refresh with the new information
+			})
+			.catch(err => {
+				logger.error('cfgExplorer error', err);
 			});
 
-			if (file) {
-				try {
-					const read = fs.readFileSync(file.path, 'utf-8');
-					const read2 = JSON.parse(read);
-					await cfgProvider.explodeConfig(read2);
-				} catch (e) {
-					logger.error('cfg explorer raw corkscrew import failed', e);
-				}
-			}
+	}));
 
-			cfgProvider.refresh();	// refresh with the new information
+
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
+		// no input means we need to browse for a local file
+		const file = await window.showOpenDialog({
+			canSelectMany: false
+		}).then(x => {
+			if (Array.isArray(x)) {
+				return x[0];
+			}
+		});
+
+		if (file) {
+			try {
+				const read = fs.readFileSync(file.path, 'utf-8');
+				const read2 = JSON.parse(read);
+				await cfgProvider.explodeConfig(read2);
+			} catch (e) {
+				logger.error('cfg explorer raw corkscrew import failed', e);
+			}
+		}
+
+		cfgProvider.refresh();	// refresh with the new information
 	}));
 
 
