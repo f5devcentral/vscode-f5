@@ -12,7 +12,7 @@ Any comments, questions or feature requests, please open a github repository iss
 
 ### New documentation site!!!
 > https://f5devcentral.github.io/vscode-f5/#/
-
+> 
 > this page is in progress as we transition documents to the new site above
 
 
@@ -36,6 +36,14 @@ If you are not excited yet, the extension can also:
 ## Getting the extension
 
 The best path is to install Visual Studio Code from: https://code.visualstudio.com/
+
+### VSCode Marketplace
+
+- https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5
+
+### Open Source Marketplace
+
+- https://open-vsx.org/extension/F5DevCentral/vscode-f5
 
 Then install the extension following the steps below:
 

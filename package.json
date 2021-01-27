@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "2.10.2-beta",
+	"version": "2.10.3-beta",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -590,6 +590,11 @@
 			{
 				"command": "f5.b64Decode",
 				"title": "base64 Decode",
+				"category": "F5"
+			},
+			{
+				"command": "f5.changeVersion",
+				"title": "Change Extension Version",
 				"category": "F5"
 			},
 			{

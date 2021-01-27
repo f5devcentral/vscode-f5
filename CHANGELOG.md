@@ -8,6 +8,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.10.3] - (01-27-2021)
+
+### Added
+- command to select and download github releases of the extension to allow users easy access to future beta versions
+  - Like RPM mgmt, it will query github for all the releases (including betas) and provide a list for the user to select the desired version.  It will then attempt to install the version.  Success on the install command is very subjective, but at least it will provide the user with the path to the file so it can be installed through the UI
+
+---
+
 ## [2.10.2] - (01-25-2021)
 
 ### Modified
@@ -40,6 +48,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Clearing config explorer no longer makes it inoperable
   - Config explorer view is now always visible and has welcome options for accesing documentation and importing local files
   - Now supports browsing and importing files through local file system
+- fixed a bug where TS command enablement was tied to DO installed
 - bigiq/as3 integration
   - displays targets/tenants appropriately
   - get/modify/repost declaration for target tenant

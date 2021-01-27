@@ -27,9 +27,12 @@ import { TextDocumentView } from './editorViews/editorView';
 import { getMiniUcs, makeExplosion } from './cfgExplorer';
 import { unInstallOldExtension } from './extMigration';
 import { injectSchema } from './atcSchema';
+import { ChangeVersion } from './changeVersion';
 
 
 export async function activate(context: ExtensionContext) {
+
+	new ChangeVersion(context);
 
 	await unInstallOldExtension();
 

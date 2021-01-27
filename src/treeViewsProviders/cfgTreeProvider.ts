@@ -3,7 +3,6 @@ import {
     TreeItem, 
     TreeItemCollapsibleState, 
     Event, 
-    commands, 
     EventEmitter, 
     Uri, 
     Command, 
@@ -16,7 +15,10 @@ import {
  }  from 'vscode';
 import { ext } from '../extensionVariables';
 
-import { BigipConfObj, ConfigFiles, Explosion, TmosApp } from 'f5-corkscrew';
+import { BigipConfObj, Explosion, TmosApp } from 'f5-corkscrew';
+
+// remodel everything here like this example:  https://github.com/microsoft/vscode-extension-samples/blob/master/tree-view-sample/src/testView.ts
+// it will provide a working 'reveal' function and a browsable tmos config tree in the view
 
 /**
  * Tree view provider class that hosts and present the data for the Config Explorer view
