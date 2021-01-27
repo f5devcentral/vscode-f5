@@ -1312,13 +1312,43 @@ export async function activate(context: ExtensionContext) {
 			}
 		});
 
-		if (file) {
+		let filePath;
+
+		if (file?.fsPath) {
+
+			logger.info(`f5.cfgExploreRawCorkscrew _fsPath recieved:`, file.fsPath);
+			filePath = file.fsPath;
+			
+		} else if (file?.path) {
+			
+			logger.info(`f5.cfgExploreRawCorkscrew path revieved:`, file.path);
+			filePath = file.path;
+
+		} else {
+
+			return logger.error('f5.cfgExploreRawCorkscrew -> Neither path supplied was valid', JSON.stringify(file));
+
+		}
+
+		try {
+			// test that we can access the file
+			const x = fs.statSync(filePath);
+		} catch (e) {
+			// if we couldn't get to the file, trim leading character
+			// remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
+			// filePath = filePath.replace(/^(\\|\/)/, '');
+			logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
+			filePath = filePath.substr(1);
+		}
+
+		if (filePath) {
 			try {
-				const read = fs.readFileSync(file.path, 'utf-8');
+				const read = fs.readFileSync(filePath, 'utf-8');
+				// parse json
 				const read2 = JSON.parse(read);
 				await cfgProvider.explodeConfig(read2);
 			} catch (e) {
-				logger.error('cfg explorer raw corkscrew import failed', e);
+				logger.error('cfgExploreRawCorkscrew import failed', e);
 			}
 		}
 

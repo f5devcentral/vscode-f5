@@ -14,6 +14,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - command to select and download github releases of the extension to allow users easy access to future beta versions
   - Like RPM mgmt, it will query github for all the releases (including betas) and provide a list for the user to select the desired version.  It will then attempt to install the version.  Success on the install command is very subjective, but at least it will provide the user with the path to the file so it can be installed through the UI
 
+### Modified
+- fixed cfgExploreRawCorkscrew command input path bug
+
 ---
 
 ## [2.10.2] - (01-25-2021)
@@ -55,7 +58,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Updated docs:
   - Added "Edit in Github" and modified date header to each page
   - fixed changelog reference
-  - Reference repo README.MD instead of copied README in docs dir
 
 ---
 
