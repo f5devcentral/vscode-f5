@@ -8,6 +8,26 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.10.4] - (02-01-2021)
+
+### Added
+- Documented tree view searching (pending)
+  - https://github.com/microsoft/vscode/issues/50062
+  - https://github.com/microsoft/vscode-docs/blob/master/release-notes/v1_37.md#new-tree-widget-adopted-in-tree-view
+  - https://code.visualstudio.com/updates/v1_31#_new-tree-widget
+
+### Modified
+- AS3 targets/tenants are now alphabetically ordered
+- Config Explorer apps are now alphabetically ordered
+- Get all tenants declarations for a target (pending)
+- list apps per tenant (pending)
+  - app object counts (pending)
+
+- corkscrew will now error on application parsing, but continue with next application (pending)
+  - error does not stop entire process (pending)
+
+---
+
 ## [2.10.3] - (01-27-2021)
 
 ### Added

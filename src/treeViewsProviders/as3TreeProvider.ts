@@ -6,22 +6,50 @@ import {
 	TreeItem,
 	TreeItemCollapsibleState
 } from 'vscode';
+import { AdcDeclaration, As3AppMap, As3Declaration } from '../utils/as3Models';
 import { ext } from '../extensionVariables';
+import logger from '../utils/logger';
+import { debug } from 'console';
 
+
+// interface apps: string[]
+// declare interface target {
+// 	tenants: apps[]
+// }
 
 export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 	private _onDidChangeTreeData: EventEmitter<AS3item | undefined> = new EventEmitter<AS3item | undefined>();
 	readonly onDidChangeTreeData: Event<AS3item | undefined> = this._onDidChangeTreeData.event;
 
-	private _tenants: any[] = [];
-	private _bigiqTenants: any = [];
+	/**
+	 * target/tenant/app map from /declare endpoint
+	 */
+	as3DeclareMap: As3AppMap | undefined;
+
+	/**
+	 * original declare output
+	 */
+	declare = [];
+
+	private _tenants: {
+		class: string,
+		id: string,
+		schemaVersion: string,
+		updateMode: string
+		[key: string]: unknown
+	}[] = [];
+	private _bigiqTenants: {
+		target: string,
+		tensList: []
+	}[] = [];
 	private _tasks: string[] = [];
 
 	constructor() {
 	}
 
 	refresh(): void {
+		// this.declarations = [];
 		this._bigiqTenants = [];
 		this._tenants = [];
 		this._tasks = [];
@@ -44,8 +72,17 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 					treeItems = this._bigiqTenants.map((el: { target: string; tensList: any[]; }) => {
 						const targetTenCount = el.tensList.length.toString();
+
+						// const declaration = {
+						// 	class: 'ADC',
+						// 	target: tenant.target,
+						// 	schemaVersion: tenant.schemaVersion,
+						// 	id: tenant.id,
+						// 	[tenant.label]: tenant.dec
+						// }
+
 						return new AS3item(el.target, targetTenCount, '', '', TreeItemCollapsibleState.Collapsed,
-							{ command: '', title: '', arguments: el.tensList });
+							{ command: 'f5-as3.getDecs', title: '', arguments: [el.tensList] });
 					});
 
 				} else if (element.label === 'Tenants') {
@@ -145,10 +182,11 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 		// await ext.f5Client?.as3?.getDecs()
 		await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/`)
-			.then((resp: any) => {
+			.then(async (resp: any) => {
+
+				this.as3DeclareMap = await mapAs3(resp.data);
 
 				// got an array, so this should be a bigiq list of devices with tenant information
-
 				if (Array.isArray(resp.data)) {
 
 					// loop through targets/devices
@@ -168,12 +206,35 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 									schemaVersion: el.schemaVersion,
 									updateMode: el.updateMode
 								});
+
+							}
+						});
+
+						// now sort the tenants list
+						tensList.sort((a, b) => {
+							const x = a.label.toLowerCase();
+							const y = b.label.toLowerCase();
+							if (x < y) {
+								return -1;
+							} else {
+								return 1;
 							}
 						});
 
 						return { target, tensList };
 					});
 
+
+					// now sort the targets list
+					this._bigiqTenants.sort((a, b) => {
+						const x = a.target.toLowerCase();
+						const y = b.target.toLowerCase();
+						if (x < y) {
+							return -1;
+						} else {
+							return 1;
+						}
+					});
 
 				} else {
 
@@ -186,12 +247,14 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 					for (const [tenant, dec] of Object.entries(resp.data)) {
 
 						if (isObject(dec) && tenant === 'target') {
+
 							// Capture target if defined
 							target = dec;
+
 						}
 
 						if (isObject(dec) && tenant !== 'controls' && tenant !== 'target') {
-							// const target = dec.target?.address ? 
+
 							// rebuild each tenant as3 dec
 							const finalDec = {
 								class: 'AS3',
@@ -207,6 +270,37 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 							}
 							this._tenants.push(finalDec);
 						}
+
+						// now sort the tenants list - spelled out...
+						this._tenants.sort((a, b) => {
+
+							let x, y;
+							// find the tenant name of a
+							for (const [key, value] of Object.entries(a)) {
+								if (isObject(value)) {
+									x = key;
+								}
+							}
+							// find the tenant name of b
+							for (const [key, value] of Object.entries(b)) {
+								if (isObject(value)) {
+									y = key;
+								}
+							}
+
+							if (x && y) {
+								// sort tenant
+								if (x < y) {
+									return -1;
+								} else {
+									return 1;
+								}
+							} else {
+								// we should always have the appropriate object structure by the time we get here but TS will help keep any unexpected bugs down
+								// meaning we should always get x and y, but since we didn't type the a and b, TS wants us to code the the possibility of undefined
+								return 0;
+							}
+						});
 					}
 				}
 			});
@@ -227,12 +321,76 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 			});
 	}
 
+
+
 }
 
-function isObject(x: any) {
-	// return object(true) if json object
-	return x === Object(x);
+export async function mapAs3(declare: AdcDeclaration | AdcDeclaration[]): Promise<As3AppMap> {
+
+	// if array from bigiq/targets, assign, else put in array
+	const declareArray = Array.isArray(declare) ? declare : [declare];
+
+	let as3Map: {
+		[key: string]: {
+			[key: string]: string[]
+		}
+	} = {};
+
+
+	// go through each item in the array
+	declareArray.map((el: any) => {
+		let tenants: {
+			[key: string]: string[]
+		} = {};
+
+		// get target if defined
+		const target
+			= el?.target?.address ? el.target.address
+				: el?.target?.hostname ? el.target.hostname
+					: undefined;
+
+		Object.entries(el).forEach(([key, val]) => {
+			if (isObject(val) && key !== 'target' && key !== 'controls') {
+
+				const apps: string[] = [];
+				Object.entries(val).forEach(([tKey, tVal]) => {
+					if (isObject(tVal)) {
+						apps.push(tKey);
+					}
+				});
+
+				tenants[key] = apps;
+			}
+		});
+
+		if (target) {
+			as3Map[target] = tenants;
+		} else {
+			Object.assign(as3Map, tenants);
+		}
+
+	});
+
+	return as3Map;
+
 }
+
+/**
+ * checks if input is object
+ * 
+ * ***an array is an object!!! ***
+ * - use Array.isArray(x) => boolean
+ * @param x 
+ * @returns boolean
+ */
+const isObject = (x: any): boolean => {
+	return (typeof x === 'object' ? true : false);
+	// if( typeof x === 'object') {
+	// 	return true;
+	// } else {
+	// 	return false;
+	// }
+};
 
 class AS3item extends TreeItem {
 	constructor(
