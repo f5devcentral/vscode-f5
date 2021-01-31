@@ -2,13 +2,90 @@
 
 /**
  * target/tenant/app index type
+ *  - now includes app pieces
+ * 
+ * ```ts
+ * const exmp = {
+ *     "target": {
+ *      "tenant": {
+ *        "app": {
+ *          Pool: 1,
+ *          Service_HTTP: 1,
+ *          ...
+ *        },
+ *      },
+ *    },
+ *  }
+ * ```
+ * 
  */
 export interface As3AppMap {
     // parentType: 'targets' | 'tenants',
     [key: string]: {
-        [key: string]: string[]
+        [key: string]: {}
     } | 'targets' | 'tenants'
 }
+
+
+
+/**
+ * target/tenant/app/app-pieces index type
+ * 
+ * ```ts
+ * const example = {
+ *   target: "10.200.244.5",
+ *   tenants: [
+ *     {
+ *       tenant: "core1_sample_01",
+ *       apps: [
+ *         {
+ *           app: "A1",
+ *           parts: {
+ *             Pool: 1,
+ *             Service_HTTP: 1,
+ *           },
+ *         },
+ *       ],
+ *     },
+ *   ],
+ * },
+ * ```
+ * 
+ */
+export interface As3AppMapTargets extends As3AppMapTenants {
+    target: string;
+    tenants: As3AppMapTenants
+};
+
+
+/**
+ * tenant/app/app-pieces index type
+ * 
+ * ```ts
+ * const example = {
+ *   tenant: "core1_sample_01",
+ *   apps: [
+ *     {
+ *       app: "A1",
+ *       parts: {
+ *         Pool: 1,
+ *         Service_HTTP: 1,
+ *       },
+ *     },
+ *   ],
+ * },
+ * ```
+ * 
+ */
+export interface As3AppMapTenants {
+    tenant: string;
+    apps: {
+        app: string;
+        components: {};
+    }[];
+};
+
+
 
 
 export interface As3App {

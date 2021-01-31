@@ -6,10 +6,9 @@ import {
 	TreeItem,
 	TreeItemCollapsibleState
 } from 'vscode';
-import { AdcDeclaration, As3AppMap, As3Declaration } from '../utils/as3Models';
+import { AdcDeclaration, As3AppMap, As3AppMapTargets, As3AppMapTenants, As3Declaration } from '../utils/as3Models';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
-import { debug } from 'console';
 
 
 // interface apps: string[]
@@ -49,7 +48,6 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 	}
 
 	refresh(): void {
-		// this.declarations = [];
 		this._bigiqTenants = [];
 		this._tenants = [];
 		this._tasks = [];
@@ -320,28 +318,21 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				});
 			});
 	}
-
-
-
 }
 
 export async function mapAs3(declare: AdcDeclaration | AdcDeclaration[]): Promise<As3AppMap> {
 
 	// if array from bigiq/targets, assign, else put in array
-	const declareArray = Array.isArray(declare) ? declare : [declare];
+	const declareArray: AdcDeclaration[] = Array.isArray(declare) ? declare : [declare];
 
-	let as3Map: {
-		[key: string]: {
-			[key: string]: string[]
-		}
-	} = {};
+	const as3Map: As3AppMap = {};
+	const as3MapNew = [];
 
-
-	// go through each item in the array
+	// go through each item in the targets array
 	declareArray.map((el: any) => {
-		let tenants: {
-			[key: string]: string[]
-		} = {};
+
+		const tenants: As3AppMap = {};
+		const tenantsNew: As3AppMapTenants[] = [];
 
 		// get target if defined
 		const target
@@ -349,24 +340,62 @@ export async function mapAs3(declare: AdcDeclaration | AdcDeclaration[]): Promis
 				: el?.target?.hostname ? el.target.hostname
 					: undefined;
 
+		// loop through declaration (adc) level
 		Object.entries(el).forEach(([key, val]) => {
+
+			// named object for each tenant
 			if (isObject(val) && key !== 'target' && key !== 'controls') {
 
-				const apps: string[] = [];
-				Object.entries(val).forEach(([tKey, tVal]) => {
+				let apps2: any = {};
+				let appsNew: { app: string; components: {}; }[] = [];
+
+				// loop through items of the tenant
+				Object.entries(val as object).forEach(([tKey, tVal]) => {
+
+					// if we are at an application object
 					if (isObject(tVal)) {
-						apps.push(tKey);
+						const appProps: any = {};
+
+						// loop through the items of the application
+						Object.entries(tVal).forEach(([aKey, aVal]) => {
+
+							// look at the objects (application pieces)
+							if (isObject(aVal) && (aVal as { class: string })?.class) {
+
+								const appVal: { class: string } = aVal as { class: string };
+
+								// capture the class of each application piece
+								if (appVal?.class in appProps) {
+									appProps[appVal.class] + 1;
+								} else {
+									appProps[appVal.class] = 1;
+								}
+							}
+						});
+						apps2[tKey] = appProps;
+						appsNew.push({
+							app: tKey,
+							components: appProps
+						});
 					}
 				});
-
-				tenants[key] = apps;
+				tenants[key] = apps2;
+				tenantsNew.push({
+					tenant: key,
+					apps: appsNew
+				});
 			}
 		});
 
 		if (target) {
 			as3Map[target] = tenants;
+			as3MapNew.push({
+				target,
+				tenants: tenantsNew
+			});
 		} else {
 			Object.assign(as3Map, tenants);
+			as3MapNew.push(...tenantsNew);
 		}
 
 	});
