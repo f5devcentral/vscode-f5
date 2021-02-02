@@ -390,9 +390,9 @@ export async function activate(context: ExtensionContext) {
 	 * ###########################################################################
 	 * 
 	 * 				TTTTTTT    CCCCC    LL      
-		 * 				  TTT     CC    C   LL      
-		 * 				  TTT     CC        LL      
-		 * 				  TTT     CC    C   LL      
+	 * 				  TTT     CC    C   LL      
+	 * 				  TTT     CC        LL      
+	 * 				  TTT     CC    C   LL      
 	 * 				  TTT      CCCCC    LLLLLLL 
 	 * 
 	 * ############################################################################
@@ -790,24 +790,7 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-as3.getDecs', async (tenant) => {
 
-		// set blank value if not defined -> get all tenants dec
-		// tenant = tenant ? tenant : '';
-
-		// console.log(tenant.test('?'));
-
-		// bigiq target single tenant 
-		if (tenant?.dec && tenant?.label && tenant.id) {
-
-			// rebuild the target tenant declaration so it can be resent if needed
-			ext.panel.render({
-				class: 'ADC',
-				target: tenant.target,
-				schemaVersion: tenant.schemaVersion,
-				id: tenant.id,
-				[tenant.label]: tenant.dec
-			});
-
-		} else if (typeof tenant === 'object') {
+		if (typeof tenant === 'object') {
 
 			// just a regular as3 declaration object
 			ext.panel.render(tenant);
@@ -825,9 +808,6 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 
-	// context.subscriptions.push(commands.registerCommand('f5-as3.fullTenant', async (tenant) => {
-	// 	commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=full`);
-	// }));
 	context.subscriptions.push(commands.registerCommand('f5-as3.expandedTenant', async (tenant) => {
 		commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=expanded`);
 	}));

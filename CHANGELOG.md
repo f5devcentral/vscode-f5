@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [2.10.4] - (02-01-2021)
+## [2.10.4] - (02-02-2021)
 
 ### Added
 - Documented tree view searching (pending)
@@ -17,11 +17,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - https://code.visualstudio.com/updates/v1_31#_new-tree-widget
 
 ### Modified
-- AS3 targets/tenants are now alphabetically ordered
+- AS3 view enhanced to show targets/tenants/apps/app-components
+  - including app component counts
+  - hover/tooltip includes tenant/app/app-component information when possible
+- AS3 targets/tenants/apps are now alphabetically ordered
 - Config Explorer apps are now alphabetically ordered
-- Get all tenants declarations for a target (pending)
-- list apps per tenant (pending)
-  - app object counts (pending)
+- Get all tenants declarations for a target
 
 - corkscrew will now error on application parsing, but continue with next application (pending)
   - error does not stop entire process (pending)

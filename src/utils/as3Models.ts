@@ -22,8 +22,10 @@
 export interface As3AppMap {
     // parentType: 'targets' | 'tenants',
     [key: string]: {
-        [key: string]: {}
-    } | 'targets' | 'tenants'
+        [key: string]: {
+            [key: string]: any;
+        }
+    }
 }
 
 
