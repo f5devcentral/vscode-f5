@@ -75,9 +75,9 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
                     // sort the apps
                     const apps = this.explosion.config.apps.sort( (a, b) => {
-                        const x = a.name.toLocaleLowerCase();
-                        const y = b.name.toLocaleLowerCase();
-                        if ( a < b) {
+                        const x = a.name.toLowerCase();
+                        const y = b.name.toLowerCase();
+                        if ( x < y ) {
                             return -1;
                         } else {
                             return 1;
