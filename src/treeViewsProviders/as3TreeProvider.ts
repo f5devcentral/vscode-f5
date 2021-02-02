@@ -291,7 +291,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				this.targets = await targetDecsBool(resp.data);
 				
 				// assign the raw /declare output
-				this.declare = this.targets ? resp.data : [ resp.data ];
+				this.declare = Array.isArray(resp.data) ? resp.data : [ resp.data ];
 
 				// create target/tenant/app map
 				this.as3DeclareMap = await mapAs3(resp.data);
@@ -324,7 +324,11 @@ export async function targetDecsBool(declare: AdcDeclaration | AdcDeclaration[])
 	// if array from bigiq/targets, assign, else put in array
 	const declareArray: AdcDeclaration[] = Array.isArray(declare) ? declare : [declare];
 
-	return (declareArray[0]?.target as boolean);
+	if (declareArray[0]?.target as boolean) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 
