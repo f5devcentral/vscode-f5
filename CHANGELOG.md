@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [2.10.5] - (02-02-2021)
+## [2.10.6] - (02-02-2021)
 
 ### Added
 - Documented tree view searching (pending)
@@ -18,6 +18,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - corkscrew will now error on application parsing, but continue with next application (pending)
   - error does not stop entire process (pending)
+  
+---
+
+## [2.10.5] - (02-02-2021)
+
+### Modified
+- fixed single target render problem (again)
 
 ---
 
