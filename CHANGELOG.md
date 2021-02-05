@@ -10,12 +10,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [2.10.6] - (02-02-2021)
 
-### Added
-- Documented tree view searching (pending)
-  - https://github.com/microsoft/vscode/issues/50062
-  - https://github.com/microsoft/vscode-docs/blob/master/release-notes/v1_37.md#new-tree-widget-adopted-in-tree-view
-  - https://code.visualstudio.com/updates/v1_31#_new-tree-widget
-
+### Modified
+- fixed cfgExplore/App sorting
 - corkscrew will now error on application parsing, but continue with next application (pending)
   - error does not stop entire process (pending)
   
