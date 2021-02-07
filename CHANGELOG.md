@@ -15,21 +15,22 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - as3 to fast yaml conversion command
   - takes an as3 declaration and converts it to a FAST YAML template
   - includes the first step of changing the tenant definition to a template parameter
-- command to list and download other extension versions on github (pending)
+- command to list and download other extension versions on github
 
 ### Modified
 
 - fixed cfgExplore/App sorting
 - corkscrew v0.8
-  - will now error on application parsing, but continue with next application (pending)
-    - error does not stop entire process (pending)
+  - will now error on application parsing, but continue with next application
+    - error does not stop entire process
   - converts \r\n line returns to \n
   - loosened file checking for parent tmos objects
 - fixed app component counts in as3 view
 
 ### Removed
+
 - removed log that indicated seed file was not found on extension load
-  - this seemed to cause an-necessary confusion
+  - this seemed to cause unnecessary confusion
   
 ---
 
