@@ -14,12 +14,10 @@ interface As3Declaration {
 interface AdcDeclaration {
     id: string;
     class: string;
-    target?: {
-        address: string;
-    };
+    target?: As3Tenant | string | Target;
     updateMode: string;
     schemaVersion: string;
-    [key: string]: As3Tenant | string | Target
+    [key: string]: As3Tenant | string | Target | undefined
 }
 
 
@@ -242,4 +240,4 @@ const some: AdcDeclaration[] = [
         class: "Tenant",
       },
     },
-  ]
+  ];

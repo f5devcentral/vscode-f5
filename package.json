@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "2.10.5-beta",
+	"version": "2.10.6-beta",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -50,6 +50,10 @@
 			{
 				"language": "json",
 				"path": "./snippets.json"
+			},
+			{
+				"language": "yaml",
+				"path": "./snippets/fastYamlSnippets.json"
 			}
 		],
 		"yamlValidation": [
@@ -480,6 +484,11 @@
 				"category": "F5-Fast"
 			},
 			{
+				"command": "f5-fast.as3ToFastYml",
+				"title": "AS3 -> FAST YAML",
+				"category": "F5-Fast"
+			},
+			{
 				"command": "f5-fast.refreshTemplates",
 				"title": "Refresh",
 				"category": "F5",
@@ -624,6 +633,10 @@
 				},
 				{
 					"command": "f5-fast.renderHtmlPreview",
+					"group": "F5"
+				},
+				{
+					"command": "f5-fast.as3ToFastYml",
 					"group": "F5"
 				},
 				{

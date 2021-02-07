@@ -10,10 +10,22 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [2.10.6] - (02-02-2021)
 
+### Added
+
+- as3 to fast yaml conversion command
+  - takes an as3 declaration and converts it to a FAST YAML template
+  - includes the first step of changing the tenant definition to a template parameter
+- command to list and download other extension versions on github (pending)
+
 ### Modified
 - fixed cfgExplore/App sorting
-- corkscrew will now error on application parsing, but continue with next application (pending)
-  - error does not stop entire process (pending)
+- corkscrew v0.8
+  - will now error on application parsing, but continue with next application (pending)
+    - error does not stop entire process (pending)
+  - converts \r\n line returns to \n
+  - loosened file checking for parent tmos objects
+- fixed app component counts in as3 view
+- 
   
 ---
 

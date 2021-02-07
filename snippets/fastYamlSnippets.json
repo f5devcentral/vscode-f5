@@ -1,0 +1,29 @@
+{
+    "FAST YAML Base": {
+        "prefix": "fast",
+        "body": [
+            "title: ${1:template title}",
+            "description: ${2:template description}",
+            "template: | ",
+            ""
+        ],
+        "description": "Base FAST YAML template properties"
+    },
+    "FAST YAML Extended": {
+        "prefix": "fast",
+        "body": [
+            "title: ${1:template title}",
+            "description: ${2:template description}",
+            "parameters:",
+            "  tenant_name: ${3:default tenant name}",
+            "definitions: ",
+            "  tenant_name:",
+            "    title: Tenant Name",
+            "    type: string",
+            "    description: partition on bigip",
+            "template: | ",
+            ""
+        ],
+        "description": "Extended FAST YAML template"
+    }
+}

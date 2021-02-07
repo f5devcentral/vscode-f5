@@ -28,11 +28,13 @@ import { getMiniUcs, makeExplosion } from './cfgExplorer';
 import { unInstallOldExtension } from './extMigration';
 import { injectSchema } from './atcSchema';
 import { ChangeVersion } from './changeVersion';
+import { FastCore } from './fastCore';
 
 
 export async function activate(context: ExtensionContext) {
 
 	new ChangeVersion(context);
+	new FastCore(context);
 
 	await unInstallOldExtension();
 

@@ -287,14 +287,18 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 		await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/`)
 			.then(async (resp: any) => {
 
-				// set targets boolens so we know if we are workign with targets or just tenants
-				this.targets = await targetDecsBool(resp.data);
-				
-				// assign the raw /declare output
-				this.declare = Array.isArray(resp.data) ? resp.data : [ resp.data ];
+				if ( resp.status === 200) {
+					// set targets boolens so we know if we are workign with targets or just tenants
+					this.targets = await targetDecsBool(resp.data);
+					
+					// assign the raw /declare output
+					this.declare = Array.isArray(resp.data) ? resp.data : [ resp.data ];
+	
+					// create target/tenant/app map
+					this.as3DeclareMap = await mapAs3(resp.data);
 
-				// create target/tenant/app map
-				this.as3DeclareMap = await mapAs3(resp.data);
+				}
+
 
 			});
 	}
@@ -396,7 +400,7 @@ export async function mapAs3(declare: AdcDeclaration | AdcDeclaration[]): Promis
 								// capture the class of each application piece
 								if (appVal?.class in appProps) {
 									// already have this key, so add one
-									appProps[appVal.class] + 1;
+									appProps[appVal.class] = appProps[appVal.class] + 1;
 								} else {
 									// key not detected, so create it
 									appProps[appVal.class] = 1;
@@ -498,8 +502,8 @@ export function sortTreeItems(treeItems: AS3item[]) {
  * @param x 
  * @returns boolean
  */
-const isObject = (x: any): boolean => {
-	return (typeof x === 'object' ? true : false);
+export function isObject(x: any): boolean {
+	return ( x !== null && typeof x === 'object' ? true : false);
 };
 
 
