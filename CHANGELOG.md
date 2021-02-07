@@ -26,6 +26,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - converts \r\n line returns to \n
   - loosened file checking for parent tmos objects
 - fixed app component counts in as3 view
+
+### Removed
+- removed log that indicated seed file was not found on extension load
+  - this seemed to cause an-necessary confusion
   
 ---
 
