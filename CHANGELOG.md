@@ -14,6 +14,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - as3 to fast yaml conversion command
   - takes an as3 declaration and converts it to a FAST YAML template
+  - detects ADC vs AS3 declaration parent level
   - includes the first step of changing the tenant definition to a template parameter
 - command to list and download other extension versions on github
 
@@ -25,6 +26,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - error does not stop entire process
   - converts \r\n line returns to \n
   - loosened file checking for parent tmos objects
+  - Added data-group extraction from irules
 - fixed app component counts in as3 view
 
 ### Removed
@@ -460,7 +462,7 @@ Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/
   - *.ts.json - will auto reference the latest online ts schema
 
 - Added following right click on as3 tenant options
-  - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/as3-api.html
+  - <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/as3-api.html>
   - show=full
   - show=expanded
   
@@ -488,7 +490,7 @@ Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/
   - This was to allow for more robust error handling for async post operations
 - Updated password prompt to provide more clarity of what is expected
 - Refined conditions that clear cached passwords
-  - [issue #19]https://github.com/f5devcentral/vscode-f5/issues/19
+  - [issue #19]<https://github.com/f5devcentral/vscode-f5/issues/19>
 
 ### Added
 
@@ -517,7 +519,7 @@ Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/
 
 - Device add/modify
   - Relaxed regex to allow :port for single nic ve
-  - [issue #5] https://github.com/f5devcentral/vscode-f5/issues/5
+  - [issue #5] <https://github.com/f5devcentral/vscode-f5/issues/5>
 
 ---
 

@@ -44,27 +44,34 @@ export class FastCore {
                     text = editor.document.getText(editor.selection);	// highlighted text
                 }
 
-                text = as3TemplateStrings(text);
+                await as3TemplateStrings(text)
+                    .then(text => {
 
-                editor.edit(edit => {
-                    edit.setEndOfLine(EndOfLine.LF);
+                        editor.edit(edit => {
+                            edit.setEndOfLine(EndOfLine.LF);
 
-                    text = text.replace(/\r\n/g, '\n');
+                            text = text.replace(/\r\n/g, '\n');
 
-                    // split on lines, add two spaces at beginning of each line, then put everything back together
-                    text = text.split('\n').map((line: string) => `  ${line}`).join('\n');
+                            // split on lines, add two spaces at beginning of each line, then put everything back together
+                            text = text.split('\n').map((line: string) => `  ${line}`).join('\n');
 
-                    const startPosition = new Position(0, 0);
-                    const endPosition = document.lineAt(document.lineCount - 1).range.end;
-                    edit.replace(new Range(startPosition, endPosition), text);
-                });
+                            const startPosition = new Position(0, 0);
+                            const endPosition = document.lineAt(document.lineCount - 1).range.end;
+                            edit.replace(new Range(startPosition, endPosition), text);
+                        });
 
-                // change the editor language to yaml
-                languages.setTextDocumentLanguage(document, 'yaml');
-                // move the cursor to the very beginning of the doc/editor
-                editor.selection = new Selection(new Position(0, 0), new Position(0, 0));
-                // insert snippet
-                commands.executeCommand("editor.action.insertSnippet", { langId: "yaml", name: 'FAST YAML Extended' },);
+                        // change the editor language to yaml
+                        languages.setTextDocumentLanguage(document, 'yaml');
+                        // move the cursor to the very beginning of the doc/editor
+                        editor.selection = new Selection(new Position(0, 0), new Position(0, 0));
+                        // insert snippet
+                        commands.executeCommand("editor.action.insertSnippet", { langId: "yaml", name: 'FAST YAML Extended' },);
+
+                    })
+                    .catch(err => {
+                        logger.error('f5-fast.as3ToFastYml failed', err);
+                    });
+
 
             }
         }));
@@ -75,26 +82,60 @@ export class FastCore {
  * look for as3 tenant object definition and replace with {{tenant_name}} for fast template
  * @param text as3 declaration as string
  */
-export function as3TemplateStrings(text: string): string {
+export async function as3TemplateStrings(text: string): Promise<string> {
 
     // let's try to parse the as3 declarationn and put in a template string for the tenant
     const dec = JSON.parse(text);
-    Object.entries(dec.declaration).forEach(([key, value]) => {
 
-        // look at the objects (application pieces)
-        if (isObject(value) && (value as unknown as { class: string })?.class) {
+    if (dec?.declaration) {
 
-            // recast object param as needed
-            const appVal: { class: string } = (value as unknown) as { class: string };
+        logger.info('f5-fast.as3ToFastYml: AS3 parent class');
 
-            // capture the class of each application piece
-            if (appVal?.class === 'Tenant') {
-                // we found the tenant class
-                delete dec.declaration[key];
-                dec.declaration['{{tenant_name}}'] = value;
+        // we got an AS3/declaration
+        Object.entries(dec.declaration).forEach(([key, value]) => {
+
+            // look at the objects (application pieces)
+            if (isObject(value) && (value as unknown as { class: string })?.class) {
+
+                // recast object param as needed
+                const appVal: { class: string } = (value as unknown) as { class: string };
+
+                // capture the class of each application piece
+                if (appVal?.class === 'Tenant') {
+                    // we found the tenant class
+                    delete dec.declaration[key];
+                    dec.declaration['{{tenant_name}}'] = value;
+
+                    // made our needed change, let's exit
+                    return;
+                }
             }
-        }
-    });
+        });
+    } else {
+
+        logger.info('f5-fast.as3ToFastYml: ADC parent class');
+
+        // this is a list of ADC tenants
+        Object.entries(dec).forEach(([key, value]) => {
+
+            // look at the objects (application pieces)
+            if (isObject(value) && (value as unknown as { class: string })?.class) {
+
+                // recast object param as needed
+                const appVal: { class: string } = (value as unknown) as { class: string };
+
+                // capture the class of each application piece
+                if (appVal?.class === 'Tenant') {
+                    // we found the tenant class
+                    delete dec[key];
+                    dec['{{tenant_name}}'] = value;
+
+                    // made our needed change, let's exit
+                    return;
+                }
+            }
+        });
+    }
 
     // return the declaration back in string form but with 2 spaces to better match yamls format
     return JSON.stringify(dec, undefined, 2);
