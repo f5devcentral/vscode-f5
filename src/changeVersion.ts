@@ -26,7 +26,8 @@ export class ChangeVersion {
 			//  4. install version, reload window?
 
 			// get current extension home folder
-			const hostDir = path.resolve(context.extensionPath, '..');
+			// const hostDir = path.resolve(context.extensionPath, '..');
+			const hostDir = context.extensionPath;
 
 			logger.info('f5.changeVersion, fetching github releases');
 
@@ -55,12 +56,17 @@ export class ChangeVersion {
 
 					try {
 						// try to issue the install command via node sub-process
-						const resp = cp.execSync(cmd2Install).toString();
-						logger.info('f5.changeVersion, install response', resp);
+						const installResp = cp.execSync(cmd2Install).toString();
+						logger.info('f5.changeVersion, install response', installResp);
+
+						// TODO: this need some work. over remote-ssh file does not download and it doesn't fail appropriately
 					} catch (e) {
 						
 						logger.info('f5.changeVersion, failed install', e);
 					}
+				})
+				.catch( err => {
+					logger.error('f5.changeVersion, failed download', err);
 				});
 			} else {
 				logger.info('f5.changeVersion, valid selection details not detected, user probably exited quick pick dropdown');
