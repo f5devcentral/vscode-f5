@@ -14,9 +14,13 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 # **/*.gif
+# ignore cache directories
 atc_ilx_rpm_cache/**
+cache
 fastTemplateFolderUploadTemp/**
 # ignore test seed file
-.vscode-f5.json
+*.vscode-f5.json
 # ignore github actions
 .github/**
+# ignore node cpu profiling file
+*.cpuprofile

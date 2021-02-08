@@ -8,6 +8,7 @@ node_modules
 
 # ignore ilx rpm cache directory
 atc_ilx_rpm_cache
+cache
 .vscode-test/
 # ignore any extension install files and zips
 *.vsix
@@ -22,3 +23,5 @@ atc_ilx_rpm_cache
 *.tmpl
 # ignore temp mini_ucs for config explorere (corkscrew)
 mini_ucs.tar.gz
+# ignore node cpu profiling outputs
+*.cpuprofile

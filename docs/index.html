@@ -11,16 +11,16 @@
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css" title="Simple">
-    <link rel="stylesheet" href="assets/main.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css" title="Simple Dark">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/buble.css" title="Buble">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/dark.css" title="Dark">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/pure.css" title="Pure">
-    
-    <!-- banner sylesheet - testing -->
-    <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-top-banner-plugin@latest/dist/style.css"> -->
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css" title="Simple">
+  <link rel="stylesheet" href="assets/main.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css" title="Simple Dark">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/buble.css" title="Buble">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/dark.css" title="Dark">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/pure.css" title="Pure">
+
+  <!-- banner sylesheet - testing -->
+  <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-top-banner-plugin@latest/dist/style.css"> -->
 </head>
 
 <body>
@@ -28,7 +28,7 @@
   <script>
     window.$docsify = {
       alias: {
-        '/changelog': 'https://raw.githubusercontent.com/f5devcentral/vscode-f5/corkscrew/CHANGELOG.md'
+        '/changelog': 'https://raw.githubusercontent.com/f5devcentral/vscode-f5/main/CHANGELOG.md'
       },
       topMargin: 90, // default: 0
       name: 'F5 VSCode Docs',
@@ -42,10 +42,9 @@
       mergeNavbar: true,
       maxLevel: 2,
       subMaxLevel: 2,
-      // formatUpdated: '{MM}/{DD} {HH}:{mm}',
+      formatUpdated: '{DD}.{MM}.{YYYY}',
       // formatUpdated: function (time) {
       //   // ...
-
       //   return time;
       // },
 
@@ -53,7 +52,7 @@
 
       search: {
         // maxAge: 86400000, // Expiration time, the default one day
-        maxAge: 5, // Expiration time, the default one day
+        // maxAge: 5, // Expiration time, the default one day
         paths: 'auto',
         placeholder: 'Type to search',
         noData: 'No Results!',
@@ -61,26 +60,39 @@
         depth: 6,
         hideOtherSidebarContent: false, // whether or not to hide other sidebar content
       },
-      // banner config - testihng
+      // banner config - testing
       // https://github.com/Plugin-contrib/docsify-plugin/tree/master/packages/docsify-top-banner-plugin
       // topBanner: {
       //   content: 'yay - banner!'
       // },
       plugins: [
         function (hook, vm) {
-          hook.beforeEach(function (html) {
+          hook.beforeEach(function (content) {
+            let url = 'https://github.com/f5devcentral/vscode-f5/tree/main/docs/' + vm.route.file;
+            // const editGif = '[Github](media/github.svg)eddddtir (' + url + ')'
+            // let editHtml = '[:memo: Edit Document](' + url + ')          Last modified {docsify-updated}\n';
+            let header = [
+              '<table style="width:100%">',
+                '<tr>',
+                  '<td style="text-align:left;width:50%"><a href="' + url + '" target="_blank">',
+                  '<svg viewBox="0 0 24 24" width="5%" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
+                  '  Edit in Github</a></td>',
+                  // '<td>' + editGif + '</td>',
+                  '<td style="text-align:right;width:50%">Last modified {docsify-updated}</td>',
+                '</tr>',
+              '</table>'
+            ].join('');
+            return header + content + '\n----\n' + 'Last modified (DD.MM.YYYY) - {docsify-updated}';
+          });
 
-            // var editHtml = '[:memo: Edit Document](' + url + ')\n'
-            return html
-              + '\n\n----\n\n'
-              + '<a href="https://docsify.js.org" target="_blank" style="color: inherit; font-weight: normal; text-decoration: none;">Powered by docsify</a>'
-            // })
-            // hook.afterEach(function (html){
-            //   if(vm.route.path === '/'){
-            //     return html
-            //   }
-            //   return `${html}<br/> <i>Vercel</i> has given us a Pro account <br/> <a href="https://vercel.com/?utm_source=docsifyjsdocs" target="_blank"><img src="_media/vercel_logo.svg" alt="Vercel" width="100" height="64"></a>`
-          })
+          hook.afterEach(function (html) {
+            let footer = [
+              '<footer>',
+              '<span>Powered by <a href="https://github.com/docsifyjs/docsify" target="_blank">docsify</a>.</span>',
+              '</footer>'
+            ].join('');
+            return html + footer;
+          });
         }
       ]
     }
@@ -90,7 +102,7 @@
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  
+
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-nginx.min.js"></script>
@@ -98,7 +110,7 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-jq.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-tcl.js"></script>
-  
+
   <!-- banner plugin - testing -->
   <!-- <script src="//cdn.jsdelivr.net/npm/docsify-top-banner-plugin@latest/dist/index.js"></script> -->
 

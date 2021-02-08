@@ -4,16 +4,125 @@
 
 All notable changes to the "vscode-f5" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file
+
+---
+
+## [2.10.6] - (02-02-2021)
+
+### Added
+
+- as3 to fast yaml conversion command
+  - takes an as3 declaration and converts it to a FAST YAML template
+  - detects ADC vs AS3 declaration parent level
+  - includes the first step of changing the tenant definition to a template parameter
+- command to list and download other extension versions on github
+
+### Modified
+
+- fixed cfgExplore/App sorting
+- corkscrew v0.8
+  - will now error on application parsing, but continue with next application
+    - error does not stop entire process
+  - converts \r\n line returns to \n
+  - loosened file checking for parent tmos objects
+  - Added data-group extraction from irules
+- fixed app component counts in as3 view
+
+### Removed
+
+- removed log that indicated seed file was not found on extension load
+  - this seemed to cause unnecessary confusion
+  
+---
+
+## [2.10.5] - (02-02-2021)
+
+### Modified
+
+- fixed single target render problem (again)
+
+---
+
+## [2.10.4] - (02-02-2021)
+
+### Modified
+
+- AS3 view enhanced to show targets/tenants/apps/app-components
+  - including app component counts
+  - hover/tooltip includes tenant/app/app-component information when possible
+- AS3 targets/tenants/apps are now alphabetically ordered
+- Config Explorer apps are now alphabetically ordered
+- Get all tenants declarations for a target
+
+---
+
+## [2.10.3] - (01-27-2021)
+
+### Added
+
+- command to select and download github releases of the extension to allow users easy access to future beta versions
+  - Like RPM mgmt, it will query github for all the releases (including betas) and provide a list for the user to select the desired version.  It will then attempt to install the version.  Success on the install command is very subjective, but at least it will provide the user with the path to the file so it can be installed through the UI
+
+### Modified
+
+- fixed cfgExploreRawCorkscrew command input path bug
+
+---
+
+## [2.10.2] - (01-25-2021)
+
+### Modified
+
+- updated f5-corkscrew to v0.7.0
+  - fixed a bug where extracted irules were missing a closing bracket
+  - fixed a bug that was causing application extractions to fail
+    - removed logic that attempted to discover pools reference via variables in irules
+  - improved speed by removing some unecessary JSON.stringify/parsing
+  - converted most functions to async
+    - this allows errors to bubble up from deep within the code
+  - added extractApp events
+    - This was feed back into the OUTPUT for better understanding where processing is and possibly where it failed
+
+---
+
+## [2.10.1] - (01-20-2021)
+
+### Modified
+
+- fixed problem where single bigiq as3 target did not track target details and looked like local as3 declaration
+  - this included adding an object description noting it's target
+
+---
+
+## [2.10.0] - (01-19-2021)
+
+### Modified
+
+- corkscrew updates
+  - corkscrew returns source config files in explosion output to more easily import into extension view
+- Config Explorer
+  - Clearing config explorer no longer makes it inoperable
+  - Config explorer view is now always visible and has welcome options for accesing documentation and importing local files
+  - Now supports browsing and importing files through local file system
+- fixed a bug where TS command enablement was tied to DO installed
+- bigiq/as3 integration
+  - displays targets/tenants appropriately
+  - get/modify/repost declaration for target tenant
+- Updated docs:
+  - Added "Edit in Github" and modified date header to each page
+  - fixed changelog reference
 
 ---
 
 ## [2.8.2] - (11-05-2020)
 
 ### Added
+
 - Refresh command for Config Explerer view
 
 ### Modified
+
 - Major documentation updates for new doc site and features
 - Tweaked some error handling for exiting mid device mgmt workflows
 - Updated Documentation view with latest changes
@@ -23,16 +132,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [2.8.1] - (11-02-2020)
 
 ### Modified
+
 - Fixed where clearing of password was not happening in all scenarios
 - Fixed fast template uploading from non-windows based file systems
 - Fixed config explore tree refresh when new config is 'explored'
-
 
 ---
 
 ## [2.8.0] - (10-30-2020)
 
 ### Added
+
 - function to attempt to remove old extension if detected
   - the functions/settings it provides will conflict with new/reBranded extension
 - Finished function to inject/remove schema reference from declaration
@@ -40,8 +150,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - if a schema reference is present, it will remove it
   - if no schema is present, it will attempt to discover the declaration type (as3/do/ts) and inject the appropriate schema reference
   - If the declaration is not a valid json object or it is not able to figure out what kind of ATC declaration it is, then it will prompt a given selection to inject anyway
-  - https://f5devcentral.github.io/vscode-f5/#/schema_validation?id=injectremove-schema-reference-command
-
+  - <https://f5devcentral.github.io/vscode-f5/#/schema_validation?id=injectremove-schema-reference-command>
 
 ---
 
@@ -84,6 +193,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [2.5.1] - (10-7-2020)
 
 ### Modified
+
 - TMOS Config Explorer
   - Updates for corkscrew v2
     - Includes faster processing, mini_ucs fetch of connected device, Base config (vlans/Selfs), all partitions configs
@@ -108,8 +218,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [2.4.0] - (9-30-2020)
 
-
 ### Modified
+
 - FAST Template Render HTML preview
   - now respects tab settings like other windows
   - Re-renders appropriately when sending new content (like changing template params)
@@ -129,6 +239,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [2.3.0] - (9-8-2020)
 
 ### Added
+
 - OUTPUT Logging
   - Moved most console.log() information to the OUTPUT window at the bottom of the editor
   - Channnel name is `f5-fast`
@@ -139,8 +250,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Examples shows terminal connecting to ssh and tailing ltm logs
     - then disconnecting ssh when extension disconnects
 
-
 ### Modified
+
 - Editor tab mgmt/re-use
   - This includes displaying json and HTTP responses with json
   - Tabs are now managed and re-used as configured
@@ -174,6 +285,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [2.2.0] - (8-21-2020)
 
 ### Added
+
 - tcl/iRule/iApp functionality
   - create/modify/delete irules
   - upload/import/create/modify/delete iApp templates
@@ -181,9 +293,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
       - included options for redeploying iApp-App with current paramters and deleting an iApp-App
   - `Merge TCL/TMOS` can be used to merge ANY TMOS config item
 
-Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs/tcl.md
+Documentation: <https://github.com/f5devcentral/vscode-f5/blob/master/README_docs/tcl.md>
 
 ### Modified
+
 - extension now has dynamic config-settings changes, meaning, when an extension setting is changed, it is applied to extension without reload of workspace
 
 ---
@@ -191,6 +304,7 @@ Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs
 ## [2.1.0] - (8-5-2020)
 
 ### Added
+
 - Make HTTP/S Requests function provides the necessary flexbility to make any API call to ANYthing (mostly...)
   - Highlight text, right-click, select: `Make HTTPS Request`
   - support raw URL, json and yaml structures
@@ -198,21 +312,21 @@ Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs
   - Also accepts enough parameters to craft an external API for any destination
   - Includes connection status pop up and error handling like other api calls in the extension
   - Documented usage and examples:
-    - * [Crafting raw API calls](./README_docs/rawApiCalls.md)
-
+    - [Crafting raw API calls](./README_docs/rawApiCalls.md)
 
 ### Modified
+
 - Added nodejs nock for api tests
 - Started refactoring device mgmt functions for automated testing
   - Device Add/Remove
   - allowing entry/command functions to take parameters that would normally be collected from the user by some sort of input, like a click or input/select box
-
 
 ---
 
 ## [2.0.1] - (7-28-2020)
 
 ### Added
+
 - Function to migration legacy devices config to new devices config
 
 ---
@@ -220,6 +334,7 @@ Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs
 ## [2.0.0] - (7-28-2020)
 
 ### Added
+
 - ATC rpm install/un-install/upgrade
   - will download and cache rpm from official github repo
   - cache is located in %USERPROFILE%\.vscode\extensions\%extensionInstall%\atc_ilx_rpm_cache
@@ -237,6 +352,7 @@ Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs
     - Also added function to show configured logon provider (right-click device in list)
 
 ### Modified
+
 - Combined AS3 Tenant and Tasks views
   - This should provider a cleaner and more efficient interface
   - Now showing number of configured tenants and tasks
@@ -254,13 +370,14 @@ Documentation: https://github.com/f5devcentral/vscode-f5/blob/master/README_docs
 
 Created a git repo for documenting the building of fast templates and a bunch of other things for demo'ing the extension
 
-> https://github.com/DumpySquare/f5-fasting
+> <https://github.com/DumpySquare/f5-fasting>
 
 ---
 
 ## [1.0.1-2] - (6-23-2020)
 
 ### Changed
+
 - Documentation tweaks
 
 ---
@@ -297,20 +414,22 @@ Should cover most prominent F5 (A)utomated (T)ool(C)hain workflows (FAST/AS3/DO/
 
 ## [0.1.11] - (6-4-2020)
 
-- Fixed the following 
-```
-CVE-2020-7598
-moderate severity
-Vulnerable versions: < 0.2.1
-Patched version: 0.2.1
-minimist before 1.2.2 could be tricked into adding or modifying properties of Object.prototype using a "constructor" or "proto" payload.
-```
+- Fixed the following
+
+  ```text
+  CVE-2020-7598
+  moderate severity
+  Vulnerable versions: < 0.2.1
+  Patched version: 0.2.1
+  minimist before 1.2.2 could be tricked into adding or modifying properties of Object.prototype using a "constructor" or "proto" payload.
+  ```
 
 ---
 
 ## [0.1.10] - (6-4-2020)
 
 ### Added
+
 - Populated fast view on left
   - list deployed fast apps
     - click to view individual app configurations and deployment constants
@@ -334,6 +453,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.9] - (5-31-2020)
 
 ### Added
+
 - Added warning when posting syncronous DO dec that async is highly recommended
 - Defined file types for the different ATC services (as3/do/ts) to provide auto schema validation
   - This happend with files from a defined workspace, like opening a folder
@@ -342,7 +462,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
   - *.ts.json - will auto reference the latest online ts schema
 
 - Added following right click on as3 tenant options
-  - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/as3-api.html
+  - <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/as3-api.html>
   - show=full
   - show=expanded
   
@@ -364,14 +484,16 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.8] - (5-25-2020)
 
 ### Modified
+
 - Now allowing all http responses so it would show more information about failing declarations
   - Was only allowing 200/201/202/404/422
   - This was to allow for more robust error handling for async post operations
 - Updated password prompt to provide more clarity of what is expected
 - Refined conditions that clear cached passwords
-  - [issue #19]https://github.com/f5devcentral/vscode-f5/issues/19
+  - [issue #19]<https://github.com/f5devcentral/vscode-f5/issues/19>
 
 ### Added
+
 - Auto-refresh AS3 trees after tenant delete or declaration post
   - includes a slight pause to let processing complete before refresh
 - AS3 async post
@@ -384,6 +506,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.7] - (5-20-2020)
 
 ### Modified
+
 - More work to allow port specification on device item: user@device.domain.net:8443
 - Added more feedback (warning pop up) for failed api calls
 - Documentation on client side logging and BIG-IQ usage
@@ -393,15 +516,17 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.6] - (5-19-2020)
 
 ### Modified
+
 - Device add/modify
   - Relaxed regex to allow :port for single nic ve
-  - [issue #5] https://github.com/f5devcentral/vscode-f5/issues/5
+  - [issue #5] <https://github.com/f5devcentral/vscode-f5/issues/5>
 
 ---
 
 ## [0.1.5] - (5-18-2020)
 
 ### Added
+
 - AS3 Delete Tenant command - Right click tenant item in tree
 - auto refresh AS3 trees when AS3 service detected
 - Documentation in README, including demo gifs of workflows
@@ -411,6 +536,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.4] - (5-15-2020)
 
 ### Added
+
 - AS3 tenants tree
   - two level tree hiarchy representing deployed tenant and apps for each tenant
   - click to get 'Get-All-Tenants' to get ALL declarations
@@ -421,6 +547,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.3] - (5-13-2020)
 
 ### Added
+
 - Tree view to display TS examples from github
 - get/post Delcaratinve Onboarding (DO) declarations
 - base example snippets for as3/do/ts
@@ -435,6 +562,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.2] - (5-10-2020)
 
 ### Added
+
 - AS3/DO/TS service checking - display in tool bar with version if installed
 - GET/POST TS declaration
 - Execute BASH command on device
@@ -444,11 +572,13 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.1.1] - (5-8-2020)
 
 ### Added
+
 - password caching with keytar
 
 ## [0.1.0] - (5-7-2020)
 
 ### Added
+
 - load sample as3 declaration
 - post as3 declaration to connected F5
 
@@ -457,6 +587,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.0.4] - (5-4-2020)
 
 ### Added
+
 - Device Tree features
   - Modify entry
   - Remove entry
@@ -467,6 +598,7 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.0.3] - (4-26-2020)
 
 ### Added
+
 - BIG-IP authentication via auth token
 - Device tree refresh button
 
@@ -475,9 +607,10 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.0.2] - (4-26-2020)
 
 ### Added
+
 - Tree View container with F5 icon
-    - list configured devices from config file
-    - testing with carTreeView and depenencyTreeView
+  - list configured devices from config file
+  - testing with carTreeView and depenencyTreeView
 - Status bar information about connected device
 
 ---
@@ -485,6 +618,6 @@ minimist before 1.2.2 could be tricked into adding or modifying properties of Ob
 ## [0.0.1] - (4-24-2020)
 
 - Initial release!
-    - Make api to get Chuck Norris joke, display in new editor window for testing, learning and laughs...
-    - Started extension settings to host devices
-    - Command skeleton for next call to be coded
+  - Make api to get Chuck Norris joke, display in new editor window for testing, learning and laughs...
+  - Started extension settings to host devices
+  - Command skeleton for next call to be coded

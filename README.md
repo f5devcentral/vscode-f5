@@ -12,16 +12,16 @@ Any comments, questions or feature requests, please open a github repository iss
 
 ### New documentation site!!!
 > https://f5devcentral.github.io/vscode-f5/#/
-
+> 
 > this page is in progress as we transition documents to the new site above
 
 
 
-If you mention the words "F5" and "API" with any sort of consistency, then you need to be using The F5 VSCode Extension...
+If you consistently use APIs while working with F5s, the F5 VSCode Extension needs to be a permanent addition to your toolkit!
 
 The F5 VSCode Extension will not only only supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, but also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
 
-If that wasn't enough to get your attention, the extension can also...
+If you are not excited yet, the extension can also:
 
 - GET/POST/DELETE of all ATC services, including FAST/AS3/DO/TS
 - links to quickly open related ATC documentation
@@ -36,6 +36,14 @@ If that wasn't enough to get your attention, the extension can also...
 ## Getting the extension
 
 The best path is to install Visual Studio Code from: https://code.visualstudio.com/
+
+### VSCode Marketplace
+
+- https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5
+
+### Open Source Marketplace
+
+- https://open-vsx.org/extension/F5DevCentral/vscode-f5
 
 Then install the extension following the steps below:
 
@@ -157,7 +165,7 @@ Different ways to install vsix:
 - Clone and install dependencies:
     ```bash
     git clone https://github.com/f5devcentral/vscode-f5.git
-    cd cd vscode-f5-fast/
+    cd vscode-f5-fast/
     npm install
     code .
     ```

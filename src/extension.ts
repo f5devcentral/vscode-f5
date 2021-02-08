@@ -27,10 +27,15 @@ import { TextDocumentView } from './editorViews/editorView';
 import { getMiniUcs, makeExplosion } from './cfgExplorer';
 import { unInstallOldExtension } from './extMigration';
 import { injectSchema } from './atcSchema';
+import { ChangeVersion } from './changeVersion';
+import { FastCore } from './fastCore';
 
 
 export async function activate(context: ExtensionContext) {
-	
+
+	new ChangeVersion(context);
+	new FastCore(context);
+
 	await unInstallOldExtension();
 
 	// assign context to global name space
@@ -49,12 +54,12 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(ext.doBar);
 	ext.tsBar = window.createStatusBarItem(StatusBarAlignment.Left, 10);
 	context.subscriptions.push(ext.tsBar);
-	
+
 
 	ext.connectBar = window.createStatusBarItem(StatusBarAlignment.Left, 9);
 	context.subscriptions.push(ext.connectBar);
 	ext.connectBar.command = 'f5.connectDevice';
-    ext.connectBar.text = 'F5 -> Connect!';
+	ext.connectBar.text = 'F5 -> Connect!';
 	ext.connectBar.tooltip = 'Click to connect!';
 	ext.connectBar.show();
 
@@ -87,17 +92,17 @@ export async function activate(context: ExtensionContext) {
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Banner3&t=Devices
 	 * #########################################################################
 	 */
-	
-	
+
+
 	const hostsTreeProvider = new F5TreeProvider('');
 	window.registerTreeDataProvider('f5Hosts', hostsTreeProvider);
 	commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
-	
+
 	context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {
 
-	logger.info('selected device', device);  // preferred at the moment
+		logger.info('selected device', device);  // preferred at the moment
 
-		if(ext.mgmtClient) {
+		if (ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
 		}
 
@@ -105,7 +110,7 @@ export async function activate(context: ExtensionContext) {
 			device: string,
 			provider: string
 		};
-		
+
 		if (!device) {
 			const bigipHosts: Array<devObj> | undefined = await workspace.getConfiguration().get('f5.hosts');
 
@@ -117,11 +122,11 @@ export async function activate(context: ExtensionContext) {
 			 * loop through config array of objects and build quickPick list appropriate labels
 			 * [ {label: admin@192.168.1.254:8443, target: { host: 192.168.1.254, user: admin, ...}}, ...]
 			 */
-			const qPickHostList = bigipHosts.map( item => {
+			const qPickHostList = bigipHosts.map(item => {
 				return { label: item.device, target: item };
 			});
 
-			device = await window.showQuickPick(qPickHostList, {placeHolder: 'Select Device'});
+			device = await window.showQuickPick(qPickHostList, { placeHolder: 'Select Device' });
 			if (!device) {
 				throw new Error('user exited device input');
 			} else {
@@ -129,13 +134,13 @@ export async function activate(context: ExtensionContext) {
 				device = device.target;
 			}
 		}
-		
+
 		var [user, host] = device.device.split('@');
 		var [host, port] = host.split(':');
 
 		const password: string = await utils.getPassword(device.device);
 
-		ext.mgmtClient = new MgmtClient( device.device, {
+		ext.mgmtClient = new MgmtClient(device.device, {
 			host,
 			port,
 			user,
@@ -145,10 +150,10 @@ export async function activate(context: ExtensionContext) {
 
 		const connect = await ext.mgmtClient.connect();
 		logger.debug(`F5 Connect Discovered ${JSON.stringify(connect)}`);
-		setTimeout( () => { tclTreeProvider.refresh();}, 300);
+		setTimeout(() => { tclTreeProvider.refresh(); }, 300);
 
 	}));
-	
+
 	context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {
 		const resp: any = await ext.mgmtClient?.makeRequest('/mgmt/tm/auth/source');
 		ext.panel.render(resp);
@@ -157,11 +162,11 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.getF5HostInfo', async () => {
 		var device: string | undefined = ext.hostStatusBar.text;
-		
+
 		if (!device) {
 			device = await commands.executeCommand('f5.connectDevice');
 		}
-		
+
 		if (device === undefined) {
 			throw new Error('no hosts in configuration');
 		}
@@ -172,7 +177,7 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.disconnect', () => {
 
-		if(ext.mgmtClient) {
+		if (ext.mgmtClient) {
 			ext.mgmtClient.disconnect();
 			ext.mgmtClient = undefined;
 			// cfgProvider.clear();
@@ -191,55 +196,55 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5.removeHost', async (hostID) => {
 		return await hostsTreeProvider.removeDevice(hostID);
 	}));
-	
+
 	context.subscriptions.push(commands.registerCommand('f5.editHost', async (hostID) => {
-		
+
 		logger.debug(`Edit Host command: ${JSON.stringify(hostID)}`);
-		
-		let bigipHosts: {device: string} [] | undefined= workspace.getConfiguration().get('f5.hosts');
+
+		let bigipHosts: { device: string }[] | undefined = workspace.getConfiguration().get('f5.hosts');
 		logger.debug(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
-		
+
 		window.showInputBox({
-			prompt: 'Update Device/BIG-IP/Host', 
+			prompt: 'Update Device/BIG-IP/Host',
 			value: hostID.label,
 			ignoreFocusOut: true
 		})
-		.then( input => {
+			.then(input => {
 
-			logger.debug('user input', input);
+				logger.debug('user input', input);
 
-			if (input === undefined || bigipHosts === undefined) {
-				// throw new Error('Update device inputBox cancelled');
-				logger.warn('Update device inputBox cancelled');
-				return;
-			}
+				if (input === undefined || bigipHosts === undefined) {
+					// throw new Error('Update device inputBox cancelled');
+					logger.warn('Update device inputBox cancelled');
+					return;
+				}
 
-			const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
-			const devicesString = JSON.stringify(bigipHosts);
-			
-			if (!devicesString.includes(`\"${input}\"`) && deviceRex.test(input)) {
+				const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
+				const devicesString = JSON.stringify(bigipHosts);
 
-				bigipHosts.forEach( (item: { device: string; }) => {
-					if(item.device === hostID.label) {
-						item.device = input;
-					}
-				});
-				
-				workspace.getConfiguration().update('f5.hosts', bigipHosts, ConfigurationTarget.Global);
-				setTimeout( () => { hostsTreeProvider.refresh();}, 300);
-			} else {
-		
-				window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>:<port>');
-			}
-		});
-		
+				if (!devicesString.includes(`\"${input}\"`) && deviceRex.test(input)) {
+
+					bigipHosts.forEach((item: { device: string; }) => {
+						if (item.device === hostID.label) {
+							item.device = input;
+						}
+					});
+
+					workspace.getConfiguration().update('f5.hosts', bigipHosts, ConfigurationTarget.Global);
+					setTimeout(() => { hostsTreeProvider.refresh(); }, 300);
+				} else {
+
+					window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>:<port>');
+				}
+			});
+
 	}));
 
 
 
 	context.subscriptions.push(commands.registerCommand('f5.editDeviceProvider', async (hostID) => {
-		
-		let bigipHosts: {device: string} [] | undefined= workspace.getConfiguration().get('f5.hosts');
+
+		let bigipHosts: { device: string }[] | undefined = workspace.getConfiguration().get('f5.hosts');
 
 		const providerOptions: string[] = [
 			'local',
@@ -252,34 +257,34 @@ export async function activate(context: ExtensionContext) {
 			'custom for bigiq'
 		];
 
-		window.showQuickPick(providerOptions, {placeHolder: 'Default BIGIP providers'})
-		.then( async input => {
+		window.showQuickPick(providerOptions, { placeHolder: 'Default BIGIP providers' })
+			.then(async input => {
 
-			logger.debug('user input', input);
+				logger.debug('user input', input);
 
-			if (input === undefined || bigipHosts === undefined) {
-				// throw new Error('Update device inputBox cancelled');
-				logger.warn('Update device inputBox cancelled');
-				return;
-			}
-
-			if (input === 'custom for bigiq') {
-				input = await window.showInputBox({
-					prompt: "Input custom bigiq login provider"
-				});
-			}
-
-			bigipHosts.forEach( (item: { device: string; provider?: string; }) => {
-				if(item.device === hostID.label) {
-					item.provider = input;
+				if (input === undefined || bigipHosts === undefined) {
+					// throw new Error('Update device inputBox cancelled');
+					logger.warn('Update device inputBox cancelled');
+					return;
 				}
-			});
-			
-			workspace.getConfiguration().update('f5.hosts', bigipHosts, ConfigurationTarget.Global);
 
-			setTimeout( () => { hostsTreeProvider.refresh();}, 300);
-		});
-		
+				if (input === 'custom for bigiq') {
+					input = await window.showInputBox({
+						prompt: "Input custom bigiq login provider"
+					});
+				}
+
+				bigipHosts.forEach((item: { device: string; provider?: string; }) => {
+					if (item.device === hostID.label) {
+						item.provider = input;
+					}
+				});
+
+				workspace.getConfiguration().update('f5.hosts', bigipHosts, ConfigurationTarget.Global);
+
+				setTimeout(() => { hostsTreeProvider.refresh(); }, 300);
+			});
+
 	}));
 
 
@@ -287,7 +292,7 @@ export async function activate(context: ExtensionContext) {
 
 		// get editor window
 		var editor = window.activeTextEditor;
-		if (!editor) {	
+		if (!editor) {
 			return; // No open text editor
 		}
 
@@ -297,11 +302,11 @@ export async function activate(context: ExtensionContext) {
 			text = editor.document.getText();	// entire editor/doc window
 		} else {
 			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+		}
 
 		await deviceImport(text);
 
-		setTimeout( () => { hostsTreeProvider.refresh();}, 1000);
+		setTimeout(() => { hostsTreeProvider.refresh(); }, 1000);
 
 	}));
 
@@ -330,7 +335,7 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5.installRPM', async (selectedRPM) => {
 
 
-		if(selectedRPM) {
+		if (selectedRPM) {
 			// set rpm path/location from oject return in explorer tree
 			selectedRPM = selectedRPM.fsPath;
 			logger.debug(`workspace selected rpm`, selectedRPM);
@@ -343,11 +348,11 @@ export async function activate(context: ExtensionContext) {
 		// const iRpms = await rpmMgmt.installedRPMs();
 		logger.debug('selected rpm', selectedRPM);
 
-		if(!selectedRPM) {
+		if (!selectedRPM) {
 			debugger;
 			// probably need to setup error handling for this situation
 		}
-		
+
 		const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
 		logger.debug('installed rpm', installedRpm);
 		ext.mgmtClient?.connect(); // refresh connect/status bars
@@ -355,25 +360,25 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.unInstallRPM', async (rpm) => {
-		
+
 		// if no rpm sent in from update command
-		if(!rpm) {
+		if (!rpm) {
 			// get installed packages
 			const installedRPMs = await rpmMgmt.installedRPMs();
 			// have user select package
-			rpm = await window.showQuickPick(installedRPMs, {placeHolder: 'select rpm to remove'});
+			rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
 		} else {
 			// rpm came from rpm update call...
 		}
 
-		if(!rpm) {	// return error pop-up if quickPick escaped
+		if (!rpm) {	// return error pop-up if quickPick escaped
 			return window.showWarningMessage('user exited - did not select rpm to un-install');
 		}
 
 		const status = await rpmMgmt.unInstallRpm(rpm);
 		window.showInformationMessage(`rpm ${rpm} removal ${status}`);
 		// debugger;
-		
+
 		// used to pause between uninstalling and installing a new version of the same atc
 		//		should probably put this somewhere else
 		await new Promise(resolve => { setTimeout(resolve, 2000); });
@@ -387,9 +392,9 @@ export async function activate(context: ExtensionContext) {
 	 * ###########################################################################
 	 * 
 	 * 				TTTTTTT    CCCCC    LL      
-  	 * 				  TTT     CC    C   LL      
-  	 * 				  TTT     CC        LL      
-  	 * 				  TTT     CC    C   LL      
+	 * 				  TTT     CC    C   LL      
+	 * 				  TTT     CC        LL      
+	 * 				  TTT     CC    C   LL      
 	 * 				  TTT      CCCCC    LLLLLLL 
 	 * 
 	 * ############################################################################
@@ -400,33 +405,33 @@ export async function activate(context: ExtensionContext) {
 	const tclTreeProvider = new TclTreeProvider();
 	window.registerTreeDataProvider('as3Tasks', tclTreeProvider);
 	commands.registerCommand('f5.refreshTclTree', () => tclTreeProvider.refresh());
-	
+
 
 	// --- IRULE COMMANDS ---
 	context.subscriptions.push(commands.registerCommand('f5-tcl.getRule', async (rule) => {
 		return tclTreeProvider.displayRule(rule);
 	}));
-	
+
 	context.subscriptions.push(commands.registerCommand('f5-tcl.deleteRule', async (rule) => {
 		return tclTreeProvider.deleteRule(rule);
 	}));
 
-	
-	
-	
-	
+
+
+
+
 	// --- IAPP COMMANDS ---
 	context.subscriptions.push(commands.registerCommand('f5-tcl.getApp', async (item) => {
 		logger.debug('f5-tcl.getApp command: ', item);
 		return ext.panel.render(item);
 	}));
 
-	
+
 	context.subscriptions.push(commands.registerCommand('f5-tcl.getTemplate', async (item) => {
 		// returns json view of iApp Template
 		return ext.panel.render(item);
 	}));
-	
+
 
 	context.subscriptions.push(commands.registerCommand('f5-tcl.getTMPL', async (item) => {
 		// gets the original .tmpl output
@@ -459,7 +464,7 @@ export async function activate(context: ExtensionContext) {
 		const resp: any = await tclTreeProvider.deleteTMPL(item);
 		return resp;
 	}));
-	
+
 	context.subscriptions.push(commands.registerCommand('f5-tcl.mergeTCL', async (item) => {
 		await tclTreeProvider.mergeTCL(item);
 	}));
@@ -471,15 +476,15 @@ export async function activate(context: ExtensionContext) {
 	 * ###########################################################################
 	 * 
 	 *  			FFFFFFF   AAA    SSSSS  TTTTTTT 
- 	 *  			FF       AAAAA  SS        TTT   
- 	 *  			FFFF    AA   AA  SSSSS    TTT   
- 	 *  			FF      AAAAAAA      SS   TTT   
- 	 *  			FF      AA   AA  SSSSS    TTT   
+	   *  			FF       AAAAA  SS        TTT   
+	   *  			FFFF    AA   AA  SSSSS    TTT   
+	   *  			FF      AAAAAAA      SS   TTT   
+	   *  			FF      AA   AA  SSSSS    TTT   
 	 * 
 	 * ############################################################################
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
 	 */
-	
+
 	// setting up hosts tree
 	const fastTreeProvider = new FastTemplatesTreeProvider();
 	window.registerTreeDataProvider('fastView', fastTreeProvider);
@@ -495,7 +500,7 @@ export async function activate(context: ExtensionContext) {
 
 		// get editor window
 		var editor = window.activeTextEditor;
-		if (!editor) {	
+		if (!editor) {
 			return; // No open text editor
 		}
 
@@ -505,17 +510,17 @@ export async function activate(context: ExtensionContext) {
 			text = editor.document.getText();	// entire editor/doc window
 		} else {
 			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+		}
 
 		// TODO: make this a try sequence to only parse the json once
 		let jsonText: object;
-		if(utils.isValidJson(text)){
+		if (utils.isValidJson(text)) {
 			jsonText = JSON.parse(text);
 		} else {
 			window.showWarningMessage(`Not valid json object`);
 			return;
 		}
-		
+
 		const resp = await f5FastApi.deployFastApp(jsonText);
 
 		ext.panel.render(resp);
@@ -558,7 +563,8 @@ export async function activate(context: ExtensionContext) {
 
 		// get editor window
 		var editor = window.activeTextEditor;
-		if (!editor) {	return; // No open text editor
+		if (!editor) {
+			return; // No open text editor
 		}
 
 		// capture selected text or all text in editor
@@ -567,11 +573,11 @@ export async function activate(context: ExtensionContext) {
 			text = editor.document.getText();	// entire editor/doc window
 		} else {
 			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+		}
 
 		logger.debug(JSON.stringify(text));
 
-		if(utils.isValidJson(text)){
+		if (utils.isValidJson(text)) {
 
 			//TODO:  parse object and find the level for just ADC,
 			//		need to remove all the AS3 details since fast will handle that
@@ -588,12 +594,12 @@ export async function activate(context: ExtensionContext) {
 
 		let text: string | Buffer;
 
-		if(!sFile) {
+		if (!sFile) {
 			// not right click from explorer view, so gather file details
 
 			// get editor window
 			var editor = window.activeTextEditor;
-			if (!editor) {	
+			if (!editor) {
 				return; // No open text editor
 			}
 
@@ -602,7 +608,7 @@ export async function activate(context: ExtensionContext) {
 				text = editor.document.getText();	// entire editor/doc window
 			} else {
 				text = editor.document.getText(editor.selection);	// highlighted text
-			} 
+			}
 		} else {
 			// right click from explorer view, so load file contents
 			const fileContents = fs.readFileSync(sFile.fsPath);
@@ -621,16 +627,16 @@ export async function activate(context: ExtensionContext) {
 		logger.debug('postTemplateSet selection', sPath);
 		let wkspPath;
 		let selectedFolder;
-		
-		if(!sPath) {
+
+		if (!sPath) {
 			// didn't get a path passed in from right click, so we have to gather necessary details
 
 			// get list of open workspaces
 			const workspaces = workspace.workspaceFolders;
 			logger.debug('workspaces', workspaces);
-			
+
 			// if no open workspace...
-			if(!workspaces) {
+			if (!workspaces) {
 				// Show message to select workspace
 				await window.showInformationMessage('See top bar to open a workspace with Fast Templates first');
 				// pop up to selecte a workspace
@@ -638,13 +644,13 @@ export async function activate(context: ExtensionContext) {
 				// return to begining of function to try again
 				return commands.executeCommand('f5-fast.postTemplateSet');
 			}
-		
+
 			const folder1 = workspace.workspaceFolders![0]!.uri;
 			wkspPath = folder1.fsPath;
 			const folder2 = await workspace.fs.readDirectory(folder1);
-		
+
 			logger.debug('workspace name', workspace.name);
-			
+
 			/**
 			 * having problems typing the workspaces to a list for quick pick
 			 * todo: get the following working
@@ -657,11 +663,11 @@ export async function activate(context: ExtensionContext) {
 			// 	// else select the first workspace
 			// 	wkspc = workspaces[0];
 			// }
-			
+
 			let wFolders = [];
 			for (const [name, type] of await workspace.fs.readDirectory(folder1)) {
 
-				if (type === FileType.Directory){
+				if (type === FileType.Directory) {
 					logger.debug('---directory', name);
 					wFolders.push(name);
 				}
@@ -669,8 +675,8 @@ export async function activate(context: ExtensionContext) {
 
 			// have user select first level folder in workspace
 			selectedFolder = await window.showQuickPick(wFolders);
-			
-			if(!selectedFolder) {
+
+			if (!selectedFolder) {
 				// if user "escaped" folder selection window
 				return window.showInformationMessage('Must select a Fast Template Set folder');
 			}
@@ -690,12 +696,12 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {
-		
+
 		// var device: string | undefined = ext.hostStatusBar.text;
 		// const password = await utils.getPassword(device);
 		const resp = await f5FastApi.delTenApp(tenApp.label);
 		ext.panel.render(resp);
-	
+
 		// give a little time to finish
 		await new Promise(resolve => { setTimeout(resolve, 2000); });
 		fastTreeProvider.refresh();
@@ -720,9 +726,9 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5-fast.renderHtmlPreview', async (item) => {
 
 		let text: string = 'empty';
-		let title: string = 'Fast Template';	
+		let title: string = 'Fast Template';
 
-		if(item?.hasOwnProperty('scheme') && item?.scheme === 'file') {
+		if (item?.hasOwnProperty('scheme') && item?.scheme === 'file') {
 			// right click from explorer view initiation, so load file contents
 			const fileContents = fs.readFileSync(item.fsPath);
 			// convert from buffer to string
@@ -747,24 +753,24 @@ export async function activate(context: ExtensionContext) {
 		} else {
 			// right-click or commandpalette initiation, so get editor text
 			var editor = window.activeTextEditor;
-			if (editor) {	
+			if (editor) {
 				if (editor?.selection?.isEmpty) {
 					text = editor.document.getText();	// entire editor/doc window
 				} else {
 					text = editor.document.getText(editor.selection);	// highlighted text
-				} 
+				}
 			}
 		}
 		fastPanel.render(text);
 
 	}));
-	
 
 
 
 
-	
-	
+
+
+
 	/**
 	 * ############################################################################
 	 * 
@@ -778,42 +784,89 @@ export async function activate(context: ExtensionContext) {
 	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=AS3
 	 */
 
-	
+
 	// setting up as3 tree
 	const as3Tree = new AS3TreeProvider();
 	window.registerTreeDataProvider('as3Tenants', as3Tree);
 	commands.registerCommand('f5-as3.refreshTenantsTree', () => as3Tree.refresh());
-	
+
 	context.subscriptions.push(commands.registerCommand('f5-as3.getDecs', async (tenant) => {
 
-		// set blank value if not defined -> get all tenants dec
-		tenant = tenant ? tenant : '';
+		if (typeof tenant === 'object') {
 
-		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`);
-		ext.panel.render(resp);
+			// just a regular as3 declaration object
+			ext.panel.render(tenant);
+
+		} else {
+
+			// got a simple tenant name as string with uri parameter,
+			// this is typically for extended information
+			// so fetch fresh information with param
+			// await ext.f5Client?.as3?.getDecs({ tenant })
+			await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant}`)
+				.then((resp: any) => ext.panel.render(resp.data))
+				.catch(err => logger.error('get as3 tenant with param failed:', err));
+		}
 	}));
 
 
-	context.subscriptions.push(commands.registerCommand('f5-as3.fullTenant', async (tenant) => {
-		commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=full`);
-	}));
 	context.subscriptions.push(commands.registerCommand('f5-as3.expandedTenant', async (tenant) => {
 		commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=expanded`);
 	}));
-	
-	
+
+
 	context.subscriptions.push(commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
-		
-	    const progress = await window.withProgress({
+
+		await window.withProgress({
 			location: ProgressLocation.Notification,
+			// location: { viewId: 'as3Tenants'},
 			title: `Deleting ${tenant.label} Tenant`
 		}, async (progress) => {
-			
-			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare/${tenant.label}`, {
-				method: 'DELETE'
-			});
-			const resp2 = resp.data.results[0];
-			progress.report({message: `${resp2.code} - ${resp2.message}`});
+
+			await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare`, {
+				method: 'POST',
+				body: {
+					class: 'AS3',
+					declaration: {
+						schemaVersion: tenant.command.arguments[0].schemaVersion,
+						class: 'ADC',
+						target: tenant.command.arguments[0].target,
+						[tenant.label]: {
+							class: 'Tenant'
+						}
+					}
+				}
+			})
+				// await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare`, {
+				// 	method: 'POST',
+				// 	data: {
+				// 		class: 'AS3',
+				// 		declaration: {
+				// 			schemaVersion: tenant.command.arguments[0].schemaVersion,
+				// 			class: 'ADC',
+				// 			target: tenant.command.arguments[0].target,
+				// 			[tenant.label]: {
+				// 				class: 'Tenant'
+				// 			}
+				// 		}
+				// 	}
+				// })
+				.then((resp: any) => {
+					const resp2 = resp.data.results[0];
+					progress.report({ message: `${resp2.code} - ${resp2.message}` });
+
+				})
+				.catch(err => {
+					progress.report({ message: `${err.message}` });
+					// might need to adjust logging depending on the error, but this works for now, or at least the main HTTP responses...
+					logger.error('as3 delete tenant failed with:', {
+						respStatus: err.response.status,
+						respText: err.response.statusText,
+						errMessage: err.message,
+						errRespData: err.response.data
+					});
+				});
+
 			// hold the status box for user and let things finish before refresh
 			await new Promise(resolve => { setTimeout(resolve, 5000); });
 		});
@@ -823,13 +876,15 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-as3.getTask', (id) => {
 
-		window.withProgress({
+		return window.withProgress({
 			location: ProgressLocation.Notification,
 			title: `Getting AS3 Task`
 		}, async () => {
 
-			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${id}`);
-			ext.panel.render(resp);
+			return await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/task/${id}`)
+				// await ext.f5Client?.as3?.getTasks(id)
+				.then(resp => ext.panel.render(resp))
+				.catch(err => logger.error('as3 get task failed:', err));
 		});
 
 	}));
@@ -839,7 +894,7 @@ export async function activate(context: ExtensionContext) {
 		ext.as3AsyncPost = workspace.getConfiguration().get('f5.as3Post.async');
 
 		let postParam;
-		if(ext.as3AsyncPost) {
+		if (ext.as3AsyncPost) {
 			postParam = 'async=true';
 		} else {
 			postParam = undefined;
@@ -855,7 +910,7 @@ export async function activate(context: ExtensionContext) {
 			text = editor.document.getText();	// entire editor/doc window
 		} else {
 			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+		}
 
 		if (!utils.isValidJson(text)) {
 			return window.showErrorMessage('Not valid JSON object');
@@ -876,7 +931,7 @@ export async function activate(context: ExtensionContext) {
 
 		// Get the active text editor
 		const editor = window.activeTextEditor;
-		
+
 		if (editor) {
 			let text: string;
 			const document = editor.document;
@@ -886,10 +941,10 @@ export async function activate(context: ExtensionContext) {
 				text = editor.document.getText();	// entire editor/doc window
 			} else {
 				text = editor.document.getText(editor.selection);	// highlighted text
-			} 
+			}
 
-			const [ newText, validDec ] = await injectSchema(text);
-			
+			const [newText, validDec] = await injectSchema(text);
+
 			// check if modification worked
 			if (newText && validDec) {
 				editor.edit(edit => {
@@ -951,16 +1006,16 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5-ts.postDec', async () => {
-		
+
 		// if selected text, capture that, if not, capture entire document
 		var editor = window.activeTextEditor;
 		let text: string;
-		if(editor) {
+		if (editor) {
 			if (editor.selection.isEmpty) {
 				text = editor.document.getText();	// entire editor/doc window
 			} else {
 				text = editor.document.getText(editor.selection);	// highlighted text
-			} 
+			}
 
 			if (!utils.isValidJson(text)) {
 				return window.showErrorMessage('Not valid JSON object');
@@ -981,7 +1036,7 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
 
-		const resp = await extAPI.makeRequest({	url: decUrl	});
+		const resp = await extAPI.makeRequest({ url: decUrl });
 		return ext.panel.render(resp);
 	}));
 
@@ -989,18 +1044,18 @@ export async function activate(context: ExtensionContext) {
 
 
 
-/**
- * #########################################################################
- * 
- * 			 █████    ██████  
- *			 ██   ██ ██    ██ 
- *			 ██   ██ ██    ██ 
- *			 ██   ██ ██    ██ 
- *			 █████    ██████  
- * 			
- * #########################################################################
- * 	http://patorjk.com/software/taag/#p=display&h=0&f=ANSI%20Regular&t=DO
- */
+	/**
+	 * #########################################################################
+	 * 
+	 * 			 █████    ██████  
+	 *			 ██   ██ ██    ██ 
+	 *			 ██   ██ ██    ██ 
+	 *			 ██   ██ ██    ██ 
+	 *			 █████    ██████  
+	 * 			
+	 * #########################################################################
+	 * 	http://patorjk.com/software/taag/#p=display&h=0&f=ANSI%20Regular&t=DO
+	 */
 
 	context.subscriptions.push(commands.registerCommand('f5-do.getDec', async () => {
 
@@ -1027,7 +1082,7 @@ export async function activate(context: ExtensionContext) {
 			text = editor.document.getText();	// entire editor/doc window
 		} else {
 			text = editor.document.getText(editor.selection);	// highlighted text
-		} 
+		}
 
 		if (!utils.isValidJson(text)) {
 			return window.showErrorMessage('Not valid JSON object');
@@ -1046,7 +1101,7 @@ export async function activate(context: ExtensionContext) {
 		}, async () => {
 			const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
 			ext.panel.render(resp);
-		}); 
+		});
 
 	}));
 
@@ -1067,18 +1122,18 @@ export async function activate(context: ExtensionContext) {
 
 
 
-/**
- * #########################################################################
- * 
- * 		UU   UU  TTTTTTT  IIIII  LL      
- * 		UU   UU    TTT     III   LL      
- * 		UU   UU    TTT     III   LL      
- * 		UU   UU    TTT     III   LL      
- * 		 UUUUU     TTT    IIIII  LLLLLLL 
- * 
- * #########################################################################
- * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=UTIL
- */
+	/**
+	 * #########################################################################
+	 * 
+	 * 		UU   UU  TTTTTTT  IIIII  LL      
+	 * 		UU   UU    TTT     III   LL      
+	 * 		UU   UU    TTT     III   LL      
+	 * 		UU   UU    TTT     III   LL      
+	 * 		 UUUUU     TTT    IIIII  LLLLLLL 
+	 * 
+	 * #########################################################################
+	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=UTIL
+	 */
 
 
 	// register example delarations tree
@@ -1113,33 +1168,38 @@ export async function activate(context: ExtensionContext) {
 		 * 	UCS arcive, qkview, or our special little archive from above
 		 * 
 		 */
-		         
-        if (!ext.mgmtClient) {
-            /**
-             * loop this back into the connect flow, since we have the device, automatically connect
-             *  - this should probably happen in the main extension.ts
-             */
-            // await commands.executeCommand('f5.connectDevice', item.label);
-            return window.showWarningMessage('Connect to BIGIP Device first');
+
+		if (!ext.mgmtClient) {
+			/**
+			 * loop this back into the connect flow, since we have the device, automatically connect
+			 *  - this should probably happen in the main extension.ts
+			 */
+			// await commands.executeCommand('f5.connectDevice', item.label);
+			return window.showWarningMessage('Connect to BIGIP Device first');
 		}
-		
+
 		const file = await getMiniUcs();
 		let expl: any = undefined;
 
 		if (file) {
 			logger.debug('Got mini_ucs -> extracting config with corkscrew');
-			
+
 			expl = await makeExplosion(file);
-			
+
 			if (expl) {
-				await cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
+				await cfgProvider.explodeConfig(expl.explosion);
+
+				// inject the config files (not included in explosion output by default)
+				// cfgProvider.bigipConfs = expl.config;
+				// inject the config object (just for looks...)
+				cfgProvider.confObj = expl.obj;
 			}
 
 			logger.debug('Deleting mini_ucs file at', file);
 
 			try {
 				// wait  couple seconds before we try to delete the mini_ucs
-				setTimeout( () => { fs.unlinkSync(file); }, 2000);
+				setTimeout(() => { fs.unlinkSync(file); }, 2000);
 			} catch (e) {
 				logger.error('Not able to delete mini_ucs at:', file);
 			}
@@ -1150,41 +1210,147 @@ export async function activate(context: ExtensionContext) {
 
 
 
+		cfgProvider.refresh();	// refresh with the new information
 	}));
 
 	/**
 	 * this command is exposed via right click in editor so user does not have to connect to F5
+	 * this flow assumes the file is local
 	 */
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore', async (item) => {
 
-		let expl;
-		if (item._fsPath) {
-			// I think this is the better way for windows?
-			logger.debug('f5.cfgExplore got _fsPath:', item._fsPath);
-			expl = await makeExplosion(item._fsPath);
-		} else if (item.path) {
-			// only path is seen when working in wsl2
-			logger.debug('f5.cfgExplore got path:', item.path);
-			expl = await makeExplosion(item.path);
+		let filePath: string;
+
+		if (!item) {
+			// no input means we need to browse for a local file
+			item = await window.showOpenDialog({
+				canSelectMany: false
+			});
+
+			// if we got a file from the showOpenDialog, it comes in an array, even though we told it to only allow single item selection -> return the single array item
+			if (Array.isArray(item)) {
+				item = item[0];
+			}
+		}
+
+		if (item?._fsPath) {
+
+			logger.info(`f5.cfgExplore _fsPath recieved:`, item._fsPath);
+			filePath = item._fsPath;
+			
+		} else if (item?.path) {
+			
+			logger.info(`f5.cfgExplore path revieved:`, item.path);
+			filePath = item.path;
+
 		} else {
+
 			return logger.error('f5.cfgExplore -> Neither path supplied was valid', JSON.stringify(item));
+
 		}
 
-		if (expl) {
-			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
-			// starting to setup the ability to have the view come into focus when excuted
-			// I believe this will require enabling experimental features, so I'm tabling
-			// 	for now
-			// cfgView.reveal('Apps', { focus: true, select: false, expand: true } );
-
-			// // cfgView.title = 'yay!!!';
-			// cfgView.description = 'descrrrrr';
-			// cfgView.message = 'messsg';
-			// cfgView.selection;
-			// cfgView.visible
+		try {
+			// test that we can access the file
+			const x = fs.statSync(filePath);
+		} catch (e) {
+			// if we couldn't get to the file, trim leading character
+			// remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
+			// filePath = filePath.replace(/^(\\|\/)/, '');
+			logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
+			filePath = filePath.substr(1);
 		}
+		
+		
+		
+		logger.info(`f5.cfgExplore: exploding config @ ${filePath}`);
+
+		await makeExplosion(filePath)
+			.then(async expl => {
+
+				if (expl.explosion) {
+					await cfgProvider.explodeConfig(expl.explosion);
+				}
+
+				if (expl.obj) {
+					// inject the config object (just for looks...)
+					cfgProvider.confObj = expl.obj;
+				}
+				cfgProvider.refresh();	// refresh with the new information
+			})
+			.catch(err => {
+				logger.error('cfgExplorer error', err);
+			});
 
 	}));
+
+
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
+		// no input means we need to browse for a local file
+		const file = await window.showOpenDialog({
+			canSelectMany: false
+		}).then(x => {
+			if (Array.isArray(x)) {
+				return x[0];
+			}
+		});
+
+		let filePath;
+
+		if (file?.fsPath) {
+
+			logger.info(`f5.cfgExploreRawCorkscrew _fsPath recieved:`, file.fsPath);
+			filePath = file.fsPath;
+			
+		} else if (file?.path) {
+			
+			logger.info(`f5.cfgExploreRawCorkscrew path revieved:`, file.path);
+			filePath = file.path;
+
+		} else {
+
+			return logger.error('f5.cfgExploreRawCorkscrew -> Neither path supplied was valid', JSON.stringify(file));
+
+		}
+
+		try {
+			// test that we can access the file
+			const x = fs.statSync(filePath);
+		} catch (e) {
+			// if we couldn't get to the file, trim leading character
+			// remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
+			// filePath = filePath.replace(/^(\\|\/)/, '');
+			logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
+			filePath = filePath.substr(1);
+		}
+
+		if (filePath) {
+			try {
+				const read = fs.readFileSync(filePath, 'utf-8');
+				// parse json
+				const read2 = JSON.parse(read);
+				await cfgProvider.explodeConfig(read2);
+			} catch (e) {
+				logger.error('cfgExploreRawCorkscrew import failed', e);
+			}
+		}
+
+		cfgProvider.refresh();	// refresh with the new information
+	}));
+
+
+
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreReveal', async (text) => {
+		// await new Promise(resolve => { setTimeout(resolve, 2000); });
+		if (cfgProvider.viewElement) {
+			cfgView.reveal(cfgProvider.viewElement, {
+				select: true,
+				focus: true,
+				expand: true
+			});
+		}
+	}));
+
+
 
 	context.subscriptions.push(commands.registerCommand('f5.cfgExploreClear', async (text) => {
 		cfgProvider.clear();
@@ -1201,7 +1367,7 @@ export async function activate(context: ExtensionContext) {
 		if (Array.isArray(x) && x.length > 1) {
 			// got multi-select array, push all necessary details to a single object
 
-			x.forEach( (el) => {
+			x.forEach((el) => {
 				const y = el.command?.arguments;
 				if (y) {
 					full.push(y[0].join('\n'));
@@ -1210,8 +1376,8 @@ export async function activate(context: ExtensionContext) {
 			});
 			text = full;
 
-		// } else if (Array.isArray(x) && x.length === 1) {
-		// 	return window.showWarningMessage('Select multiple apps with "Control" key');
+			// } else if (Array.isArray(x) && x.length === 1) {
+			// 	return window.showWarningMessage('Select multiple apps with "Control" key');
 		} else if (typeof text === 'string') {
 			// just text, convert to single array with render
 			text = [text];
@@ -1222,7 +1388,7 @@ export async function activate(context: ExtensionContext) {
 		cfgProvider.render(text);
 	}));
 
-	
+
 	// /**
 	//  * 
 	//  * 
@@ -1237,24 +1403,24 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.jsonYmlConvert', async () => {
 		const editor = window.activeTextEditor;
-		if(!editor) {
+		if (!editor) {
 			return;
 		}
-		const selection = editor.selection;	
+		const selection = editor.selection;
 		const text = editor.document.getText(editor.selection);	// highlighted text
 
-		
+
 		let newText: string;
 		if (utils.isValidJson(text)) {
 			logger.debug('converting json -> yaml');
 			// since it was valid json -> dump it to yaml
-			newText = jsYaml.safeDump(JSON.parse(text), {indent: 4});
+			newText = jsYaml.safeDump(JSON.parse(text), { indent: 4 });
 		} else {
 			logger.debug('converting yaml -> json');
 			newText = JSON.stringify(jsYaml.safeLoad(text), undefined, 4);
 		}
 
-		editor.edit( editBuilder => {
+		editor.edit(editBuilder => {
 			editBuilder.replace(selection, newText);
 		});
 	}));
@@ -1282,12 +1448,12 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.b64Encode', () => {
 		const editor = window.activeTextEditor;
-		if(!editor){
+		if (!editor) {
 			return;
 		}
 		const text = editor.document.getText(editor.selection);	// highlighted text
 		const encoded = Buffer.from(text).toString('base64');
-		editor.edit( editBuilder => {
+		editor.edit(editBuilder => {
 			editBuilder.replace(editor.selection, encoded);
 		});
 	}));
@@ -1295,12 +1461,12 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.b64Decode', () => {
 		const editor = window.activeTextEditor;
-		if(!editor){
+		if (!editor) {
 			return;
 		}
 		const text = editor.document.getText(editor.selection);	// highlighted text
 		const decoded = Buffer.from(text, 'base64').toString('ascii');
-		editor.edit( editBuilder => {
+		editor.edit(editBuilder => {
 			editBuilder.replace(editor.selection, decoded);
 		});
 	}));
@@ -1316,11 +1482,11 @@ export async function activate(context: ExtensionContext) {
 		const editor = window.activeTextEditor;
 		let resp;
 
-		if(editor){
+		if (editor) {
 			var text: any = editor.document.getText(editor.selection);	// highlighted text
 
 			// see if it's json or yaml or string
-			if(utils.isValidJson(text)) {
+			if (utils.isValidJson(text)) {
 
 				logger.debug('JSON detected -> parsing');
 				text = JSON.parse(text);
@@ -1328,17 +1494,17 @@ export async function activate(context: ExtensionContext) {
 			} else {
 
 				logger.debug('NOT JSON');
-				
-				if(text.includes('url:')) {
+
+				if (text.includes('url:')) {
 					// if yaml should have url: param
 					logger.debug('yaml with url: param -> parsing raw to JSON', JSON.stringify(text));
 					text = jsYaml.safeLoad(text);
-					
+
 				} else {
 					// not yaml
 					logger.debug('http with OUT url param -> converting to json');
 					// trim line breaks
-					text = text.replace(/(\r\n|\n|\r)/gm,"");
+					text = text.replace(/(\r\n|\n|\r)/gm, "");
 					text = { url: text };
 				}
 			}
@@ -1348,7 +1514,7 @@ export async function activate(context: ExtensionContext) {
 			 * 	depending on the parameters, it's an F5 call, or an external call
 			 */
 
-			if(text.url.includes('http')) {
+			if (text.url.includes('http')) {
 
 				resp = await window.withProgress({
 					location: ProgressLocation.Notification,
@@ -1360,14 +1526,14 @@ export async function activate(context: ExtensionContext) {
 						logger.debug("User canceled External API Request");
 						return new Error(`User canceled External API Request`);
 					});
-					
+
 					//external call
 					logger.debug('external call -> ', JSON.stringify(text));
 					return await extAPI.makeRequest(text);
 				});
-				
+
 			} else {
-				
+
 				resp = await window.withProgress({
 					location: ProgressLocation.Notification,
 					title: `Making API Request`,
@@ -1380,11 +1546,11 @@ export async function activate(context: ExtensionContext) {
 					});
 
 					// f5 device call
-					if(!ext.mgmtClient) {
+					if (!ext.mgmtClient) {
 						// connect to f5 if not already connected
 						await commands.executeCommand('f5.connectDevice');
 					}
-				
+
 					logger.debug('device call -> ', JSON.stringify(text));
 					return await ext.mgmtClient?.makeRequest(text.url, {
 						method: text.method,
@@ -1393,7 +1559,7 @@ export async function activate(context: ExtensionContext) {
 				});
 			}
 
-			if(resp) {
+			if (resp) {
 				ext.panel.render(resp);
 			}
 		}
@@ -1404,8 +1570,8 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5.remoteCommand', async () => {
 
 		const cmd = await window.showInputBox({ placeHolder: 'Bash Command to Execute?', ignoreFocusOut: true });
-		
-		if ( cmd === undefined ) {
+
+		if (cmd === undefined) {
 			// maybe just showInformationMessage and exit instead of error?
 			throw new Error('Remote Command inputBox cancelled');
 		}
@@ -1419,7 +1585,7 @@ export async function activate(context: ExtensionContext) {
 		});
 
 		ext.panel.render(resp.data.commandResult);
-	}));	
+	}));
 
 
 
@@ -1429,7 +1595,7 @@ export async function activate(context: ExtensionContext) {
 		const newEditorColumn = ext.settings.previewColumn;
 		const wndw = window.visibleTextEditors;
 		let viewColumn: ViewColumn | undefined;
-		
+
 		wndw.forEach(el => {
 			// const el1 = element;
 			if (el.document.fileName === 'chuck-joke.json') {
@@ -1437,11 +1603,11 @@ export async function activate(context: ExtensionContext) {
 				viewColumn = el.viewColumn;
 			}
 		});
-		
-		
-		const resp: any = await extAPI.makeRequest({url: 'https://api.chucknorris.io/jokes/random'});
+
+
+		const resp: any = await extAPI.makeRequest({ url: 'https://api.chucknorris.io/jokes/random' });
 		// let activeColumn = window.activeTextEditor?.viewColumn;
-		
+
 		logger.debug('chuck-joke->resp.data', resp.data);
 
 		const content = JSON.stringify(resp.data, undefined, 4);
@@ -1451,15 +1617,15 @@ export async function activate(context: ExtensionContext) {
 
 		var vDoc: Uri = Uri.parse("untitled:" + "chuck-Joke.json");
 		workspace.openTextDocument(vDoc)
-		.then((a: TextDocument) => {
-			window.showTextDocument(a, viewColumn, false).then(e => {
-				e.edit(edit => {
-					const startPosition = new Position(0, 0);
-					const endPosition = a.lineAt(a.lineCount - 1).range.end;
-					edit.replace(new Range(startPosition, endPosition), content);
+			.then((a: TextDocument) => {
+				window.showTextDocument(a, viewColumn, false).then(e => {
+					e.edit(edit => {
+						const startPosition = new Position(0, 0);
+						const endPosition = a.lineAt(a.lineCount - 1).range.end;
+						edit.replace(new Range(startPosition, endPosition), content);
+					});
 				});
 			});
-		});
 
 
 		// chuckJoke1();
@@ -1473,4 +1639,4 @@ export async function activate(context: ExtensionContext) {
 
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
