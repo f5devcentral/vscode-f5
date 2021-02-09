@@ -1,4 +1,5 @@
 
+
 # Make HTTP/S Request documentation and examples
 
 This function provides the necessary flexbility to make any API call to ANYthing
@@ -12,26 +13,31 @@ Highlight text, right-click, select: `Make HTTPS Request`
 This assumes the request is intented for the currently connected device, of which host details are already known.
 
 K13225405: Common iControl REST API command examples
-- https://support.f5.com/csp/article/K13225405
+
+- <https://support.f5.com/csp/article/K13225405>
 
 How to use postman api for external tests like post
-- https://docs.postman-echo.com/?version=latest
+
+- <https://docs.postman-echo.com/?version=latest>
 
 
 >The underlying HTTP client is AXIOS, so most AXIOS parameters should work
-https://www.npmjs.com/package/axios
+<https://www.npmjs.com/package/axios>
 
 ### simple url as string
+
 ```url
 /mgmt/tm/sys/clock
 ```
 
 ### simple url in yaml format
+
 ```yaml
 url: /mgmt/tm/sys/clock
 ```
 
 ### simple url in json format
+
 ```json
 {
   "url": "/mgmt/tm/sys/clock"
@@ -39,11 +45,13 @@ url: /mgmt/tm/sys/clock
 ```
 
 ### list vlans
+
 ```yaml
 /mgmt/tm/net/vlan/
 ```
 
 ### list nodes
+
 ```yaml
 /mgmt/tm/ltm/node
 ```
@@ -51,6 +59,7 @@ url: /mgmt/tm/sys/clock
 
 
 ### url post in yaml
+
 ```yaml
 url: /mgmt/shared/authn/login
 method: POST
@@ -60,6 +69,7 @@ body:
 ```
 
 ### url post in yaml
+
 ```yaml
 url: /mgmt/tm/sys/config
 method: POST
@@ -68,16 +78,19 @@ body:
 ```
 
 ### list sys options
+
 ```yaml
 /mgmt/tm/sys/
 ```
 
 ### list sys ucs
-```
+
+```yaml
 /mgmt/tm/sys/ucs/
 ```
 
 ### url post in json
+
 ```json
 {
     "url": "/mgmt/shared/authn/login",
@@ -90,6 +103,7 @@ body:
 ```
 
 ### tmsh save sys config (all partitions)
+
 > <POST> /mgmt/tm/sys/config  -d '{"command":"save","partition":"all"}'
 
 ```yaml
@@ -113,21 +127,25 @@ Default HTTP method = GET
 data, or body, must also include 'POST' HTTP method
 
 ### Simple get
-```
+
+```yaml
 https://api.chucknorris.io/jokes/random
 ```
 
 ### simple get in yaml
+
 ```yaml
 url: https://api.chucknorris.io/jokes/random
 ```
 
 ### simple get in yaml - shows broken destination
+
 ```yaml
 url: https://broken.extra.io/whah
 ```
 
 ### simple POST in yaml
+
 ```yaml
 url: 'https://postman-echo.com/post'
 method: POST
@@ -136,6 +154,7 @@ data:
 ```
 
 ### simple POST in json
+
 ```json
 {
     "url": "https://postman-echo.com/post",
@@ -148,6 +167,7 @@ data:
 
 
 ### raw get to external F5 using basic auth - DEV
+
 ```json
 {
   "url": "https://192.168.200.131/mgmt/tm/sys/ntp",
@@ -162,6 +182,7 @@ data:
 
 
 ### raw get to external F5 using basic auth - DEV
+
 ```json
 {
   "url": "https://192.168.200.131/mgmt/tm/sys/ntp",
@@ -175,6 +196,7 @@ data:
 
 
 ### get f5 auth token
+
 ```json
 {
   "url": "https://10.200.244.110:8443/mgmt/shared/authn/login",
@@ -188,6 +210,7 @@ data:
 
 
 ### get f5 auth token
+
 ```yaml
 url: 'https://10.200.244.110:8443/mgmt/tm/auth/source'
 headers:

@@ -1,5 +1,13 @@
+/*
+ * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
+ * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
+ * may copy and modify this software product for its internal business purposes.
+ * Further, Licensee may upload, publish and distribute the modified version of
+ * the software product on devcentral.f5.com.
+ */
 
 'use strict';
+
 import * as vscode from 'vscode';
 import { request } from 'https';
 var https = require('https');
@@ -62,21 +70,21 @@ export async function makeAuth(
         loginProviderName: string
     }) {
 
-        // logger.debug('AUTH-DETAILS:', hostPort, JSON.stringify(data));
-        const resp = await axios.request({
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            baseURL: `https://${hostPort}`,
-            url: '/mgmt/shared/authn/login',
-            data,
-            // validateStatus: () => true  // return ALL responses
-        })
-        .then( resp => {
+    // logger.debug('AUTH-DETAILS:', hostPort, JSON.stringify(data));
+    const resp = await axios.request({
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        baseURL: `https://${hostPort}`,
+        url: '/mgmt/shared/authn/login',
+        data,
+        // validateStatus: () => true  // return ALL responses
+    })
+        .then(resp => {
             return resp;
         })
         .catch(function (error) {
@@ -92,7 +100,7 @@ export async function makeAuth(
                 const message = error.response.data.message;
 
                 // if user/pass failed - clear cached password
-                if(message === "Authentication failed.") {
+                if (message === "Authentication failed.") {
                     console.error('401 - makeAuth failed!!!!!!  +++ clearning cached password +++');
                     vscode.window.showErrorMessage('Authentication Failed - clearing password');
                     // clear cached password and disconnect
@@ -102,17 +110,17 @@ export async function makeAuth(
                     //      and all it's functionality moved to the mgmtClient.disconnect function
                     //      so everything uses the same end to end flow
                     ext.mgmtClient?.disconnect();
-                } 
+                }
 
                 vscode.window.showErrorMessage(`HTTP Auth FAILURE: ${status} - ${message}`);
                 console.error(`HTTP Auth FAILURE: ${status} - ${message} - ${JSON.stringify(error.response.data)}`);
                 throw new Error(`HTTP Auth FAILURE: ${status} - ${message}`);
-            // } else if (error.request) {
-            //   // The request was made but no response was received
-            //   // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            //   // http.ClientRequest in node.js
-            //   logger.debug('AuthHttpErrorRequest', error.request);
-            } else if (error.code && error.message){
+                // } else if (error.request) {
+                //   // The request was made but no response was received
+                //   // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                //   // http.ClientRequest in node.js
+                //   logger.debug('AuthHttpErrorRequest', error.request);
+            } else if (error.code && error.message) {
                 // console.error('HTTP-response-error:', error);
                 console.error(`HTTP-response-error: ${error.code} - ${error.message}`);
                 vscode.window.showErrorMessage(`${error.code} - ${error.message}`);
@@ -121,10 +129,10 @@ export async function makeAuth(
                 console.error('AuthHttpError', error.message);
             }
             // console.error('AuthHttpConfigError',error.config);
-            console.error('AuthHttpFULLError',error);
+            console.error('AuthHttpFULLError', error);
         });
-        return resp;
-    }
+    return resp;
+}
 
 
 /**
@@ -136,7 +144,7 @@ export async function makeAuth(
  * @param options http options (method, port, body, headers, basicAuth)
  */
 export async function makeReqAXnew(host: string, uri: string, options: {
-    method?: any; 
+    method?: any;
     port?: number;
     body?: object;
     headers?: object;
@@ -152,7 +160,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
     /**
      * todo:  move some of the parameter assignments above so they can be logged before execution
      *  like http/method, base/url
-     */ 
+     */
 
     const httpResponse: any = await axios.request({
         httpsAgent: new https.Agent({
@@ -170,62 +178,62 @@ export async function makeReqAXnew(host: string, uri: string, options: {
         // validateStatus: null
         validateStatus: () => true  // return ALL responses
     })
-    .then( resp => {
-        // the following log may cause some problems, mainly the resp.data,
-        //      if it's circular...
-        logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
-        // logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
-        return {
-            data: resp.data,
-            headers: resp.headers,
-            status: resp.status,
-            statusText: resp.statusText,
-            request: {
-                url: resp.config.url,
-                method: resp.request.method,
-                headers: resp.request._headers,
-                protocol: resp.config.httpsAgent.protocol,
-                data: resp.data
-            }
-        };
-        // return resp;
-    })
-    .catch( error => {
-        if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            // logger.debug('AX-HTTP-error.response', error.response.data);
-            // logger.debug('AX-HTTP-error.status', error.response.status);
-            // logger.debug('AX-HTTP-error.headers', error.response.headers);
+        .then(resp => {
+            // the following log may cause some problems, mainly the resp.data,
+            //      if it's circular...
+            logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
+            // logger.debug(`makeReqAXnew-RESPONSE: ${resp.status} - ${resp.statusText}`);
+            return {
+                data: resp.data,
+                headers: resp.headers,
+                status: resp.status,
+                statusText: resp.statusText,
+                request: {
+                    url: resp.config.url,
+                    method: resp.request.method,
+                    headers: resp.request._headers,
+                    protocol: resp.config.httpsAgent.protocol,
+                    data: resp.data
+                }
+            };
+            // return resp;
+        })
+        .catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                // logger.debug('AX-HTTP-error.response', error.response.data);
+                // logger.debug('AX-HTTP-error.status', error.response.status);
+                // logger.debug('AX-HTTP-error.headers', error.response.headers);
 
-            const status = error.response.status;
-            const message = error.response.data?.message;
+                const status = error.response.status;
+                const message = error.response.data?.message;
 
-            // if user/pass failed - clear cached password
-            if(message === "Authentication failed.") {
-                console.error('401 - makeReqAXnew auth failed!!!!!!  +++ clearning cached password +++');
-                vscode.window.showErrorMessage('Authentication Failed - clearing password');
-                // clear cached password and disconnect
-                // ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
-                ext.mgmtClient?.clearPassword();
-                // todo: this should probably call the main extension disconnect command
-                //      and all it's functionality moved to the mgmtClient.disconnect function
-                //      so everything uses the same end to end flow
-                ext.mgmtClient?.disconnect();
-            } 
+                // if user/pass failed - clear cached password
+                if (message === "Authentication failed.") {
+                    console.error('401 - makeReqAXnew auth failed!!!!!!  +++ clearning cached password +++');
+                    vscode.window.showErrorMessage('Authentication Failed - clearing password');
+                    // clear cached password and disconnect
+                    // ext.keyTar.deletePassword('f5Hosts', `${data.username}@${hostPort}`);
+                    ext.mgmtClient?.clearPassword();
+                    // todo: this should probably call the main extension disconnect command
+                    //      and all it's functionality moved to the mgmtClient.disconnect function
+                    //      so everything uses the same end to end flow
+                    ext.mgmtClient?.disconnect();
+                }
 
 
-            vscode.window.showErrorMessage(`AX-HTTP FAILURE: ${status} - ${message}`);
-            console.error(`AX-HTTP FAILURE: ${status} - ${message} - ${JSON.stringify(error.response.data)}`);
-            // throw new Error(`AX-HTTP FAILURE: ${status} - ${message}`);
+                vscode.window.showErrorMessage(`AX-HTTP FAILURE: ${status} - ${message}`);
+                console.error(`AX-HTTP FAILURE: ${status} - ${message} - ${JSON.stringify(error.response.data)}`);
+                // throw new Error(`AX-HTTP FAILURE: ${status} - ${message}`);
 
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            vscode.window.showErrorMessage(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
-            console.error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
-            // throw new Error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                vscode.window.showErrorMessage(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
+                console.error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
+                // throw new Error(`AX-HTTP-error.request: ${JSON.stringify(error.request)}`);
             } else {
                 // Something happened in setting up the request that triggered an Error
                 console.error('AX-HTTP-Setup-Error', error.message);
@@ -244,7 +252,7 @@ export async function makeReqAXnew(host: string, uri: string, options: {
                     data: error.resp.data
                 }
             };
-    });
+        });
     return httpResponse;
 };
 
@@ -330,15 +338,15 @@ export async function multiPartUploadSDK(file: string, host: string, port: numbe
     // const fileName = file.split('/')[file.split('/').length - 1];
     const fileName2 = path.parse(file).base;
     // const fileNameS = 'fastTempUpload.zip';
-    
+
     const fileStats = fs.statSync(file);
     const chunkSize = 1024 * 1024;
     let start = 0;
-    let end = Math.min(chunkSize, fileStats.size-1);
+    let end = Math.min(chunkSize, fileStats.size - 1);
     let uploadStat;
     while (end <= fileStats.size - 1 && start < end) {
 
-        uploadStat = await makeReqAXnew( host, `/mgmt/shared/file-transfer/uploads/${fileName2}`, 
+        uploadStat = await makeReqAXnew(host, `/mgmt/shared/file-transfer/uploads/${fileName2}`,
             {
                 method: 'POST',
                 port,
@@ -362,7 +370,7 @@ export async function multiPartUploadSDK(file: string, host: string, port: numbe
             end = fileStats.size;
         }
         // logger.debug('upload stat in loop', uploadStat);
-        
+
     }
     // logger.debug('upload stat done', uploadStat);
     return uploadStat;
@@ -414,9 +422,56 @@ export async function downloadToFile(url: string, file: string): Promise<void> {
             url,
             responseType: 'stream'
         })
-        .then(function (response) {
-            response.data.pipe(fs.createWriteStream(file))
-                .on('finish', resolve);
-        });
+            .then(function (response) {
+                response.data.pipe(fs.createWriteStream(file))
+                    .on('finish', resolve);
+            });
+    }));
+}
+
+
+
+/**
+ * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
+ * 
+ * Download HTTP payload to file
+ *
+ * @param url  url
+ * @param file local file location where the downloaded contents should go
+ *
+ * @returns void
+ */
+export async function downloadToFileNew(url: string, file: string): Promise<any> {
+
+    const writable = fs.createWriteStream(file);
+
+    return await new Promise(((resolve, reject) => {
+        axios({
+            url,
+            responseType: 'stream'
+        })
+            .then(function (resp) {
+                resp.data.pipe(writable)
+                    .on('finish', () => {
+
+                        // over-write response data
+                        resp.data = {
+                            file: writable.path,
+                            bytes: writable.bytesWritten
+                        };
+
+                        logger.info('external downloader', {
+                            message: 'download complete',
+                            data: resp.data
+                        });
+
+                        return resolve(resp);
+                    });
+            })
+            .catch(err => {
+                // look at adding more failure details, like,
+                // was it tcp, dns, dest url problem, write file problem, ...
+                return reject(err);
+            });
     }));
 }

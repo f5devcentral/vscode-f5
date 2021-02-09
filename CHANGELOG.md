@@ -1,3 +1,6 @@
+
+
+
 # Change Log
 
 [BACK TO MAIN README](README.md)
@@ -5,6 +8,18 @@
 All notable changes to the "vscode-f5" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file
+
+---
+
+## [2.10.7] - (02-09-2021)
+
+### Modified
+
+- re-apply latest corkscrew update
+  - data-group from irule extraction was missing
+- documentation updates
+  - AS3->FAST YAML
+- change extension version command enhancements
 
 ---
 
