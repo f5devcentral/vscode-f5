@@ -8,6 +8,15 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [2.10.7] - (02-09-2021)
+
+### Modified
+
+- re-apply latest corkscrew update
+  - data-group from irule extraction was missing
+
+---
+
 ## [2.10.6] - (02-02-2021)
 
 ### Added

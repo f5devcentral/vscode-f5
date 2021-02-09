@@ -1,6 +1,8 @@
+
+
 # Schama Validation
 
-<p>&nbsp;</p>
+<!-- <p>&nbsp;</p> -->
 
 One of the primary uses of this tool is to provide schema validation of the ATC declaration during the authoring process.  Understanding and having constant feedback about the declaration and it's content during development can drastically improve the expereince.
 
