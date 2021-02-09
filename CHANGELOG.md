@@ -17,6 +17,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - re-apply latest corkscrew update
   - data-group from irule extraction was missing
+- documentation updates
+  - AS3->FAST YAML
+- change extension version command enhancements
 
 ---
 
