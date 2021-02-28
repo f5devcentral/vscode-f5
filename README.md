@@ -49,17 +49,17 @@ Then install the extension following the steps below:
 
 Select the extensions view 
 
-<img src="./docs/media/vscode_extensions_icon.PNG" alt="drawing" width="5%"/>
+<img src="./images/vscode_extensions_icon.PNG" alt="drawing" width="5%"/>
 
 Search for `F5`, select the extension "The F5 Extension", then `Install`
 
-<img src="./docs/media/installWithinCode_11.04.2020.gif" alt="drawing" width="80%"/>
+<img src="./images/installWithinCode_11.04.2020.gif" alt="drawing" width="80%"/>
 
 ## Create a device and connect
 
 Select `Add Host` in the `F5: Hosts` view.  Then type in device details in the \<user\>@x.x.x.x format, hit `Enter` to submit
 
-<img src="./docs/media/addDeviceConnect_11.04.2020.gif" alt="drawing" width="80%"/>
+<img src="./images/addDeviceConnect_11.04.2020.gif" alt="drawing" width="80%"/>
 
 ## Deploy example as3 app
 
@@ -79,7 +79,7 @@ Right-click in the editor and select `POST as AS3 Declaration`.  This should pos
 
 !> Please be sure to have the AS3 service installed prior.  See [ATC RPM Mgmt](atc_rpm_mgmt.md) for assistance with getting a service installed
 
-<img src="./docs/media/as3SnippetDemo_11.04.2020.gif" alt="drawing" width="80%"/>
+<img src="./images/as3SnippetDemo_11.04.2020.gif" alt="drawing" width="80%"/>
 
 
 
