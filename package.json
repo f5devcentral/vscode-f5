@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "2.10.7",
+	"version": "3.0.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -389,7 +389,13 @@
 				"command": "f5.unInstallRPM",
 				"title": "Un-Install RPM",
 				"category": "F5",
-				"enablement": "f5.device"
+				"enablement": "f5.device && viewItem == atcService"
+			},
+			{
+				"command": "f5.createUCS",
+				"title": "Create UCS",
+				"category": "F5",
+				"enablement": "f5.device && viewItem == ucsHeader"
 			},
 			{
 				"command": "f5.refreshHostsTree",
@@ -940,6 +946,16 @@
 					"group": "inline"
 				},
 				{
+					"command": "f5.unInstallRPM",
+					"when": "view == f5Hosts && viewItem == atcService",
+					"group": "inline"
+				},
+				{
+					"command": "f5.createUCS",
+					"when": "view == f5Hosts && viewItem == ucsHeader",
+					"group": "inline"
+				},
+				{
 					"command": "f5.editHost",
 					"when": "view == f5Hosts && viewItem == f5Host"
 				},
@@ -1044,7 +1060,8 @@
 		"@types/js-yaml": "^3.12.6",
 		"axios": "^0.21.1",
 		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git",
-		"js-yaml": "^3.14.1",
+		"f5-conx-core": "file:../f5-conx-core",
+    "js-yaml": "^3.14.1",
 		"keytar": "^6.0.1"
 	}
 }

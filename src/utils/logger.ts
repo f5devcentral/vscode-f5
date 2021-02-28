@@ -85,22 +85,22 @@ export class Log {
      * @param msg 
      */
     debug(...msg: [unknown, ...unknown[]]): void {
-        this.write('DEBUG', ...msg);
+        this.log('DEBUG', ...msg);
     }
 
     info(...msg: [unknown, ...unknown[]]): void {
-        this.write('INFO', ...msg);
+        this.log('INFO', ...msg);
     }
 
     warn(...msg: [unknown, ...unknown[]]): void {
-        this.write('WARN', ...msg);
+        this.log('WARN', ...msg);
     }
 
     error(...msg: [unknown, ...unknown[]]): void {
-        this.write('ERROR', ...msg);
+        this.log('ERROR', ...msg);
     }
 
-    write(label: string, ...messageParts: unknown[]): void {
+    log(label: string, ...messageParts: unknown[]): void {
         const message = messageParts.map(this.stringify).join(' ');
         // const dateTime = new Date().toLocaleString();
         // const dateTime = new Date();

@@ -4,7 +4,7 @@
 
 If you consistently use APIs while working with F5s, the F5 VSCode Extension needs to be a permanent addition to your toolkit!
 
-The F5 VSCode Extension will not only only supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, but also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
+The F5 VSCode Extension will not only supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, but also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
 
 If you are not excited yet, the extension can also:
 

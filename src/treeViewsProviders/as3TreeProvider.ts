@@ -14,6 +14,8 @@ import logger from '../utils/logger';
 
 export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
+export class AS3TreeProvider implements TreeDataProvider<AS3item> {
+
 	private _onDidChangeTreeData: EventEmitter<AS3item | undefined> = new EventEmitter<AS3item | undefined>();
 	readonly onDidChangeTreeData: Event<AS3item | undefined> = this._onDidChangeTreeData.event;
 
@@ -28,6 +30,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 	declare: AdcDeclaration[] = [];
 
 	targets: boolean = false;
+
 
 	private _tasks: string[] = [];
 
@@ -241,6 +244,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 							{ command: 'f5-as3.getTask', title: '', arguments: [task.iId] });
 					});
 
+
 				}
 
 			} else {
@@ -275,11 +279,14 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				treeItems.push(
 					new AS3item('Tasks', taskCount, 'Get All Tasks', '', TreeItemCollapsibleState.Collapsed,
 						{ command: 'f5-as3.getTask', title: '', arguments: [this._tasks] })
+
 				);
 			}
 		}
 		return Promise.resolve(treeItems);
 	}
+
+
 
 	private async getTenants() {
 
@@ -332,6 +339,7 @@ export async function targetDecsBool(declare: AdcDeclaration | AdcDeclaration[])
 		return true;
 	} else {
 		return false;
+
 	}
 }
 
@@ -505,8 +513,6 @@ export function sortTreeItems(treeItems: AS3item[]) {
 export function isObject(x: any): boolean {
 	return ( x !== null && typeof x === 'object' ? true : false);
 };
-
-
 
 
 class AS3item extends TreeItem {

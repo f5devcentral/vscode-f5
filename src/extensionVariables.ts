@@ -3,13 +3,26 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import * as path from 'path';
+import * as fs from 'fs';
 import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands, TextDocument } from "vscode";
 import * as keyTarType from "keytar";
-import { MgmtClient } from './utils/f5DeviceClient';
+// import { MgmtClient } from './utils/f5DeviceClient.ts.old';
 import logger from "./utils/logger";
 import { TextDocumentView } from './editorViews/editorView';
 
+import { F5Client } from "./f5Client";
+import { ExtHttp } from 'f5-conx-core';
+
 type KeyTar = typeof keyTarType;
+
+// export interface f5Context extends ExtensionContext {
+//     tmpDir: typeof path,
+
+// }
+
+
+// path.join(ext.context.extensionPath, 'cache')
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -17,29 +30,32 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
-    export let mgmtClient: MgmtClient | undefined;
+    // export let mgmtClient: MgmtClient | undefined;
+    export let f5Client: F5Client | undefined;
+    export let extHttp: ExtHttp;
     export let keyTar: KeyTar;
-    export let hostStatusBar: StatusBarItem;
-    export let hostNameBar: StatusBarItem;
-    export let as3Bar: StatusBarItem;
-    export let fastBar: StatusBarItem;
-    export let doBar: StatusBarItem;
-    export let tsBar: StatusBarItem;
+    // export let hostStatusBar: StatusBarItem;
+    // export let hostNameBar: StatusBarItem;
+    // export let as3Bar: StatusBarItem;
+    // export let fastBar: StatusBarItem;
+    // export let doBar: StatusBarItem;
+    // export let tsBar: StatusBarItem;
     export let connectBar: StatusBarItem;
-    export let iRulesAble: boolean = false;
-    export let as3AsyncPost: boolean | undefined;
+    // export let iRulesAble: boolean = false;
+    // export let as3AsyncPost: boolean | undefined;
     export let panel: TextDocumentView;
-    export let tsExampleView: object | undefined;
+    // export let tsExampleView: object | undefined;
+    export let cacheDir: string;
     
     export namespace settings {
         export let as3PostAsync: boolean;
         export let asyncInterval: number;
-        export let irulesEnabled: boolean;
+        // export let irulesEnabled: boolean;
         export let timeoutInMilliseconds: number;
 
         export let previewColumn: ViewColumn;
         export let httpResponseDetails: string;
-        export let enableWebViews: boolean;
+        // export let enableWebViews: boolean;
         export let preserveEditorFocus: boolean;
         export let newEditorTabForAll: boolean;
 
@@ -54,28 +70,53 @@ workspace.onDidChangeConfiguration( () => {
 
 export async function loadConfig() {
     logger.debug('loading configuration for ext.settings!!!');
-    ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
-    ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
+    // ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
+    // ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
     // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.tcl', false);
     ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
-
-
+    
     ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.newEditorColumn', 'two'));
     ext.settings.httpResponseDetails = workspace.getConfiguration().get<string>("f5.httpResponseDetails", "full");
-    ext.settings.enableWebViews = workspace.getConfiguration().get('f5.enableWebViews', false);
+    // ext.settings.enableWebViews = workspace.getConfiguration().get('f5.enableWebViews', false);
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
     
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
+    
+    // todo: setup settings for external http proxy - should probably set environment vars
+    
+    
+    ext.cacheDir = path.join(ext.context.extensionPath, 'cache');
+    process.env.F5_CONX_CORE_EXT_HTTP_AGENT = 'The F5 VScode Extension';
+    process.env.F5_CONX_CORE_CACHE = ext.cacheDir;
+    
+
+    ext.extHttp = new ExtHttp();
+    ext.extHttp.cacheDir = ext.cacheDir;
+    ext.extHttp.events.on('log-debug', msg => logger.debug(msg));
+    ext.extHttp.events.on('log-info', msg => logger.info(msg));
+    ext.extHttp.events.on('log-warn', msg => logger.warn(msg));
+    ext.extHttp.events.on('log-error', msg => logger.error(msg));
+
+    // // irule view stuff
+    // // need to 
+    // ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', true);
+    // if(ext.settings.irulesEnabled && ext.iRulesAble){
+    //     commands.executeCommand('setContext', 'f5.tcl', true);
+    // } else {
+    //     commands.executeCommand('setContext', 'f5.tcl', false);
+    // }
 
 
-    // irule view stuff - in progress
-    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', true);
-    if(ext.settings.irulesEnabled && ext.iRulesAble){
-        commands.executeCommand('setContext', 'f5.tcl', true);
-    } else {
-        commands.executeCommand('setContext', 'f5.tcl', false);
-    }
+
+
+    if (!fs.existsSync(ext.cacheDir)) {
+        logger.debug('CREATING CACHE DIRECTORY');
+        // ext.cacheDir = cacheDir;
+        fs.mkdirSync(ext.cacheDir);
+    } else { 
+        logger.debug(`existing cache directory detected: ${ext.cacheDir}`);
+    };
 }
 
 
@@ -102,6 +143,8 @@ function parseColumn(value: string): ViewColumn {
             return ViewColumn.Beside;
     }
 }
+
+
 
 
 /*

@@ -92,14 +92,14 @@ export async function zipPostTemplate (doc: string) {
         progress.report({ message: `Uploading Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
-        const uploadStatus = await ext.mgmtClient?.upload(zipOut);
+        const uploadStatus = await ext.f5Client?.upload(zipOut, 'FILE');
 
         progress.report({ message: `Installing Template`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
-        const importStatus = await ext.mgmtClient?.makeRequest('/mgmt/shared/fast/templatesets', {
+        const importStatus = await ext.f5Client?.https('/mgmt/shared/fast/templatesets', {
             method: 'POST',
-            body: {
+            data: {
                 name: fastTemplateFolderName
             }
         });
@@ -169,14 +169,14 @@ export async function zipPostTempSet (folder: string) {
         //f5-sdk-js version
         progress.report({ message: `Uploading Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
-        const uploadStatus = await ext.mgmtClient?.upload(zipOut);
+        const uploadStatus = await ext.f5Client?.upload(zipOut, 'FILE');
         
         progress.report({ message: `Installing Template set`});
         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
-        const importStatus: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/fast/templatesets', {
+        const importStatus: any = await ext.f5Client?.https('/mgmt/shared/fast/templatesets', {
             method: 'POST',
-            body: {
+            data: {
                 name: parsedFolder.base
             }
         });

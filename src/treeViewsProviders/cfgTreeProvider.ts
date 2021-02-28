@@ -67,6 +67,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         }
 
 		var treeItems: CfgApp[] = [];
+
 		if(element) {
             
             if (element.label === 'Apps') {

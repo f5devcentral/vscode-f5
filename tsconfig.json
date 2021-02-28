@@ -1,9 +1,10 @@
 {
 	"compilerOptions": {
-        "experimentalDecorators": true,
+		"target": "es6",
 		"module": "commonjs",
 		"allowJs": false,
-		"target": "es6",
+		"experimentalDecorators": true,
+		"esModuleInterop": true,
 		"outDir": "out",
 		"lib": [
 			"es6",
@@ -12,15 +13,19 @@
 		"sourceMap": true,
 		"resolveJsonModule": true,
 		"rootDir": "src",
-		"strict": true   /* enable all strict type-checking options */
+		"strict": true, /* enable all strict type-checking options */
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
+		// "alwaysStrict": false,
+		// "noImplicitUseStrict": true,
 	},
 	"exclude": [
 		"node_modules",
+		"test",
 		".vscode-test",
+		"*f5-conx-core*",
 		"**/*.http"
 	]
 }

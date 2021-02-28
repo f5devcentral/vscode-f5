@@ -8,7 +8,7 @@ import {
 	Command
  } from 'vscode';
  
-import { callHTTPS } from '../utils/externalAPIs';
+import { ext } from '../extensionVariables';
 
 
 export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
@@ -33,43 +33,86 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 		if (element) {
 			// get example dec list for atc service
 			if (element.label === 'AS3 Examples - Coming soon!') {
-				// const examples = await getAS3examples();
 
-				// treeItems = examples.body.map((item: any) => {
-				// 	return new ExampleDec(item.name, TreeItemCollapsibleState.None,
-				// 		{command: 'f5.getGitHubExample', title: '', arguments: [item.download_url]});
-				// });
+				await ext.extHttp.makeRequest({
+					url: 'https://api.github.com/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations'
+				})
+				.then( resp => {
+					treeItems = resp.data.map((item: any) => {
+						return new ExampleDec(
+							item.name,
+							'',
+							TreeItemCollapsibleState.None,
+							{
+								command: 'f5.getGitHubExample',
+								title: '',
+								arguments: [item.download_url]
+							}
+						);
+					});
+				});
+
 
 			} else if (element.label === 'DO Examples') {
-				const examples = await getDOexamples();
+				// const examples = await getDOexamples();
 
-				treeItems = examples.body.map((item: any) => {
-					return new ExampleDec(
-						item.name,
-						'',
-						TreeItemCollapsibleState.None,
-						{
-							command: 'f5.getGitHubExample',
-							title: '',
-							arguments: [item.download_url]
-						}
-					);
+				await ext.extHttp.makeRequest({
+					url: 'https://api.github.com/repos/F5Networks/f5-declarative-onboarding/contents/examples'
+				})
+				.then( resp => {
+					treeItems = resp.data.map((item: any) => {
+						return new ExampleDec(
+							item.name,
+							'',
+							TreeItemCollapsibleState.None,
+							{
+								command: 'f5.getGitHubExample',
+								title: '',
+								arguments: [item.download_url]
+							}
+						);
+					});
 				});
 
 			} else if (element.label === 'TS Examples') {
-				const examples = await getTSexamples();
 
-				treeItems = examples.body.map((item: any) => {
-					return new ExampleDec(
-						item.name,
-						'',
-						TreeItemCollapsibleState.None,
-						{
-							command: 'f5.getGitHubExample',
-							title: '',
-							arguments: [item.download_url]
-						}
-					);
+				await ext.extHttp.makeRequest({
+					url: 'https://api.github.com/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations'
+				})
+				.then( resp => {
+					treeItems = resp.data.map((item: any) => {
+						return new ExampleDec(
+							item.name,
+							'',
+							TreeItemCollapsibleState.None,
+							{
+								command: 'f5.getGitHubExample',
+								title: '',
+								arguments: [item.download_url]
+							}
+						);
+					});
+				});
+
+
+			} else if (element.label === 'CF Examples') {
+
+				await ext.extHttp.makeRequest({
+					url: 'https://api.github.com/repos/F5Networks/f5-cloud-failover-extension/contents/examples/declarations'
+				})
+				.then( resp => {
+					treeItems = resp.data.map((item: any) => {
+						return new ExampleDec(
+							item.name,
+							'',
+							TreeItemCollapsibleState.None,
+							{
+								command: 'f5.getGitHubExample',
+								title: '',
+								arguments: [item.download_url]
+							}
+						);
+					});
 				});
 			}
 
@@ -171,48 +214,25 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 					}
 				)
 			);
+
+
+			treeItems.push(
+				new ExampleDec(
+					'CF Examples',
+					'CF examples direct from /F5Networks/f5-cloud-failover-extension repo',
+					TreeItemCollapsibleState.Collapsed,
+					{
+						command: 'vscode.open',
+						title: '',
+						arguments: [Uri.parse('https://github.com/F5Networks/f5-cloud-failover-extension/tree/master/examples')]
+					}
+				)
+			);
 		}
 		return Promise.resolve(treeItems);
 	}
 }
 
-async function getAS3examples() {
-	return await callHTTPS({
-		method: 'GET',
-		host: 'api.github.com',
-		path: '/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations',
-		headers: {
-			'Content-Type': 'application/json',
-			'User-Agent': 'F5 VScode FAST extension'
-		}
-	});
-}
-
-
-async function getDOexamples() {
-	return await callHTTPS({
-		method: 'GET',
-		host: 'api.github.com',
-		path: '/repos/F5Networks/f5-declarative-onboarding/contents/examples',
-		headers: {
-			'Content-Type': 'application/json',
-			'User-Agent': 'F5 VScode FAST extension'
-		}
-	});
-}
-
-
-async function getTSexamples() {
-	return await callHTTPS({
-		method: 'GET',
-		host: 'api.github.com',
-		path: '/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations',
-		headers: {
-			'Content-Type': 'application/json',
-			'User-Agent': 'F5 VScode FAST extension'
-		}
-	});
-}
 
 export class ExampleDec extends TreeItem {
 	constructor(
