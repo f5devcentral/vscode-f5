@@ -23,3 +23,5 @@ cache
 *.tmpl
 # ignore temp mini_ucs for config explorere (corkscrew)
 mini_ucs.tar.gz
+# ignore node cpu profiling outputs
+*.cpuprofile

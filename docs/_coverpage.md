@@ -1,7 +1,7 @@
 <!-- ![logo](media/f5_white_24x24.svg) -->
 ![logo](media/f5.png ':size=40%')
 
-# F5 VSCode Extension <small>v3.0-pending</small>
+# F5 VSCode Extension
 
 > Accelerate your F5 work flows
 

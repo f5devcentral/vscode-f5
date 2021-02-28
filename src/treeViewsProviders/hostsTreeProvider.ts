@@ -91,11 +91,15 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		return element;
 	}
 
-	/**
-	 * loads all the release information for each ATC service
-	 * - this should be async to complete in the background as the extention loads
-	 */
-	async loadAtcMetaData(): Promise<void> {
+	getChildren(element?: F5Host): Thenable<F5Host[]> {
+
+		var bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
+		// logger.debug(`bigips: ${JSON.stringify(bigipHosts)}`);
+
+		if (bigipHosts === undefined) {
+			throw new Error('No configured hosts - from hostTreeProvider');
+		}
+
 
 		// todo: move this function back into f5-conx-core
 
@@ -128,6 +132,22 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			}).catch(_ => _);
 
 
+// <<<<<<< main
+// 		// if devices in list and first list item is a string, not an object
+// 		if (bigipHosts.length > 0 && typeof (bigipHosts[0]) === 'string') {
+
+// 			logger.debug('devices are type of:', typeof (bigipHosts[0]));
+// 			bigipHosts = bigipHosts.map((el: any) => {
+// 				let newObj: { device: string } = { device: el };
+// 				logger.debug(`device coverted from: ${el} -> ${JSON.stringify(newObj)}`);
+// 				return newObj;
+// 			});
+
+// 			logger.debug('conversion complete, saving new devices list:', bigipHosts);
+// 			// save config
+// 			vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
+// 			vscode.window.showWarningMessage('Legacy device config list converted!!!');
+// =======
 		ext.extHttp.makeRequest({ url: atcMetaData.as3.gitReleases })
 			.then(resp => {
 				// loop through reach release and build 
@@ -428,8 +448,15 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 
 			return treeItems;
+// >>>>>>> v3.0
 		} else {
 
+// <<<<<<< main
+// 		const treeItems = bigipHosts.map((item: {
+// 			device: string;
+// 			provider: string;
+// 		}) => {
+// =======
 			var bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
 			// logger.debug(`bigips: ${JSON.stringify(bigipHosts)}`);
 
@@ -449,6 +476,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			 * 
 			 * Should be able remove this down the road
 			 */
+// >>>>>>> v3.0
 
 			// if devices in list and first list item is a string, not an object
 			if (bigipHosts.length > 0 && typeof (bigipHosts[0]) === 'string') {
@@ -581,8 +609,8 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	}
 
 	/**
- * clears password
- */
+	 * clears password
+	 */
 	async clearPassword(device?: string) {
 
 		if (device) {
@@ -605,15 +633,6 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			 */
 		}
 	}
-
-
-
-
-	private async parseAtcMeta() {
-
-
-	}
-}
 
 
 export class F5Host extends vscode.TreeItem {

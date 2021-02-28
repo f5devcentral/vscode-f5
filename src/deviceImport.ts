@@ -27,7 +27,9 @@ export async function deviceImportOnLoad(extPath: string, hostsTreeProvider: F5T
          * can also look into searching a workspace if there is one at start up
          */
     } catch (e) {
-        return logger.debug('device seed file not found', e.message);
+        // 2.7.2021 -> disabled this log message since it was causing confusion
+        // return logger.debug('device seed file not found', e.message);
+        return;
     }
         
     const q = await window.showInformationMessage('Device seed file detected, would you like to import?', 'Yes', 'Yes-Consume', 'No');

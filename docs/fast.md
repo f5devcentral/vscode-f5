@@ -6,6 +6,24 @@ FAST view on the left will display applications deployed with device fast servic
 
 ![as3 to mst](./media/FAST_view_6.23.2020.PNG)
 
+## AS3 -> FAST YAML command
+
+As of v2.10 a command was added to convert and wrap an as3 declaration into a yaml fast template.
+
+!> Notice how the tenant paramter is already has a fast template string
+
+With an editor with an AS3 declaration, right-click, select `AS3 -> FAST YAML`.
+
+<img src="./media/AS3_2_FAST_YAML_02.09.2021.gif" alt="drawing" width="80%"/>
+
+### Deployed AS3 to FAST YAML
+
+This flow shows how to take a deployed AS3 declaration and convert it to a FAST YAML template.
+
+!> This flow is different from the above example declaration because AS3 returns the ADC class without the AS3 class of the declartion.  ***Injecting the schema wraps the ADC class with the necessary AS3 class information***
+
+<img src="./media/AS3_deployed_2_FAST_YAML_02.09.2021.gif" alt="drawing" width="80%"/>
+
 ## How to create FAST template from AS3 declaration
 
 The following is an example FAST template in YAML form.  FAST accepts other template types, like .mst, but .yml is the recommended path since it provides the interface HTML paramters to make the template more consumable to the end users
@@ -77,14 +95,16 @@ Post template to fast engine via the command palette:  press `F1`, then filter/s
 
 Template sets are the recommended method for long term template authoring and mgmt.  It is recommended to have a folder with different folders for the different template sets you may be creating.  
 
-*** example layout ***
+***example layout***
+
 - main_templates_folder
   - prod_templates
   - qa_templates
   - dev_templates
   - infra_templates
 
-*** example directory structure ***
+***example directory structure***
+
 - sample_decs
   - app1Templates
   - app2Templates
@@ -102,13 +122,11 @@ Press `F1`, then filter/select `F5-Fast: Post Template Set`
 
 <img src="./media/FAST_tempSet_upload_6.23.2020.gif" alt="drawing" width="80%"/>
 
-
 ## Uploading via right-click
 
 The latest method to upload templates is with a simple right click from within the explorer view
 
 <img src="./media/uploadFastTemplates_11.04.2020.gif" alt="drawing" width="80%"/>
-
 
 ## Deploying an application through FAST
 
@@ -136,11 +154,8 @@ Press `F1`, then filter/select `F5-Fast: Deploy Fast App`
 
 ![deploy fast app](./media/FAST_deployApp_6.23.2020.gif)
 
-
 ## Delete Fast application
 
 Find the deployed application in the Fast view under "Deployed Applications", right click on the app, then select `Delete Fast App`
 
 <img src="./media/FAST_deleteApp_6.23.2020.gif" alt="drawing" width="80%"/>
-
-

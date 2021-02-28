@@ -22,6 +22,14 @@ If you are not excited yet, the extension can also:
 
 The best path is to install Visual Studio Code from: https://code.visualstudio.com/
 
+### VSCode Marketplace
+
+- https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5
+
+### Open Source Marketplace
+
+- https://open-vsx.org/extension/F5DevCentral/vscode-f5
+
 Then install the extension following the steps below:
 
 Select the extensions view 

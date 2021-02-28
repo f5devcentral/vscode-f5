@@ -2,7 +2,7 @@
 
 # General
 
-## Basic device management 
+## Basic device management
 
 ### (add/edit/delete, connect/disconnect)
 
