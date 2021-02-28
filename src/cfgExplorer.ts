@@ -55,6 +55,8 @@ export async function getMiniUcs(): Promise<string | undefined> {
             }
         });
 
+        await new Promise(r => setTimeout(r, 1000));
+
         const coreDir = ext.context.extensionPath;
         const zipDown = path.join(coreDir, tempFile);
 
