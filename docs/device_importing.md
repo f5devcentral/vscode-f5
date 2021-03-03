@@ -1,4 +1,5 @@
 
+
 # Importing devices
 
 There are functions to automatically import devices into the list or import devices by right clicking on data in an editor.  Both methods support the same data structure defined below.

@@ -50,6 +50,10 @@
 			{
 				"language": "json",
 				"path": "./snippets.json"
+			},
+			{
+				"language": "yaml",
+				"path": "./snippets/fastYamlSnippets.json"
 			}
 		],
 		"yamlValidation": [
@@ -81,6 +85,12 @@
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view": "cfgTree",
+				"contents": "Import TMOS Config to explore.\n[Documenation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Import Corkscrew output](command:f5.cfgExploreRawCorkscrew)"
+			}
+		],
 		"views": {
 			"f5-view-container": [
 				{
@@ -108,7 +118,6 @@
 				},
 				{
 					"id": "cfgTree",
-					"when": "f5.cfgTreeContxt",
 					"name": "Config Explorer"
 				}
 			]
@@ -257,6 +266,11 @@
 			{
 				"command": "f5.connectDevice",
 				"title": "Connect to Device",
+				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExploreReveal",
+				"title": "Reveal Config Explorer",
 				"category": "F5"
 			},
 			{
@@ -476,6 +490,11 @@
 				"category": "F5-Fast"
 			},
 			{
+				"command": "f5-fast.as3ToFastYml",
+				"title": "AS3 -> FAST YAML",
+				"category": "F5-Fast"
+			},
+			{
 				"command": "f5-fast.refreshTemplates",
 				"title": "Refresh",
 				"category": "F5",
@@ -589,6 +608,11 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.changeVersion",
+				"title": "Change Extension Version",
+				"category": "F5"
+			},
+			{
 				"command": "chuckJoke",
 				"title": "Chuck Joke",
 				"category": "F5"
@@ -615,6 +639,10 @@
 				},
 				{
 					"command": "f5-fast.renderHtmlPreview",
+					"group": "F5"
+				},
+				{
+					"command": "f5-fast.as3ToFastYml",
 					"group": "F5"
 				},
 				{
@@ -1016,24 +1044,24 @@
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^7.0.1",
-		"@types/node": "^12.12.55",
+		"@types/node": "^12.19.16",
 		"@types/vscode": "^1.42.0",
 		"@typescript-eslint/eslint-plugin": "^2.34.0",
 		"@typescript-eslint/parser": "^2.34.0",
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
-		"nock": "^13.0.4",
+		"nock": "^13.0.7",
 		"typescript": "^3.9.7",
-		"vscode-test": "^1.4.0"
+		"vscode-test": "^1.5.0"
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
-		"@types/js-yaml": "^3.12.5",
-		"axios": "^0.19.2",
+		"@types/js-yaml": "^3.12.6",
+		"axios": "^0.21.1",
+		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git",
 		"f5-conx-core": "file:../f5-conx-core",
-		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git#a15106ccc6e7d502986a272c4f0c4fe13ff1d578",
-		"js-yaml": "^3.14.0",
+    "js-yaml": "^3.14.1",
 		"keytar": "^6.0.1"
 	}
 }

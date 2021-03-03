@@ -1,6 +1,8 @@
+
+
 # Schama Validation
 
-<p>&nbsp;</p>
+<!-- <p>&nbsp;</p> -->
 
 One of the primary uses of this tool is to provide schema validation of the ATC declaration during the authoring process.  Understanding and having constant feedback about the declaration and it's content during development can drastically improve the expereince.
 
@@ -96,26 +98,26 @@ https://code.visualstudio.com/docs/editor/userdefinedsnippets
 <!-- <p>&nbsp;</p> -->
 
 ### Latest AS3 Schema
-https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json
+
+<https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json>
 
 ### Latest DO Schema
-https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json
+
+<https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json>
 
 ### Latest TS Schema
-https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json
 
-<!-- <p>&nbsp;</p> -->
+<https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json>
 
 ---
 
-
 ## Validating YAML ATC Declarations with JSON Schemas
-
 
 Install the RedHat YAML extension
 
 >https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml
 
+><https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml>
 
 In the vscode settings for that extension:
 
@@ -127,6 +129,6 @@ In the vscode settings for that extension:
 }
 ```
 
-create a yaml file for as3 like: `as3Dec1.as3.yml `
+create a yaml file for as3 like: `as3Dec1.as3.yml`
 
-![example1](./media/as3SchemaInYaml.PNG)
+<img src="./media/as3SchemaInYaml.PNG" alt="drawing" width="80%"/>

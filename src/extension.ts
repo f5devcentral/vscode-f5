@@ -42,6 +42,8 @@ import { TextDocumentView } from './editorViews/editorView';
 import { makeExplosion } from './cfgExplorer';
 // import { unInstallOldExtension } from './extMigration';
 import { injectSchema } from './atcSchema';
+import { ChangeVersion } from './changeVersion';
+import { FastCore } from './fastCore';
 
 import { F5Client } from './f5Client';
 import { Device } from './models';
@@ -136,6 +138,7 @@ export async function activate(context: ExtensionContext) {
 
 		const password: string = await utils.getPassword(device.device);
 
+
 		ext.f5Client = new F5Client(device, host, user, password, {
 			port,
 			provider: device.provider,
@@ -188,6 +191,7 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.disconnect', () => {
+
 
 		if (ext.f5Client) {
 			ext.f5Client.disconnect();
@@ -402,6 +406,7 @@ export async function activate(context: ExtensionContext) {
 		let signature;
 		let installed: HttpResponse;
 
+
 		if (isArray(selectedRPM)) {
 
 			window.withProgress({
@@ -458,31 +463,7 @@ export async function activate(context: ExtensionContext) {
 					hostsTreeProvider.refresh();
 				}
 			});
-
-
 		}
-
-		// if (selectedRPM) {
-		// 	// set rpm path/location from oject return in explorer tree
-		// 	selectedRPM = selectedRPM.fsPath;
-		// 	logger.debug(`workspace selected rpm`, selectedRPM);
-		// } else {
-		// 	// pick atc/tool/version picker/downloader
-		// 	selectedRPM = await rpmMgmt.rpmPicker();
-		// 	logger.debug('downloaded rpm location', selectedRPM);
-		// }
-
-		// // const iRpms = await rpmMgmt.installedRPMs();
-		// logger.debug('selected rpm', selectedRPM);
-
-		// if (!selectedRPM) {
-		// 	debugger;
-		// 	// probably need to setup error handling for this situation
-		// }
-
-		// const installedRpm = await rpmMgmt.rpmInstaller(selectedRPM);
-		// logger.debug('installed rpm', installedRpm);
-
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.unInstallRPM', async (rpm) => {
@@ -949,24 +930,7 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-as3.getDecs', async (tenant) => {
 
-		// set blank value if not defined -> get all tenants dec
-		// tenant = tenant ? tenant : '';
-
-		// console.log(tenant.test('?'));
-
-		// bigiq target single tenant 
-		if (tenant?.dec && tenant?.label && tenant.id) {
-
-			// rebuild the target tenant declaration so it can be resent if needed
-			ext.panel.render({
-				class: 'ADC',
-				target: tenant.target,
-				schemaVersion: tenant.schemaVersion,
-				id: tenant.id,
-				[tenant.label]: tenant.dec
-			});
-
-		} else if (typeof tenant === 'object') {
+		if (typeof tenant === 'object') {
 
 			// just a regular as3 declaration object
 			ext.panel.render(tenant);
@@ -976,13 +940,14 @@ export async function activate(context: ExtensionContext) {
 			// got a simple tenant name as string with uri parameter,
 			// this is typically for extended information
 			// so fetch fresh information with param
-			// await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare/${tenant}`)
-			await ext.f5Client?.as3?.getDecs({ tenant })
-				.then(resp => ext.panel.render(resp.data))
+			// await ext.f5Client?.as3?.getDecs({ tenant })
+			await ext.f5Client?m(`/mgmt/shared/appsvcs/declare/${tenant}`)
+				.then((resp: any) => ext.panel.render(resp.data))
 				.catch(err => logger.error('get as3 tenant with param failed:', err));
 		}
-
 	}));
+
+
 
 	context.subscriptions.push(commands.registerCommand('f5-as3.expandedTenant', async (tenant) => {
 		commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=expanded`);
@@ -997,14 +962,25 @@ export async function activate(context: ExtensionContext) {
 			title: `Deleting ${tenant.label} Tenant`
 		}, async (progress) => {
 
-			await ext.f5Client?.as3?.deleteTenant({
-				class: 'AS3',
-				declaration: {
-					schemaVersion: tenant.command.arguments[0].schemaVersion,
-					class: 'ADC',
-					target: tenant.command.arguments[0].target,
-					[tenant.label]: {
-						class: 'Tenant'
+			await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare`, {
+				method: 'POST',
+				body: {
+					class: 'AS3',
+					declaration: {
+						schemaVersion: tenant.command.arguments[0].schemaVersion,
+						class: 'ADC',
+						target: tenant.command.arguments[0].target,
+						[tenant.label]: {
+							class: 'Tenant'
+						}
+// 			await ext.f5Client?.as3?.deleteTenant({
+// 				class: 'AS3',
+// 				declaration: {
+// 					schemaVersion: tenant.command.arguments[0].schemaVersion,
+// 					class: 'ADC',
+// 					target: tenant.command.arguments[0].target,
+// 					[tenant.label]: {
+// 						class: 'Tenant'
 					}
 				}
 			})
@@ -1022,7 +998,8 @@ export async function activate(context: ExtensionContext) {
 				// 		}
 				// 	}
 				// })
-				.then(resp => {
+				.then((resp: any) => {
+
 					const resp2 = resp.data.results[0];
 					progress.report({ message: `${resp2.code} - ${resp2.message}` });
 
@@ -1217,7 +1194,6 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
-
 		await ext.extHttp.makeRequest({ url: decUrl })
 			.then(resp => ext.panel.render(resp))
 			.catch(err => logger.error(err));
@@ -1286,6 +1262,7 @@ export async function activate(context: ExtensionContext) {
 			location: ProgressLocation.Notification,
 			title: `Getting DO Inspect`
 		}, async () => {
+
 			// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
 			// ext.panel.render(resp);
 
@@ -1365,7 +1342,41 @@ export async function activate(context: ExtensionContext) {
 		 * 
 		 */
 
+// 		if (!ext.mgmtClient) {
+// 			/**
+// 			 * loop this back into the connect flow, since we have the device, automatically connect
+// 			 *  - this should probably happen in the main extension.ts
+// 			 */
+// 			// await commands.executeCommand('f5.connectDevice', item.label);
+// 			return window.showWarningMessage('Connect to BIGIP Device first');
+// 		}
 
+// 		const file = await getMiniUcs();
+// 		let expl: any = undefined;
+
+// 		if (file) {
+// 			logger.debug('Got mini_ucs -> extracting config with corkscrew');
+
+// 			expl = await makeExplosion(file);
+
+// 			if (expl) {
+// 				await cfgProvider.explodeConfig(expl.explosion);
+
+// 				// inject the config files (not included in explosion output by default)
+// 				// cfgProvider.bigipConfs = expl.config;
+// 				// inject the config object (just for looks...)
+// 				cfgProvider.confObj = expl.obj;
+// 			}
+
+
+// 			try {
+// 				// wait  couple seconds before we try to delete the mini_ucs
+// 				setTimeout(() => { fs.unlinkSync(file); }, 2000);
+// 			} catch (e) {
+// 				logger.error('Not able to delete mini_ucs at:', file);
+// 			}
+// 		} else {
+// 			logger.error('Failed to retrieve mini_ucs for configuration exploration');
 		if (!ext.f5Client) {
 			await commands.executeCommand('f5.connectDevice', item.command.arguments[0]);
 		}
@@ -1392,41 +1403,147 @@ export async function activate(context: ExtensionContext) {
 					});
 			});
 
+		cfgProvider.refresh();	// refresh with the new information
 	}));
 
 	/**
 	 * this command is exposed via right click in editor so user does not have to connect to F5
+	 * this flow assumes the file is local
 	 */
 	context.subscriptions.push(commands.registerCommand('f5.cfgExplore', async (item) => {
 
-		let expl;
-		if (item._fsPath) {
-			// I think this is the better way for windows?
-			logger.debug('f5.cfgExplore got _fsPath:', item._fsPath);
-			expl = await makeExplosion(item._fsPath);
-		} else if (item.path) {
-			// only path is seen when working in wsl2
-			logger.debug('f5.cfgExplore got path:', item.path);
-			expl = await makeExplosion(item.path);
+		let filePath: string;
+
+		if (!item) {
+			// no input means we need to browse for a local file
+			item = await window.showOpenDialog({
+				canSelectMany: false
+			});
+
+			// if we got a file from the showOpenDialog, it comes in an array, even though we told it to only allow single item selection -> return the single array item
+			if (Array.isArray(item)) {
+				item = item[0];
+			}
+		}
+
+		if (item?._fsPath) {
+
+			logger.info(`f5.cfgExplore _fsPath recieved:`, item._fsPath);
+			filePath = item._fsPath;
+			
+		} else if (item?.path) {
+			
+			logger.info(`f5.cfgExplore path revieved:`, item.path);
+			filePath = item.path;
+
 		} else {
+
 			return logger.error('f5.cfgExplore -> Neither path supplied was valid', JSON.stringify(item));
+
 		}
 
-		if (expl) {
-			cfgProvider.explodeConfig(expl.config, expl.obj, expl.explosion);
-			// starting to setup the ability to have the view come into focus when excuted
-			// I believe this will require enabling experimental features, so I'm tabling
-			// 	for now
-			// cfgView.reveal('Apps', { focus: true, select: false, expand: true } );
-
-			// // cfgView.title = 'yay!!!';
-			// cfgView.description = 'descrrrrr';
-			// cfgView.message = 'messsg';
-			// cfgView.selection;
-			// cfgView.visible
+		try {
+			// test that we can access the file
+			const x = fs.statSync(filePath);
+		} catch (e) {
+			// if we couldn't get to the file, trim leading character
+			// remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
+			// filePath = filePath.replace(/^(\\|\/)/, '');
+			logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
+			filePath = filePath.substr(1);
 		}
+		
+		
+		
+		logger.info(`f5.cfgExplore: exploding config @ ${filePath}`);
+
+		await makeExplosion(filePath)
+			.then(async expl => {
+
+				if (expl.explosion) {
+					await cfgProvider.explodeConfig(expl.explosion);
+				}
+
+				if (expl.obj) {
+					// inject the config object (just for looks...)
+					cfgProvider.confObj = expl.obj;
+				}
+				cfgProvider.refresh();	// refresh with the new information
+			})
+			.catch(err => {
+				logger.error('cfgExplorer error', err);
+			});
 
 	}));
+
+
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
+		// no input means we need to browse for a local file
+		const file = await window.showOpenDialog({
+			canSelectMany: false
+		}).then(x => {
+			if (Array.isArray(x)) {
+				return x[0];
+			}
+		});
+
+		let filePath;
+
+		if (file?.fsPath) {
+
+			logger.info(`f5.cfgExploreRawCorkscrew _fsPath recieved:`, file.fsPath);
+			filePath = file.fsPath;
+			
+		} else if (file?.path) {
+			
+			logger.info(`f5.cfgExploreRawCorkscrew path revieved:`, file.path);
+			filePath = file.path;
+
+		} else {
+
+			return logger.error('f5.cfgExploreRawCorkscrew -> Neither path supplied was valid', JSON.stringify(file));
+
+		}
+
+		try {
+			// test that we can access the file
+			const x = fs.statSync(filePath);
+		} catch (e) {
+			// if we couldn't get to the file, trim leading character
+			// remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
+			// filePath = filePath.replace(/^(\\|\/)/, '');
+			logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
+			filePath = filePath.substr(1);
+		}
+
+		if (filePath) {
+			try {
+				const read = fs.readFileSync(filePath, 'utf-8');
+				// parse json
+				const read2 = JSON.parse(read);
+				await cfgProvider.explodeConfig(read2);
+			} catch (e) {
+				logger.error('cfgExploreRawCorkscrew import failed', e);
+			}
+		}
+
+		cfgProvider.refresh();	// refresh with the new information
+	}));
+
+
+
+	context.subscriptions.push(commands.registerCommand('f5.cfgExploreReveal', async (text) => {
+		// await new Promise(resolve => { setTimeout(resolve, 2000); });
+		if (cfgProvider.viewElement) {
+			cfgView.reveal(cfgProvider.viewElement, {
+				select: true,
+				focus: true,
+				expand: true
+			});
+		}
+	}));
+
+
 
 	context.subscriptions.push(commands.registerCommand('f5.cfgExploreClear', async (text) => {
 		cfgProvider.clear();
@@ -1631,7 +1748,6 @@ export async function activate(context: ExtensionContext) {
 					}
 
 					logger.debug('generic https f5 call -> ', text);
-
 					return await ext.f5Client?.https(text.url, {
 						method: text.method,
 						data: text.body
@@ -1681,7 +1797,6 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 
-
 	// context.subscriptions.push(commands.registerCommand('chuckJoke', async () => {
 
 
@@ -1689,6 +1804,42 @@ export async function activate(context: ExtensionContext) {
 	// 	const wndw = window.visibleTextEditors;
 	// 	let viewColumn: ViewColumn | undefined;
 
+// <<<<<<< main
+// 		const newEditorColumn = ext.settings.previewColumn;
+// 		const wndw = window.visibleTextEditors;
+// 		let viewColumn: ViewColumn | undefined;
+
+// 		wndw.forEach(el => {
+// 			// const el1 = element;
+// 			if (el.document.fileName === 'chuck-joke.json') {
+// 				//logger.debug('f5-fast.json editor column', el1.viewColumn);
+// 				viewColumn = el.viewColumn;
+// 			}
+// 		});
+
+
+// 		const resp: any = await extAPI.makeRequest({ url: 'https://api.chucknorris.io/jokes/random' });
+// 		// let activeColumn = window.activeTextEditor?.viewColumn;
+
+// 		logger.debug('chuck-joke->resp.data', resp.data);
+
+// 		const content = JSON.stringify(resp.data, undefined, 4);
+
+// 		// if vClm has a value assign it, else set column 1
+// 		viewColumn = viewColumn ? viewColumn : newEditorColumn;
+
+// 		var vDoc: Uri = Uri.parse("untitled:" + "chuck-Joke.json");
+// 		workspace.openTextDocument(vDoc)
+// 			.then((a: TextDocument) => {
+// 				window.showTextDocument(a, viewColumn, false).then(e => {
+// 					e.edit(edit => {
+// 						const startPosition = new Position(0, 0);
+// 						const endPosition = a.lineAt(a.lineCount - 1).range.end;
+// 						edit.replace(new Range(startPosition, endPosition), content);
+// 					});
+// 				});
+// 			});
+// =======
 	// 	wndw.forEach(el => {
 	// 		// const el1 = element;
 	// 		if (el.document.fileName === 'chuck-joke.json') {
@@ -1696,6 +1847,7 @@ export async function activate(context: ExtensionContext) {
 	// 			viewColumn = el.viewColumn;
 	// 		}
 	// 	});
+//  >>>>>>> v3.0
 
 
 	// 	const resp: any = await extAPI.makeRequest({ url: 'https://api.chucknorris.io/jokes/random' });

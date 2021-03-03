@@ -39,7 +39,6 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	private qkviewList = [];
 
 	constructor(private workspaceRoot: string) {
-		// const { fast, as3, (do: AtcVersion as decOn), ts, cf } = ext.atcVersions;
 		this.fast = ext.atcVersions.fast;
 		this.as3 = ext.atcVersions.as3;
 		this.do = ext.atcVersions.do;
@@ -380,8 +379,8 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	}
 
 	/**
- * clears password
- */
+	 * clears password
+	 */
 	async clearPassword(device?: string) {
 
 		if (device) {

@@ -312,7 +312,7 @@ export async function rpmInstaller (rpm: string) {
  *  example:  https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases/27113449
  * @returns full path/file of rpm
  */
-async function getRPMgit(assetUrl: string) {
+export async function getRPMgit(assetUrl: string, dir?: string) {
     // get release asset information
     const resp = await axios(assetUrl);
     // logger.debug('Getting github asset details', resp);
@@ -320,7 +320,8 @@ async function getRPMgit(assetUrl: string) {
     
     const extDir = ext.context.extensionPath; 
     // todo:  move cache directory to a real linux/windows temp directory...
-    const rpmDir = path.join(extDir, 'atc_ilx_rpm_cache');
+    // if we got a directory assign it, if not, use cache
+    const rpmDir = dir ? dir : path.join(extDir, 'atc_ilx_rpm_cache');
 
     if (!fs.existsSync(rpmDir)) {
         logger.debug('CREATING ATC ILX RPM CACHE DIRECTORY');
@@ -355,7 +356,10 @@ async function getRPMgit(assetUrl: string) {
     logger.debug('assets done downloading');
 
     // get array item that has the installable rpm
-    const rpmAsset = assetSet.filter( (el: { name: string; }) => el.name.endsWith('.rpm'));
+    const rpmAsset = [];
+    // did we download an rpm or vsix?
+    rpmAsset.push(...assetSet.filter( (el: { name: string; }) => el.name.endsWith('.rpm')));
+    rpmAsset.push(...assetSet.filter( (el: { name: string; }) => el.name.endsWith('.vsix')));
     const assetFpath = path.join(rpmDir, rpmAsset[0].name);
 
     // return just rpm name
@@ -368,7 +372,7 @@ async function getRPMgit(assetUrl: string) {
  * @param url atc github releases url
  * @returns asset name and download url as object
  */
-async function listGitReleases(url: string){
+export async function listGitReleases(url: string){
     const resp = await axios.get(url);
     var mapEd;
     if(resp.status === 200) {
