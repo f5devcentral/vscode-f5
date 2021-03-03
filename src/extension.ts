@@ -13,14 +13,15 @@ import {
 	ViewColumn,
 	Uri,
 	TextDocument,
-	Position
+	Position,
+	EventEmitter
 } from 'vscode';
 import * as jsYaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as keyTarType from 'keytar';
 
-import { Asset, F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
+import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { TclTreeProvider } from './treeViewsProviders/tclTreeProvider';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
@@ -29,7 +30,7 @@ import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 import * as f5Api from './utils/f5Api';
 // import * as extAPI from './utils/externalAPIs';
 import * as utils from './utils/utils';
-import { ext, loadConfig } from './extensionVariables';
+import { ext, initSettings, loadSettings } from './extensionVariables';
 import { FastWebView } from './editorViews/fastWebView';
 import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
@@ -39,20 +40,26 @@ import logger from './utils/logger';
 import { deviceImport, deviceImportOnLoad } from './deviceImport';
 import { TextDocumentView } from './editorViews/editorView';
 import { makeExplosion } from './cfgExplorer';
-import { unInstallOldExtension } from './extMigration';
+// import { unInstallOldExtension } from './extMigration';
 import { injectSchema } from './atcSchema';
 
 import { F5Client } from './f5Client';
 import { Device } from './models';
-import { AtcRelease, HttpResponse, isArray } from 'f5-conx-core';
+import { HttpResponse, isArray, Asset } from 'f5-conx-core';
 
 
 export async function activate(context: ExtensionContext) {
 
-	await unInstallOldExtension();
+	process.on('unhandledRejection', error => {
+		logger.error('unhandledRejection', error);
+	});
 
-	// assign context to global name space
-	ext.context = context;
+
+	// initialize extension settings
+	await initSettings(context);
+
+	// load ext config to ext.settings.
+	await loadSettings();
 
 	ext.connectBar = window.createStatusBarItem(StatusBarAlignment.Left, 9);
 	ext.connectBar.command = 'f5.connectDevice';
@@ -60,18 +67,11 @@ export async function activate(context: ExtensionContext) {
 	ext.connectBar.tooltip = 'Click to connect!';
 	ext.connectBar.show();
 
-	// const webview = new HttpResponseWebview(context);
 	ext.panel = new TextDocumentView();
 	ext.keyTar = keyTarType;
 
-	// load ext config to ext.settings.
-	loadConfig();
 
-	// keep an eye on this for different user install scenarios, like slim docker containers that don't have the supporting librarys
-	// if this error happens, need to find a fallback method of password caching or disable caching without breaking everything
-	if (ext.keyTar === undefined) {
-		throw new Error('keytar undefined in initiation');
-	}
+
 
 
 
@@ -98,8 +98,6 @@ export async function activate(context: ExtensionContext) {
 		showCollapseAll: true
 	});
 	commands.registerCommand('f5.refreshHostsTree', () => hostsTreeProvider.refresh());
-
-	hostsTreeProvider.loadAtcMetaData();
 
 	context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {
 
@@ -141,25 +139,10 @@ export async function activate(context: ExtensionContext) {
 		ext.f5Client = new F5Client(device, host, user, password, {
 			port,
 			provider: device.provider,
-		});
+		},
+		ext.eventEmitterGlobal,
+			ext.extHttp);
 
-
-		ext.f5Client.events.on('failedAuth', msg => {
-			window.showErrorMessage('Failed Authentication - Please check password');
-			logger.error('Failed Authentication Event!', ext.f5Client?.device, msg);
-			ext.f5Client?.clearPassword();
-			commands.executeCommand('f5.disconnect');
-		});
-
-		ext.f5Client.extHttp = ext.extHttp;
-
-		// hook up events to logger
-		ext.f5Client.events.on('log-debug', msg => logger.debug(msg));
-		ext.f5Client.events.on('log-info', msg => logger.info(msg));
-		ext.f5Client.events.on('log-warn', msg => logger.warn(msg));
-		ext.f5Client.events.on('log-error', msg => logger.error(msg));
-
-		// await ext.f5Client.discover();
 		await ext.f5Client.connect()
 			.then(connect => {
 
@@ -364,7 +347,7 @@ export async function activate(context: ExtensionContext) {
 		// download ucs from f5
 
 		return await window.withProgress({
-			location: ProgressLocation.SourceControl,
+			location: ProgressLocation.Window,
 		}, async () => {
 
 			// todo:  this ultimatelly doesn't work right now.  It downloads a file, but only the first 1Mb of the file...
@@ -372,8 +355,8 @@ export async function activate(context: ExtensionContext) {
 			const fUri2 = Uri.file(filename);
 			// let saveD = await window.showSaveDialog({defaultUri: Uri.parse(filename)});
 
-			const folder = await window.showOpenDialog({ 
-				title: 'Select Folder to Save UCS', 
+			const folder = await window.showOpenDialog({
+				title: 'Select Folder to Save UCS',
 				canSelectFiles: false,
 				canSelectFolders: true,
 				canSelectMany: false
@@ -382,9 +365,10 @@ export async function activate(context: ExtensionContext) {
 			const dest = folder ? folder[0].path : ext.cacheDir;
 
 			// debugger;
-			
-			// return await ext.f5Client?.ucs.download(filename, dest);
-			return await ext.f5Client?.download(filename, dest, 'UCS');
+
+			return await ext.f5Client?.ucs.download(filename, dest)
+			.catch(err => logger.error('download ucs failed:', err));
+			// return await ext.f5Client?.download(filename, dest, 'UCS')
 		});
 	}));
 

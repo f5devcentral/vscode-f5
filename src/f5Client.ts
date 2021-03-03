@@ -2,19 +2,26 @@
 
 'use strict';
 
-import { Terminal, window, ProgressLocation, commands, StatusBarItem, StatusBarAlignment } from 'vscode';
-import { ext, loadConfig } from './extensionVariables';
-import * as utils from './utils/utils';
-import { F5Client as _F5Client } from 'f5-conx-core';
+import { 
+    Terminal,
+    window,
+    ProgressLocation,
+    commands,
+    StatusBarItem,
+    StatusBarAlignment
+} from 'vscode';
+import { ext } from './extensionVariables';
+import { ExtHttp, F5Client as _F5Client } from 'f5-conx-core';
 import { Device } from './models';
-import Logger from './utils/logger';
+import EventEmitter from 'events';
 
 
 
 
 export class F5Client extends _F5Client {
-    logger: typeof Logger;
+    // logger: typeof Logger;
     device: Device;
+    events: EventEmitter;
     private terminal: Terminal | undefined;
 
     hostStatusBar: StatusBarItem;
@@ -33,11 +40,15 @@ export class F5Client extends _F5Client {
         options?: {
             port?: number;
             provider?: string;
-        }
+        },
+        eventEmitter?: EventEmitter,
+        extHttp?: ExtHttp
     ) {
-        super(host, user, password, options);
+        super(host, user, password, options, eventEmitter, extHttp);
+
+        this.events = eventEmitter ? eventEmitter : new EventEmitter();
         this.device = device;
-        this.logger = Logger;
+        // this.logger = Logger;
         this.hostStatusBar = window.createStatusBarItem(StatusBarAlignment.Left, 32);
         this.hostNameBar = window.createStatusBarItem(StatusBarAlignment.Left, 31);
         this.fastBar = window.createStatusBarItem(StatusBarAlignment.Left, 30);
@@ -53,7 +64,6 @@ export class F5Client extends _F5Client {
      * Pulls device/connection details from this. within the class
      */
     async connect() {
-        loadConfig();
 
         const progress = await window.withProgress({
             location: ProgressLocation.Notification,
@@ -92,7 +102,6 @@ export class F5Client extends _F5Client {
                 this.host.product === 'BIG-IP' ?
                 commands.executeCommand('setContext', 'f5.tcl', true) :
                 commands.executeCommand('setContext', 'f5.tcl', false);
-                
                 commands.executeCommand('setContext', 'f5.device', true);
                 
             }

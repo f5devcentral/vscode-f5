@@ -13,38 +13,8 @@ import path from 'path';
 import { TreeItemCollapsibleState } from 'vscode';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
-import { atcMetaData, AtcMetaData, AtcRelease } from 'f5-conx-core';
+import { atcMetaData, AtcRelease, AtcVersion, AtcVersions, AtcVersionsClient, F5Client } from 'f5-conx-core';
 
-export type atcVersion = {
-	downloadUrl: string,
-	latest: boolean,
-	packageName: string
-};
-
-export type atcType = {
-	installed?: string,
-	latest: string,
-	version: atcVersion[]
-};
-
-
-export type GitRelease = {
-	tag_name: string,
-	id: number,
-	assets: Asset[]
-};
-
-export type Asset = {
-	name: string,
-	id: number,
-	size: number,
-	browser_download_url: string
-};
-
-export type AtcMeta = {
-	releases?: AtcRelease[];
-	latest?: string;
-};
 
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
@@ -52,12 +22,13 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	private _onDidChangeTreeData: vscode.EventEmitter<F5Host | undefined> = new vscode.EventEmitter<F5Host | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<F5Host | undefined> = this._onDidChangeTreeData.event;
 
-	// atcMetaData: AtcMetaData | undefined;
-	fast: AtcMeta | undefined;
-	as3: AtcMeta | undefined;
-	do: AtcMeta | undefined;
-	ts: AtcMeta | undefined;
-	cf: AtcMeta | undefined;
+	fast: AtcVersion | undefined;
+	as3: AtcVersion | undefined;
+	do: AtcVersion | undefined;
+	ts: AtcVersion | undefined;
+	cf: AtcVersion | undefined;
+
+	f5Client: F5Client | undefined;
 
 	private orangeDot = ext.context.asAbsolutePath(path.join("images", "orangeDot.svg"));
 	private greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
@@ -68,179 +39,34 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	private qkviewList = [];
 
 	constructor(private workspaceRoot: string) {
+		// const { fast, as3, (do: AtcVersion as decOn), ts, cf } = ext.atcVersions;
+		this.fast = ext.atcVersions.fast;
+		this.as3 = ext.atcVersions.as3;
+		this.do = ext.atcVersions.do;
+		this.ts = ext.atcVersions.ts;
+		this.cf = ext.atcVersions.cf;
 	}
 
 	async refresh(): Promise<void> {
 		this._onDidChangeTreeData.fire(undefined);
-		
+
 		if (ext.f5Client) {
 			// start getting ucs/qkview 
 			await ext.f5Client.connect();
 			await ext.f5Client.ucs.list()
-			.then(resp => this.ucsList = resp.data.items);
-			
+				.then(resp => this.ucsList = resp.data.items);
+
 			await ext.f5Client.qkview.list()
-			.then(resp => this.qkviewList = resp.data.items);
+				.then(resp => this.qkviewList = resp.data.items);
 		}
-		
+
 		this._onDidChangeTreeData.fire(undefined);
-		
+
 	}
 
 	getTreeItem(element: F5Host): vscode.TreeItem {
 		return element;
 	}
-
-	/**
-	 * loads all the release information for each ATC service
-	 * - this should be async to complete in the background as the extention loads
-	 */
-	async loadAtcMetaData(): Promise<void> {
-
-		// todo: move this function back into f5-conx-core
-
-		// at launch of extension, load all the latest atc metadata
-		ext.extHttp.makeRequest({ url: atcMetaData.fast.gitReleases })
-			.then(resp => {
-				// loop through reach release and build 
-				const latest: string[] = [];
-				const releases = resp.data.map((el: GitRelease) => {
-					const assets = el.assets.map((asset: Asset) => {
-						return {
-							name: asset.name,
-							id: asset.id,
-							size: asset.size,
-							browser_download_url: asset.browser_download_url
-						};
-					});
-					const version = el.tag_name.replace(/v/, '');
-					latest.push(version);
-					return {
-						version,
-						id: el.id,
-						assets
-					};
-				});
-				this.fast = {
-					releases,
-					latest: latest.sort(cmp)[latest.length - 1]
-				};
-			}).catch(_ => _);
-
-
-		ext.extHttp.makeRequest({ url: atcMetaData.as3.gitReleases })
-			.then(resp => {
-				// loop through reach release and build 
-				const latest: string[] = [];
-				const releases = resp.data.map((el: GitRelease) => {
-					const assets = el.assets.map((asset: Asset) => {
-						return {
-							name: asset.name,
-							id: asset.id,
-							size: asset.size,
-							browser_download_url: asset.browser_download_url
-						};
-					});
-					const version = el.tag_name.replace(/v/, '');
-					latest.push(version);
-					return {
-						version,
-						id: el.id,
-						assets
-					};
-				});
-				this.as3 = {
-					releases,
-					latest: latest.sort(cmp)[latest.length - 1]
-				};
-			}).catch(_ => _);
-
-
-		ext.extHttp.makeRequest({ url: atcMetaData.do.gitReleases })
-			.then(resp => {
-				// loop through reach release and build 
-				const latest: string[] = [];
-				const releases = resp.data.map((el: GitRelease) => {
-					const assets = el.assets.map((asset: Asset) => {
-						return {
-							name: asset.name,
-							id: asset.id,
-							size: asset.size,
-							browser_download_url: asset.browser_download_url
-						};
-					});
-					const version = el.tag_name.replace(/v/, '');
-					latest.push(version);
-					return {
-						version,
-						id: el.id,
-						assets
-					};
-				});
-				this.do = {
-					releases,
-					latest: latest.sort(cmp)[latest.length - 1]
-				};
-			})
-			.catch(_ => _);
-
-
-
-		ext.extHttp.makeRequest({ url: atcMetaData.ts.gitReleases })
-			.then(resp => {
-				// loop through reach release and build 
-				const latest: string[] = [];
-				const releases = resp.data.map((el: GitRelease) => {
-					const assets = el.assets.map((asset: Asset) => {
-						return {
-							name: asset.name,
-							id: asset.id,
-							size: asset.size,
-							browser_download_url: asset.browser_download_url
-						};
-					});
-					const version = el.tag_name.replace(/v/, '');
-					latest.push(version);
-					return {
-						version,
-						id: el.id,
-						assets
-					};
-				});
-				this.ts = {
-					releases,
-					latest: latest.sort(cmp)[latest.length - 1]
-				};
-			}).catch(_ => _);
-
-		ext.extHttp.makeRequest({ url: atcMetaData.cf.gitReleases })
-			.then(resp => {
-				// loop through reach release and build 
-				const latest: string[] = [];
-				const releases = resp.data.map((el: GitRelease) => {
-					const assets = el.assets.map((asset: Asset) => {
-						return {
-							name: asset.name,
-							id: asset.id,
-							size: asset.size,
-							browser_download_url: asset.browser_download_url
-						};
-					});
-					const version = el.tag_name.replace(/v/, '');
-					latest.push(version);
-					return {
-						version,
-						id: el.id,
-						assets
-					};
-				});
-				this.cf = {
-					releases,
-					latest: latest.sort(cmp)[latest.length - 1]
-				};
-			}).catch(_ => _);
-	}
-
 	async getChildren(element?: F5Host): Promise<F5Host[]> {
 
 		if (element) {
@@ -268,25 +94,24 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 			} else if (element.label === 'ATC') {
 
-
 				const fastIcon
-					= ext.f5Client?.fast?.version.version === this.fast?.latest ? this.greenDot
+					= `v${ext.f5Client?.fast?.version.version}` === this.fast?.latest ? this.greenDot
 						: ext.f5Client?.fast ? this.orangeDot
 							: '';
 				const as3Icon
-					= ext.f5Client?.as3?.version.version === this.as3?.latest ? this.greenDot
+					= `v${ext.f5Client?.as3?.version.version}` === this.as3?.latest ? this.greenDot
 						: ext.f5Client?.as3 ? this.orangeDot
 							: '';
 				const doIcon
-					= ext.f5Client?.do?.version.version === this.do?.latest ? this.greenDot
+					= `v${ext.f5Client?.do?.version.version}` === this.do?.latest ? this.greenDot
 						: ext.f5Client?.do ? this.orangeDot
 							: '';
 				const tsIcon
-					= ext.f5Client?.ts?.version.version === this.ts?.latest ? this.greenDot
+					= `v${ext.f5Client?.ts?.version.version}` === this.ts?.latest ? this.greenDot
 						: ext.f5Client?.ts ? this.orangeDot
 							: '';
 				const cfIcon
-					= ext.f5Client?.cf?.version.version === this.cf?.latest ? this.greenDot
+					= `v${ext.f5Client?.cf?.version.version}` === this.cf?.latest ? this.greenDot
 						: ext.f5Client?.cf ? this.orangeDot
 							: '';
 
@@ -308,9 +133,12 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 				this.fast?.releases?.forEach((el: AtcRelease) => {
 
+					// remove the leading "v" if present
+					const deviceVersion = el.version.replace(/^v/, '');
+
 					const desc = [
 						el.version === this.fast?.latest ? 'Latest' : '',
-						el.version === ext.f5Client?.fast?.version.version ? 'Installed' : ''
+						deviceVersion === ext.f5Client?.fast?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -325,9 +153,12 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 				this.as3?.releases?.forEach((el: AtcRelease) => {
 
+					// remove the leading "v" if present
+					const deviceVersion = el.version.replace(/^v/, '');
+
 					const desc = [
 						el.version === this.as3?.latest ? 'Latest' : '',
-						el.version === ext.f5Client?.as3?.version.version ? 'Installed' : ''
+						deviceVersion === ext.f5Client?.as3?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -342,9 +173,12 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 				this.do?.releases?.forEach((el: AtcRelease) => {
 
+					// remove the leading "v" if present
+					const deviceVersion = el.version.replace(/^v/, '');
+
 					const desc = [
 						el.version === this.do?.latest ? 'Latest' : '',
-						el.version === ext.f5Client?.do?.version.version ? 'Installed' : ''
+						deviceVersion === ext.f5Client?.do?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -362,7 +196,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 					const desc = [
 						el.version === this.ts?.latest ? 'Latest' : '',
-						el.version === ext.f5Client?.ts?.version.version ? 'Installed' : ''
+						el.version.replace(/^v/, '') === ext.f5Client?.ts?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -380,7 +214,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 					const desc = [
 						el.version === this.cf?.latest ? 'Latest' : '',
-						el.version === ext.f5Client?.cf?.version.version ? 'Installed' : ''
+						el.version.replace(/^v/, '') === ext.f5Client?.cf?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -437,42 +271,11 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 				throw new Error('No configured hosts - from hostTreeProvider');
 			}
 
-			logger.debug('checking for legacy hosts config');
-
-
-			/**
-			 * 7.27.2020
-			 * the following code bloc detects the legacy device configuration structure of an array of strings
-			 * 	then converts it to the new structure for the new devices view, which is an array of objects.  
-			 * 
-			 * Should only run once when it detects the legacy config the first time.
-			 * 
-			 * Should be able remove this down the road
-			 */
-
-			// if devices in list and first list item is a string, not an object
-			if (bigipHosts.length > 0 && typeof (bigipHosts[0]) === 'string') {
-
-				logger.debug('devices are type of:', typeof (bigipHosts[0]));
-				bigipHosts = bigipHosts.map((el: any) => {
-					let newObj: { device: string } = { device: el };
-					logger.debug(`device coverted from: ${el} -> ${JSON.stringify(newObj)}`);
-					return newObj;
-				});
-
-				logger.debug('conversion complete, saving new devices list:', bigipHosts);
-				// save config
-				vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
-				vscode.window.showWarningMessage('Legacy device config list converted!!!');
-			} else {
-				logger.debug('New device configuration list detected -> no conversion');
-			}
 
 			const treeItems = bigipHosts.map((item: {
 				device: string;
 				provider: string;
 			}) => {
-
 
 
 				// add default provider=local if not defined
@@ -483,11 +286,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 				// if device is connected device, make it expandable
 				let itemCollapsibleStat = TreeItemCollapsibleState.None;
 				if (item.device === ext.f5Client?.device.device) {
-					logger.debug('hostsTreeProvider, These devices are equal!');
 					itemCollapsibleStat = TreeItemCollapsibleState.Expanded;
-
-					// refresh/get atcMetaData
-					// this.atcMetaData = ext.f5Client?.atcMetaData;
 				}
 
 				const treeItem = new F5Host(
@@ -606,13 +405,6 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		}
 	}
 
-
-
-
-	private async parseAtcMeta() {
-
-
-	}
 }
 
 
