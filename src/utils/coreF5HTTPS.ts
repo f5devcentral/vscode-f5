@@ -461,11 +461,8 @@ import logger from './logger';
 // // // // };
 
 
-// // // // /**
-// // // //  *  just a placeholder
-// // // // =======
-// // // //  *  download file from f5
-// // // // >>>>>>> v3.0
+/**
+
  * @param url to get file
  * @param dest path/file name (./path/test.tar.gz)
  * @param host ip/fqdn where to get file
@@ -602,29 +599,29 @@ export async function download(file: string, dest: string, host: string, port: n
 
 
 
-// /**
-//  * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
-//  * 
-//  * external Download HTTP payload to file
-//  *
-//  * @param url  url
-//  * @param file local file location where the downloaded contents should go
-//  *
-//  * @returns void
-//  */
-// export async function downloadToFile(url: string, file: string): Promise<void> {
-//     await new Promise(((resolve) => {
-//         axios({
-//             httpsAgent: new https.Agent({
-//                 rejectUnauthorized: false
-//             }),
-//             method: 'GET',
-//             url,
-//             responseType: 'stream'
-//         })
-//         .then(function (response) {
-//             response.data.pipe(fs.createWriteStream(file))
-//                 .on('finish', resolve);
-//         });
-//     }));
-// }
+/**
+ * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
+ * 
+ * external Download HTTP payload to file
+ *
+ * @param url  url
+ * @param file local file location where the downloaded contents should go
+ *
+ * @returns void
+ */
+export async function downloadToFile(url: string, file: string): Promise<void> {
+    await new Promise(((resolve) => {
+        axios({
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            }),
+            method: 'GET',
+            url,
+            responseType: 'stream'
+        })
+        .then(function (response) {
+            response.data.pipe(fs.createWriteStream(file))
+                .on('finish', resolve);
+        });
+    }));
+}

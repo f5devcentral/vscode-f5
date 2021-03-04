@@ -140,10 +140,10 @@ export async function activate(context: ExtensionContext) {
 
 
 		ext.f5Client = new F5Client(device, host, user, password, {
-			port,
-			provider: device.provider,
-		},
-		ext.eventEmitterGlobal,
+				port,
+				provider: device.provider,
+			},
+			ext.eventEmitterGlobal,
 			ext.extHttp);
 
 		await ext.f5Client.connect()
@@ -941,7 +941,7 @@ export async function activate(context: ExtensionContext) {
 			// this is typically for extended information
 			// so fetch fresh information with param
 			// await ext.f5Client?.as3?.getDecs({ tenant })
-			await ext.f5Client?m(`/mgmt/shared/appsvcs/declare/${tenant}`)
+			await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare/${tenant}`)
 				.then((resp: any) => ext.panel.render(resp.data))
 				.catch(err => logger.error('get as3 tenant with param failed:', err));
 		}
@@ -962,9 +962,9 @@ export async function activate(context: ExtensionContext) {
 			title: `Deleting ${tenant.label} Tenant`
 		}, async (progress) => {
 
-			await ext.mgmtClient?.makeRequest(`/mgmt/shared/appsvcs/declare`, {
+			await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare`, {
 				method: 'POST',
-				body: {
+				data: {
 					class: 'AS3',
 					declaration: {
 						schemaVersion: tenant.command.arguments[0].schemaVersion,
@@ -1388,7 +1388,7 @@ export async function activate(context: ExtensionContext) {
 
 				return await makeExplosion(resp.data.file)
 					.then(async cfg => {
-						return await cfgProvider.explodeConfig(cfg.config, cfg.obj, cfg.explosion);
+						// return await cfgProvider.explodeConfig(cfg.config, cfg.obj, cfg.explosion);
 					})
 					.finally(() => {
 
