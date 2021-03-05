@@ -1,6 +1,6 @@
 /*
- * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
- * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
+* Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
+* license terms. Notwithstanding anything to the contrary in the EULA, Licensee
  * may copy and modify this software product for its internal business purposes.
  * Further, Licensee may upload, publish and distribute the modified version of
  * the software product on devcentral.f5.com.
@@ -23,6 +23,7 @@ import * as jsYaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as keyTarType from 'keytar';
+import * as os from 'os';
 
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
@@ -52,6 +53,13 @@ export async function activate(context: ExtensionContext) {
 	process.on('unhandledRejection', error => {
 		logger.error('unhandledRejection', error);
 	});
+
+	logger.debug(`Host details: `, {
+        hostOS: os.type(),
+        platform: os.platform(),
+        release: os.release(),
+        userInfo: `${JSON.stringify(os.userInfo())}`
+    });
 
 
 	// initialize extension settings
