@@ -13,10 +13,35 @@
 import * as tls from 'tls';
 import * as net from 'net';
 
-export function parseX509(cert: string): string {
+type tlsCert = {
+    subject: unknown,
+    issuer: unknown,
+    valid_from: unknown,
+    valid_to: unknown,
+    serialNumber: string,
+    bits: number
+};
 
+/**
+ * parse/decode raw cert body
+ * -----BEGIN CERTIFICATE----- / -----END CERTIFICATE-----
+ * 
+ * returns { subject, issuer, valid_from, valid_to, serialNumber, bits }
+ * 
+ * @param cert 
+ */
+export function parseX509(cert: string): string {
+    // https://stackoverflow.com/questions/58724396/parse-x509-certificate-string-in-node
+
+    cert = cert.replace(/\\n/g, "\n");
+
+    // create a tls context with the certificate (like we are going to make an https connection)
     const secureContext = tls.createSecureContext({ cert });
-    
+
+    // create a tls socket with the cert/context
+    const secureSocket = new tls.TLSSocket(new net.Socket(), { secureContext });
+
+    // deconstruct the output of the certificate from the secureSocket connection, then we typecast the output since the default typings lack...
     const {
         subject,
         issuer,
@@ -24,8 +49,12 @@ export function parseX509(cert: string): string {
         valid_to,
         serialNumber,
         bits
-    } = new tls.TLSSocket(new net.Socket(), {secureContext}).getCertificate() as tls.PeerCertificate;
+    } = secureSocket.getCertificate() as tlsCert;
 
+    // destroy the socket to return resources
+    secureSocket.destroy();
+
+    // return the stringified cert to strip out the object prototype tags
     return JSON.stringify({
         subject,
         issuer,

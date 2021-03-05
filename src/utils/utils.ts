@@ -255,7 +255,7 @@ export async function getPassword(device: string): Promise<any> {
 /**
  * capture entire active editor text or selected text
  */
-export async function getText() {
+export async function getText(): Promise<string> {
 
     // get editor window
     var editor = vscode.window.activeTextEditor;
@@ -268,7 +268,7 @@ export async function getText() {
         } 
     } else {
         logger.warn('getText was called, but no active editor... this should not happen');
-        return; // No open/active text editor
+        throw new Error('getText was called, but no active editor... this should not happen'); // No open/active text editor
     }
     
 }

@@ -287,7 +287,8 @@
 			{
 				"command": "f5.getF5HostInfo",
 				"title": "Show Device Info",
-				"category": "F5"
+				"category": "F5",
+				"enablement": "f5.device"
 			},
 			{
 				"command": "f5.cfgExploreOnConnect",
@@ -973,10 +974,6 @@
 				},
 				{
 					"command": "f5.clearPassword",
-					"when": "view == f5Hosts && viewItem == f5Host"
-				},
-				{
-					"command": "f5.getF5HostInfo",
 					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{

@@ -12,11 +12,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 
-import { downloadToFileNew } from './utils/coreF5HTTPS';
+// import { downloadToFileNew } from './utils/coreF5HTTPS';
 import { commands, ExtensionContext, window } from 'vscode';
 import logger from './utils/logger';
 import { getRPMgit, listGitReleases } from './utils/rpmMgmt';
 import axios from 'axios';
+import { ext } from './extensionVariables';
+import { ExtHttp } from 'f5-conx-core';
 
 /**
  * Provides command to download github releases of this extension so users can easily access beta versions for testing
@@ -27,7 +29,7 @@ export class ChangeVersion {
 	 */
 	readonly repo = 'https://api.github.com/repos/f5devcentral/vscode-f5/releases';
 
-	constructor(context: ExtensionContext) {
+	constructor(context: ExtensionContext, extHttp: ExtHttp) {
 
 		context.subscriptions.push(commands.registerCommand('f5.changeVersion', async () => {
 
@@ -53,7 +55,8 @@ export class ChangeVersion {
 			// if we have a selection from the previous list
 			if (chosenVersion && typeof chosenVersion === 'object' && chosenVersion.asset) {
 
-				const downloadLocation = await axios(chosenVersion.asset)
+				// const downloadLocation = await axios(chosenVersion.asset)
+				const downloadLocation = await extHttp.makeRequest({ url: chosenVersion.asset })
 					.then(async resp => {
 
 						// loop through assets get needed information
@@ -70,7 +73,8 @@ export class ChangeVersion {
 						} else {
 							logger.debug(`${assetSet[0].name} NOT found in local cache, downloading...`);
 							// await rpmDownload(item.browser_download_url, destPath);
-							return await downloadToFileNew(assetSet[0].browser_download_url, destPath)
+							// return await downloadToFileNew(assetSet[0].browser_download_url, destPath)
+							return await extHttp.download(assetSet[0].browser_download_url, undefined, extDir)
 								.then(resp => {
 									// return path to downloaded file
 									return resp.data.file;
@@ -85,21 +89,21 @@ export class ChangeVersion {
 				// 	// https://github.com/microsoft/vscode-remote-release/issues/385
 				// 	// https://github.com/microsoft/vscode-remote-release/issues/2749
 				// 	// furthermore, code-server command for web based code would require detecting the environemnt and changing the command accordingly
-				logger.info('f5.changeVersion, the install command will probably NOT work, but at least the new extenion version will be downloaded and easily installable via the UI');
+				// logger.info('f5.changeVersion, the install command will probably NOT work, but at least the new extenion version will be downloaded and easily installable via the UI');
 
 				const cmd2Install = `code --install-extension ${downloadLocation}`;
-				logger.info('f5.changeVersion, installing: \n\n', cmd2Install, '\n\n');
+				logger.info('f5.changeVersion, you can try the following command, or just "install vsix from UI", cmd: \n\n', cmd2Install, '\n\n');
 
-				try {
-					// try to issue the install command via node sub-process
-					const installResp = cp.execSync(cmd2Install).toString();
-					logger.info('f5.changeVersion, install response', installResp);
+				// try {
+				// 	// try to issue the install command via node sub-process
+				// 	const installResp = cp.execSync(cmd2Install).toString();
+				// 	logger.info('f5.changeVersion, install response', installResp);
 
-					// TODO: this need some work. over remote-ssh file does not download and it doesn't fail appropriately
-				} catch (e) {
+				// 	// TODO: this need some work. over remote-ssh file does not download and it doesn't fail appropriately
+				// } catch (e) {
 
-					logger.info('f5.changeVersion, failed install', e);
-				}
+				// 	logger.info('f5.changeVersion, failed install', e);
+				// }
 
 			} else {
 				logger.info('f5.changeVersion, valid selection details not detected, user probably exited quick pick dropdown');

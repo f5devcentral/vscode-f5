@@ -14,6 +14,8 @@ import { EventEmitter } from "events";
 
 import { F5Client } from "./f5Client";
 import { AtcVersions, AtcVersionsClient, ExtHttp } from 'f5-conx-core';
+import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
+import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 
 type KeyTar = typeof keyTarType;
 
@@ -28,6 +30,8 @@ export namespace ext {
     export let f5Client: F5Client | undefined;
     export let extHttp: ExtHttp;
     export let keyTar: KeyTar;
+    export let hostsTreeProvider: F5TreeProvider;
+    export let as3Tree: AS3TreeProvider;
     export let eventEmitterGlobal: EventEmitter;
     export let atcVersions: AtcVersions;
     export let connectBar: StatusBarItem;

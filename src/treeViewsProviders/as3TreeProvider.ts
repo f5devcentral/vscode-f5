@@ -18,18 +18,24 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 	readonly onDidChangeTreeData: Event<AS3item | undefined> = this._onDidChangeTreeData.event;
 
 	/**
-	 * target/tenant/app map from /declare endpoint
+	 * target/tenant/app map derived from /declare endpoint
 	 */
 	as3DeclareMap: As3AppMap | undefined;
 
 	/**
-	 * original declare output
+	 * original /declare api output
 	 */
 	declare: AdcDeclaration[] = [];
 
+	/**
+	 * did we detect any targets in the declaration(s)?
+	 */
 	targets: boolean = false;
 
-	private _tasks: string[] = [];
+	/**
+	 * raw as3 /tasks endpoint output
+	 */
+	tasks: string[] = [];
 
 	constructor() {
 	}
@@ -37,7 +43,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 	refresh(): void {
 		this.as3DeclareMap = undefined;
 		this.declare = [];
-		this._tasks = [];
+		this.tasks = [];
 		this._onDidChangeTreeData.fire(undefined);
 	}
 
@@ -66,13 +72,13 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 							return (isObject(tVal) && tKey !== 'target' && tKey !== 'controls');
 						}).length.toString();
 
-						if (!this.as3DeclareMap) {
-							// this should never happen, but TS needs it...
-							return;
-						}
+						// if (!this.as3DeclareMap) {
+						// 	// this should never happen, but TS needs it...
+						// 	return;
+						// }
 
 						// get appStats and set as tooltip
-						const as3DecMap = this.as3DeclareMap[target];
+						const as3DecMap = this.as3DeclareMap?.[target];
 						const as3DecMapStringified = jsYaml.safeDump(as3DecMap, { indent: 4 });
 
 						treeItems.push(new AS3item(target, targetTenCount, as3DecMapStringified, 'as3Target', TreeItemCollapsibleState.Collapsed,
@@ -176,31 +182,31 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 						tenantDeclaration = this.declare[0];
 					}
 
-					
-					
+
+
 					if (tenantDeclaration) {
-	
+
 						// get target details, at this point we should know for certain that we are dealing with targets...
 						const toolTip
 							= tenantDeclaration?.target?.address ? `${tenantDeclaration.target.address}/${element.label}`
 								: tenantDeclaration?.target?.hostname ? `${tenantDeclaration.target.hostname}/${element.label}`
 									: `${element.label}`;
-	
-	
+
+
 						// get the device declaration with tenants						
 						const apps = Object.entries(tenantDeclaration[element.label] as object).filter(([tenantKey, tenantValue]) => {
 							return (isObject(tenantValue));
 						});
 
-						
-						apps.map( async app => {
+
+						apps.map(async app => {
 							// bunch of typing magic..
 							const appDec = tenantDeclaration[element.label] as As3Tenant;
 							const appStats = await as3AppStats(appDec[app[0]] as object);
 							const appCount = Object.keys(appStats as object).length.toString();
 							treeItems.push(
 								new AS3item(app[0], appCount, toolTip, 'as3App', TreeItemCollapsibleState.Collapsed,
-								{ command: '', title: '', arguments: [] })
+									{ command: '', title: '', arguments: [] })
 							);
 						});
 					}
@@ -236,7 +242,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 				} else if (element.label === 'Tasks') {
 
-					treeItems = this._tasks.map((task: any) => {
+					treeItems = this.tasks.map((task: any) => {
 						return new AS3item(task.iId.split('-').pop(), task.timeStamp, '', '', TreeItemCollapsibleState.None,
 							{ command: 'f5-as3.getTask', title: '', arguments: [task.iId] });
 					});
@@ -251,30 +257,35 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				await this.getTenants(); // refresh tenant information
 				await this.getTasks();	// refresh tasks information
 
-				const taskCount = this._tasks.length !== 0 ? this._tasks.length.toString() : '';
+				const taskCount = this.tasks.length !== 0 ? this.tasks.length.toString() : '';
 
-				// if we have bigiQ/targets
-				if (this.targets) {
+				// only try to parse declarations if we have an as3 dec map
+				// sometimes AS3 is installed but has no apps
+				if (this.as3DeclareMap) {
 
-					const targetCount = Object.keys(this.as3DeclareMap as object).length.toString();
-					treeItems.push(
-						new AS3item('Targets', targetCount, '', '', TreeItemCollapsibleState.Collapsed,
-							{ command: '', title: '', arguments: [''] })
-					);
+					// if we have bigiQ/targets
+					if (this.targets) {
 
-				} else {
+						const targetCount = Object.keys(this.as3DeclareMap as object).length.toString();
+						treeItems.push(
+							new AS3item('Targets', targetCount, '', '', TreeItemCollapsibleState.Collapsed,
+								{ command: '', title: '', arguments: [''] })
+						);
 
-					const tenCount = Object.keys(this.as3DeclareMap as object).length.toString();
-					treeItems.push(
-						new AS3item('Tenants', tenCount, 'Get All Tenants', '', TreeItemCollapsibleState.Collapsed,
-							{ command: 'f5-as3.getDecs', title: '', arguments: [this.declare] })
-					);
+					} else {
 
+						const tenCount = Object.keys(this.as3DeclareMap as object).length.toString();
+						treeItems.push(
+							new AS3item('Tenants', tenCount, 'Get All Tenants', '', TreeItemCollapsibleState.Collapsed,
+								{ command: 'f5-as3.getDecs', title: '', arguments: [this.declare] })
+						);
+
+					}
 				}
 
 				treeItems.push(
 					new AS3item('Tasks', taskCount, 'Get All Tasks', '', TreeItemCollapsibleState.Collapsed,
-						{ command: 'f5-as3.getTask', title: '', arguments: [this._tasks] })
+						{ command: 'f5-as3.getTask', title: '', arguments: [this.tasks] })
 				);
 			}
 		} else {
@@ -285,32 +296,29 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 	private async getTenants() {
 
-		// await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare/`)
 		await ext.f5Client?.as3?.getDecs()
 			.then(async (resp: any) => {
 
-				if ( resp.status === 200) {
+				if (resp.status === 200) {
 					// set targets boolens so we know if we are workign with targets or just tenants
 					this.targets = await targetDecsBool(resp.data);
-					
+
 					// assign the raw /declare output
-					this.declare = Array.isArray(resp.data) ? resp.data : [ resp.data ];
-	
+					this.declare = Array.isArray(resp.data) ? resp.data : [resp.data];
+
 					// create target/tenant/app map
 					this.as3DeclareMap = await mapAs3(resp.data);
 
 				}
-
-
 			});
 	}
 
 	private async getTasks() {
-		// await ext.f5Client?.https(`/mgmt/shared/appsvcs/task/`)
+
 		await ext.f5Client?.as3?.getTasks()
 			.then((resp: any) => {
-				this._tasks = [];	// clear current tenant list
-				this._tasks = resp.data.items.map((item: any) => {
+				this.tasks = [];	// clear current tenant list
+				this.tasks = resp.data.items.map((item: any) => {
 					// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
 					const timeStamp = item.declaration.hasOwnProperty('controls') ? item.declaration.controls.archiveTimestamp : '';
 					const iId = item.id;
@@ -320,6 +328,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 			});
 	}
 }
+
 
 /**
  * returns true if working with targets
@@ -505,7 +514,7 @@ export function sortTreeItems(treeItems: AS3item[]) {
  * @returns boolean
  */
 export function isObject(x: any): boolean {
-	return ( x !== null && typeof x === 'object' ? true : false);
+	return (x !== null && typeof x === 'object' ? true : false);
 };
 
 

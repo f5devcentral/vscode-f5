@@ -22,7 +22,7 @@ export class F5Client extends _F5Client {
     // logger: typeof Logger;
     device: Device;
     events: EventEmitter;
-    private terminal: Terminal | undefined;
+    terminal: Terminal | undefined;
 
     hostStatusBar: StatusBarItem;
     hostNameBar: StatusBarItem;
