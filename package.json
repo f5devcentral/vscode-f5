@@ -1056,8 +1056,8 @@
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"@types/js-yaml": "^3.12.6",
 		"axios": "^0.21.1",
-		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git",
 		"f5-conx-core": "file:../f5-conx-core",
+		"f5-corkscrew": "file:../f5-corkscrew",
 		"js-yaml": "^3.14.1",
 		"keytar": "^6.0.1"
 	}

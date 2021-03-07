@@ -15,7 +15,8 @@ import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
 import { atcMetaData, AtcRelease, AtcVersion, AtcVersions, AtcVersionsClient, F5Client } from 'f5-conx-core';
 
-
+// icon listing for addin icons to key elements
+// https://code.visualstudio.com/api/references/icons-in-labels#icon-listing
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
