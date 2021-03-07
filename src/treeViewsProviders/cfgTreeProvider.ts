@@ -21,7 +21,7 @@ import {
     Position,
     workspace,
     TextDocument,
-    Range
+    Range,
 } from 'vscode';
 import { ext } from '../extensionVariables';
 
@@ -53,37 +53,42 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     constructor() {
     }
 
-    // async explodeConfig(explosion: Explosion){
-    //     this.explosion = explosion;
-    // }
-
     async makeExplosion(file: string) {
 
-        this.bigipConfig = new BigipConfig();
+        window.withProgress({
+            location: {
+                viewId: 'cfgTree'
+            },
+            title: `Extracting TMOS Configs`,
+        }, async () => {
+            this.bigipConfig = new BigipConfig();
 
-        this.bigipConfig.on('parseFile', x => {
-            this.parsedFileEvents.push(x);
-            ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, parsing file -> ${x}`);
+            this.bigipConfig.on('parseFile', x => {
+                this.parsedFileEvents.push(x);
+                ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, parsing file -> ${x}`);
+            });
+            this.bigipConfig.on('parseObject', x => this.parsedObjEvents.push(x));
+
+            ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, opening archive`);
+
+            await this.bigipConfig.loadParseAsync(file)
+                .catch(err => logger.error('makeExplosion', err));
+
+
+            ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extracting apps`);
+            await this.bigipConfig.explode()
+                .then(exp => {
+                    this.explosion = exp;
+                    ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extraction complete`);
+                    this.refresh();
+                })
+                .catch(err => logger.error('makeExplosion', err));
+
         });
-        this.bigipConfig.on('parseObject', x => this.parsedObjEvents.push(x));
-
-        ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, opening archive`);
-
-        await this.bigipConfig.loadParseAsync(file)
-            .catch(err => logger.error('makeExplosion', err));
-
-
-        ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extracting apps`);
-        await this.bigipConfig.explode()
-            .then(exp => {
-                this.explosion = exp;
-                ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extraction complete`);
-                this.refresh();
-            })
-            .catch(err => logger.error('makeExplosion', err));
     }
 
-    async importExplosion (exp: Explosion) {
+
+    async importExplosion(exp: Explosion) {
         this.explosion = exp;
     }
 
@@ -189,7 +194,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                         return;
                     }
                 })
-                .map((el: ConfigFile) => `\n###  ${el.fileName}\n${el.content}\n\n`);
+                    .map((el: ConfigFile) => `\n###  ${el.fileName}\n${el.content}\n\n`);
 
                 treeItems.push(new CfgApp('FileStore', '', this.bigipConfig.fileStore.length.toString(), '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [allFileStore.join('\n')] }));
