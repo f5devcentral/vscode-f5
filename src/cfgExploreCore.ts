@@ -29,52 +29,6 @@ export function cfgExplore(context: ExtensionContext) {
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreOnConnect', async (item) => {
 
-        /**
-         * now to ready the archive contents and feed to corkscrew...
-         * 
-         * https://stackoverflow.com/questions/39705209/node-js-read-a-file-in-a-zip-without-unzipping-it
-         * 
-         * Thinking this is all best to handle in corkscrew so it can handle
-         * 	any file type we specify, bigip.conf as string, bigip.conf as single file,
-         * 	UCS arcive, qkview, or our special little archive from above
-         * 
-         */
-
-        // 		if (!ext.mgmtClient) {
-        // 			/**
-        // 			 * loop this back into the connect flow, since we have the device, automatically connect
-        // 			 *  - this should probably happen in the main extension.ts
-        // 			 */
-        // 			// await commands.executeCommand('f5.connectDevice', item.label);
-        // 			return window.showWarningMessage('Connect to BIGIP Device first');
-        // 		}
-
-        // 		const file = await getMiniUcs();
-        // 		let expl: any = undefined;
-
-        // 		if (file) {
-        // 			logger.debug('Got mini_ucs -> extracting config with corkscrew');
-
-        // 			expl = await makeExplosion(file);
-
-        // 			if (expl) {
-        // 				await cfgProvider.explodeConfig(expl.explosion);
-
-        // 				// inject the config files (not included in explosion output by default)
-        // 				// cfgProvider.bigipConfs = expl.config;
-        // 				// inject the config object (just for looks...)
-        // 				cfgProvider.confObj = expl.obj;
-        // 			}
-
-
-        // 			try {
-        // 				// wait  couple seconds before we try to delete the mini_ucs
-        // 				setTimeout(() => { fs.unlinkSync(file); }, 2000);
-        // 			} catch (e) {
-        // 				logger.error('Not able to delete mini_ucs at:', file);
-        // 			}
-        // 		} else {
-        // 			logger.error('Failed to retrieve mini_ucs for configuration exploration');
         if (!ext.f5Client) {
             await commands.executeCommand('f5.connectDevice', item.command.arguments[0]);
         }
@@ -83,26 +37,8 @@ export function cfgExplore(context: ExtensionContext) {
         return await ext.f5Client?.ucs?.get({ mini: true, localDestPathFile: ext.cacheDir })
             .then(async resp => {
                 logger.debug('Got mini_ucs -> extracting config with corkscrew');
-
                 cfgProvider.makeExplosion(resp.data.file);
-                // return await makeExplosion(resp.data.file)
-                //     .then(async cfg => {
-                //         // return await cfgProvider.explodeConfig(cfg.config, cfg.obj, cfg.explosion);
-                //     })
-                //     .finally(() => {
-
-                //         logger.debug('Deleting mini_ucs file at', resp.data.file);
-
-                //         try {
-                //             // wait  couple seconds before we try to delete the mini_ucs
-                //             setTimeout(() => { fs.unlinkSync(resp.data.file); }, 2000);
-                //         } catch (e) {
-                //             logger.error('Not able to delete mini_ucs at:', resp.data.file);
-                //         }
-                //     });
             });
-
-        cfgProvider.refresh();	// refresh with the new information
     }));
 
     /**
@@ -152,27 +88,9 @@ export function cfgExplore(context: ExtensionContext) {
             filePath = filePath.substr(1);
         }
 
-
-
         logger.info(`f5.cfgExplore: exploding config @ ${filePath}`);
 
         cfgProvider.makeExplosion(filePath);
-        // await makeExplosion(filePath)
-        //     .then(async expl => {
-
-        //         if (expl.explosion) {
-        //             await cfgProvider.explodeConfig(expl.explosion);
-        //         }
-
-        //         if (expl.obj) {
-        //             // inject the config object (just for looks...)
-        //             cfgProvider.confObj = expl.obj;
-        //         }
-        //         cfgProvider.refresh();	// refresh with the new information
-        //     })
-        //     .catch(err => {
-        //         logger.error('cfgExplorer error', err);
-        //     });
 
     }));
 
@@ -221,7 +139,7 @@ export function cfgExplore(context: ExtensionContext) {
                 const read = fs.readFileSync(filePath, 'utf-8');
                 // parse json
                 const read2 = JSON.parse(read);
-                // await cfgProvider.explodeConfig(read2);
+                await cfgProvider.importExplosion(read2);
             } catch (e) {
                 logger.error('cfgExploreRawCorkscrew import failed', e);
             }

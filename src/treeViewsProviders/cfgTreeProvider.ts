@@ -25,7 +25,7 @@ import {
 } from 'vscode';
 import { ext } from '../extensionVariables';
 
-import { ConfigFile, ConfigFiles, Explosion, TmosApp, xmlStats } from 'f5-corkscrew';
+import { ConfigFile, Explosion, TmosApp, xmlStats } from 'f5-corkscrew';
 import logger from '../utils/logger';
 import BigipConfig from 'f5-corkscrew/dist/ltm';
 
@@ -81,6 +81,10 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 this.refresh();
             })
             .catch(err => logger.error('makeExplosion', err));
+    }
+
+    async importExplosion (exp: Explosion) {
+        this.explosion = exp;
     }
 
     async refresh(): Promise<void> {
@@ -178,14 +182,12 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     { command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion.config.base] }));
             }
 
-            if (this.bigipConfig?.fileStore) {
+            if (this.bigipConfig?.fileStore && this.bigipConfig?.fileStore.length > 0) {
                 const allFileStore = this.bigipConfig.fileStore.filter((el: ConfigFile) => {
-
                     // only return the certs and keys for now
                     if (el.fileName.includes('/certificate_d/') || el.fileName.includes('/certificate_key_d/')) {
                         return;
                     }
-                    // el.content.join('\n').concat(brkr)
                 })
                 .map((el: ConfigFile) => `\n###  ${el.fileName}\n${el.content}\n\n`);
 
