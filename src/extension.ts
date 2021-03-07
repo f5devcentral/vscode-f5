@@ -48,6 +48,7 @@ import { Hovers } from './hovers';
 // update this logger with f5-conx-core logger
 import logger from './utils/logger';
 import { cfgExplore } from './cfgExploreCore';
+import { FastCore } from './fastCore';
 
 export async function activate(context: ExtensionContext) {
 
@@ -83,6 +84,8 @@ export async function activate(context: ExtensionContext) {
 	new ChangeVersion(context, ext.extHttp);
 	
 	new Hovers(context, ext.eventEmitterGlobal);
+
+	new FastCore(context);
 	
 	
 	// or do we prefer the function style of importing core blocks?
@@ -245,7 +248,7 @@ export async function activate(context: ExtensionContext) {
 
 		let text: string | Buffer;
 
-		if (!sFile) {
+		if (!sFile || sFile.scheme === "untitled") {
 			// not right click from explorer view, so gather file details
 
 			// get editor window

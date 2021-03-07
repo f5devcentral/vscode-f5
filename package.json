@@ -639,6 +639,10 @@
 					"group": "F5"
 				},
 				{
+					"command": "f5-fast.postTemplate",
+					"group": "F5"
+				},
+				{
 					"command": "f5-fast.renderHtmlPreview",
 					"group": "F5"
 				},

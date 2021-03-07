@@ -71,7 +71,7 @@ export class Hovers {
 
                         // treat everything else as regular text, so clean up the excaping and display
                         let bodyText = jsonLine.replace(/\\\"/g, '\"');
-                        bodyText = bodyText.replace(/\\n/g, '\n');
+                        bodyText = bodyText.replace(/(?:\\n|\\r\\n)/g, '\n');
                         return new Hover({ language: 'yaml', value: bodyText });
                     }
                 }
