@@ -99,6 +99,8 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     clear(): void {
         this.bigipConfig = undefined;
         this.explosion = undefined;
+        this.parsedFileEvents.length = 0;
+        this.parsedObjEvents.length = 0;
         this.refresh();
     }
 

@@ -46,4 +46,12 @@ The allows for expanded possible workflows where details can be loaded via any m
 
 > example 2:  load config from qkview, then merge an application with a connected device
 
-<img src="./media/configExplore_clear_11.04.2020.PNG" alt="drawing" width="80%"/>
+<img src="./media/configExplore_clear_11.04.2020.PNG" alt="drawing" width="60%"/>
+
+## Searching Config Explorer View
+
+The config explorer view has a simple search/filter function that can be accessed by clicking on the device item at the top, the typing in the text to search.  All matches are highlighted.  
+
+Additionally, clicking in the search text box will filter the results
+
+<img src="./media/configExplerSearching_3.7.2021.gif" alt="drawing" width="60%"/>
