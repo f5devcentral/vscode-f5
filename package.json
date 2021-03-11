@@ -466,12 +466,6 @@
 				"enablement": "f5.fastInstalled"
 			},
 			{
-				"command": "f5-fast.postTemplate",
-				"title": "Post Template",
-				"category": "F5-Fast",
-				"enablement": "f5.fastInstalled"
-			},
-			{
 				"command": "f5-fast.postTemplateSet",
 				"title": "Post Template Set",
 				"category": "F5-Fast",
@@ -643,10 +637,6 @@
 					"group": "F5"
 				},
 				{
-					"command": "f5-fast.postTemplate",
-					"group": "F5"
-				},
-				{
 					"command": "f5-fast.renderHtmlPreview",
 					"group": "F5"
 				},
@@ -720,11 +710,6 @@
 				{
 					"when": "f5.fastInstalled && explorerResourceIsFolder",
 					"command": "f5-fast.postTemplateSet",
-					"group": "F5-Fast"
-				},
-				{
-					"when": "f5.fastInstalled && resourceExtname =~ /\\.(mst|ya?ml|fast)/",
-					"command": "f5-fast.postTemplate",
 					"group": "F5-Fast"
 				},
 				{
@@ -858,10 +843,6 @@
 				{
 					"command": "f5-fast.getApps",
 					"when": "none"
-				},
-				{
-					"command": "f5-fast.postTemplate",
-					"when": "f5.fastInstalled"
 				},
 				{
 					"command": "f5-fast.postTemplateSet",

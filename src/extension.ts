@@ -244,37 +244,37 @@ export async function activate(context: ExtensionContext) {
 
 	}));
 
-	context.subscriptions.push(commands.registerCommand('f5-fast.postTemplate', async (sFile) => {
+	// context.subscriptions.push(commands.registerCommand('f5-fast.postTemplate', async (sFile) => {
 
-		let text: string | Buffer;
+	// 	let text: string | Buffer;
 
-		if (!sFile || sFile.scheme === "untitled") {
-			// not right click from explorer view, so gather file details
+	// 	if (!sFile || sFile.scheme === "untitled") {
+	// 		// not right click from explorer view, so gather file details
 
-			// get editor window
-			var editor = window.activeTextEditor;
-			if (!editor) {
-				return; // No open text editor
-			}
+	// 		// get editor window
+	// 		var editor = window.activeTextEditor;
+	// 		if (!editor) {
+	// 			return; // No open text editor
+	// 		}
 
-			// capture selected text or all text in editor
-			if (editor.selection.isEmpty) {
-				text = editor.document.getText();	// entire editor/doc window
-			} else {
-				text = editor.document.getText(editor.selection);	// highlighted text
-			}
-		} else {
-			// right click from explorer view, so load file contents
-			const fileContents = fs.readFileSync(sFile.fsPath);
-			// convert from buffer to string
-			text = fileContents.toString('utf8');
-		}
+	// 		// capture selected text or all text in editor
+	// 		if (editor.selection.isEmpty) {
+	// 			text = editor.document.getText();	// entire editor/doc window
+	// 		} else {
+	// 			text = editor.document.getText(editor.selection);	// highlighted text
+	// 		}
+	// 	} else {
+	// 		// right click from explorer view, so load file contents
+	// 		const fileContents = fs.readFileSync(sFile.fsPath);
+	// 		// convert from buffer to string
+	// 		text = fileContents.toString('utf8');
+	// 	}
 
-		await f5FastUtils.zipPostTemplate(text);
+	// 	await f5FastUtils.zipPostTemplate(text);
 
-		await new Promise(resolve => { setTimeout(resolve, 1000); });
-		fastTreeProvider.refresh();
-	}));
+	// 	await new Promise(resolve => { setTimeout(resolve, 1000); });
+	// 	fastTreeProvider.refresh();
+	// }));
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.postTemplateSet', async (sPath) => {
 

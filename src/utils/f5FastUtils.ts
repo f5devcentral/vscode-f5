@@ -13,120 +13,120 @@ https://github.com/f5devcentral/f5-fast-core/blob/develop/cli.js
 
 const fast = require('@f5devcentral/f5-fast-core');
 
-/**
- * single fast template validate, zip, upload and import function
- * will detect what device is currently selected
- * @param doc template/text from editor (or selection)
- */
-export async function zipPostTemplate (doc: string) {
+// /**
+//  * single fast template validate, zip, upload and import function
+//  * will detect what device is currently selected
+//  * @param doc template/text from editor (or selection)
+//  */
+// export async function zipPostTemplate (doc: string) {
 
-    /*
-    look at using a system temp directory also fs.mkdtemp(dirprefix)
-    https://nodejs.org/api/fs.html#fs_fs_mkdtemp_prefix_options_callback
-    https://code.visualstudio.com/api/references/vscode-api#ExtensionContext
-    */
+//     /*
+//     look at using a system temp directory also fs.mkdtemp(dirprefix)
+//     https://nodejs.org/api/fs.html#fs_fs_mkdtemp_prefix_options_callback
+//     https://code.visualstudio.com/api/references/vscode-api#ExtensionContext
+//     */
 
-    const progressBar = await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        title: 'Upload Fast Template',
-        cancellable: true
-    }, async (progress, token) => {
-        token.onCancellationRequested(() => {
-            logger.debug("User canceled the template upload");
-            return new Error(`User canceled the template`);
-        });
+//     const progressBar = await vscode.window.withProgress({
+//         location: vscode.ProgressLocation.Notification,
+//         title: 'Upload Fast Template',
+//         cancellable: true
+//     }, async (progress, token) => {
+//         token.onCancellationRequested(() => {
+//             logger.debug("User canceled the template upload");
+//             return new Error(`User canceled the template`);
+//         });
         
-        progress.report({ message: `Please provide a Template Set Name`});
+//         progress.report({ message: `Please provide a Template Set Name`});
         
-        //get folder name from user
-        //  potentially make this an input/select box to allow create a new folder or select existing
-        const fastTemplateFolderName = await vscode.window.showInputBox({
-            prompt: 'Destination FAST Templates Folder Name ---',
-            value: 'test'
-        });
+//         //get folder name from user
+//         //  potentially make this an input/select box to allow create a new folder or select existing
+//         const fastTemplateFolderName = await vscode.window.showInputBox({
+//             prompt: 'Destination FAST Templates Folder Name ---',
+//             value: 'test'
+//         });
         
-        progress.report({ message: `Please provide a Template Name`});
-        // get template name from user
-        const fastTemplateName = await vscode.window.showInputBox({
-            placeHolder: 'appTemplate1',
-            value: 'testTemplate',
-            prompt: 'Input Destination FAST Template Name ---'
-        });
+//         progress.report({ message: `Please provide a Template Name`});
+//         // get template name from user
+//         const fastTemplateName = await vscode.window.showInputBox({
+//             placeHolder: 'appTemplate1',
+//             value: 'testTemplate',
+//             prompt: 'Input Destination FAST Template Name ---'
+//         });
 
 
-        if (!fastTemplateName) {
-            // if no destination template name provided, it will fail, so exit
-            return vscode.window.showWarningMessage('No destination FAST template name provided!');
-        }
+//         if (!fastTemplateName) {
+//             // if no destination template name provided, it will fail, so exit
+//             return vscode.window.showWarningMessage('No destination FAST template name provided!');
+//         }
         
         
-        const coreDir = ext.context.extensionPath; 
-        const fullTempDir = path.join(coreDir, 'fastTemplateFolderUploadTemp');
-        const zipOut = path.join(coreDir, `${fastTemplateFolderName}.zip`);
+//         const coreDir = ext.context.extensionPath; 
+//         const fullTempDir = path.join(coreDir, 'fastTemplateFolderUploadTemp');
+//         const zipOut = path.join(coreDir, `${fastTemplateFolderName}.zip`);
         
-        logger.debug('fast Template Folder Name: ', fastTemplateFolderName);
-        logger.debug('fast Template Name: ', fastTemplateName);
-        logger.debug('base directory: ', coreDir);
-        logger.debug('full Temp directory: ', fullTempDir);
-        logger.debug('zip output dir/fileName: ', zipOut);
+//         logger.debug('fast Template Folder Name: ', fastTemplateFolderName);
+//         logger.debug('fast Template Name: ', fastTemplateName);
+//         logger.debug('base directory: ', coreDir);
+//         logger.debug('full Temp directory: ', fullTempDir);
+//         logger.debug('zip output dir/fileName: ', zipOut);
 
         
-        //  if the temp directory is not there, create it
-        //      this shouldn't happen but if things get stuck half way...
-        if (!fs.existsSync(fullTempDir)) {
-            fs.mkdirSync(fullTempDir);
-        }
+//         //  if the temp directory is not there, create it
+//         //      this shouldn't happen but if things get stuck half way...
+//         if (!fs.existsSync(fullTempDir)) {
+//             fs.mkdirSync(fullTempDir);
+//         }
 
-        progress.report({ message: `Verifing and Packaging Template`});
-        await new Promise(resolve => { setTimeout(resolve, (1000)); });
+//         progress.report({ message: `Verifing and Packaging Template`});
+//         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
 
-        // // log whats in the new folder in above dir
-        // logger.debug(fs.readdirSync(fullTempDir));
+//         // // log whats in the new folder in above dir
+//         // logger.debug(fs.readdirSync(fullTempDir));
 
-        fs.writeFileSync(path.join(fullTempDir, `${fastTemplateName}.mst`), doc);
+//         fs.writeFileSync(path.join(fullTempDir, `${fastTemplateName}.yml`), doc);
         
-        const zipedTemplates = await packageTemplateSet2(fullTempDir, zipOut);
+//         const zipedTemplates = await packageTemplateSet2(fullTempDir, zipOut);
 
-        //f5-sdk-js version
-        progress.report({ message: `Uploading Template`});
-        await new Promise(resolve => { setTimeout(resolve, (1000)); });
+//         //f5-sdk-js version
+//         progress.report({ message: `Uploading Template`});
+//         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
-        const uploadStatus = await ext.f5Client?.upload(zipOut, 'FILE');
+//         const uploadStatus = await ext.f5Client?.upload(zipOut, 'FILE');
 
-        progress.report({ message: `Installing Template`});
-        await new Promise(resolve => { setTimeout(resolve, (1000)); });
+//         progress.report({ message: `Installing Template`});
+//         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
-        const importStatus = await ext.f5Client?.https('/mgmt/shared/fast/templatesets', {
-            method: 'POST',
-            data: {
-                name: fastTemplateFolderName
-            }
-        });
+//         const importStatus = await ext.f5Client?.https('/mgmt/shared/fast/templatesets', {
+//             method: 'POST',
+//             data: {
+//                 name: fastTemplateFolderName
+//             }
+//         });
         
-        progress.report({ message: `Deleting temporary files`});
-        logger.debug(`Pending Delete of Temporary folder/files`);
-        // if the temp directory is there, list contents, delete all files, then delete the directory
-        if (fs.existsSync(fullTempDir)) {
+//         progress.report({ message: `Deleting temporary files`});
+//         logger.debug(`Pending Delete of Temporary folder/files`);
+//         // if the temp directory is there, list contents, delete all files, then delete the directory
+//         if (fs.existsSync(fullTempDir)) {
 
-            const dirContents = fs.readdirSync(fullTempDir);
+//             const dirContents = fs.readdirSync(fullTempDir);
 
-            dirContents.map( item => {
-                const pathFile = path.join(fullTempDir, item);
-                logger.debug(`Deleting file: ${pathFile}`);
-                fs.unlinkSync(pathFile);
-            });
+//             dirContents.map( item => {
+//                 const pathFile = path.join(fullTempDir, item);
+//                 logger.debug(`Deleting file: ${pathFile}`);
+//                 fs.unlinkSync(pathFile);
+//             });
             
-            logger.debug(`Deleting folder: ${fullTempDir}`);
-            fs.rmdirSync(fullTempDir, { recursive: true });
-        }
-        // remove zip file
-        logger.debug(`Deleting zip: ${zipOut}`);
-        fs.unlinkSync(zipOut);
-        await new Promise(resolve => { setTimeout(resolve, (1000)); });
+//             logger.debug(`Deleting folder: ${fullTempDir}`);
+//             fs.rmdirSync(fullTempDir, { recursive: true });
+//         }
+//         // remove zip file
+//         logger.debug(`Deleting zip: ${zipOut}`);
+//         fs.unlinkSync(zipOut);
+//         await new Promise(resolve => { setTimeout(resolve, (1000)); });
 
-    });
-}
+//     });
+// }
 
 
 /**
