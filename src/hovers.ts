@@ -54,23 +54,37 @@ export class Hovers {
                 // get the entire line from the editor doc
                 const docLineText = document.lineAt(position.line).text;
 
-                // is this a json line?  "key": "...capture..."
-                const jsonLine = docLineText.match(/\"[\w\-\/_.]+\": ?\"(.+)\".?/)?.[1];
+                // is this a json line?  "key": "...value..."
+                const jsonLine = docLineText.match(/ *\"(?<key>[\w\-\/_.]+)\": ?\"(?<value>.+)\",?/);
 
+                if (jsonLine?.groups) {
 
-                if (jsonLine) {
+                    if (jsonLine.groups.key === 'base64') {
 
-                    if (/-{3,}BEGIN CERTIFICATE-{3,}[\s\S]+?-{3,}END CERTIFICATE-{3,}/.test(jsonLine)) {
+                        // get previous line of editor
+                        const previousLine = document.lineAt(position.line - 1).text;
+                        let language = 'json';  // set default language to "json"
+
+                        // if this is a base64 encoded irule in an as3 declaration, update the language
+                        if (previousLine.includes('iRule')) {
+                            language = 'irule';
+                        }
+
+                        // base64 decode text
+                        const value = Buffer.from(jsonLine?.groups?.value, 'base64').toString('ascii');
+                        return new Hover({ language, value });
+                    
+                    } else if (/-{3,}BEGIN CERTIFICATE-{3,}[\s\S]+?-{3,}END CERTIFICATE-{3,}/.test(jsonLine.groups.value)) {
                         
                         // if this is a certificate, parse it
-                        const parsed2Json = parseX509(jsonLine);
+                        const parsed2Json = parseX509(jsonLine.groups.value);
                         const parsed2Yml = jsyaml.safeDump(JSON.parse(parsed2Json), { indent: 4 });
                         return new Hover({ language: 'yaml', value: parsed2Yml });
 
-                    } else {
+                    } else if (/\\n/.test(jsonLine?.groups?.value)){
 
                         // treat everything else as regular text, so clean up the excaping and display
-                        let bodyText = jsonLine.replace(/\\\"/g, '\"');
+                        let bodyText = jsonLine.groups.value.replace(/\\\"/g, '\"');
                         bodyText = bodyText.replace(/(?:\\n|\\r\\n)/g, '\n');
                         return new Hover({ language: 'yaml', value: bodyText });
                     }

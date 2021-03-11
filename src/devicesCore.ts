@@ -40,7 +40,7 @@ export default function devicesCore(context: ExtensionContext) {
 
 
 
-    ext.hostsTreeProvider = new F5TreeProvider('');
+    ext.hostsTreeProvider = new F5TreeProvider(context);
     // window.registerTreeDataProvider('f5Hosts', ext.hostsTreeProvider);
     window.createTreeView('f5Hosts', {
         treeDataProvider: ext.hostsTreeProvider,
