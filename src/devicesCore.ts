@@ -189,6 +189,11 @@ export default function devicesCore(context: ExtensionContext) {
 
     context.subscriptions.push(commands.registerCommand('f5.editDeviceProvider', async (hostID) => {
 
+        // todo: look at removing all this.
+        //  1.  for bigip, it should always be tmos...  even if still local auth and/or remote auth is configured (which we can set)
+        //  2.  it clutters the UI
+        //  3.  bigiq will always be a custom value that can be set by the user on the config
+
         let bigipHosts: { device: string }[] | undefined = workspace.getConfiguration().get('f5.hosts');
 
         const providerOptions: string[] = [
@@ -196,7 +201,7 @@ export default function devicesCore(context: ExtensionContext) {
             'radius',
             'tacacs',
             'tmos',
-            'active-dirctory',
+            'active-directory',
             'ldap',
             'apm',
             'custom for bigiq'
