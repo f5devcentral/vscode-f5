@@ -124,7 +124,7 @@
 		},
 		"configuration": [
 			{
-				"title": "f5-fast",
+				"title": "f5",
 				"properties": {
 					"f5.hosts": {
 						"type": "array",
@@ -135,7 +135,7 @@
 								"device": {
 									"type": "string",
 									"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format",
-									"pattern": "^[\\w-.]+@[\\w-.]+(:[0-9]+)?$",
+									"pattern": "^[\\w-.]+@[\\w-.:]+(:[0-9]+)?$",
 									"examples": [
 										"admin@192.168.1.254",
 										"usr1@10.40.40.20:8443",
@@ -152,6 +152,10 @@
 										"ldap",
 										"custom"
 									]
+								},
+								"label": {
+									"type": "string",
+									"description": "short device label"
 								},
 								"onConnect": {
 									"type": "array",

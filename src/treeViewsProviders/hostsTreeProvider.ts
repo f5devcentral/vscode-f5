@@ -10,13 +10,32 @@
 
 import * as vscode from 'vscode';
 import path from 'path';
-import { TreeItemCollapsibleState } from 'vscode';
+import { ConfigurationTarget, TreeItem, TreeItemCollapsibleState, workspace } from 'vscode';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
-import { atcMetaData, AtcRelease, AtcVersion, AtcVersions, AtcVersionsClient, F5Client } from 'f5-conx-core';
+import { 
+	atcMetaData, 
+	AtcRelease, 
+	AtcVersion, 
+	AtcVersions, 
+	AtcVersionsClient, 
+	F5Client
+} from 'f5-conx-core';
 
 // icon listing for addin icons to key elements
 // https://code.visualstudio.com/api/references/icons-in-labels#icon-listing
+
+// export type HostList = {
+
+// };
+
+export type BigipHost = {
+	device: string;
+	provider: string;
+	label?: string;
+	onConnect?: string[];
+	onDisconnect?: string[];
+};
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
@@ -29,7 +48,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	ts: AtcVersion | undefined;
 	cf: AtcVersion | undefined;
 
-	f5Client: F5Client | undefined;
+	// f5Client: F5Client | undefined;
 
 	private orangeDot = ext.context.asAbsolutePath(path.join("images", "orangeDot.svg"));
 	private greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
@@ -38,13 +57,24 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	private ucsList = [];
 	private qkviewList = [];
+	bigipHosts: BigipHost[] | undefined;
 
-	constructor(private workspaceRoot: string) {
+	constructor(context: vscode.ExtensionContext) {
 		this.fast = ext.atcVersions.fast;
 		this.as3 = ext.atcVersions.as3;
 		this.do = ext.atcVersions.do;
 		this.ts = ext.atcVersions.ts;
 		this.cf = ext.atcVersions.cf;
+		this.loadHosts();
+	}
+
+	async loadHosts(): Promise<void> {
+		this.bigipHosts = workspace.getConfiguration().get('f5.hosts');
+	}
+
+	async saveHosts(): Promise<void> {
+		await workspace.getConfiguration()
+		.update('f5.hosts', this.bigipHosts, ConfigurationTarget.Global);
 	}
 
 	async refresh(): Promise<void> {
@@ -264,23 +294,22 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			return treeItems;
 		} else {
 
-			var bigipHosts: any | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
+
+
+			this.bigipHosts = vscode.workspace.getConfiguration().get('f5.hosts');
 			// logger.debug(`bigips: ${JSON.stringify(bigipHosts)}`);
 
-			if (bigipHosts === undefined) {
+			if (this.bigipHosts === undefined) {
 				throw new Error('No configured hosts - from hostTreeProvider');
 			}
 
 
-			const treeItems = bigipHosts.map((item: {
-				device: string;
-				provider: string;
-			}) => {
+			const treeItems = this.bigipHosts.map((item: BigipHost) => {
 
 
 				// add default provider=local if not defined
 				if (!item.hasOwnProperty('provider')) {
-					item['provider'] = 'local';
+					item['provider'] = 'tmos';
 				}
 
 				// if device is connected device, make it expandable
@@ -289,8 +318,10 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 					itemCollapsibleStat = TreeItemCollapsibleState.Expanded;
 				}
 
+				
+
 				const treeItem = new F5Host(
-					item.device,
+					(item.label || item.device),
 					item.provider,
 					'',
 					'',
@@ -337,7 +368,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		// the following is a quick and dirty way to search the entire 
 		//	devices config obj for a match without having to check each piece
 
-		const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
+		const deviceRex = /^[\w-.]+@[\w-.:]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
 		const devicesString = JSON.stringify(bigipHosts);
 
 		if (!devicesString.includes(`\"${newHost}\"`) && deviceRex.test(newHost)) {
@@ -368,7 +399,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		const newBigipHosts = bigipHosts.filter(item => item.device !== hostID.label);
 
 		if (bigipHosts.length === (newBigipHosts.length + 1)) {
-			logger.debug('successfully removed device!!!');
+			logger.debug('device removed');
 			await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
 			setTimeout(() => { this.refresh(); }, 300);
 			return `successfully removed ${hostID.label} from devices configuration`;
@@ -394,7 +425,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 			// get list of items in keytar for the 'f5Hosts' service
 			logger.debug('CLEARING KEYTAR PASSWORD CACHE');
-			const one1 = await ext.keyTar.findCredentials('f5Hosts').then(list => {
+			await ext.keyTar.findCredentials('f5Hosts').then(list => {
 				// map through and delete all
 				list.map(item => ext.keyTar.deletePassword('f5Hosts', item.account));
 			});
@@ -408,7 +439,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 }
 
 
-export class F5Host extends vscode.TreeItem {
+export class F5Host extends TreeItem {
 	constructor(
 		public readonly label: string,
 		public description: string,
@@ -416,11 +447,6 @@ export class F5Host extends vscode.TreeItem {
 		public iconPath: string,
 		public contextValue: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		// public rpm?: {
-		// 	downloadUrl: string,
-		// 	latest: boolean,
-		// 	packageName: string
-		// },
 		public readonly command?: vscode.Command,
 	) {
 		super(label, collapsibleState);
