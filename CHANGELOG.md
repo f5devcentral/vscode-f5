@@ -11,6 +11,46 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.0.0] - (04-01-2021)
+
+[v3.0 enhancements/refactor](https://github.com/f5devcentral/vscode-f5/milestone/6)
+
+### Added/Modified/Removed
+
+- [#106](https://github.com/f5devcentral/vscode-f5/issues/106) - Documented how to search Config Explorer view
+
+- [#99](https://github.com/f5devcentral/vscode-f5/issues/99) - [RFE] ability to 'label' host entries
+
+- [#92](https://github.com/f5devcentral/vscode-f5/issues/92) - [RFE] F5 Hosts view v2
+  - Extended Hosts view details that include ATC service management and UCS/QKVIEWS
+
+- [#87](https://github.com/f5devcentral/vscode-f5/issues/87) - [RFE] ipv6 support (**PENDING**)
+
+- [#60](https://github.com/f5devcentral/vscode-f5/issues/60) - [RFE] view x509 certificate details
+  - This enabled hovers to show details about certificates but also got expanded to show nexted details in json structures, like cert/iRules/config-objects
+
+- [#88](https://github.com/f5devcentral/vscode-f5/issues/88) - [RFE] Examples Requests with web proxy support (**PENDING**)
+  - Provides configuration options for external proxy support
+  - This would be for all calls not destined for an F5
+
+- [#118](https://github.com/f5devcentral/vscode-f5/issues/118) - [RFE] corkscrew v0.8.0 updates
+  - cert/key extraction (different depending on mini_ucs/ucs/qkview)
+  - stats extraction from qkview
+  - asyncrounous extraction
+
+- [#109](https://github.com/f5devcentral/vscode-f5/issues/109) - [BUG] Fail to explore config on connected BIG-IP
+  - The new f5-conx-core fixed a bug that failed to download the mini_ucs if it was over a certain size
+
+- [#110](https://github.com/f5devcentral/vscode-f5/issues/110) - [RFE] Sort alphabetically Sources files in config explorer enhancement
+  - Fixed a bug that was causing an error when as3 was installed but had no tenants to display
+
+- [#117](https://github.com/f5devcentral/vscode-f5/issues/117) - [BUG] "Cannot convert undefined or null to object" with as3 (no tenants)
+
+- [#111](https://github.com/f5devcentral/vscode-f5/issues/111) - [RFE] enable post fast template command in editor
+  - Feature actually got removed to provide a clear path to template sets
+
+---
+
 ## [2.10.7] - (02-09-2021)
 
 ### Modified

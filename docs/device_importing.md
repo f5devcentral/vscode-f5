@@ -27,7 +27,7 @@ Check the `f5` log OUTPUT for more details on what might be missing
 
 ### simple string import
 
-```
+```yaml
 admin@1.1.1.1
 ```
 
@@ -59,4 +59,3 @@ admin@1.1.1.1
     }
 ]
 ```
-
