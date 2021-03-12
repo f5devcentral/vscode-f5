@@ -2,6 +2,7 @@ import {
 	Command,
 	Event,
 	EventEmitter,
+	MarkdownString,
 	TreeDataProvider,
 	TreeItem,
 	TreeItemCollapsibleState
@@ -80,8 +81,9 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 						// get appStats and set as tooltip
 						const as3DecMap = this.as3DeclareMap?.[target];
 						const as3DecMapStringified = jsYaml.safeDump(as3DecMap, { indent: 4 });
+						const as3DecMdYaml = new MarkdownString().appendCodeblock(as3DecMapStringified, 'yaml');
 
-						treeItems.push(new AS3item(target, targetTenCount, as3DecMapStringified, 'as3Target', TreeItemCollapsibleState.Collapsed,
+						treeItems.push(new AS3item(target, targetTenCount, as3DecMdYaml, 'as3Target', TreeItemCollapsibleState.Collapsed,
 							{ command: 'f5-as3.getDecs', title: '', arguments: [el] })
 						);
 					});
@@ -147,6 +149,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 								const tenant = targetKey as string;
 								const as3DecMap = this.as3DeclareMap[target][tenant];
 								const as3DecMapStringified = jsYaml.safeDump(as3DecMap, { indent: 4 });
+								const as3DecMdYaml = new MarkdownString().appendCodeblock(as3DecMapStringified, 'yaml');
 
 								// get name of other tenants
 								const targetRemoval = Object.keys(this.as3DeclareMap[target]).filter(key => key !== targetKey);
@@ -158,7 +161,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 								});
 
 								treeItems.push(
-									new AS3item(targetKey, appCount, as3DecMapStringified, 'as3Tenant', TreeItemCollapsibleState.Collapsed,
+									new AS3item(targetKey, appCount, as3DecMdYaml, 'as3Tenant', TreeItemCollapsibleState.Collapsed,
 										{ command: 'f5-as3.getDecs', title: '', arguments: [newDec] })
 								);
 							}
@@ -220,11 +223,15 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 					}
 
 					let as3DecMap: any;
-					if (/\//.test(element.tooltip) && this.as3DeclareMap) {
-						const [target, tenant] = element.tooltip.split('/');
-						as3DecMap = this.as3DeclareMap[target][tenant][element.label];
+					if (/\//.test(element.tooltip as string) && this.as3DeclareMap) {
+						if (typeof element.tooltip === 'string') {
+							const [target, tenant] = element.tooltip.split('/');
+							as3DecMap = this.as3DeclareMap[target][tenant][element.label];
+						}
 					} else {
-						as3DecMap = this.as3DeclareMap[element.tooltip][element.label];
+						if (typeof element.tooltip === 'string') {
+							as3DecMap = this.as3DeclareMap[element.tooltip][element.label];
+						}
 					}
 
 					Object.entries(as3DecMap).forEach(([key, value]) => {
@@ -524,7 +531,7 @@ class AS3item extends TreeItem {
 	constructor(
 		public readonly label: string,
 		public description: string,
-		public tooltip: string,
+		public tooltip: string | MarkdownString,
 		public context: string,
 		public readonly collapsibleState: TreeItemCollapsibleState,
 		public readonly command: Command,
