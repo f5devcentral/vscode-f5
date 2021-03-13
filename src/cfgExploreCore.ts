@@ -3,7 +3,7 @@
  * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
  * may copy and modify this software product for its internal business purposes.
  * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com.
+ * the software product on devcentral.f5.com or github.com/f5devcentral.
  */
 
 'use strict';
@@ -152,13 +152,14 @@ export function cfgExplore(context: ExtensionContext) {
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreReveal', async (text) => {
         // await new Promise(resolve => { setTimeout(resolve, 2000); });
-        if (cfgProvider.viewElement) {
-            cfgView.reveal(cfgProvider.viewElement, {
-                select: true,
-                focus: true,
-                expand: true
-            });
-        }
+        commands.executeCommand('cfgTree.focus');
+        // if (cfgProvider.viewElement) {
+        //     cfgView.reveal(cfgProvider.viewElement, {
+        //         select: true,
+        //         focus: true,
+        //         expand: true
+        //     });
+        // }
     }));
 
 

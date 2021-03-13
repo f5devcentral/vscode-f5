@@ -3,7 +3,7 @@
  * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
  * may copy and modify this software product for its internal business purposes.
  * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com.
+ * the software product on devcentral.f5.com or github.com/f5devcentral.
  */
 
 'use strict';
@@ -298,7 +298,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 /**
  * sort tree items by label
  */
-export function sortTreeItems(treeItems: CfgApp[]) {
+function sortTreeItems(treeItems: CfgApp[]) {
     return treeItems.sort((a, b) => {
         const x = a.label.toLowerCase();
         const y = b.label.toLowerCase();

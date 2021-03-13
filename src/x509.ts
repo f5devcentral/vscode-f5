@@ -4,7 +4,7 @@
  * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
  * may copy and modify this software product for its internal business purposes.
  * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com.
+ * the software product on devcentral.f5.com or github.com/f5devcentral.
  */
 
 'use strict';
