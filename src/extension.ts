@@ -3,7 +3,7 @@
 * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
  * may copy and modify this software product for its internal business purposes.
  * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com.
+ * the software product on devcentral.f5.com or github.com/f5devcentral.
  */
 
 'use strict';
@@ -28,7 +28,6 @@ import * as os from 'os';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
-// import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 import * as f5Api from './utils/f5Api';
 import * as utils from './utils/utils';
 import { ext, initSettings, loadSettings } from './extensionVariables';
@@ -37,18 +36,17 @@ import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import { deviceImportOnLoad } from './deviceImport';
 import { TextDocumentView } from './editorViews/editorView';
-// import { makeExplosion } from './cfgExplorer';
 import { injectSchema } from './atcSchema';
 import devicesCore from './devicesCore';
 import rpmCore from './rpmCore';
 import tclCore from './tclCore';
 import { ChangeVersion } from './changeVersion';
 import { Hovers } from './hovers';
-
-// update this logger with f5-conx-core logger
 import logger from './utils/logger';
 import { cfgExplore } from './cfgExploreCore';
 import { FastCore } from './fastCore';
+import { BigiqCore } from './bigiqCore';
+import { tokeTimer } from './tokeTimer';
 
 export async function activate(context: ExtensionContext) {
 
@@ -79,6 +77,8 @@ export async function activate(context: ExtensionContext) {
 	ext.panel = new TextDocumentView();
 	ext.keyTar = keyTarType;
 
+	tokeTimer();
+
 
 	// do we prefer the class style of importing core blocks?
 	new ChangeVersion(context, ext.extHttp);
@@ -86,6 +86,8 @@ export async function activate(context: ExtensionContext) {
 	new Hovers(context, ext.eventEmitterGlobal);
 
 	new FastCore(context);
+
+	new BigiqCore(context);
 	
 	
 	// or do we prefer the function style of importing core blocks?

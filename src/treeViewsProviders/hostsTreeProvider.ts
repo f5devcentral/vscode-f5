@@ -13,12 +13,12 @@ import path from 'path';
 import { ConfigurationTarget, TreeItem, TreeItemCollapsibleState, workspace } from 'vscode';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
-import { 
-	atcMetaData, 
-	AtcRelease, 
-	AtcVersion, 
-	AtcVersions, 
-	AtcVersionsClient, 
+import {
+	atcMetaData,
+	AtcRelease,
+	AtcVersion,
+	AtcVersions,
+	AtcVersionsClient,
 	F5Client
 } from 'f5-conx-core';
 
@@ -74,7 +74,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	async saveHosts(): Promise<void> {
 		await workspace.getConfiguration()
-		.update('f5.hosts', this.bigipHosts, ConfigurationTarget.Global);
+			.update('f5.hosts', this.bigipHosts, ConfigurationTarget.Global);
 	}
 
 	async refresh(): Promise<void> {
@@ -83,11 +83,11 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		if (ext.f5Client) {
 			// start getting ucs/qkview 
 			await ext.f5Client.connect();
-			await ext.f5Client.ucs.list()
-				.then(resp => this.ucsList = resp.data.items);
+			// await ext.f5Client.ucs.list()
+			// 	.then(resp => this.ucsList = resp.data.items);
 
-			await ext.f5Client.qkview.list()
-				.then(resp => this.qkviewList = resp.data.items);
+			// await ext.f5Client.qkview.list()
+			// 	.then(resp => this.qkviewList = resp.data.items);
 		}
 
 		this._onDidChangeTreeData.fire(undefined);
@@ -113,6 +113,12 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 					ext.f5Client.ts ? 'ts' : undefined,
 					ext.f5Client.cf ? 'cf' : undefined,
 				].filter(Boolean);
+
+				ext.f5Client.ucs.list()
+					.then(resp => this.ucsList = resp.data.items);
+
+				ext.f5Client.qkview.list()
+					.then(resp => this.qkviewList = resp.data.items);
 
 
 				// to be used when conx has ATC ILX mgmt
@@ -318,7 +324,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 					itemCollapsibleStat = TreeItemCollapsibleState.Expanded;
 				}
 
-				
+
 
 				const treeItem = new F5Host(
 					(item.label || item.device),

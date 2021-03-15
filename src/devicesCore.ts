@@ -120,7 +120,6 @@ export default function devicesCore(context: ExtensionContext) {
 
     context.subscriptions.push(commands.registerCommand('f5.disconnect', () => {
 
-
         if (ext.f5Client) {
             ext.f5Client.disconnect();
             ext.f5Client = undefined;

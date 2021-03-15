@@ -98,6 +98,11 @@
 					"name": "F5 Hosts"
 				},
 				{
+					"id": "iqView",
+					"name": "BIG-IQ",
+					"when": "f5.isBigiq"
+				},
+				{
 					"id": "fastView",
 					"name": "FAST View",
 					"when": "f5.fastInstalled"
@@ -295,6 +300,46 @@
 				"enablement": "f5.device"
 			},
 			{
+				"command": "f5.iqAppMoveApp",
+				"title": "Move App",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqAppDelete",
+				"title": "Delete BIG-IQ App",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqTemplatePublish",
+				"title": "Publish/Un-Publish BIG-IQ Template",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqTemplateDelete",
+				"title": "Delete BIG-IQ Template",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqPostTemplate",
+				"title": "Post BIG-IQ Template",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqScriptDelete",
+				"title": "Delete BIG-IQ Script",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqScriptPost",
+				"title": "Post BIG-IQ Script",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqScriptExecute",
+				"title": "Execute Script",
+				"category": "F5"
+			},
+			{
 				"command": "f5.cfgExploreOnConnect",
 				"title": "Explore Config",
 				"category": "F5"
@@ -405,6 +450,15 @@
 			{
 				"command": "f5.refreshHostsTree",
 				"title": "Refresh Devices",
+				"category": "F5",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "f5.iqViewRefresh",
+				"title": "Refresh BIG-IQ View",
 				"category": "F5",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -629,6 +683,16 @@
 					"group": "F5"
 				},
 				{
+					"command": "f5.iqPostTemplate",
+					"when": "f5.isBigiq",
+					"group": "F5"
+				},
+				{
+					"command": "f5.iqScriptPost",
+					"when": "f5.isBigiq",
+					"group": "F5"
+				},
+				{
 					"command": "f5.deviceImport",
 					"group": "F5"
 				},
@@ -727,6 +791,11 @@
 				{
 					"command": "f5.refreshHostsTree",
 					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.iqViewRefresh",
+					"when": "view == iqView",
 					"group": "navigation"
 				},
 				{
@@ -964,6 +1033,30 @@
 				{
 					"command": "f5.clearPassword",
 					"when": "view == f5Hosts && viewItem == f5Host"
+				},
+				{
+					"command": "f5.iqAppMoveApp",
+					"when": "view == iqView && viewItem == iQapp"
+				},
+				{
+					"command": "f5.iqTemplatePublish",
+					"when": "view == iqView && viewItem == iqTemplate"
+				},
+				{
+					"command": "f5.iqTemplateDelete",
+					"when": "view == iqView && viewItem == iqTemplate"
+				},
+				{
+					"command": "f5.iqScriptDelete",
+					"when": "view == iqView && viewItem == iqScript"
+				},
+				{
+					"command": "f5.iqScriptExecute",
+					"when": "view == iqView && viewItem == iqScript"
+				},
+				{
+					"command": "f5.iqAppDelete",
+					"when": "view == iqView && viewItem == iQglobalApp"
 				},
 				{
 					"command": "f5.cfgExploreOnConnect",

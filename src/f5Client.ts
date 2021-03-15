@@ -2,7 +2,7 @@
 
 'use strict';
 
-import { 
+import {
     Terminal,
     window,
     ProgressLocation,
@@ -90,7 +90,7 @@ export class F5Client extends _F5Client {
                 this.hostNameBar.text = this.host.hostname;
                 this.hostNameBar.command = 'f5.getF5HostInfo';
                 this.hostNameBar.show();
-                
+
                 ext.connectBar.hide();      // hide connect bar
                 returnInfo.push(
                     this.host.hostname,
@@ -99,48 +99,61 @@ export class F5Client extends _F5Client {
                 );
 
                 //********** enable irules view **********/
-                this.host.product === 'BIG-IP' ?
-                commands.executeCommand('setContext', 'f5.tcl', true) :
-                commands.executeCommand('setContext', 'f5.tcl', false);
-                commands.executeCommand('setContext', 'f5.device', true);
-                
+                if (this.host.product === 'BIG-IP') {
+
+                    commands.executeCommand('setContext', 'f5.tcl', true);
+                    commands.executeCommand('setContext', 'f5.device', true);
+
+                } else if (this.host.product === 'BIG-IQ') {
+
+                    commands.executeCommand('setContext', 'f5.device', true);
+                    commands.executeCommand('setContext', 'f5.isBigiq', true);
+
+                } else {
+
+                    commands.executeCommand('setContext', 'f5.device', false);
+                    commands.executeCommand('setContext', 'f5.tcl', false);
+                    // commands.executeCommand('setContext', 'f5.isBigiq', false);
+                }
+
+
             }
 
 
 
             //********** FAST info **********/
             if (this.fast) {
-            
+
                 this.fastBar.command = 'f5-fast.getInfo';
                 this.fastBar.text = `FAST(${this.fast.version.version})`;
                 this.fastBar.show();
                 commands.executeCommand('setContext', 'f5.fastInstalled', true);
                 returnInfo.push(this.fastBar.text);
-            
+
             }
 
             //********** AS3 info **********/
             if (this.as3) {
-            
+
                 this.cfBar.command = 'f5-as3.getDec';
                 this.as3Bar.text = `AS3(${this.as3.version.version})`;
                 this.as3Bar.tooltip = `CLICK FOR ALL TENANTS \r\nschemaCurrent: ${this.as3.version.schemaCurrent} `;
                 this.as3Bar.show();
                 commands.executeCommand('setContext', 'f5.as3Installed', true);
                 returnInfo.push(this.as3Bar.text);
-            
+
             }
 
             //********** DO info **********/
             if (this.do) {
-            
+
                 this.cfBar.command = 'f5-do.getDec';
                 this.doBar.text = `DO(${this.do.version.version})`;
                 this.doBar.tooltip = `schemaCurrent: ${this.do.version.version} `;
                 this.doBar.show();
                 commands.executeCommand('setContext', 'f5.doInstalled', true);
                 returnInfo.push(this.doBar.text);
-            
+
             }
 
             //********** TS info **********/
@@ -190,13 +203,6 @@ export class F5Client extends _F5Client {
         this.tsBar.hide();
         this.cfBar.hide();
 
-        // utils.setHostStatusBar();
-        // utils.setHostnameBar();
-        // utils.setFastBar();
-        // utils.setAS3Bar();
-        // utils.setDOBar();
-        // utils.setTSBar();
-
         /**
          * // hide irules/iapps view
          * this should probably dispose of the view or at least clear it's contents?
@@ -211,6 +217,7 @@ export class F5Client extends _F5Client {
         commands.executeCommand('setContext', 'f5.doInstalled', false);
         commands.executeCommand('setContext', 'f5.tsInstalled', false);
         commands.executeCommand('setContext', 'f5.cfInstalled', false);
+        commands.executeCommand('setContext', 'f5.isBigiq', false);
         // ext.iRulesAble = false;
 
         // show connect status bar
