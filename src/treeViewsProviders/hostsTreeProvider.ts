@@ -83,11 +83,11 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		if (ext.f5Client) {
 			// start getting ucs/qkview 
 			await ext.f5Client.connect();
-			// await ext.f5Client.ucs.list()
-			// 	.then(resp => this.ucsList = resp.data.items);
+			await ext.f5Client.ucs.list()
+				.then(resp => this.ucsList = resp.data.items);
 
-			// await ext.f5Client.qkview.list()
-			// 	.then(resp => this.qkviewList = resp.data.items);
+			await ext.f5Client.qkview.list()
+				.then(resp => this.qkviewList = resp.data.items);
 		}
 
 		this._onDidChangeTreeData.fire(undefined);
@@ -114,11 +114,6 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 					ext.f5Client.cf ? 'cf' : undefined,
 				].filter(Boolean);
 
-				ext.f5Client.ucs.list()
-					.then(resp => this.ucsList = resp.data.items);
-
-				ext.f5Client.qkview.list()
-					.then(resp => this.qkviewList = resp.data.items);
 
 
 				// to be used when conx has ATC ILX mgmt
