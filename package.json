@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.0-beta.4",
+	"version": "3.0.0-beta.6",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -302,22 +302,26 @@
 			{
 				"command": "f5.iqAppMoveApp",
 				"title": "Move App",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(move)"
 			},
 			{
 				"command": "f5.iqAppDelete",
 				"title": "Delete BIG-IQ App",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "f5.iqTemplatePublish",
 				"title": "Publish/Un-Publish BIG-IQ Template",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(live-share)"
 			},
 			{
 				"command": "f5.iqTemplateDelete",
 				"title": "Delete BIG-IQ Template",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "f5.iqPostTemplate",
@@ -327,7 +331,8 @@
 			{
 				"command": "f5.iqScriptDelete",
 				"title": "Delete BIG-IQ Script",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "f5.iqScriptPost",
@@ -337,7 +342,8 @@
 			{
 				"command": "f5.iqScriptExecute",
 				"title": "Execute Script",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(run)"
 			},
 			{
 				"command": "f5.cfgExploreOnConnect",
@@ -357,7 +363,8 @@
 			{
 				"command": "f5.addHost",
 				"title": "Add Host",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(add)"
 			},
 			{
 				"command": "f5.deviceImport",
@@ -367,7 +374,8 @@
 			{
 				"command": "f5.removeHost",
 				"title": "Remove Host",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "f5.remoteCommand",
@@ -1007,10 +1015,6 @@
 					"when": "view == f5Hosts && viewItem == ucsItem"
 				},
 				{
-					"command": "f5.editHost",
-					"when": "view == f5Hosts && viewItem == f5Host"
-				},
-				{
 					"command": "f5.editDeviceProvider",
 					"when": "view == f5Hosts && viewItem == f5Host"
 				},
@@ -1020,6 +1024,7 @@
 				},
 				{
 					"command": "f5.removeHost",
+					"group": "inline",
 					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
@@ -1028,22 +1033,27 @@
 				},
 				{
 					"command": "f5.iqAppMoveApp",
+					"group": "inline",
 					"when": "view == iqView && viewItem == iQapp"
 				},
 				{
 					"command": "f5.iqTemplatePublish",
+					"group": "inline",
 					"when": "view == iqView && viewItem == iqTemplate"
 				},
 				{
 					"command": "f5.iqTemplateDelete",
+					"group": "inline",
 					"when": "view == iqView && viewItem == iqTemplate"
 				},
 				{
 					"command": "f5.iqScriptDelete",
+					"group": "inline",
 					"when": "view == iqView && viewItem == iqScript"
 				},
 				{
 					"command": "f5.iqScriptExecute",
+					"group": "inline",
 					"when": "view == iqView && viewItem == iqScript"
 				},
 				{
@@ -1130,8 +1140,8 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"axios": "^0.21.1",
-		"f5-conx-core": "file:../f5-conx-core",
-		"f5-corkscrew": "file:../f5-corkscrew",
+		"f5-conx-core": "github:dumpysquare/f5-conx-core",
+		"f5-corkscrew": "github:f5devcentral/f5-corkscrew#certs",
 		"js-yaml": "4.0.0",
 		"keytar": "^6.0.1"
 	}

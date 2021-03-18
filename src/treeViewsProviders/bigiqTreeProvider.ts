@@ -11,7 +11,6 @@
 import { wait } from 'f5-conx-core';
 import {
     Command,
-    commands,
     Event,
     EventEmitter,
     ExtensionContext,
@@ -22,7 +21,6 @@ import {
     TreeDataProvider,
     TreeItem,
     TreeItemCollapsibleState,
-    TreeView,
     Uri,
     ViewColumn,
     window,
@@ -30,6 +28,7 @@ import {
 } from 'vscode';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
+import jsyaml from "js-yaml";
 
 
 // https://clouddocs.f5.com/products/big-iq/mgmt-api/v6.1.0/ApiReferences/bigiq_public_api_ref/r_as3_template.html
@@ -44,6 +43,8 @@ import logger from '../utils/logger';
 
 // /mgmt/cm/global/appsvcs-templates
 
+type IqDataRefresh = 'TEMPLATES' | 'GLOBAL-APPS' | 'DEVICES' | 'SCRIPTS' | 'SCRIPT-EXEC';
+
 export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
     // treeView: TreeView;
     context: ExtensionContext;
@@ -51,6 +52,7 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
     appsGlobal: IqGlobalApp[] = [];
     templates: IqTemplate[] = [];
     scripts: IqScript[] = [];
+    scriptsExecuted: IqExecutedScript[] = [];
 
     //https://clouddocs.f5.com/products/big-iq/mgmt-api/v0.0/
     readonly endPoints = {
@@ -77,25 +79,12 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         this.context = context;
     }
 
+
     /**
      * refresh tree view
      */
-    refreshView(): void {
+    refresh() {
         this._onDidChangeTreeData.fire(undefined);
-    }
-
-    /**
-     * refresh data
-     */
-    refreshData(): void {
-        this.devices.length = 0;
-        this.appsGlobal.length = 0;
-        this.templates.length = 0;
-        this.scripts.length = 0;
-        this.getDevices();
-        this.getGlobalApps();
-        this.getTemplates();
-        this.getScripts();
     }
 
     getTreeItem(element: IqTreeItem): TreeItem {
@@ -164,16 +153,40 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
                 treeItems.push(...sortTreeItems(iqTemps));
 
-                treeItems.unshift(new IqTreeItem('Script-Jobs', 'execution high level', '', 'iqScriptJob', '', TreeItemCollapsibleState.None,
-                { command: 'f5.iqViewShow', title: '', arguments: ['el'] }));
+                const scriptExecCount = this.scriptsExecuted.length.toString() || '';
+                treeItems.unshift(new IqTreeItem('Executed-Scripts', scriptExecCount, 'Executed scripts tasks', '', '', TreeItemCollapsibleState.Collapsed));
+
+            } else if (element.label === 'Executed-Scripts') {
+
+                const execScripts = this.scriptsExecuted.map(el => {
+                    const desc = el.status || '';
+
+                    // const output = el.userScriptTaskStatuses[0].output;
+                    // output ? output : ''
+                    const tooltip =
+                     el.userScriptTaskStatuses[0] ? new MarkdownString(`# output\n \`\`\`yaml\n${el.userScriptTaskStatuses[0].output}\n\`\`\``) :
+                     el.errorMessage ? new MarkdownString(`# error\n ${el.errorMessage}\n`)
+                     : '';
+                    // const tooltip2 = new MarkdownString()
+                    return new IqTreeItem(el.name, desc, tooltip, 'iqExecScript', '', TreeItemCollapsibleState.None,
+                        { command: 'f5.iqViewShow', title: '', arguments: [el] });
+                });
+
+                treeItems.push(...sortTreeItems(execScripts));
+
             }
 
 
         } else {
 
-            if (this.devices.length < 1 || this.templates.length < 1 || this.appsGlobal.length < 1) {
-                this.refreshData();
-            }
+            // this.refreshData();
+            await Promise.all([
+                this.getGlobalApps(),
+                this.getTemplates(),
+                this.getDevices(),
+                this.getScripts(),
+                this.getExecutedScripts()
+            ]);
 
             // todo: build count and hover details
             treeItems.push(
@@ -190,10 +203,11 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
      * fetch bigiq managed device information
      */
     private async getDevices() {
+        this.devices.length = 0;
         await ext.f5Client?.https(this.endPoints.devices)
             .then(resp => {
                 this.devices = resp.data.items;
-                this.refreshView();
+                // this.refresh();
             })
             .catch(err => logger.error(err));
     }
@@ -202,10 +216,11 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
      * fetch bigiq global apps
      */
     private async getGlobalApps() {
+        this.appsGlobal.length = 0;
         await ext.f5Client?.https(this.endPoints.apps.global)
             .then(resp => {
                 this.appsGlobal = resp.data.items;
-                this.refreshView();
+                // this.refresh();
             })
             .catch(err => logger.error(err));
 
@@ -215,10 +230,11 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
      * fetch bigiq as3 templates
      */
     private async getTemplates() {
+        this.templates.length = 0;
         await ext.f5Client?.https(this.endPoints.templates)
             .then(resp => {
                 this.templates = resp.data.items;
-                this.refreshView();
+                // this.refresh();
             })
             .catch(err => logger.error(err));
     }
@@ -245,7 +261,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         const selfLink = app?.command?.arguments?.[0].selfLink;
         const id = (selfLink.split('/').pop() || selfLink);
         return await ext.f5Client?.https(`${this.endPoints.apps.global}/${id}`, { method: 'DELETE' })
-            .then(() => wait(500, this.getGlobalApps()));
+            .then(() => wait(500, this.getGlobalApps()))
+            .then(() => wait(500, this.refresh()));
     }
 
     async moveApp(selfLink: IqTreeItem) {
@@ -280,7 +297,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
                     requireNewGlobalApp: false
                 }
             })
-                .then(resp => wait(500, this.getGlobalApps()));
+                .then(resp => wait(500, this.getGlobalApps()))
+                .then(resp => wait(500, this.refresh()));
         }
     }
 
@@ -301,9 +319,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
             method: 'POST',
             data: text
         })
-            .then(resp => {
-                this.getTemplates();
-            });
+            .then(resp => wait(500, this.getTemplates()))
+            .then(resp => wait(500, this.refresh()));
     }
 
     /**
@@ -323,7 +340,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
                 published: (template.description === 'not-published')
             }
         })
-            .then(() => wait(500, this.getTemplates()));
+            .then(() => wait(500, this.getTemplates()))
+            .then(resp => wait(500, this.refresh()));
     }
 
     /**
@@ -337,7 +355,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         const selfLink = template?.command?.arguments?.[0].selfLink;
         const id = (selfLink.split('/').pop() || selfLink);
         return await ext.f5Client?.https(`${this.endPoints.templates}/${id}`, { method: 'DELETE' })
-            .then(() => wait(500, this.getTemplates()));
+            .then(() => wait(500, this.getTemplates()))
+            .then(resp => wait(500, this.refresh()));
     }
 
 
@@ -352,21 +371,47 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
      * fetch bigiq scripts
      */
     private async getScripts() {
+        this.scripts.length = 0;
         await ext.f5Client?.https(this.endPoints.scripts)
             .then(resp => {
                 this.scripts = resp.data.items;
-                this.refreshView();
             })
             .catch(err => logger.error(err));
     }
 
+
+    /**
+     * fetch executed bigiq scripts
+     */
+    private async getExecutedScripts() {
+        this.scriptsExecuted.length = 0;
+        await ext.f5Client?.https(this.endPoints.scriptExecute)
+            .then(resp => {
+                this.scriptsExecuted = resp.data.items;
+                // this.refresh();
+            })
+            .catch(err => logger.error(err));
+    }
+
+    /**
+     * 
+     * @param item tree item script reference to delete
+     * @returns 
+     */
     async deleteScript(item: IqTreeItem) {
         const selfLink = item?.command?.arguments?.[0].selfLink;
         const id = (selfLink.split('/').pop() || selfLink);
         return await ext.f5Client?.https(`${this.endPoints.scripts}/${id}`, { method: 'DELETE' })
-            .then(() => wait(1000, this.getScripts()));
+            .then(() => wait(500, this.getScripts()))
+            .then(resp => wait(500, this.refresh()));
     }
 
+
+    /**
+     * processes script text, extracts script header information (name/id), posts new or updates existing script
+     * @param text raw text script from editor
+     * @returns 
+     */
     async postScript(text: string) {
 
         const postableScript = await this.prePostScript(text);
@@ -382,11 +427,19 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
                 method: 'POST',
                 data: postableScript
             })
-                .then(() => wait(1000, this.getScripts()));
+                .then(() => wait(1000, this.getScripts()))
+                .then(resp => wait(500, this.refresh()));
         }
 
     }
 
+    /**
+     * discovers script header information used for managing the script in bigiq api
+     * 
+     * This is so we can track the name/description/id of the script in the editor and reference those details back to the REST API
+     * @param script bigiq script body
+     * @returns 
+     */
     async prePostScript(script: string) {
         // get the first five lines and extract script meta-data (name/desc/id)
         const firstThreeLines = script.split('\n').slice(0, 5).join('\n');
@@ -398,8 +451,15 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         return { name, description, id, script };
     }
 
+
+    /**
+     * Executes script on selected device
+     * 
+     * input is selected script, function will prompt user to select device, then execute
+     * 
+     * @param item script tree item
+     */
     async executeScript(item: IqTreeItem) {
-        const item2 = item;
 
         const scriptRef = item.command?.arguments?.[0].selfLink;
 
@@ -415,8 +475,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         // "hostname": "bigip-tparty05.benlab.io",
         // "selfLink": "https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/1932275d-7c55-4fb4-b981-8857d20ac220",
         // "machineId": "1932275d-7c55-4fb4-b981-8857d20ac220",
-        const devices = this.devices.map( (el: IqDevice) => {
-            return { 
+        const devices = this.devices.map((el: IqDevice) => {
+            return {
                 uuid: el.uuid,
                 machineId: el.machineId,
                 address: el.address,
@@ -425,28 +485,28 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         });
 
         const deviceRef = await window.showQuickPick(devices, { ignoreFocusOut: true });
-        
+
+        const scriptName = item.command?.arguments?.[0].name;
+        const jobLabel = `${scriptName}->${deviceRef?.label}`;
+
         return await ext.f5Client?.https(this.endPoints.scriptExecute, {
             method: 'POST',
             data: {
-                name: "vscoode-f5-script-execution",
+                name: jobLabel,
                 deviceReferences: [{
-                        "link": `https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/${deviceRef?.machineId}`
+                    "link": `https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/${deviceRef?.machineId}`
                 }],
                 timeoutInSeconds: 600,
                 scriptReference: {
-                        "link": `https://localhost/mgmt/shared/user-scripts/${scriptRef}`
+                    "link": scriptRef
                 }
             }
         })
             .then(async resp => {
-                // pass response into async follower
                 return await ext.f5Client?.mgmtClient.followAsync(`${this.endPoints.scriptExecute}/${resp.data.id}`);
-                // .then( resp2 => {
-                //     const x = resp2;
-                // });
-
-            });
+            })
+            .then(resp => wait(500, this.getExecutedScripts()))
+            .then(resp => wait(500, this.refresh()));
     }
 
 
@@ -470,7 +530,7 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
             docName = 'BIG-IQ.sh';
 
             // discover bigiq script header details
-            const {name, description, id} = await this.prePostScript(script.script);
+            const { name, description, id } = await this.prePostScript(script.script);
 
             // if we got existing bigiq script details
             if (name && description && id) {
@@ -489,9 +549,9 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         } else {
 
             if (Array.isArray(items)) {
-    
+
                 docContent = items.join('\n');
-    
+
             } else if (Object(items)) {
                 // if array -> single selection, just join internal array normally -> display contents
                 docContent = JSON.stringify(items, undefined, 4);
@@ -500,7 +560,7 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
 
 
-        for ( const el of editors) {
+        for (const el of editors) {
             if (el.document.fileName === 'BIG-IQ.sh' || el.document.fileName === 'BIG-IQ.json') {
                 viewColumn = el.viewColumn;
             }
@@ -556,6 +616,95 @@ class IqTreeItem extends TreeItem {
     }
 }
 
+
+type IqExecutedScript = {
+    id: string;
+    kind: string;
+    name: string;
+    status: string;
+    selfLink: string;
+    username: string;
+    generation: number;
+    currentStep: string;
+    deviceCount: number;
+    endDateTime: string;
+    startDateTime: string;
+    errorMessage: string;
+    userReference: {
+        link: string;
+    }
+    ownerMachineId: string;
+    scriptReference: {
+        link: string;
+    }
+    deviceReferences: [
+        {
+            link: string;
+        }
+    ]
+    userScriptTaskStatuses: [{
+        output: string;
+        status: string;
+        address: string;
+        exitCode: string;
+        hostname: string;
+        httpsPort: number;
+        machineId: string;
+        startTime: number;
+        deviceReference: {
+            link: string;
+        }
+    }]
+};
+
+const exmpExecutedScript = {
+    "id": "0dbde32c-d287-426b-a3e1-401b616d9d5a",
+    "kind": "shared:user-script-execution:userscripttaskstate",
+    "name": "vscoode-f5-script-execution",
+    "status": "FINISHED",
+    "selfLink": "https://localhost/mgmt/shared/user-script-execution/0dbde32c-d287-426b-a3e1-401b616d9d5a",
+    "username": "admin",
+    "generation": 7,
+    "currentStep": "CLEAN_UP",
+    "deviceCount": 1,
+    "endDateTime": "2021-03-18T01:32:02.407-0700",
+    "startDateTime": "2021-03-18T01:31:41.971-0700",
+    "userReference": {
+        "link": "https://localhost/mgmt/shared/authz/users/admin"
+    },
+    "ownerMachineId": "b8f3869d-d554-4ff9-8be3-0dd5e40c21bb",
+    "scriptReference": {
+        "link": "https://localhost/mgmt/shared/user-scripts/3e912016-d564-4457-9ed1-998f26ac4de5"
+    },
+    "deviceReferences": [
+        {
+            "link": "https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/1932275d-7c55-4fb4-b981-8857d20ac220"
+        }
+    ],
+    "lastUpdateMicros": 1616056322458023,
+    "timeoutInSeconds": 600,
+    "identityReferences": [
+        {
+            "link": "https://localhost/mgmt/shared/authz/users/admin"
+        }
+    ],
+    "userScriptTaskStatuses": [
+        {
+            "output": "/var/tmp/0dbde32c-d287-426b-a3e1-401b616d9d5a-script.sh: line 12: syntax error near unexpected token `<'\n/var/tmp/0dbde32c-d287-426b-a3e1-401b616d9d5a-script.sh: line 12: `CREDS=<username><password>'\n",
+            "status": "FINISHED",
+            "address": "192.168.200.131",
+            "message": "Finished executing script.",
+            "exitCode": "2",
+            "hostname": "bigip-tparty05.benlab.io",
+            "httpsPort": 443,
+            "machineId": "1932275d-7c55-4fb4-b981-8857d20ac220",
+            "startTime": 1272239427833470,
+            "deviceReference": {
+                "link": "https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/1932275d-7c55-4fb4-b981-8857d20ac220"
+            }
+        }
+    ]
+};
 
 type IqScript = {
     id: string;

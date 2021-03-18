@@ -76,7 +76,7 @@ export class BigiqCore {
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqViewRefresh', async () => {
-            iqProvider.refreshData();
+            iqProvider.refresh();
         }));
 
 
