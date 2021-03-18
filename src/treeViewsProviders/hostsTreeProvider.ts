@@ -8,12 +8,19 @@
 
 'use strict';
 
-import * as vscode from 'vscode';
 import path from 'path';
-import { 
+import {
+	Command,
 	ConfigurationTarget,
+	Event,
+	EventEmitter,
+	ExtensionContext,
+	MarkdownString,
+	ThemeIcon,
+	TreeDataProvider,
 	TreeItem,
 	TreeItemCollapsibleState,
+	window,
 	workspace
 } from 'vscode';
 import { ext } from '../extensionVariables';
@@ -21,18 +28,21 @@ import logger from '../utils/logger';
 import {
 	AtcRelease,
 	AtcVersion,
+	wait,
 } from 'f5-conx-core';
 import { BigipHost } from '../models';
+import jsyaml from 'js-yaml';
+import { F5Client } from '../f5Client';
 
 // icon listing for addin icons to key elements
 // https://code.visualstudio.com/api/references/icons-in-labels#icon-listing
 
 type hostsRefreshType = 'ATC' | 'UCS' | 'QKVIEW';
 
-export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
+export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<F5Host | undefined> = new vscode.EventEmitter<F5Host | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<F5Host | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<F5Host | HostTreeItem | undefined> = new EventEmitter<F5Host | HostTreeItem | undefined>();
+	readonly onDidChangeTreeData: Event<F5Host | HostTreeItem | undefined> = this._onDidChangeTreeData.event;
 
 	fast: AtcVersion | undefined;
 	as3: AtcVersion | undefined;
@@ -40,18 +50,35 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	ts: AtcVersion | undefined;
 	cf: AtcVersion | undefined;
 
-	// f5Client: F5Client | undefined;
-
 	private orangeDot = ext.context.asAbsolutePath(path.join("images", "orangeDot.svg"));
 	private greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
-	private greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
+	// private greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
+	private f5Hex = ext.context.asAbsolutePath(path.join("images", "f5_open_dark.svg"));
+	private f524 = ext.context.asAbsolutePath(path.join("images", "f5_white_24x24.svg"));
+	private bigiqSvg = ext.context.asAbsolutePath(path.join("images", "BIG-IQ-sticker_transparent.png"));
 
+	/**
+	 * regex for confirming host entry <user>@<host/ip>:<port>
+	 */
+	readonly deviceRex = /^[\w-.]+@[\w-.:]+(:[0-9]+)?$/;
 
+	/**
+	 * f5Client object when connected to a device
+	 */
+	connectedDevice: F5Client | undefined;
+	/**
+	 * list of UCSs from currently connected device
+	 */
 	private ucsList = [];
 	private qkviewList = [];
-	bigipHosts: BigipHost[] | undefined;
+	/**
+	 * list of hosts from config file
+	 */
+	bigipHosts: BigipHost[] = [];
+	private context: ExtensionContext;
 
-	constructor(context: vscode.ExtensionContext) {
+	constructor(context: ExtensionContext) {
+		this.context = context;
 		this.fast = ext.atcVersions.fast;
 		this.as3 = ext.atcVersions.as3;
 		this.do = ext.atcVersions.do;
@@ -61,7 +88,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	}
 
 	async loadHosts(): Promise<void> {
-		this.bigipHosts = workspace.getConfiguration().get('f5.hosts');
+		this.bigipHosts = (workspace.getConfiguration().get('f5.hosts') || []);
 	}
 
 	async saveHosts(): Promise<void> {
@@ -70,30 +97,30 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 	}
 
 	async refresh(type?: hostsRefreshType): Promise<void> {
-		this._onDidChangeTreeData.fire(undefined);
+		// this._onDidChangeTreeData.fire(undefined);
 
-		if (ext.f5Client && type === 'UCS') {
+		if (this.connectedDevice && type === 'UCS') {
 
-			await ext.f5Client.ucs.list()
+			await this.connectedDevice.ucs.list()
 				.then(resp => this.ucsList = resp.data.items);
 
-		} else if (ext.f5Client && type === 'QKVIEW') {
+		} else if (this.connectedDevice && type === 'QKVIEW') {
 
-			await ext.f5Client.qkview.list()
+			await this.connectedDevice.qkview.list()
 				.then(resp => this.qkviewList = resp.data.items);
 
-		} else if (ext.f5Client && type === 'ATC') {
+		} else if (this.connectedDevice && type === 'ATC') {
 
-			await ext.f5Client.discover();
+			await this.connectedDevice.discover();
 
-		} else if (ext.f5Client) {
+		} else if (this.connectedDevice) {
 
 			// start getting ucs/qkview 
-			await ext.f5Client.discover();
-			await ext.f5Client.ucs.list()
+			await this.connectedDevice.discover();
+			await this.connectedDevice.ucs.list()
 				.then(resp => this.ucsList = resp.data.items);
 
-			await ext.f5Client.qkview.list()
+			await this.connectedDevice.qkview.list()
 				.then(resp => this.qkviewList = resp.data.items);
 		}
 
@@ -101,26 +128,28 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	}
 
-	getTreeItem(element: F5Host): vscode.TreeItem {
+
+	getTreeItem(element: F5Host): TreeItem {
 		return element;
 	}
+
+
 	async getChildren(element?: F5Host): Promise<F5Host[]> {
 
 		if (element) {
 			const treeItems: F5Host[] = [];
 
 			// if the item is the device we are connected to
-			if (element.device?.device === ext.f5Client?.device.device) {
+			if (element.device?.device === this.connectedDevice?.device.device) {
 
-				// const atcDesc = Object.keys(this.latest);
+				// build item description indicating which atc services are installed
 				const atcDesc = [
-					ext.f5Client?.fast ? 'fast' : undefined,
-					ext.f5Client?.as3 ? 'as3' : undefined,
-					ext.f5Client?.do ? 'do' : undefined,
-					ext.f5Client?.ts ? 'ts' : undefined,
-					ext.f5Client?.cf ? 'cf' : undefined,
+					this.connectedDevice?.fast ? 'fast' : undefined,
+					this.connectedDevice?.as3 ? 'as3' : undefined,
+					this.connectedDevice?.do ? 'do' : undefined,
+					this.connectedDevice?.ts ? 'ts' : undefined,
+					this.connectedDevice?.cf ? 'cf' : undefined,
 				].filter(Boolean);
-
 
 
 				// to be used when conx has ATC ILX mgmt
@@ -133,24 +162,24 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			} else if (element.label === 'ATC') {
 
 				const fastIcon
-					= `v${ext.f5Client?.fast?.version.version}` === this.fast?.latest ? this.greenDot
-						: ext.f5Client?.fast ? this.orangeDot
+					= `v${this.connectedDevice?.fast?.version.version}` === this.fast?.latest ? this.greenDot
+						: this.connectedDevice?.fast ? this.orangeDot
 							: '';
 				const as3Icon
-					= `v${ext.f5Client?.as3?.version.version}` === this.as3?.latest ? this.greenDot
-						: ext.f5Client?.as3 ? this.orangeDot
+					= `v${this.connectedDevice?.as3?.version.version}` === this.as3?.latest ? this.greenDot
+						: this.connectedDevice?.as3 ? this.orangeDot
 							: '';
 				const doIcon
-					= `v${ext.f5Client?.do?.version.version}` === this.do?.latest ? this.greenDot
-						: ext.f5Client?.do ? this.orangeDot
+					= `v${this.connectedDevice?.do?.version.version}` === this.do?.latest ? this.greenDot
+						: this.connectedDevice?.do ? this.orangeDot
 							: '';
 				const tsIcon
-					= `v${ext.f5Client?.ts?.version.version}` === this.ts?.latest ? this.greenDot
-						: ext.f5Client?.ts ? this.orangeDot
+					= `v${this.connectedDevice?.ts?.version.version}` === this.ts?.latest ? this.greenDot
+						: this.connectedDevice?.ts ? this.orangeDot
 							: '';
 				const cfIcon
-					= `v${ext.f5Client?.cf?.version.version}` === this.cf?.latest ? this.greenDot
-						: ext.f5Client?.cf ? this.orangeDot
+					= `v${this.connectedDevice?.cf?.version.version}` === this.cf?.latest ? this.greenDot
+						: this.connectedDevice?.cf ? this.orangeDot
 							: '';
 
 
@@ -176,7 +205,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 					const desc = [
 						el.version === this.fast?.latest ? 'Latest' : '',
-						deviceVersion === ext.f5Client?.fast?.version.version ? 'Installed' : ''
+						deviceVersion === this.connectedDevice?.fast?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -196,7 +225,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 					const desc = [
 						el.version === this.as3?.latest ? 'Latest' : '',
-						deviceVersion === ext.f5Client?.as3?.version.version ? 'Installed' : ''
+						deviceVersion === this.connectedDevice?.as3?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -216,7 +245,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 					const desc = [
 						el.version === this.do?.latest ? 'Latest' : '',
-						deviceVersion === ext.f5Client?.do?.version.version ? 'Installed' : ''
+						deviceVersion === this.connectedDevice?.do?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -234,7 +263,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 					const desc = [
 						el.version === this.ts?.latest ? 'Latest' : '',
-						el.version.replace(/^v/, '') === ext.f5Client?.ts?.version.version ? 'Installed' : ''
+						el.version.replace(/^v/, '') === this.connectedDevice?.ts?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -252,7 +281,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 					const desc = [
 						el.version === this.cf?.latest ? 'Latest' : '',
-						el.version.replace(/^v/, '') === ext.f5Client?.cf?.version.version ? 'Installed' : ''
+						el.version.replace(/^v/, '') === this.connectedDevice?.cf?.version.version ? 'Installed' : ''
 					].filter(Boolean);
 
 					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
@@ -298,18 +327,13 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 				);
 			}
 
-
 			return treeItems;
 		} else {
 
 
-
-			// this.bigipHosts = vscode.workspace.getConfiguration().get('f5.hosts');
-			// logger.debug(`bigips: ${JSON.stringify(bigipHosts)}`);
-
-			if (this.bigipHosts === undefined) {
-				throw new Error('No configured hosts - from hostTreeProvider');
-			}
+			// if (this.bigipHosts === undefined) {
+			// 	throw new Error('No configured hosts - from hostTreeProvider');
+			// }
 
 
 			const treeItems = this.bigipHosts.map((item: BigipHost) => {
@@ -322,15 +346,21 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 				// if device is connected device, make it expandable
 				let itemCollapsibleState = TreeItemCollapsibleState.None;
-				if (item.device === ext.f5Client?.device.device) {
+				if (item.device === this.connectedDevice?.device.device) {
 					itemCollapsibleState = TreeItemCollapsibleState.Expanded;
+					this.saveConnectedDeviceDetails();
 				}
+
+				const icon = 
+				(item.details?.product === 'BIG-IQ') ? this.bigiqSvg : 
+				(item.details?.product === 'BIG-IP') ? this.f5Hex : '';
+				const tooltip = item.details ? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml') : '';
 
 				const treeItem = new F5Host(
 					(item.label || item.device),
 					item.provider,
-					'',
-					'',
+					tooltip,
+					icon,
 					'f5Host',
 					itemCollapsibleState,
 					{
@@ -350,11 +380,9 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 	async addDevice(newHost: string) {
 
-		let bigipHosts: { device: string }[] | undefined = await vscode.workspace.getConfiguration().get('f5.hosts');
-
 		if (!newHost) {
 			// attempt to get user to input new device
-			newHost = await vscode.window.showInputBox({
+			newHost = await window.showInputBox({
 				prompt: 'Device/BIG-IP/Host',
 				placeHolder: '<user>@<host/ip>',
 				ignoreFocusOut: true
@@ -368,48 +396,70 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 				});
 		}
 
-		if (bigipHosts === undefined) {
-			// throw new Error('no devices in config?');
-			bigipHosts = [];
-		}
+		// quick-n-dirty way, stringify the entire hosts config and search it for the host we are adding
+		const devicesString = JSON.stringify(this.bigipHosts);
 
-		// the following is a quick and dirty way to search the entire 
-		//	devices config obj for a match without having to check each piece
-
-		const deviceRex = /^[\w-.]+@[\w-.:]+(:[0-9]+)?$/;		// matches any username combo an F5 will accept and host/ip
-		const devicesString = JSON.stringify(bigipHosts);
-
-		if (!devicesString.includes(`\"${newHost}\"`) && deviceRex.test(newHost)) {
-			bigipHosts.push({ device: newHost });
-			await vscode.workspace.getConfiguration().update('f5.hosts', bigipHosts, vscode.ConfigurationTarget.Global);
-			// vscode.window.showInformationMessage(`Adding ${newHost} to list!`);
-			this.refresh();
+		if (!devicesString.includes(`\"${newHost}\"`) && this.deviceRex.test(newHost)) {
+			this.bigipHosts.push({ device: newHost, provider: 'tmos' });
+			this.saveHosts();
+			wait(500, this.refresh());
 			return `${newHost} added to device configuration`;
 		} else {
-			vscode.window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>');
+			logger.error(`${newHost} exists or invalid format: <user>@<host/ip>:<port>`);
 			return 'FAILED - Already exists or invalid format: <user>@<host/ip>';
-			// Promise.reject('Already exists or invalid format: <user>@<host/ip>');
-			// throw new Error('Already exists or invalid format: <user>@<host/ip>');
 		}
 	}
 
-	async removeDevice(hostID: any) {
-		logger.debug(`Remove Host command: ${JSON.stringify(hostID)}`);
+	async editDevice(hostID: F5Host) {
+		logger.debug(`Edit Host command:`, hostID);
 
-		this.clearPassword(hostID.label);	// clear cached password for device
+        window.showInputBox({
+            prompt: 'Update Device/BIG-IP/Host',
+            value: hostID.label,
+            ignoreFocusOut: true
+        })
+            .then(input => {
 
-		let bigipHosts: { device: string }[] | undefined = vscode.workspace.getConfiguration().get('f5.hosts');
+                logger.debug('user input', input);
 
-		if (!bigipHosts || !hostID) {
-			throw new Error('device delete, no devices in config or no selected host to delete');
-		}
+                if (input === undefined || this.bigipHosts === undefined) {
+                    // throw new Error('Update device inputBox cancelled');
+                    logger.warn('Update device inputBox cancelled');
+                    return;
+                }
 
-		const newBigipHosts = bigipHosts.filter(item => item.device !== hostID.label);
+                // const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
+                const devicesString = JSON.stringify(this.bigipHosts);
 
-		if (bigipHosts.length === (newBigipHosts.length + 1)) {
+                if (!devicesString.includes(`\"${input}\"`) && this.deviceRex.test(input) && this.bigipHosts && hostID.device) {
+
+					// get the array index of the modified device
+					const modifiedDeviceIndex = this.bigipHosts.findIndex(x => x.device === hostID.device?.device);
+
+					// update device using index
+					this.bigipHosts[modifiedDeviceIndex].device = input;
+
+					this.saveHosts();
+					wait(500, this.refresh());
+
+				} else {
+
+                    logger.error(`${input} exists or invalid format: <user>@<host/ip>:<port>`);
+                }
+            });
+	}
+
+	async removeDevice(hostID: F5Host) {
+		logger.debug(`Remove Host command:`, hostID);
+		
+		const newBigipHosts = this.bigipHosts.filter(item => item.device !== hostID.device?.device);
+		
+		if (this.bigipHosts.length === (newBigipHosts.length + 1)) {
 			logger.debug('device removed');
-			await vscode.workspace.getConfiguration().update('f5.hosts', newBigipHosts, vscode.ConfigurationTarget.Global);
-			setTimeout(() => { this.refresh(); }, 300);
+			this.clearPassword(hostID.label);	// clear cached password for device
+			this.bigipHosts = newBigipHosts;
+			this.saveHosts();
+			wait(500, this.refresh());
 			return `successfully removed ${hostID.label} from devices configuration`;
 		} else {
 			logger.debug('something with remove device FAILED!!!');
@@ -444,19 +494,58 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 		}
 	}
 
+
+	/**
+	 * capture connected device details to save in the config for the hosts view
+	 */
+	async saveConnectedDeviceDetails() {
+
+		// get the index of the current connected device in the devices array
+		const connectedDeviceIndex = this.bigipHosts?.findIndex(x => x.device === this.connectedDevice?.device.device);
+
+		// we should have everything we need by now
+		if ((connectedDeviceIndex || connectedDeviceIndex === 0) && this.bigipHosts && this.connectedDevice) {
+			// inject/refresh details
+			this.bigipHosts[connectedDeviceIndex].details = {
+				product: this.connectedDevice.host?.product,
+				platformMarketingName: this.connectedDevice.host?.platformMarketingName,
+				version: this.connectedDevice.host?.version,
+				managementAddress: this.connectedDevice.host?.managementAddress,
+				platform: this.connectedDevice.host?.platform,
+				physicalMemory: this.connectedDevice.host?.physicalMemory
+			};
+			this.saveHosts();
+		}
+	}
+
 }
 
 
 export class F5Host extends TreeItem {
-	device?: BigipHost | undefined;
+	device: BigipHost | undefined;
 	constructor(
 		public readonly label: string,
 		public description: string,
-		public tooltip: string,
-		public iconPath: string,
+		public tooltip: string | MarkdownString,
+		public iconPath: string | ThemeIcon,
 		public contextValue: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command,
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command?: Command,
+	) {
+		super(label, collapsibleState);
+	}
+}
+
+
+export class HostTreeItem extends TreeItem {
+	constructor(
+		public readonly label: string,
+		public description: string,
+		public tooltip: string | MarkdownString,
+		public iconPath: string | ThemeIcon,
+		public contextValue: string,
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command?: Command,
 	) {
 		super(label, collapsibleState);
 	}

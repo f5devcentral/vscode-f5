@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.0-beta.6",
+	"version": "3.0.0-beta.7",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -161,6 +161,31 @@
 								"label": {
 									"type": "string",
 									"description": "short device label"
+								},
+								"details": {
+									"type": "object",
+									"description": "device details",
+									"product": {
+										"type": "string"
+									},
+									"platformMarketingName": {
+										"type": "string"
+									},
+									"version": {
+										"type": "string"
+									},
+									"hostname": {
+										"type": "string"
+									},
+									"managementAddress": {
+										"type": "string"
+									},
+									"platform": {
+										"type": "string"
+									},
+									"physicalMemory": {
+										"type": "string"
+									}
 								},
 								"onConnect": {
 									"type": "array",

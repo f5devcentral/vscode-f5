@@ -112,6 +112,7 @@ export default function devicesCore(context: ExtensionContext) {
                 ext.keyTar.setPassword('f5Hosts', device.device, password);
 
                 logger.debug('F5 Connect Discovered', connect);
+                ext.hostsTreeProvider.connectedDevice = ext.f5Client;
                 ext.hostsTreeProvider.refresh();
                 ext.as3Tree.refresh();
             })
@@ -138,6 +139,7 @@ export default function devicesCore(context: ExtensionContext) {
         }
         // refresh host view to clear any dropdown menus
         ext.hostsTreeProvider.refresh();
+        ext.hostsTreeProvider.connectedDevice = undefined;
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.clearPassword', async (item) => {
@@ -154,46 +156,7 @@ export default function devicesCore(context: ExtensionContext) {
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.editHost', async (hostID) => {
-
-        logger.debug(`Edit Host command: ${JSON.stringify(hostID)}`);
-
-        let bigipHosts: { device: string }[] | undefined = workspace.getConfiguration().get('f5.hosts');
-        logger.debug(`Current bigipHosts: ${JSON.stringify(bigipHosts)}`);
-
-        window.showInputBox({
-            prompt: 'Update Device/BIG-IP/Host',
-            value: hostID.label,
-            ignoreFocusOut: true
-        })
-            .then(input => {
-
-                logger.debug('user input', input);
-
-                if (input === undefined || bigipHosts === undefined) {
-                    // throw new Error('Update device inputBox cancelled');
-                    logger.warn('Update device inputBox cancelled');
-                    return;
-                }
-
-                const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
-                const devicesString = JSON.stringify(bigipHosts);
-
-                if (!devicesString.includes(`\"${input}\"`) && deviceRex.test(input)) {
-
-                    bigipHosts.forEach((item: { device: string; }) => {
-                        if (item.device === hostID.label) {
-                            item.device = input;
-                        }
-                    });
-
-                    workspace.getConfiguration().update('f5.hosts', bigipHosts, ConfigurationTarget.Global);
-                    setTimeout(() => { ext.hostsTreeProvider.refresh(); }, 300);
-                } else {
-
-                    window.showErrorMessage('Already exists or invalid format: <user>@<host/ip>:<port>');
-                }
-            });
-
+        return await ext.hostsTreeProvider.editDevice(hostID);
     }));
 
 
