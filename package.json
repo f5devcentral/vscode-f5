@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.0-beta.1",
+	"version": "3.0.0-beta.4",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -19,7 +19,7 @@
 		"Snippets"
 	],
 	"engines": {
-		"vscode": "^1.42.0"
+		"vscode": "^1.54.0"
 	},
 	"bugs": {
 		"url": "https://github.com/f5devcentral/vscode-f5/issues"
@@ -445,43 +445,39 @@
 				"command": "f5.createUCS",
 				"title": "Create UCS",
 				"category": "F5",
-				"enablement": "f5.device && viewItem == ucsHeader"
+				"enablement": "f5.device && viewItem == ucsHeader",
+				"icon": "$(add)"
+			},
+			{
+				"command": "f5.deleteUCS",
+				"title": "Delete UCS",
+				"category": "F5",
+				"enablement": "f5.device && viewItem == ucsItem",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "f5.refreshHostsTree",
 				"title": "Refresh Devices",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5.iqViewRefresh",
 				"title": "Refresh BIG-IQ View",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5.cfgExploreRefresh",
 				"title": "Refresh Config Explorer",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5.refreshTclTree",
 				"title": "Refresh tcl",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5-fast.getInfo",
@@ -552,10 +548,7 @@
 				"title": "Refresh",
 				"category": "F5",
 				"enablement": "f5.fastInstalled",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5-as3.postDec",
@@ -578,10 +571,7 @@
 				"command": "f5-as3.refreshTenantsTree",
 				"title": "Refresh Tenants Tree",
 				"category": "F5-AS3",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(sync)"
 			},
 			{
 				"command": "f5-do.inspect",
@@ -624,10 +614,7 @@
 				"command": "f5.editHost",
 				"title": "Edit Host",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/edit.svg",
-					"dark": "resources/dark/edit.svg"
-				}
+				"icon": "$(edit)"
 			},
 			{
 				"command": "f5.editDeviceProvider",
@@ -1015,6 +1002,11 @@
 					"group": "inline"
 				},
 				{
+					"command": "f5.deleteUCS",
+					"group": "inline",
+					"when": "view == f5Hosts && viewItem == ucsItem"
+				},
+				{
 					"command": "f5.editHost",
 					"when": "view == f5Hosts && viewItem == f5Host"
 				},
@@ -1123,24 +1115,24 @@
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^7.0.1",
-		"@types/node": "^12.19.16",
-		"@types/vscode": "^1.42.0",
+		"@types/node": "^12.20.6",
+		"@types/vscode": "^1.54.0",
 		"@typescript-eslint/eslint-plugin": "^2.34.0",
 		"@typescript-eslint/parser": "^2.34.0",
+		"@types/js-yaml": "4.0.0",
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
-		"mocha": "^8.1.3",
-		"nock": "^13.0.7",
-		"typescript": "^3.9.7",
-		"vscode-test": "^1.5.0"
+		"mocha": "^8.3.2",
+		"nock": "^13.0.11",
+		"typescript": "^3.9.9",
+		"vscode-test": "^1.5.1"
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
-		"@types/js-yaml": "^3.12.6",
 		"axios": "^0.21.1",
 		"f5-conx-core": "file:../f5-conx-core",
 		"f5-corkscrew": "file:../f5-corkscrew",
-		"js-yaml": "^3.14.1",
+		"js-yaml": "4.0.0",
 		"keytar": "^6.0.1"
 	}
 }

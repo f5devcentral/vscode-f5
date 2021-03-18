@@ -49,6 +49,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - [#111](https://github.com/f5devcentral/vscode-f5/issues/111) - [RFE] enable post fast template command in editor
   - Feature actually got removed to provide a clear path to template sets
 
+- [#113](https://github.com/f5devcentral/vscode-f5/issues/113) - [RFE] bigiq view v1
+  - initial bigiq specific features for as3 templates, applications management, scripts, and devices
+
 ---
 
 ## [2.10.7] - (02-09-2021)
@@ -164,51 +167,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - bigiq/as3 integration
   - displays targets/tenants appropriately
   - get/modify/repost declaration for target tenant
-- Updated docs:
-  - Added "Edit in Github" and modified date header to each page
-  - fixed changelog reference
-
----
-
-## [2.9.0] - (11-12-2020)
-
-** toying with the idea of completeing the f5-conx-core rewrite and re-integrate all changes with all enhancements
-- full qkview/ucs create/download/delete
-
-
-### Added
-- iHealth view
-  - collect/save creds
-  - list/upload/download
-  - 
-
-- setup full 'cache' directory
-  - this would be the catch-all for everything
-  - possibly add functions to open folder as workspace or even clearing cache
-
-- extraction and collection of connection timing stats
-  - would like to provide some analytics or flame charts with them
-  - alert user if timing for a particular device/call slows down so much over a given timeframe
-
-
-- extended device view details
-  - icon for bigip vs bigip vs nginx?
-  - adding hostname/tmos version to hover?
-    - cache details in configuration device details, to be refreshed at every connect
-  - When connected, the connected device in the device view, gains the ability to expand menus for managing things like:
-    - UCS create/download/delete (includes mini_ucs)
-    - QKVIEW create/download/delete
-    - ATC module list
-      - versions list for each modules
-      - install/un-install
-
-### Modified
-- rebase with new f5-conx-core
-  - extracts connectivity functions for use in other projects
-    - and external testing
-- config explorer update (wasn't processing some ucs/qkviews)
-- Clearing Config Explorer breaks it
-- single tenant from bigiq as3 target
 - Updated docs:
   - Added "Edit in Github" and modified date header to each page
   - fixed changelog reference

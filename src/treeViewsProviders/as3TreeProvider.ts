@@ -17,8 +17,15 @@ import {
 	TreeItem,
 	TreeItemCollapsibleState
 } from 'vscode';
-import * as jsYaml from 'js-yaml';
-import { AdcDeclaration, As3AppMap, As3AppMapTargets, As3AppMapTenants, As3Declaration, As3Tenant } from '../utils/as3Models';
+import jsYaml from 'js-yaml';
+import { 
+	AdcDeclaration,
+	As3AppMap,
+	As3AppMapTargets,
+	As3AppMapTenants,
+	As3Declaration,
+	As3Tenant
+} from '../utils/as3Models';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
 
@@ -90,7 +97,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 						// get appStats and set as tooltip
 						const as3DecMap = this.as3DeclareMap?.[target];
-						const as3DecMapStringified = jsYaml.safeDump(as3DecMap, { indent: 4 });
+						const as3DecMapStringified = jsYaml.dump(as3DecMap, { indent: 4 });
 						const as3DecMdYaml = new MarkdownString().appendCodeblock(as3DecMapStringified, 'yaml');
 
 						treeItems.push(new AS3item(target, targetTenCount, as3DecMdYaml, 'as3Target', TreeItemCollapsibleState.Collapsed,
@@ -110,7 +117,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 						const appStats = this.as3DeclareMap[key];
 						const appCount = Object.keys(appStats).length.toString();
-						const as3DecMapStringified = jsYaml.safeDump(appStats, { indent: 4 });
+						const as3DecMapStringified = jsYaml.dump(appStats, { indent: 4 });
 
 						// get name of other tenants
 						const targetRemoval = Object.keys(this.as3DeclareMap).filter(x => x !== key);
@@ -158,7 +165,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 								const target = element.label as string;
 								const tenant = targetKey as string;
 								const as3DecMap = this.as3DeclareMap[target][tenant];
-								const as3DecMapStringified = jsYaml.safeDump(as3DecMap, { indent: 4 });
+								const as3DecMapStringified = jsYaml.dump(as3DecMap, { indent: 4 });
 								const as3DecMdYaml = new MarkdownString().appendCodeblock(as3DecMapStringified, 'yaml');
 
 								// get name of other tenants

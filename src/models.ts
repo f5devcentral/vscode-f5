@@ -7,9 +7,19 @@
 /**
  * extension device model
  */
-export type Device = {
+export type BigipHost = {
     device: string,
-    provider?: string,
+    label?: string,
+    details?: {
+        product?: string;
+        platformMarketingName?: string;
+        version?: string;
+        hostname?: string;
+        managementAddress?: string;
+        platform?: string;
+        physicalMemory?: number;
+    }
+    provider: string,
     onConnect?: string[],
     onDisconnect?: string[]
 };

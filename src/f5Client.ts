@@ -12,7 +12,7 @@ import {
 } from 'vscode';
 import { ext } from './extensionVariables';
 import { ExtHttp, F5Client as _F5Client } from 'f5-conx-core';
-import { Device } from './models';
+import { BigipHost } from './models';
 import EventEmitter from 'events';
 
 
@@ -20,7 +20,7 @@ import EventEmitter from 'events';
 
 export class F5Client extends _F5Client {
     // logger: typeof Logger;
-    device: Device;
+    device: BigipHost;
     events: EventEmitter;
     terminal: Terminal | undefined;
 
@@ -33,7 +33,7 @@ export class F5Client extends _F5Client {
     cfBar: StatusBarItem;
 
     constructor(
-        device: Device,
+        device: BigipHost,
         host: string,
         user: string,
         password: string,
@@ -82,7 +82,7 @@ export class F5Client extends _F5Client {
 
             if (this.host) {
 
-                this.hostStatusBar.text = this.device.device;
+                this.hostStatusBar.text = (this.device.label || this.device.device);
                 this.hostStatusBar.command = 'f5.disconnect';
                 this.hostStatusBar.tooltip = 'Disconnect';
                 this.hostStatusBar.show();

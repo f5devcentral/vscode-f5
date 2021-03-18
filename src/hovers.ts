@@ -34,7 +34,7 @@ export class Hovers {
     
                     if (cert.test(word)) {
                         const parsed2Json = parseX509(word);
-                        const parsed2Yml = jsyaml.safeDump(JSON.parse(parsed2Json), { indent: 4 });
+                        const parsed2Yml = jsyaml.dump(JSON.parse(parsed2Json), { indent: 4 });
                         return new Hover({ language: 'yaml', value: parsed2Yml });
                     }
                 }
@@ -78,7 +78,7 @@ export class Hovers {
                         
                         // if this is a certificate, parse it
                         const parsed2Json = parseX509(jsonLine.groups.value);
-                        const parsed2Yml = jsyaml.safeDump(JSON.parse(parsed2Json), { indent: 4 });
+                        const parsed2Yml = jsyaml.dump(JSON.parse(parsed2Json), { indent: 4 });
                         return new Hover({ language: 'yaml', value: parsed2Yml });
 
                     } else if (/\\n/.test(jsonLine?.groups?.value)){

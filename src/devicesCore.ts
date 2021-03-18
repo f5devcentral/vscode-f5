@@ -13,10 +13,11 @@ import { F5Client } from './f5Client';
 import { window, commands, workspace, ConfigurationTarget, ProgressLocation, Uri, ExtensionContext } from "vscode";
 import { deviceImport } from "./deviceImport";
 import { ext } from "./extensionVariables";
-import { Device } from "./models";
+import { BigipHost } from "./models";
 import { F5TreeProvider } from "./treeViewsProviders/hostsTreeProvider";
 import logger from "./utils/logger";
 import * as utils from './utils/utils';
+import { wait } from 'f5-conx-core';
 
 // /**
 //  * #########################################################################
@@ -42,7 +43,7 @@ export default function devicesCore(context: ExtensionContext) {
 
     ext.hostsTreeProvider = new F5TreeProvider(context);
     // window.registerTreeDataProvider('f5Hosts', ext.hostsTreeProvider);
-    window.createTreeView('f5Hosts', {
+    const hostsTreeView = window.createTreeView('f5Hosts', {
         treeDataProvider: ext.hostsTreeProvider,
         showCollapseAll: true
     });
@@ -57,7 +58,7 @@ export default function devicesCore(context: ExtensionContext) {
         }
 
         if (!device) {
-            const bigipHosts: Device[] | undefined = await workspace.getConfiguration().get('f5.hosts');
+            const bigipHosts: BigipHost[] | undefined = await workspace.getConfiguration().get('f5.hosts');
 
             if (bigipHosts === undefined) {
                 throw new Error('no hosts in configuration');
@@ -81,7 +82,18 @@ export default function devicesCore(context: ExtensionContext) {
         }
 
         var [user, host] = device.device.split('@');
-        var [host, port] = host.split(':');
+
+        let port;
+        if(/:/.test(host)) {
+            const hostSplit = host.split(':');
+            port = hostSplit.pop();
+            host = hostSplit.join(':');
+
+            // if we stil have a ":", then it's an IPv6, so wrap it in brackets "[ipv6]"
+            if(/:/.test(host)) {
+                host = `[${host}]`;
+            }
+        }
 
         const password: string = await utils.getPassword(device.device);
 
@@ -252,17 +264,47 @@ export default function devicesCore(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('f5.createUCS', async () => {
         // create ucs on f5
 
+        // https://code.visualstudio.com/api/references/icons-in-labels
+
+        // todo: expand this command to start a series of quickPick/input boxes to provide an interface to the different ucs create options (ie. filename/passphrase/noPrivateKeys/mini_ucs)
+
+        // hostsTreeView.message = '$(sync~spin) Creating UCS...';
+
         return await window.withProgress({
-            location: ProgressLocation.SourceControl,
+            // location: ProgressLocation.Window,
+            // title: 'Creating UCS...',
+            location: { viewId: 'f5Hosts' },
         }, async () => {
 
             return await ext.f5Client?.ucs.create()
                 .then(resp => {
 
-                    setTimeout(() => { ext.hostsTreeProvider.refresh(); }, 1000);
+                    setTimeout(() => { ext.hostsTreeProvider.refresh('UCS'); }, 1000);
+                    // hostsTreeView.message = '';
                     return resp;
                 })
                 .catch(err => logger.error('create ucs failed:', err));
+        });
+
+
+
+    }));
+
+
+    context.subscriptions.push(commands.registerCommand('f5.deleteUCS', async (item) => {
+
+        return await window.withProgress({
+            location: { viewId: 'f5Hosts' },
+        }, async () => {
+
+            return await ext.f5Client?.ucs.delete(item.label)
+                .then(resp => {
+
+                    wait(1000, ext.hostsTreeProvider.refresh('UCS'));
+                    // setTimeout(() => { ext.hostsTreeProvider.refresh(); }, 1000);
+                    // return resp;
+                })
+                .catch(err => logger.error('delete ucs failed:', err));
         });
 
     }));
@@ -272,6 +314,7 @@ export default function devicesCore(context: ExtensionContext) {
 
         return await window.withProgress({
             location: ProgressLocation.Window,
+            title: '$(sync~spin) Downloading UCS...'
         }, async () => {
 
             const fUri = Uri.parse(filename);

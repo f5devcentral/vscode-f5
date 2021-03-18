@@ -10,32 +10,24 @@
 
 import * as vscode from 'vscode';
 import path from 'path';
-import { ConfigurationTarget, TreeItem, TreeItemCollapsibleState, workspace } from 'vscode';
+import { 
+	ConfigurationTarget,
+	TreeItem,
+	TreeItemCollapsibleState,
+	workspace
+} from 'vscode';
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
 import {
-	atcMetaData,
 	AtcRelease,
 	AtcVersion,
-	AtcVersions,
-	AtcVersionsClient,
-	F5Client
 } from 'f5-conx-core';
+import { BigipHost } from '../models';
 
 // icon listing for addin icons to key elements
 // https://code.visualstudio.com/api/references/icons-in-labels#icon-listing
 
-// export type HostList = {
-
-// };
-
-export type BigipHost = {
-	device: string;
-	provider: string;
-	label?: string;
-	onConnect?: string[];
-	onDisconnect?: string[];
-};
+type hostsRefreshType = 'ATC' | 'UCS' | 'QKVIEW';
 
 export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
@@ -77,12 +69,27 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			.update('f5.hosts', this.bigipHosts, ConfigurationTarget.Global);
 	}
 
-	async refresh(): Promise<void> {
+	async refresh(type?: hostsRefreshType): Promise<void> {
 		this._onDidChangeTreeData.fire(undefined);
 
-		if (ext.f5Client) {
+		if (ext.f5Client && type === 'UCS') {
+
+			await ext.f5Client.ucs.list()
+				.then(resp => this.ucsList = resp.data.items);
+
+		} else if (ext.f5Client && type === 'QKVIEW') {
+
+			await ext.f5Client.qkview.list()
+				.then(resp => this.qkviewList = resp.data.items);
+
+		} else if (ext.f5Client && type === 'ATC') {
+
+			await ext.f5Client.discover();
+
+		} else if (ext.f5Client) {
+
 			// start getting ucs/qkview 
-			await ext.f5Client.connect();
+			await ext.f5Client.discover();
 			await ext.f5Client.ucs.list()
 				.then(resp => this.ucsList = resp.data.items);
 
@@ -103,15 +110,15 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 			const treeItems: F5Host[] = [];
 
 			// if the item is the device we are connected to
-			if (element.label === ext.f5Client?.device.device) {
+			if (element.device?.device === ext.f5Client?.device.device) {
 
 				// const atcDesc = Object.keys(this.latest);
 				const atcDesc = [
-					ext.f5Client.fast ? 'fast' : undefined,
-					ext.f5Client.as3 ? 'as3' : undefined,
-					ext.f5Client.do ? 'do' : undefined,
-					ext.f5Client.ts ? 'ts' : undefined,
-					ext.f5Client.cf ? 'cf' : undefined,
+					ext.f5Client?.fast ? 'fast' : undefined,
+					ext.f5Client?.as3 ? 'as3' : undefined,
+					ext.f5Client?.do ? 'do' : undefined,
+					ext.f5Client?.ts ? 'ts' : undefined,
+					ext.f5Client?.cf ? 'cf' : undefined,
 				].filter(Boolean);
 
 
@@ -297,7 +304,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 
 
-			this.bigipHosts = vscode.workspace.getConfiguration().get('f5.hosts');
+			// this.bigipHosts = vscode.workspace.getConfiguration().get('f5.hosts');
 			// logger.debug(`bigips: ${JSON.stringify(bigipHosts)}`);
 
 			if (this.bigipHosts === undefined) {
@@ -314,12 +321,10 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 				}
 
 				// if device is connected device, make it expandable
-				let itemCollapsibleStat = TreeItemCollapsibleState.None;
+				let itemCollapsibleState = TreeItemCollapsibleState.None;
 				if (item.device === ext.f5Client?.device.device) {
-					itemCollapsibleStat = TreeItemCollapsibleState.Expanded;
+					itemCollapsibleState = TreeItemCollapsibleState.Expanded;
 				}
-
-
 
 				const treeItem = new F5Host(
 					(item.label || item.device),
@@ -327,13 +332,15 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 					'',
 					'',
 					'f5Host',
-					itemCollapsibleStat,
+					itemCollapsibleState,
 					{
 						command: 'f5.connectDevice',
 						title: 'hostTitle',
 						arguments: [item]
 					}
 				);
+
+				treeItem.device = item;
 				return treeItem;
 			});
 
@@ -441,6 +448,7 @@ export class F5TreeProvider implements vscode.TreeDataProvider<F5Host> {
 
 
 export class F5Host extends TreeItem {
+	device?: BigipHost | undefined;
 	constructor(
 		public readonly label: string,
 		public description: string,

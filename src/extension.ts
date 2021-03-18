@@ -19,7 +19,7 @@ import {
 	Range,
 	Position,
 } from 'vscode';
-import * as jsYaml from 'js-yaml';
+import jsYaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as keyTarType from 'keytar';
@@ -844,10 +844,10 @@ export async function activate(context: ExtensionContext) {
 		if (utils.isValidJson(text)) {
 			logger.debug('converting json -> yaml');
 			// since it was valid json -> dump it to yaml
-			newText = jsYaml.safeDump(JSON.parse(text), { indent: 4 });
+			newText = jsYaml.dump(JSON.parse(text), { indent: 4 });
 		} else {
 			logger.debug('converting yaml -> json');
-			newText = JSON.stringify(jsYaml.safeLoad(text), undefined, 4);
+			newText = JSON.stringify(jsYaml.load(text), undefined, 4);
 		}
 
 		editor.edit(editBuilder => {
@@ -928,7 +928,7 @@ export async function activate(context: ExtensionContext) {
 				if (text.includes('url:')) {
 					// if yaml should have url: param
 					logger.debug('yaml with url: param -> parsing raw to JSON', JSON.stringify(text));
-					text = jsYaml.safeLoad(text);
+					text = jsYaml.load(text);
 
 				} else {
 					// not yaml
