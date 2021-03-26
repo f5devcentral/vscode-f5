@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.0-beta.7",
+	"version": "3.0.0-beta.8",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -206,21 +206,6 @@
 							"default": "admin@192.168.1.254"
 						}
 					},
-					"f5.as3Post.async": {
-						"type": "boolean",
-						"default": true,
-						"description": "Make as3 posts async by default"
-					},
-					"f5.showAuthTokenTimer": {
-						"type": "boolean",
-						"default": false,
-						"description": "Displays a countdown of the auth token lifetime.  Extension will refresh the token as needed with the next call.  This is mainly for visibility/debugging purposes, or for those like a ton of feedback"
-					},
-					"f5.asyncInterval": {
-						"type": "number",
-						"default": 5,
-						"description": "Number of seconds to wait between checking POST task status"
-					},
 					"f5.timeoutinmilliseconds": {
 						"type": "integer",
 						"default": 0,
@@ -232,12 +217,6 @@
 						"default": false,
 						"scope": "resource",
 						"description": "Show everything in a new editor tab"
-					},
-					"f5.enableWebViews": {
-						"type": "boolean",
-						"default": false,
-						"scope": "resource",
-						"description": "*DEV-inProgress*"
 					},
 					"f5.newEditorColumn": {
 						"type": "string",
@@ -274,12 +253,6 @@
 						"default": false,
 						"scope": "resource",
 						"description": "Prevent new editor tab from taking focus when opened or updated\n So, by default(disabled), each new editor that is opened and/or updated with also take focus"
-					},
-					"f5.tcl": {
-						"type": "boolean",
-						"default": true,
-						"scope": "resource",
-						"description": "Enable tcl/irule/iapp functionality."
 					},
 					"f5.logLevel": {
 						"type": "string",

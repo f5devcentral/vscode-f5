@@ -5,7 +5,14 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands, TextDocument, window } from "vscode";
+import { 
+    ExtensionContext,
+    StatusBarItem,
+    workspace,
+    ViewColumn,
+    commands,
+    window
+} from "vscode";
 import * as keyTarType from "keytar";
 // import { MgmtClient } from './utils/f5DeviceClient.ts.old';
 import logger from "./utils/logger";
@@ -47,6 +54,7 @@ export namespace ext {
         export let preserveEditorFocus: boolean;
         export let newEditorTabForAll: boolean;
         export let logLevel: string;
+        export let proxy: ProxyCfg | undefined;
     }
 }
 
@@ -112,6 +120,16 @@ export async function initSettings(context: ExtensionContext) {
         });
 }
 
+type ProxyCfg = {
+    host?: string,
+    port?: number,
+    protocol?: string,
+    auth?: {
+        username?: string,
+        password?: string
+    }
+};
+
 /**
  * load/reload vscode extension settings
  */
@@ -125,8 +143,6 @@ export async function loadSettings() {
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
 
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
-
-
 
 }
 

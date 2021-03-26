@@ -92,6 +92,9 @@ export function cfgExplore(context: ExtensionContext) {
 
         cfgProvider.makeExplosion(filePath);
 
+        await new Promise(resolve => { setTimeout(resolve, 2000); });
+        commands.executeCommand('cfgTree.focus');
+
     }));
 
 

@@ -24,19 +24,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - [#92](https://github.com/f5devcentral/vscode-f5/issues/92) - [RFE] F5 Hosts view v2
   - Extended Hosts view details that include ATC service management and UCS/QKVIEWS
 
-- [#87](https://github.com/f5devcentral/vscode-f5/issues/87) - [RFE] ipv6 support (**PENDING**)
-
 - [#60](https://github.com/f5devcentral/vscode-f5/issues/60) - [RFE] view x509 certificate details
   - This enabled hovers to show details about certificates but also got expanded to show nexted details in json structures, like cert/iRules/config-objects
-
-- [#88](https://github.com/f5devcentral/vscode-f5/issues/88) - [RFE] Examples Requests with web proxy support (**PENDING**)
-  - Provides configuration options for external proxy support
-  - This would be for all calls not destined for an F5
 
 - [#118](https://github.com/f5devcentral/vscode-f5/issues/118) - [RFE] corkscrew v0.8.0 updates
   - cert/key extraction (different depending on mini_ucs/ucs/qkview)
   - stats extraction from qkview
   - asyncrounous extraction
+  - (**PENDING - finish/fix certs from ucs**)
 
 - [#109](https://github.com/f5devcentral/vscode-f5/issues/109) - [BUG] Fail to explore config on connected BIG-IP
   - The new f5-conx-core fixed a bug that failed to download the mini_ucs if it was over a certain size
@@ -51,6 +46,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - [#113](https://github.com/f5devcentral/vscode-f5/issues/113) - [RFE] bigiq view v1
   - initial bigiq specific features for as3 templates, applications management, scripts, and devices
+
+- [#122](https://github.com/f5devcentral/vscode-f5/issues/122) - [RFE] Ability to identify device as BIG-IQ/BIG-IP in the F5 Hosts
+  - Added icons and tooltip information for identifying bigiq vs bigip devices in the main hosts list
 
 ---
 

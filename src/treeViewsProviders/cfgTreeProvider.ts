@@ -193,7 +193,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 const allFileStore = this.bigipConfig.fileStore.filter((el: ConfigFile) => {
                     // only return the certs and keys for now
                     if (el.fileName.includes('/certificate_d/') || el.fileName.includes('/certificate_key_d/')) {
-                        return;
+                        return true;
                     }
                 })
                     .map((el: ConfigFile) => `\n###  ${el.fileName}\n${el.content}\n\n`);
@@ -269,12 +269,18 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             docContent = JSON.stringify(items, undefined, 4);
         }
 
-
-        editors.forEach(el => {
+        // this loop is syncronous
+        for (const el of editors) {
             if (el.document.fileName === 'app.conf' || el.document.fileName === 'app.json') {
                 viewColumn = el.viewColumn;
             }
-        });
+        };
+        // old way, not syncronous
+        // editors.forEach(el => {
+        //     if (el.document.fileName === 'app.conf' || el.document.fileName === 'app.json') {
+        //         viewColumn = el.viewColumn;
+        //     }
+        // });
 
         // if vClm has a value assign it, else set column 1
         viewColumn = viewColumn ? viewColumn : newEditorColumn;

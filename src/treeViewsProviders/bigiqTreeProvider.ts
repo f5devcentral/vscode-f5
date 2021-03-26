@@ -161,13 +161,16 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
                 const execScripts = this.scriptsExecuted.map(el => {
                     const desc = el.status || '';
 
-                    // const output = el.userScriptTaskStatuses[0].output;
-                    // output ? output : ''
-                    const tooltip =
-                     el.userScriptTaskStatuses[0] ? new MarkdownString(`# output\n \`\`\`yaml\n${el.userScriptTaskStatuses[0].output}\n\`\`\``) :
-                     el.errorMessage ? new MarkdownString(`# error\n ${el.errorMessage}\n`)
-                     : '';
-                    // const tooltip2 = new MarkdownString()
+                    const output = el.userScriptTaskStatuses?.[0]?.output || '';
+
+                    const tooltip = output
+                        ? new MarkdownString()
+                            .appendCodeblock(`startTime: ${el.startDateTime}\nendTime: ${el.endDateTime}\n`, 'yaml')
+                            .appendMarkdown(`---\n## output`)
+                            .appendCodeblock(output, 'yaml') :
+                        el.errorMessage ? new MarkdownString(`# error\n${el.errorMessage}\n`)
+                            : '';
+
                     return new IqTreeItem(el.name, desc, tooltip, 'iqExecScript', '', TreeItemCollapsibleState.None,
                         { command: 'f5.iqViewShow', title: '', arguments: [el] });
                 });
