@@ -103,6 +103,7 @@ export class F5Client extends _F5Client {
 
                     commands.executeCommand('setContext', 'f5.tcl', true);
                     commands.executeCommand('setContext', 'f5.device', true);
+                    commands.executeCommand('setContext', 'f5.isBigip', true);
 
                 } else if (this.host.product === 'BIG-IQ') {
 
@@ -192,7 +193,8 @@ export class F5Client extends _F5Client {
     async disconnect() {
 
         // this._tokenTimeout = 0;  // zero/expire authToken
-        this.mgmtClient.clearToken();
+        // this.mgmtClient.clearToken();
+        this.clearLogin();
 
         // clear connected details status bars
         this.hostStatusBar.hide();
@@ -217,6 +219,7 @@ export class F5Client extends _F5Client {
         commands.executeCommand('setContext', 'f5.doInstalled', false);
         commands.executeCommand('setContext', 'f5.tsInstalled', false);
         commands.executeCommand('setContext', 'f5.cfInstalled', false);
+        commands.executeCommand('setContext', 'f5.isBigip', false);
         commands.executeCommand('setContext', 'f5.isBigiq', false);
         // ext.iRulesAble = false;
 

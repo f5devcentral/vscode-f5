@@ -39,19 +39,11 @@ import { F5Client } from '../f5Client';
 
 type hostsRefreshType = 'ATC' | 'UCS' | 'QKVIEW';
 
-export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
+export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
-	private _onDidChangeTreeData: EventEmitter<F5Host | HostTreeItem | undefined> = new EventEmitter<F5Host | HostTreeItem | undefined>();
-	readonly onDidChangeTreeData: Event<F5Host | HostTreeItem | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<F5Host | undefined> = new EventEmitter<F5Host | undefined>();
+	readonly onDidChangeTreeData: Event<F5Host | undefined> = this._onDidChangeTreeData.event;
 
-	fast: AtcVersion | undefined;
-	as3: AtcVersion | undefined;
-	do: AtcVersion | undefined;
-	ts: AtcVersion | undefined;
-	cf: AtcVersion | undefined;
-
-	private orangeDot = ext.context.asAbsolutePath(path.join("images", "orangeDot.svg"));
-	private greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
 	// private greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
 	private f5Hex = ext.context.asAbsolutePath(path.join("images", "f5_open_dark.svg"));
 	private f524 = ext.context.asAbsolutePath(path.join("images", "f5_white_24x24.svg"));
@@ -66,11 +58,7 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 	 * f5Client object when connected to a device
 	 */
 	connectedDevice: F5Client | undefined;
-	/**
-	 * list of UCSs from currently connected device
-	 */
-	private ucsList = [];
-	private qkviewList = [];
+
 	/**
 	 * list of hosts from config file
 	 */
@@ -79,11 +67,7 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 
 	constructor(context: ExtensionContext) {
 		this.context = context;
-		this.fast = ext.atcVersions.fast;
-		this.as3 = ext.atcVersions.as3;
-		this.do = ext.atcVersions.do;
-		this.ts = ext.atcVersions.ts;
-		this.cf = ext.atcVersions.cf;
+
 		this.loadHosts();
 	}
 
@@ -96,36 +80,9 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 			.update('f5.hosts', this.bigipHosts, ConfigurationTarget.Global);
 	}
 
-	async refresh(type?: hostsRefreshType): Promise<void> {
-		// this._onDidChangeTreeData.fire(undefined);
 
-		if (this.connectedDevice && type === 'UCS') {
-
-			await this.connectedDevice.ucs.list()
-				.then(resp => this.ucsList = resp.data.items);
-
-		} else if (this.connectedDevice && type === 'QKVIEW') {
-
-			await this.connectedDevice.qkview.list()
-				.then(resp => this.qkviewList = resp.data.items);
-
-		} else if (this.connectedDevice && type === 'ATC') {
-
-			await this.connectedDevice.discover();
-
-		} else if (this.connectedDevice) {
-
-			// start getting ucs/qkview 
-			await this.connectedDevice.discover();
-			await this.connectedDevice.ucs.list()
-				.then(resp => this.ucsList = resp.data.items);
-
-			await this.connectedDevice.qkview.list()
-				.then(resp => this.qkviewList = resp.data.items);
-		}
-
+	async refresh(): Promise<void> {
 		this._onDidChangeTreeData.fire(undefined);
-
 	}
 
 
@@ -135,208 +92,15 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 
 
 	async getChildren(element?: F5Host): Promise<F5Host[]> {
+		let treeItems: F5Host[] = [];
 
 		if (element) {
-			const treeItems: F5Host[] = [];
 
-			// if the item is the device we are connected to
-			if (element.device?.device === this.connectedDevice?.device.device) {
+			// nothing for now...
 
-				// build item description indicating which atc services are installed
-				const atcDesc = [
-					this.connectedDevice?.fast ? 'fast' : undefined,
-					this.connectedDevice?.as3 ? 'as3' : undefined,
-					this.connectedDevice?.do ? 'do' : undefined,
-					this.connectedDevice?.ts ? 'ts' : undefined,
-					this.connectedDevice?.cf ? 'cf' : undefined,
-				].filter(Boolean);
-
-
-				// to be used when conx has ATC ILX mgmt
-				treeItems.push(...[
-					new F5Host('ATC', `(${atcDesc.join('/')})`, '', '', '', TreeItemCollapsibleState.Collapsed),
-					new F5Host('UCS', this.ucsList.length.toString(), '', '', 'ucsHeader', TreeItemCollapsibleState.Collapsed),
-					new F5Host('QKVIEW', this.qkviewList.length.toString(), '', '', 'qkviewHeader', TreeItemCollapsibleState.Collapsed),
-				]);
-
-			} else if (element.label === 'ATC') {
-
-				const fastIcon
-					= `v${this.connectedDevice?.fast?.version.version}` === this.fast?.latest ? this.greenDot
-						: this.connectedDevice?.fast ? this.orangeDot
-							: '';
-				const as3Icon
-					= `v${this.connectedDevice?.as3?.version.version}` === this.as3?.latest ? this.greenDot
-						: this.connectedDevice?.as3 ? this.orangeDot
-							: '';
-				const doIcon
-					= `v${this.connectedDevice?.do?.version.version}` === this.do?.latest ? this.greenDot
-						: this.connectedDevice?.do ? this.orangeDot
-							: '';
-				const tsIcon
-					= `v${this.connectedDevice?.ts?.version.version}` === this.ts?.latest ? this.greenDot
-						: this.connectedDevice?.ts ? this.orangeDot
-							: '';
-				const cfIcon
-					= `v${this.connectedDevice?.cf?.version.version}` === this.cf?.latest ? this.greenDot
-						: this.connectedDevice?.cf ? this.orangeDot
-							: '';
-
-
-				treeItems.push(...[
-					new F5Host('FAST', '', 'f5-appsvcs-templates', fastIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
-
-					new F5Host('AS3', '', 'f5-appsvcs', as3Icon, 'atcService', TreeItemCollapsibleState.Collapsed),
-
-					new F5Host('DO', '', 'f5-declarative-onboarding', doIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
-
-					new F5Host('TS', '', 'f5-telemetry', tsIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
-
-					new F5Host('CF', '', 'f5-cloud-failover', cfIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
-				]);
-
-
-			} else if (element.label === 'FAST') {
-
-				this.fast?.releases?.forEach((el: AtcRelease) => {
-
-					// remove the leading "v" if present
-					const deviceVersion = el.version.replace(/^v/, '');
-
-					const desc = [
-						el.version === this.fast?.latest ? 'Latest' : '',
-						deviceVersion === this.connectedDevice?.fast?.version.version ? 'Installed' : ''
-					].filter(Boolean);
-
-					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
-						command: 'f5.installRPM',
-						title: '',
-						arguments: [el.assets]
-					}));
-				});
-
-
-			} else if (element.label === 'AS3') {
-
-				this.as3?.releases?.forEach((el: AtcRelease) => {
-
-					// remove the leading "v" if present
-					const deviceVersion = el.version.replace(/^v/, '');
-
-					const desc = [
-						el.version === this.as3?.latest ? 'Latest' : '',
-						deviceVersion === this.connectedDevice?.as3?.version.version ? 'Installed' : ''
-					].filter(Boolean);
-
-					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
-						command: 'f5.installRPM',
-						title: '',
-						arguments: [el.assets]
-					}));
-				});
-
-
-			} else if (element.label === 'DO') {
-
-				this.do?.releases?.forEach((el: AtcRelease) => {
-
-					// remove the leading "v" if present
-					const deviceVersion = el.version.replace(/^v/, '');
-
-					const desc = [
-						el.version === this.do?.latest ? 'Latest' : '',
-						deviceVersion === this.connectedDevice?.do?.version.version ? 'Installed' : ''
-					].filter(Boolean);
-
-					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
-						command: 'f5.installRPM',
-						title: '',
-						arguments: [el.assets]
-					}));
-				});
-
-
-
-			} else if (element.label === 'TS') {
-
-				this.ts?.releases?.forEach((el: AtcRelease) => {
-
-					const desc = [
-						el.version === this.ts?.latest ? 'Latest' : '',
-						el.version.replace(/^v/, '') === this.connectedDevice?.ts?.version.version ? 'Installed' : ''
-					].filter(Boolean);
-
-					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
-						command: 'f5.installRPM',
-						title: '',
-						arguments: [el.assets]
-					}));
-				});
-
-
-
-			} else if (element.label === 'CF') {
-
-				this.cf?.releases?.forEach((el: AtcRelease) => {
-
-					const desc = [
-						el.version === this.cf?.latest ? 'Latest' : '',
-						el.version.replace(/^v/, '') === this.connectedDevice?.cf?.version.version ? 'Installed' : ''
-					].filter(Boolean);
-
-					treeItems.push(new F5Host(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
-						command: 'f5.installRPM',
-						title: '',
-						arguments: [el.assets]
-					}));
-				});
-
-
-
-
-			} else if (element.label === 'UCS') {
-
-				// get list of ucs, list as items
-				treeItems.push(...
-					this.ucsList.map((el: any) => {
-						const tip = [
-							`created: ${el.apiRawValues.file_created_date}`,
-							`file size: ${el.apiRawValues.file_size}`,
-							`version: ${el.apiRawValues.version}`,
-							`encrypted: ${el.apiRawValues.encrypted}`,
-						].join('\r\n');
-						const fileName = path.parse(el.apiRawValues.filename).base;
-
-						return new F5Host(fileName, '', tip, '', 'ucsItem', TreeItemCollapsibleState.None, {
-							command: 'f5.downloadUCS',
-							title: '',
-							arguments: [fileName]
-						});
-					})
-				);
-
-
-
-			} else if (element.label === 'QKVIEW') {
-				// get list of qkviews, list as items
-				treeItems.push(...
-					this.qkviewList.map((el: any) => {
-						const label = path.parse(el.name).name;
-						return new F5Host(label, '', '', '', 'qkviewItem', TreeItemCollapsibleState.None);
-					})
-				);
-			}
-
-			return treeItems;
 		} else {
 
-
-			// if (this.bigipHosts === undefined) {
-			// 	throw new Error('No configured hosts - from hostTreeProvider');
-			// }
-
-
-			const treeItems = this.bigipHosts.map((item: BigipHost) => {
+			this.bigipHosts.map((item: BigipHost) => {
 
 
 				// add default provider=local if not defined
@@ -346,15 +110,18 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 
 				// if device is connected device, make it expandable
 				let itemCollapsibleState = TreeItemCollapsibleState.None;
-				if (item.device === this.connectedDevice?.device.device) {
-					itemCollapsibleState = TreeItemCollapsibleState.Expanded;
-					this.saveConnectedDeviceDetails();
-				}
+				// if (item.device === this.connectedDevice?.device.device) {
+				// 	itemCollapsibleState = TreeItemCollapsibleState.Expanded;
+				// 	this.saveConnectedDeviceDetails();
+				// }
 
-				const icon = 
-				(item.details?.product === 'BIG-IQ') ? this.bigiqSvg : 
-				(item.details?.product === 'BIG-IP') ? this.f5Hex : '';
-				const tooltip = item.details ? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml') : '';
+				const icon =
+					(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
+						(item.details?.product === 'BIG-IP') ? this.f5Hex : '';
+				const tooltip
+					= item.details
+						? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
+						: '';
 
 				const treeItem = new F5Host(
 					(item.label || item.device),
@@ -371,11 +138,11 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 				);
 
 				treeItem.device = item;
-				return treeItem;
+				treeItems.push(treeItem);
 			});
 
-			return Promise.resolve(treeItems);
 		}
+		return treeItems;
 	}
 
 	async addDevice(newHost: string) {
@@ -413,25 +180,25 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 	async editDevice(hostID: F5Host) {
 		logger.debug(`Edit Host command:`, hostID);
 
-        window.showInputBox({
-            prompt: 'Update Device/BIG-IP/Host',
-            value: hostID.label,
-            ignoreFocusOut: true
-        })
-            .then(input => {
+		window.showInputBox({
+			prompt: 'Update Device/BIG-IP/Host',
+			value: hostID.label,
+			ignoreFocusOut: true
+		})
+			.then(input => {
 
-                logger.debug('user input', input);
+				logger.debug('user input', input);
 
-                if (input === undefined || this.bigipHosts === undefined) {
-                    // throw new Error('Update device inputBox cancelled');
-                    logger.warn('Update device inputBox cancelled');
-                    return;
-                }
+				if (input === undefined || this.bigipHosts === undefined) {
+					// throw new Error('Update device inputBox cancelled');
+					logger.warn('Update device inputBox cancelled');
+					return;
+				}
 
-                // const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
-                const devicesString = JSON.stringify(this.bigipHosts);
+				// const deviceRex = /^[\w-.]+@[\w-.]+(:[0-9]+)?$/;
+				const devicesString = JSON.stringify(this.bigipHosts);
 
-                if (!devicesString.includes(`\"${input}\"`) && this.deviceRex.test(input) && this.bigipHosts && hostID.device) {
+				if (!devicesString.includes(`\"${input}\"`) && this.deviceRex.test(input) && this.bigipHosts && hostID.device) {
 
 					// get the array index of the modified device
 					const modifiedDeviceIndex = this.bigipHosts.findIndex(x => x.device === hostID.device?.device);
@@ -444,16 +211,16 @@ export class F5TreeProvider implements TreeDataProvider<F5Host|HostTreeItem> {
 
 				} else {
 
-                    logger.error(`${input} exists or invalid format: <user>@<host/ip>:<port>`);
-                }
-            });
+					logger.error(`${input} exists or invalid format: <user>@<host/ip>:<port>`);
+				}
+			});
 	}
 
 	async removeDevice(hostID: F5Host) {
 		logger.debug(`Remove Host command:`, hostID);
-		
+
 		const newBigipHosts = this.bigipHosts.filter(item => item.device !== hostID.device?.device);
-		
+
 		if (this.bigipHosts.length === (newBigipHosts.length + 1)) {
 			logger.debug('device removed');
 			this.clearPassword(hostID.label);	// clear cached password for device
@@ -537,65 +304,25 @@ export class F5Host extends TreeItem {
 }
 
 
-export class HostTreeItem extends TreeItem {
-	constructor(
-		public readonly label: string,
-		public description: string,
-		public tooltip: string | MarkdownString,
-		public iconPath: string | ThemeIcon,
-		public contextValue: string,
-		public readonly collapsibleState: TreeItemCollapsibleState,
-		public readonly command?: Command,
-	) {
-		super(label, collapsibleState);
-	}
-}
+// /**
+//  * compares semver
+//  * 
+//  * https://github.com/substack/semver-compare
+//  * 
+//  * @param a 
+//  * @param b 
+//  */
+// export function cmp(a: string, b: string) {
+// 	var pa = a.split('.');
+// 	var pb = b.split('.');
+// 	for (var i = 0; i < 3; i++) {
+// 		var na = Number(pa[i]);
+// 		var nb = Number(pb[i]);
+// 		if (na > nb) { return 1; }
+// 		if (nb > na) { return -1; }
+// 		if (!isNaN(na) && isNaN(nb)) { return 1; }
+// 		if (isNaN(na) && !isNaN(nb)) { return -1; }
+// 	}
+// 	return 0;
+// };
 
-/**
- * compares semver
- * 
- * https://github.com/substack/semver-compare
- * 
- * @param a 
- * @param b 
- */
-export function cmp(a: string, b: string) {
-	var pa = a.split('.');
-	var pb = b.split('.');
-	for (var i = 0; i < 3; i++) {
-		var na = Number(pa[i]);
-		var nb = Number(pb[i]);
-		if (na > nb) { return 1; }
-		if (nb > na) { return -1; }
-		if (!isNaN(na) && isNaN(nb)) { return 1; }
-		if (isNaN(na) && !isNaN(nb)) { return -1; }
-	}
-	return 0;
-};
-
-const tmpUcsListResp = {
-	"kind": "tm:sys:ucs:ucscollectionstate",
-	"selfLink": "https://localhost/mgmt/tm/sys/ucs?ver=14.1.2.6",
-	"items": [
-		{
-			"kind": "tm:sys:ucs:ucsstate",
-			"generation": 0,
-			"apiRawValues": {
-				"base_build": "0.0.2",
-				"build": "0.0.2",
-				"built": "200605113646",
-				"changelist": "3327837",
-				"edition": "Point Release 6",
-				"encrypted": "no",
-				"file_created_date": "2020-08-01T12:57:21Z",
-				"file_size": "281800911 (in bytes)",
-				"filename": "/var/local/ucs/coreltm01_8.1.2020.ucs",
-				"install_date": "Fri Jun  5 11:36:46 PDT 2020",
-				"job_id": "1204782",
-				"product": "BIG-IP",
-				"sequence": "14.1.2.6-0.0.2.0",
-				"version": "14.1.2.6"
-			}
-		}
-	]
-};

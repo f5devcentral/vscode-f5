@@ -98,6 +98,11 @@
 					"name": "F5 Hosts"
 				},
 				{
+					"id": "ipView",
+					"name": "BIG-IP",
+					"when": "f5.isBigip"
+				},
+				{
 					"id": "iqView",
 					"name": "BIG-IQ",
 					"when": "f5.isBigiq"
@@ -468,6 +473,12 @@
 				"icon": "$(refresh)"
 			},
 			{
+				"command": "f5.refreshBigipTree",
+				"title": "Refresh BIG-IP View",
+				"category": "F5",
+				"icon": "$(refresh)"
+			},
+			{
 				"command": "f5.iqViewRefresh",
 				"title": "Refresh BIG-IQ View",
 				"category": "F5",
@@ -787,6 +798,11 @@
 					"group": "navigation"
 				},
 				{
+					"command": "f5.refreshBigipTree",
+					"when": "view == ipView",
+					"group": "navigation"
+				},
+				{
 					"command": "f5.iqViewRefresh",
 					"when": "view == iqView",
 					"group": "navigation"
@@ -999,18 +1015,18 @@
 				},
 				{
 					"command": "f5.unInstallRPM",
-					"when": "view == f5Hosts && viewItem == atcService",
+					"when": "view == ipView && viewItem == atcService",
 					"group": "inline"
 				},
 				{
 					"command": "f5.createUCS",
-					"when": "view == f5Hosts && viewItem == ucsHeader",
+					"when": "view == ipView && viewItem == ucsHeader",
 					"group": "inline"
 				},
 				{
 					"command": "f5.deleteUCS",
 					"group": "inline",
-					"when": "view == f5Hosts && viewItem == ucsItem"
+					"when": "view == ipView && viewItem == ucsItem"
 				},
 				{
 					"command": "f5.editDeviceProvider",

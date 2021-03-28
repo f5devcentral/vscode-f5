@@ -38,7 +38,7 @@ import { deviceImportOnLoad } from './deviceImport';
 import { TextDocumentView } from './editorViews/editorView';
 import { injectSchema } from './atcSchema';
 import devicesCore from './devicesCore';
-import rpmCore from './rpmCore';
+// import rpmCore from './rpmCore';
 import tclCore from './tclCore';
 import { ChangeVersion } from './changeVersion';
 import { Hovers } from './hovers';
@@ -99,7 +99,7 @@ export async function activate(context: ExtensionContext) {
 	devicesCore(context);
 
 	// rpm commands
-	rpmCore(context);
+	// rpmCore(context);
 
 	// tcl view commands
 	tclCore(context);
