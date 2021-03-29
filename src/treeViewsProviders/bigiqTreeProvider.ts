@@ -8,7 +8,9 @@
 
 'use strict';
 
-import { wait } from 'f5-conx-core';
+import path from 'path';
+
+import { AtcRelease, AtcVersion, wait } from 'f5-conx-core';
 import {
     Command,
     Event,
@@ -18,6 +20,7 @@ import {
     Position,
     Range,
     TextDocument,
+    ThemeIcon,
     TreeDataProvider,
     TreeItem,
     TreeItemCollapsibleState,
@@ -29,6 +32,7 @@ import {
 import { ext } from '../extensionVariables';
 import logger from '../utils/logger';
 import jsyaml from "js-yaml";
+import { F5Client } from '../f5Client';
 
 
 // https://clouddocs.f5.com/products/big-iq/mgmt-api/v6.1.0/ApiReferences/bigiq_public_api_ref/r_as3_template.html
@@ -46,6 +50,10 @@ import jsyaml from "js-yaml";
 type IqDataRefresh = 'TEMPLATES' | 'GLOBAL-APPS' | 'DEVICES' | 'SCRIPTS' | 'SCRIPT-EXEC';
 
 export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
+    private _onDidChangeTreeData: EventEmitter<IqTreeItem | undefined> = new EventEmitter<IqTreeItem | undefined>();
+    readonly onDidChangeTreeData: Event<IqTreeItem | undefined> = this._onDidChangeTreeData.event;
+    connected: F5Client | undefined;
+
     // treeView: TreeView;
     context: ExtensionContext;
     devices: IqDevice[] = [];
@@ -53,6 +61,12 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
     templates: IqTemplate[] = [];
     scripts: IqScript[] = [];
     scriptsExecuted: IqExecutedScript[] = [];
+
+    orangeDot = ext.context.asAbsolutePath(path.join("images", "orangeDot.svg"));
+    greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
+
+    as3: AtcVersion | undefined;
+    do: AtcVersion | undefined;
 
     //https://clouddocs.f5.com/products/big-iq/mgmt-api/v0.0/
     readonly endPoints = {
@@ -71,12 +85,12 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         certTasks: '/mgmt/cm/adc-core/tasks/certificate-management'
     };
 
-    private _onDidChangeTreeData: EventEmitter<IqTreeItem | undefined> = new EventEmitter<IqTreeItem | undefined>();
-    readonly onDidChangeTreeData: Event<IqTreeItem | undefined> = this._onDidChangeTreeData.event;
 
 
     constructor(context: ExtensionContext) {
         this.context = context;
+        this.as3 = ext.atcVersions.as3;
+        this.do = ext.atcVersions.do;
     }
 
 
@@ -102,10 +116,96 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
         if (element) {
 
-            if (element.label === 'Global Applications') {
+            if (false) {
 
+                // just makes the rest of the menu items easier to move around
+
+            } else if (element.label === 'ATC') {
+
+                const as3Icon
+                    = `v${this.connected?.as3?.version.version}` === this.as3?.latest ? this.greenDot
+                        : this.connected?.as3 ? this.orangeDot
+                            : '';
+                const doIcon
+                    = `v${this.connected?.do?.version.version}` === this.do?.latest ? this.greenDot
+                        : this.connected?.do ? this.orangeDot
+                            : '';
+                            
+                const as3Yml = jsyaml.dump({
+                    latest: this.as3?.latest,
+                    installed: this.connected?.as3?.version.version
+                }, { indent: 4 });
+                const as3ToolTip = 
+                    new MarkdownString(`## f5-appsvcs (AS3)\n`)
+                    .appendCodeblock(as3Yml, 'yaml'
+                    );
+                
+                const doToolTip = 
+                    new MarkdownString(`## f5-declarative-onboarding (DO)\n`)
+                    .appendCodeblock(jsyaml.dump({
+                        latest: this.do?.latest,
+                        installed: this.connected?.do?.version.version
+                    }, { indent: 4 }), 'yaml'
+                    );
+
+                treeItems.push(...[
+
+
+                    new IqTreeItem('AS3', '', as3ToolTip, as3Icon, 'atcService', TreeItemCollapsibleState.Collapsed),
+
+                    new IqTreeItem('DO', '', doToolTip, doIcon, 'atcService', TreeItemCollapsibleState.Collapsed),
+
+                ]);
+
+
+            } else if (element.label === 'AS3') {
+
+                this.as3?.releases?.forEach((el: AtcRelease) => {
+
+                    // remove the leading "v" if present
+                    const deviceVersion = el.version.replace(/^v/, '');
+
+                    const desc = [
+                        el.version === this.as3?.latest ? 'Latest' : '',
+                        deviceVersion === this.connected?.as3?.version.version ? 'Installed' : ''
+                    ].filter(Boolean);
+
+                    const toolTip = new MarkdownString(`## Click to install, but broken for now\n---\n`)
+                    .appendMarkdown(`**will upload the rpm, but must manaully move/install update using bigiq method**\n\n https://support.f5.com/csp/article/K54909607`);
+
+                    treeItems.push(new IqTreeItem(el.version, desc.join('/'), toolTip, '', 'rpm', TreeItemCollapsibleState.None, {
+                        command: 'f5.installRPM',
+                        title: '',
+                        arguments: [el.assets]
+                    }));
+                });
+
+
+            } else if (element.label === 'DO') {
+
+                this.do?.releases?.forEach((el: AtcRelease) => {
+
+                    // remove the leading "v" if present
+                    const deviceVersion = el.version.replace(/^v/, '');
+
+                    const desc = [
+                        el.version === this.do?.latest ? 'Latest' : '',
+                        deviceVersion === this.connected?.do?.version.version ? 'Installed' : ''
+                    ].filter(Boolean);
+
+                    treeItems.push(new IqTreeItem(el.version, desc.join('/'), 'Click to install', '', 'rpm', TreeItemCollapsibleState.None, {
+                        command: 'f5.installRPM',
+                        title: '',
+                        arguments: [el.assets]
+                    }));
+                });
+
+            
+            } else if (element.label === 'Global Applications') {
+                
                 const iqTemps = this.appsGlobal.map((el: IqGlobalApp) => {
-                    return new IqTreeItem(el.name, '', '', 'iQglobalApp', '', TreeItemCollapsibleState.Collapsed,
+
+                    return new IqTreeItem(el.name, '', '', '', 'iQglobalApp',  TreeItemCollapsibleState.Collapsed,
                         { command: 'f5.iqViewShow', title: '', arguments: [el] });
                 });
 
@@ -117,7 +217,7 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
                 if (apps.componentCount > 0) {
                     apps.appComponents.map((app: IqGlobalAppComponent) => {
-                        treeItems.push(new IqTreeItem(app.configSetName, '', '', 'iQapp', app.selfLink, TreeItemCollapsibleState.None,
+                        treeItems.push(new IqTreeItem(app.configSetName, '', '', '', 'iQapp', TreeItemCollapsibleState.None,
                             { command: 'f5.iqViewShow', title: '', arguments: [{ selfLink: app.selfLink, type: app }] }));
                     });
                 }
@@ -129,7 +229,7 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
                 const iqTemps = this.templates.map((el: IqTemplate) => {
                     const published = el.published ? 'published' : 'not-published';
-                    return new IqTreeItem(el.name, published, '', 'iqTemplate', '', TreeItemCollapsibleState.None,
+                    return new IqTreeItem(el.name, published, '', '', 'iqTemplate', TreeItemCollapsibleState.None,
                         { command: 'f5.iqViewShow', title: '', arguments: [el] });
                 });
 
@@ -138,7 +238,9 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
             } else if (element.label === 'Devices') {
 
                 const iqTemps = this.devices.map((el: IqDevice) => {
-                    return new IqTreeItem(el.hostname, el.address, '', '', '', TreeItemCollapsibleState.None,
+                    const yaml = jsyaml.dump(el, { indent: 4 });
+                    const toolTip = new MarkdownString().appendCodeblock(yaml, 'yaml');
+                    return new IqTreeItem(el.hostname, el.address, toolTip, '', '', TreeItemCollapsibleState.None,
                         { command: 'f5.iqViewShow', title: '', arguments: [el] });
                 });
 
@@ -147,20 +249,21 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
             } else if (element.label === 'Scripts') {
 
                 const iqTemps = this.scripts.map((el: IqScript) => {
-                    return new IqTreeItem(el.name, el.description, '', 'iqScript', '', TreeItemCollapsibleState.None,
+                    const scriptBody = new MarkdownString().appendCodeblock(el.script, 'yaml');
+                    return new IqTreeItem(el.name, el.description, scriptBody, '', 'iqScript', TreeItemCollapsibleState.None,
                         { command: 'f5.iqViewShow', title: '', arguments: [el] });
                 });
 
                 treeItems.push(...sortTreeItems(iqTemps));
 
-                const scriptExecCount = this.scriptsExecuted.length.toString() || '';
-                treeItems.unshift(new IqTreeItem('Executed-Scripts', scriptExecCount, 'Executed scripts tasks', '', '', TreeItemCollapsibleState.Collapsed));
+                // const scriptExecCount = this.scriptsExecuted.length.toString() || '';
+                // treeItems.unshift(new IqTreeItem('Executed-Scripts', scriptExecCount, 'Executed scripts tasks', '', '', TreeItemCollapsibleState.Collapsed));
 
-            } else if (element.label === 'Executed-Scripts') {
+            } else if (element.label === 'Script-Tasks') {
 
                 const execScripts = this.scriptsExecuted.map(el => {
+                    
                     const desc = el.status || '';
-
                     const output = el.userScriptTaskStatuses?.[0]?.output || '';
 
                     const tooltip = output
@@ -171,7 +274,7 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
                         el.errorMessage ? new MarkdownString(`# error\n${el.errorMessage}\n`)
                             : '';
 
-                    return new IqTreeItem(el.name, desc, tooltip, 'iqExecScript', '', TreeItemCollapsibleState.None,
+                    return new IqTreeItem(el.name, desc, tooltip, '', 'iqExecScript', TreeItemCollapsibleState.None,
                         { command: 'f5.iqViewShow', title: '', arguments: [el] });
                 });
 
@@ -182,6 +285,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
         } else {
 
+            this.connected = ext.f5Client;
+
             // this.refreshData();
             await Promise.all([
                 this.getGlobalApps(),
@@ -191,16 +296,68 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
                 this.getExecutedScripts()
             ]);
 
+
+            // as3/do should always be installed, so we don't check if it is installed first
+            const atcToolTip = 
+                new MarkdownString(`## f5-appsvcs (AS3)\n`)
+                .appendCodeblock(jsyaml.dump({
+                    latest: this.as3?.latest,
+                    installed: this.connected?.as3?.version.version
+                }, { indent: 4 }), 'yaml')
+                .appendMarkdown(`## f5-declarative-onboarding (DO)\n`)
+                .appendCodeblock(jsyaml.dump({
+                    latest: this.do?.latest,
+                    installed: this.connected?.do?.version.version
+                }, { indent: 4 }), 'yaml');
+
+            // build item description indicating which atc services are installed
+            // copied from deviceCore, but as3/do only apply here
+            const atcDesc = [
+                this.connected?.as3 ? 'as3' : undefined,
+                this.connected?.do ? 'do' : undefined,
+            ].filter(Boolean);
+
+            const globalAppCount = this.appsGlobal.length.toString() || '';
+            const templateCount = this.templates.length.toString() || '';
+            const deviceCount = this.devices.length.toString() || '';
+            const scriptsCount = this.scripts.length.toString() || '';
+            const scriptExecCount = this.scriptsExecuted.length.toString() || '';
+
+            // const globalAppToolTip = // build a json app map like as3 and display as yaml 
+
             // todo: build count and hover details
             treeItems.push(
-                new IqTreeItem('Global Applications', '', '', '', '', TreeItemCollapsibleState.Collapsed),
-                new IqTreeItem('Templates', '', '', '', '', TreeItemCollapsibleState.Collapsed),
-                new IqTreeItem('Devices', '', '', '', '', TreeItemCollapsibleState.Collapsed),
-                new IqTreeItem('Scripts', '', '', '', '', TreeItemCollapsibleState.Collapsed),
+                new IqTreeItem('ATC', `(${atcDesc.join('/')})`, atcToolTip, '', '', TreeItemCollapsibleState.Collapsed),
+
+                new IqTreeItem('Global Applications', globalAppCount, '', '', '', TreeItemCollapsibleState.Collapsed),
+                new IqTreeItem('Templates', templateCount, '', '', '', TreeItemCollapsibleState.Collapsed),
+                new IqTreeItem('Devices', deviceCount, '', '', '', TreeItemCollapsibleState.Collapsed),
+                new IqTreeItem('Scripts', scriptsCount, '', '', '', TreeItemCollapsibleState.Collapsed),
+                new IqTreeItem('Script-Tasks', scriptExecCount, 'Executed scripts tasks', '', '',  TreeItemCollapsibleState.Collapsed)
             );
         }
         return treeItems;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * fetch bigiq managed device information
@@ -466,18 +623,6 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
         const scriptRef = item.command?.arguments?.[0].selfLink;
 
-        // "uuid": "ae8742ff-efca-4f44-82a1-16fe5a61bfbc",
-        // "deviceUri": "https://10.200.244.5:443",
-        // "machineId": "ae8742ff-efca-4f44-82a1-16fe5a61bfbc",
-        // "state": "ACTIVE",
-        // "address": "10.200.244.5",
-        // "httpsPort": 443,
-        // "hostname": "coreltm01.benlab.io",
-
-        // "address": "192.168.200.131",
-        // "hostname": "bigip-tparty05.benlab.io",
-        // "selfLink": "https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/1932275d-7c55-4fb4-b981-8857d20ac220",
-        // "machineId": "1932275d-7c55-4fb4-b981-8857d20ac220",
         const devices = this.devices.map((el: IqDevice) => {
             return {
                 uuid: el.uuid,
@@ -570,7 +715,7 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
         };
 
         // if vClm has a value assign it, else set column 1
-        viewColumn = viewColumn ? viewColumn : newEditorColumn;
+        viewColumn = viewColumn || newEditorColumn;
 
         var vDoc: Uri = Uri.parse("untitled:" + docName);
         workspace.openTextDocument(vDoc)
@@ -610,14 +755,57 @@ class IqTreeItem extends TreeItem {
         public readonly label: string,
         public description: string,
         public tooltip: string | MarkdownString,
+        public iconPath: string | ThemeIcon,
         public contextValue: string,
-        id: string,
         public readonly collapsibleState: TreeItemCollapsibleState,
         public readonly command?: Command
     ) {
         super(label, collapsibleState);
     }
 }
+
+
+
+
+
+
+//  #############################################################################
+//  #############################################################################
+//  #############################################################################
+//  #############################################################################
+//  #############################################################################
+//  #############################################################################
+//  #############################################################################
+//  #############################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 type IqExecutedScript = {
