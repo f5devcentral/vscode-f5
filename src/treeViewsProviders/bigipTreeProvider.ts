@@ -68,39 +68,39 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
     }
 
 
-	async refresh(type?: hostsRefreshType): Promise<void> {
-		this._onDidChangeTreeData.fire(undefined);
+    async refresh(type?: hostsRefreshType): Promise<void> {
+        this._onDidChangeTreeData.fire(undefined);
 
         this.connected = ext.f5Client;
 
-		if (this.connected && type === 'UCS') {
+        if (this.connected && type === 'UCS') {
 
-			await this.connected.ucs.list()
-				.then(resp => this.ucsList = resp.data.items);
+            await this.connected.ucs.list()
+                .then(resp => this.ucsList = resp.data.items);
 
-		} else if (this.connected && type === 'QKVIEW') {
+            // } else if (this.connected && type === 'QKVIEW') {
 
-			await this.connected.qkview.list()
-				.then(resp => this.qkviewList = resp.data.items);
+            // 	await this.connected.qkview.list()
+            // 		.then(resp => this.qkviewList = resp.data.items);
 
-		} else if (this.connected && type === 'ATC') {
+        } else if (this.connected && type === 'ATC') {
 
-			await this.connected.discover();
+            await this.connected.discover();
 
-		} else if (this.connected) {
+        } else if (this.connected) {
 
-			// start getting ucs/qkview 
-			await this.connected.discover();
-			await this.connected.ucs.list()
-				.then(resp => this.ucsList = resp.data.items);
+            // start getting ucs/qkview 
+            await this.connected.discover();
+            await this.connected.ucs.list()
+                .then(resp => this.ucsList = resp.data.items);
 
-			await this.connected.qkview.list()
-				.then(resp => this.qkviewList = resp.data.items);
-		}
+            // await this.connected.qkview.list()
+            // 	.then(resp => this.qkviewList = resp.data.items);
+        }
 
-		this._onDidChangeTreeData.fire(undefined);
+        this._onDidChangeTreeData.fire(undefined);
 
-	}
+    }
     getTreeItem(element: IpTreeItem): TreeItem {
         return element;
     }
@@ -261,12 +261,21 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
                 // get list of ucs, list as items
                 treeItems.push(...
                     this.ucsList.map((el: any) => {
-                        const tip = [
-                            `created: ${el.apiRawValues.file_created_date}`,
-                            `file size: ${el.apiRawValues.file_size}`,
-                            `version: ${el.apiRawValues.version}`,
-                            `encrypted: ${el.apiRawValues.encrypted}`,
-                        ].join('\r\n');
+                        // const tip = [
+                        //     `created: ${el.apiRawValues.file_created_date}`,
+                        //     `file size: ${el.apiRawValues.file_size}`,
+                        //     `version: ${el.apiRawValues.version}`,
+                        //     `encrypted: ${el.apiRawValues.encrypted}`,
+                        // ].join('\r\n');
+
+                        const tip = new MarkdownString()
+                        .appendCodeblock(jsyaml.dump({
+                            created: el.apiRawValues.file_created_date,
+                            fileSize: el.apiRawValues.file_size,
+                            version: el.apiRawValues.version,
+                            encrypted: el.apiRawValues.encrypted,
+                            }, { indent: 4 }), 'yaml');
+
                         const fileName = path.parse(el.apiRawValues.filename).base;
 
                         return new IpTreeItem(fileName, '', tip, '', 'ucsItem', TreeItemCollapsibleState.None, {
@@ -277,14 +286,14 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
                     })
                 );
 
-            } else if (element.label === 'QKVIEW') {
-                // get list of qkviews, list as items
-                treeItems.push(...
-                    this.qkviewList.map((el: any) => {
-                        const label = path.parse(el.name).name;
-                        return new IpTreeItem(label, '', '', '', 'qkviewItem', TreeItemCollapsibleState.None);
-                    })
-                );
+                // } else if (element.label === 'QKVIEW') {
+                //     // get list of qkviews, list as items
+                //     treeItems.push(...
+                //         this.qkviewList.map((el: any) => {
+                //             const label = path.parse(el.name).name;
+                //             return new IpTreeItem(label, '', '', '', 'qkviewItem', TreeItemCollapsibleState.None);
+                //         })
+                //     );
             }
 
         } else {
@@ -299,11 +308,12 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
             ].filter(Boolean);
 
 
+
             // to be used when conx has ATC ILX mgmt
             treeItems.push(...[
-                new IpTreeItem('ATC', `(${atcDesc.join('/')})`, '', '', '', TreeItemCollapsibleState.Collapsed),
+                new IpTreeItem('ATC', `(${atcDesc.join('/')})`, this.atcToolTip(), '', '', TreeItemCollapsibleState.Collapsed),
                 new IpTreeItem('UCS', this.ucsList.length.toString(), '', '', 'ucsHeader', TreeItemCollapsibleState.Collapsed),
-                new IpTreeItem('QKVIEW', this.qkviewList.length.toString(), '', '', 'qkviewHeader', TreeItemCollapsibleState.Collapsed),
+                new IpTreeItem('QKVIEW', this.qkviewList.length.toString(), 'in progress', '', 'qkviewHeader', TreeItemCollapsibleState.Collapsed),
             ]);
         }
 
@@ -311,22 +321,68 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
         return treeItems;
     }
 
+    private atcToolTip() {
+        const atcToolTip = new MarkdownString();
+
+        if (this.connected?.fast) {
+            atcToolTip.appendMarkdown("## f5-appsvcs-templates (FAST)\n")
+            .appendCodeblock(jsyaml.dump({
+                latest: this.fast?.latest,
+                installed: this.connected?.fast?.version.version
+            }, { indent: 4 }), 'yaml');
+        }
+
+        if (this.connected?.as3) {
+            atcToolTip.appendMarkdown("## f5-appsvcs (AS3)\n")
+            .appendCodeblock(jsyaml.dump({
+                latest: this.as3?.latest,
+                installed: this.connected?.as3?.version.version
+            }, { indent: 4 }), 'yaml');
+        }
+
+        if (this.connected?.do) {
+            atcToolTip.appendMarkdown("## f5-declarative-onboarding (DO)\n")
+            .appendCodeblock(jsyaml.dump({
+                latest: this.do?.latest,
+                installed: this.connected?.do?.version.version
+            }, { indent: 4 }), 'yaml');
+        }
+
+        if (this.connected?.ts) {
+            atcToolTip.appendMarkdown("## f5-telemetry-streaming (TS)\n")
+            .appendCodeblock(jsyaml.dump({
+                latest: this.ts?.latest,
+                installed: this.connected?.ts?.version.version
+            }, { indent: 4 }), 'yaml');
+        }
+
+        if (this.connected?.cf) {
+            atcToolTip.appendMarkdown("## f5-cloud-failover (CF)\n")
+            .appendCodeblock(jsyaml.dump({
+                latest: this.cf?.latest,
+                installed: this.connected?.cf?.version.version
+            }, { indent: 4 }), 'yaml');
+        }
+
+        return atcToolTip;
+    }
+
 
     async getUcs() {
 
         return await this.connected?.ucs.list()
             .then(resp => this.ucsList = resp.data.items)
-            .then( () => this.refresh());
-            
-        }
-        
-        async getQkview() {
-            
-            await this.connected?.qkview.list()
-            .then(resp => this.qkviewList = resp.data.items)
-            .then( () => this.refresh());
+            .then(() => this.refresh());
 
     }
+
+    // async getQkview() {
+
+    //     await this.connected?.qkview.list()
+    //         .then(resp => this.qkviewList = resp.data.items)
+    //         .then(() => this.refresh());
+
+    // }
 
 
 

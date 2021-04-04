@@ -78,7 +78,8 @@ export async function initSettings(context: ExtensionContext) {
     ext.cacheDir = path.join(ext.context.extensionPath, 'cache');
     process.env.F5_CONX_CORE_EXT_HTTP_AGENT = 'The F5 VScode Extension';
     process.env.F5_CONX_CORE_CACHE = ext.cacheDir;
-
+    
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
     ext.extHttp = new ExtHttp({ rejectUnauthorized: false, eventEmitter: ext.eventEmitterGlobal });
     ext.extHttp.cacheDir = ext.cacheDir;

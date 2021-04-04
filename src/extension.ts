@@ -107,6 +107,8 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.openSettings', () => {
 		//	open settings window and bring the user to the F5 section
+
+		//  @ext:f5devcentral.vscode-f5
 		return commands.executeCommand("workbench.action.openSettings", "f5");
 	}));
 

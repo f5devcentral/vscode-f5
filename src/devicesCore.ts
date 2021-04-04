@@ -137,9 +137,7 @@ export default function devicesCore(context: ExtensionContext) {
                 
                 ext.as3Tree.refresh();
             })
-            .catch(err => {
-                logger.error('Connect/Discover failed');
-            });
+            .catch(err => logger.error('Connect/Discover failed', err) );
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {
