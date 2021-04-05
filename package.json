@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.0-beta.10",
+	"version": "3.0.0-beta.11",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -1134,7 +1134,8 @@
 		"test": "node ./out/test/runTest.js",
 		"docs": "docsify serve docs",
 		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
-		"refresh-corkscrew": "rm -rf node_modules/f5-corkscrew && npm install https://github.com/f5devcentral/f5-corkscrew.git"
+		"refresh-corkscrew": "rm -rf node_modules/f5-corkscrew && npm install f5devcentral/f5-corkscrew#certs",
+		"refresh-f5-conx": "rm -rf node_modules/f5-conx-core && npm install dumpysquare/f5-conx-core"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
