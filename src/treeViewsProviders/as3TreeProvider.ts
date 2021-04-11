@@ -117,7 +117,8 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 						const appStats = this.as3DeclareMap[key];
 						const appCount = Object.keys(appStats).length.toString();
-						const as3DecMapStringified = jsYaml.dump(appStats, { indent: 4 });
+						const as3DecMapStringified = new MarkdownString()
+						.appendCodeblock(jsYaml.dump(appStats, { indent: 4 }), 'yaml');
 
 						// get name of other tenants
 						const targetRemoval = Object.keys(this.as3DeclareMap).filter(x => x !== key);

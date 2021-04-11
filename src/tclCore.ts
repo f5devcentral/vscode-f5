@@ -41,7 +41,10 @@ export default function tclCore(context: ExtensionContext) {
 
 
     const tclTreeProvider = new TclTreeProvider();
-    window.registerTreeDataProvider('as3Tasks', tclTreeProvider);
+    const tctTreeView = window.createTreeView('as3Tasks', {
+        treeDataProvider: tclTreeProvider,
+        showCollapseAll: true
+    });
     commands.registerCommand('f5.refreshTclTree', () => tclTreeProvider.refresh());
 
 

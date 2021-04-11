@@ -1,51 +1,35 @@
 # The F5 VSCode Extension
 
-We'ved moved and renamed!!!
+Let the F5 VSCode Extension supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, and also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
 
-Formerly the F5 (A)pplication (S)ervices (T)emplates(FAST), "vscode-f5-fast" extension, now just "The F5 VSCode" Extension (vscode-f5). 
+It can also help with iRules/iApps, BIG-IQ, and regular configuration/migration.
 
-Not only not it fully integrate with the (A)utomated (T)ool (C)hain but also support TCL/iRules/iApps and much more!!!
-
-Any comments, questions or feature requests, please open a github repository issue!!!
-
-
-
-### New documentation site!!!
-> https://f5devcentral.github.io/vscode-f5/#/
-> 
-> this page is in progress as we transition documents to the new site above
-
-Microsoft Visual Studio Code Markeplace:  https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5
-
-Open VSX Registry (OSS side):  https://open-vsx.org/extension/F5DevCentral/vscode-f5
-
-If you consistently use APIs while working with F5s, the F5 VSCode Extension needs to be a permanent addition to your toolkit!
-
-The F5 VSCode Extension will not only supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, but also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
-
-If you are not excited yet, the extension can also:
-
-- GET/POST/DELETE of all ATC services, including FAST/AS3/DO/TS
+- GET/POST/DELETE of all ATC services, including FAST/AS3/DO/TS/CF
 - links to quickly open related ATC documentation
 - Direct access to ATC examples from git repo
 - Install/UnInstall of ATC rpms
 - Convert JSON <-> YAML
-- Encode/Decode base64 strings
-- Craft generic HTTP REST calls to connected device or external
+- Hovers to view decoded information for (certificates/base64)
 - Extract TMOS applications (per virtual server)
 - Write, deploy and modify iRules/iApps (with vscode-irule extension for language support)
 
+!> Any comments, questions or feature requests, please open an issue!
+
+## Documentation site
+
+> <https://f5devcentral.github.io/vscode-f5/#/>
+
 ## Getting the extension
 
-The best path is to install Visual Studio Code from: https://code.visualstudio.com/
+The best path is to install Visual Studio Code from: <https://code.visualstudio.com/>
 
-### VSCode Marketplace
+## VSCode Marketplace
 
-- https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5
+- <https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5>
 
-### Open Source Marketplace
+## Open Source Marketplace
 
-- https://open-vsx.org/extension/F5DevCentral/vscode-f5
+- <https://open-vsx.org/extension/F5DevCentral/vscode-f5>
 
 Then install the extension following the steps below:
 
@@ -110,6 +94,7 @@ Error from extension
 > HTTP Auth FAILURE: 400 - undefined
 
 Error from restjavad log
+
 ```log
 [SEVERE][6859][24 Jul 2020 13:11:39 UTC][8100/shared/authn/login AuthnWorker] Error as the maximum time to wait exceeded while getting value of loginProviderName
 [SEVERE][6860][24 Jul 2020 13:11:39 UTC][8100/shared/authn/login AuthnWorker] Error while setting value to loginProviderName when no loginReference and no loginProviderName were given
@@ -151,26 +136,29 @@ If needed, **right-click** on an entry, then select **save-as** to save the log 
 This mainly catches logs send through the console.log(''), which should typically be for development.
 
 
-## installing vsix 
+## installing vsix
 
 The recommended way to get this extension is to install from the Microsoft VScode extension marketplace or from within VSCode directly, under the extensions activity bar view on the left.
 
-If you still need to install from vsix, they can be downloaded under the 'release' tab above: https://github.com/f5devcentral/vscode-f5/releases
+If you still need to install from vsix, they can be downloaded under the 'release' tab above: <https://github.com/f5devcentral/vscode-f5/releases>
 
 Different ways to install vsix:
+
 - https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix
-- https://github.com/eamodio/vscode-gitlens/wiki/Installing-Prereleases-(vsix)
+- <https://github.com/eamodio/vscode-gitlens/wiki/Installing-Prereleases-(vsix>)
 
 
 ## Running the extension for dev
 
 - Clone and install dependencies:
+
     ```bash
     git clone https://github.com/f5devcentral/vscode-f5.git
     cd vscode-f5-fast/
     npm install
     code .
     ```
+
 - Start Debugging environment: Keystroke `F5`
 - Navigate to view container by clicking on the f5 icon in the Activity bar (typically on the left)
 - Update device list in tree view on the left with a device in your environment

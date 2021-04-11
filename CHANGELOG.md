@@ -13,6 +13,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [3.0.0] - (04-01-2021)
 
+The main purpose behind this major release is a complete overhaul of the underlying rest/api calls.  Most of the functionality has been moved to the f5-conx-core project/package so it can be consumed by others.  F5-conx-core is now providing most of the device connectivity and function management within the vscode-f5 extension.  Most of the code within the vscode-f5 extension is focused on providing the UI for all this functionality
+
+[f5-conx-core repo](https://github.com/DumpySquare/f5-conx-core)
+
 [v3.0 enhancements/refactor](https://github.com/f5devcentral/vscode-f5/milestone/6)
 
 ### Added/Modified/Removed
@@ -31,7 +35,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - cert/key extraction (different depending on mini_ucs/ucs/qkview)
   - stats extraction from qkview
   - asyncrounous extraction
-  - (**PENDING - finish/fix certs from ucs**)
 
 - [#109](https://github.com/f5devcentral/vscode-f5/issues/109) - [BUG] Fail to explore config on connected BIG-IP
   - The new f5-conx-core fixed a bug that failed to download the mini_ucs if it was over a certain size
@@ -49,6 +52,23 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - [#122](https://github.com/f5devcentral/vscode-f5/issues/122) - [RFE] Ability to identify device as BIG-IQ/BIG-IP in the F5 Hosts
   - Added icons and tooltip information for identifying bigiq vs bigip devices in the main hosts list
+
+- [#133](https://github.com/f5devcentral/vscode-f5/issues/133) - DEPTH_ZERO_SELF_SIGNED_CERT - self signed certificate
+  - Seems to be an OS update that changed how the underlying node process handles self-signed certs
+  - Axios is configured to handle self-signed, but this was still happening
+  - NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' seems to have fixed for now
+  - will add a config switch in the future
+
+
+
+- Adjusted DO/TS post response logging
+- Setup yaml language output for AS3 Targets/Tenant ToolTips
+- Update README/Docs landing page
+  - fixed broken image links
+  - updated cover page for v3.0 and ATC reference
+- added TS clear declaration snippet
+- "f5" OUTPUT now becomes visible when main hosts view becomes visible
+  - this required some small adjustments to the logging class output
 
 ---
 

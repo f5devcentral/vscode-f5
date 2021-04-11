@@ -47,6 +47,7 @@ import { cfgExplore } from './cfgExploreCore';
 import { FastCore } from './fastCore';
 import { BigiqCore } from './bigiqCore';
 import { tokeTimer } from './tokeTimer';
+// import { on } from 'node:events';
 
 export async function activate(context: ExtensionContext) {
 
@@ -55,11 +56,11 @@ export async function activate(context: ExtensionContext) {
 	});
 
 	logger.debug(`Host details: `, {
-        hostOS: os.type(),
-        platform: os.platform(),
-        release: os.release(),
-        userInfo: `${JSON.stringify(os.userInfo())}`
-    });
+		hostOS: os.type(),
+		platform: os.platform(),
+		release: os.release(),
+		userInfo: `${JSON.stringify(os.userInfo())}`
+	});
 
 
 	// initialize extension settings
@@ -82,14 +83,14 @@ export async function activate(context: ExtensionContext) {
 
 	// do we prefer the class style of importing core blocks?
 	new ChangeVersion(context, ext.extHttp);
-	
+
 	new Hovers(context, ext.eventEmitterGlobal);
 
 	new FastCore(context);
 
 	new BigiqCore(context);
-	
-	
+
+
 	// or do we prefer the function style of importing core blocks?
 
 	// config explorer
@@ -493,14 +494,14 @@ export async function activate(context: ExtensionContext) {
 						[tenant.label]: {
 							class: 'Tenant'
 						}
-// 			await ext.f5Client?.as3?.deleteTenant({
-// 				class: 'AS3',
-// 				declaration: {
-// 					schemaVersion: tenant.command.arguments[0].schemaVersion,
-// 					class: 'ADC',
-// 					target: tenant.command.arguments[0].target,
-// 					[tenant.label]: {
-// 						class: 'Tenant'
+						// 			await ext.f5Client?.as3?.deleteTenant({
+						// 				class: 'AS3',
+						// 				declaration: {
+						// 					schemaVersion: tenant.command.arguments[0].schemaVersion,
+						// 					class: 'ADC',
+						// 					target: tenant.command.arguments[0].target,
+						// 					[tenant.label]: {
+						// 						class: 'Tenant'
 					}
 				}
 			})
@@ -691,26 +692,34 @@ export async function activate(context: ExtensionContext) {
 			if (!utils.isValidJson(text)) {
 				return window.showErrorMessage('Not valid JSON object');
 			}
+			const data = JSON.parse(text);
+			const progress = await window.withProgress({
+				location: ProgressLocation.Notification,
+				title: `Posting TS Dec`
+			}, async () => {
+
+				await ext.f5Client?.https(`/mgmt/shared/telemetry/declare`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					validateStatus: function (status: number) {
+						return status >= 200 && status < 500; // default
+					},
+					data
+				})
+					.then(resp => {
+						ext.panel.render(resp);
+					})
+					.catch(err => {
+						ext.panel.render(err);
+						logger.error('post ts declaration failed:', err);
+					});
+
+			});
 		}
 
-		const progress = await window.withProgress({
-			location: ProgressLocation.Notification,
-			title: `Posting TS Dec`
-		}, async () => {
 
-			await ext.f5Client?.https(`/mgmt/shared/telemetry/declare`, {
-				method: 'POST',
-				data: JSON.parse(text)
-			})
-				.then(resp => {
-					ext.panel.render(resp);
-				})
-				.catch(err => {
-					ext.panel.render(err);
-					logger.error('post ts declaration failed:', err);
-				});
-
-		});
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
@@ -745,7 +754,11 @@ export async function activate(context: ExtensionContext) {
 			// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/`);
 			// ext.panel.render(resp);
 
-			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding`)
+			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding`, {
+				validateStatus: function (status: number) {
+					return status >= 200 && status < 300; // default
+				},
+			})
 				.then(resp => ext.panel.render(resp))
 				.catch(err => logger.error('get do declaration failed:', err));
 		});
@@ -771,8 +784,13 @@ export async function activate(context: ExtensionContext) {
 			return window.showErrorMessage('Not valid JSON object');
 		}
 
-		const resp = await f5Api.postDoDec(JSON.parse(text));
-		ext.panel.render(resp);
+		await f5Api.postDoDec(JSON.parse(text))
+			.then(resp => {
+				ext.panel.render(resp);
+			})
+			.catch(err => {
+				ext.panel.render(err);
+			});
 	}));
 
 
@@ -1007,21 +1025,21 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5.remoteCommand', async () => {
 
 		await window.showInputBox({ placeHolder: 'Bash Command to Execute?', ignoreFocusOut: true })
-		.then ( async cmd => {
+			.then(async cmd => {
 
-			if (cmd) {
+				if (cmd) {
 
-				await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
-					method: 'POST',
-					data: {
-						command: 'run',
-						utilCmdArgs: `-c '${cmd}'`
-					}
-				})
-				.then(resp => ext.panel.render(resp.data.commandResult))
-				.catch(err => logger.error('bash command failed:', err));
-			}
-		});
+					await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
+						method: 'POST',
+						data: {
+							command: 'run',
+							utilCmdArgs: `-c '${cmd}'`
+						}
+					})
+						.then(resp => ext.panel.render(resp.data.commandResult))
+						.catch(err => logger.error('bash command failed:', err));
+				}
+			});
 
 	}));
 

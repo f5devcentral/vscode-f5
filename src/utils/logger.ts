@@ -30,22 +30,17 @@ import { inspect } from 'util';
   * example: logger.debug('chuck-joke->resp.data', resp.data);
   */
 export class Log {
-    // static debug(arg0: string, arg1: string) {
-    //     throw new Error('Method not implemented.');
-    // }
-    private _outputChannel: OutputChannel | undefined;
-    // private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
+    outputChannel: OutputChannel | undefined;
     private _logLevel = LogLevel.Debug;
     public constructor() {
-        // this._outputChannel = window.createOutputChannel('f5-fast');
         this.init();
     }
 
     private init() {
         // create output channel if not available
-        if (!this._outputChannel) {
-            this._outputChannel = window.createOutputChannel('f5');
-            this._outputChannel.show(true);
+        if (!this.outputChannel) {
+            this.outputChannel = window.createOutputChannel('f5');
+            this.outputChannel.show(true);
         }
     }
 
@@ -105,10 +100,10 @@ export class Log {
         // const dateTime = new Date().toLocaleString();
         // const dateTime = new Date();
         const dateTime = new Date().toISOString();
-        if(!this._outputChannel) {
+        if(!this.outputChannel) {
             this.init();
         } else {
-            this._outputChannel.appendLine(`[${dateTime}] ${label}: ${message}`);
+            this.outputChannel.appendLine(`[${dateTime}] ${label}: ${message}`);
         }
     }
 

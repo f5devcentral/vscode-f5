@@ -50,6 +50,13 @@ export default function devicesCore(context: ExtensionContext) {
         showCollapseAll: true
     });
 
+    hostsTreeView.onDidChangeVisibility( e => {
+        // set this up to respect if onConnect/terminal has been setup
+        if(e.visible) {
+            logger.outputChannel?.show();
+        }
+    });
+
 
 
     const bigipProvider = new BigipTreeProvider(context);
@@ -69,9 +76,7 @@ export default function devicesCore(context: ExtensionContext) {
 
         logger.info('selected device', device);  // preferred at the moment
 
-        if (ext.f5Client) {
-            ext.f5Client.disconnect();
-        }
+        ext.f5Client?.disconnect();
 
         if (!device) {
             const bigipHosts: BigipHost[] | undefined = await workspace.getConfiguration().get('f5.hosts');

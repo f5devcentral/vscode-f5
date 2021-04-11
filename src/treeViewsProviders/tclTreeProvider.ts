@@ -1,4 +1,25 @@
-import * as vscode from 'vscode';
+/*
+ * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
+ * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
+ * may copy and modify this software product for its internal business purposes.
+ * Further, Licensee may upload, publish and distribute the modified version of
+ * the software product on devcentral.f5.com or github.com/f5devcentral.
+ */
+
+'use strict';
+
+import { 
+	Command,
+	Event,
+	EventEmitter,
+	MarkdownString,
+	TreeDataProvider,
+	TreeItem,
+	TreeItemCollapsibleState,
+	window,
+	workspace
+} from 'vscode';
+
 import { ext } from '../extensionVariables';
 import * as utils from '../utils/utils';
 import * as path from 'path';
@@ -6,11 +27,10 @@ import * as fs from 'fs';
 import * as os from 'os';
 import logger from '../utils/logger';
 
+export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 
-export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
-
-	private _onDidChangeTreeData: vscode.EventEmitter<TCLitem | undefined> = new vscode.EventEmitter<TCLitem | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<TCLitem | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<TCLitem | undefined> = new EventEmitter<TCLitem | undefined>();
+	readonly onDidChangeTreeData: Event<TCLitem | undefined> = this._onDidChangeTreeData.event;
 
 	private _iRules: string[] = [];  
 	private _apps: string[] = [];  
@@ -23,7 +43,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		this._onDidChangeTreeData.fire(undefined);
 	}
 
-	getTreeItem(element: TCLitem): vscode.TreeItem {
+	getTreeItem(element: TCLitem): TreeItem {
 		return element;
 	}
 
@@ -40,21 +60,25 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			if(element.label === 'iRules'){
                 
                 treeItems = this._iRules.map( (el: any) => {
-                    return new TCLitem(el.fullPath, '', '', 'rule', vscode.TreeItemCollapsibleState.None, 
+					// const as3DecMapStringified = jsYaml.dump(as3DecMap, { indent: 4 });
+					const content = `ltm rule ${el.fullPath} {\r\n` + el.apiAnonymous + '\r\n}';
+					const toolTip = new MarkdownString()
+					.appendCodeblock(content, 'irule-lang');
+                    return new TCLitem(el.fullPath, '', toolTip, 'rule', TreeItemCollapsibleState.None, 
                         { command: 'f5-tcl.getRule', title: '', arguments: [el] });
                 });
 				
 			} else if (element.label === 'Deployed-Apps'){
 				// todo: get iapps stuff
 				treeItems = this._apps.map( (el: any) => {
-                    return new TCLitem(el.fullPath, '', '', 'iApp', vscode.TreeItemCollapsibleState.None, 
+                    return new TCLitem(el.fullPath, '', '', 'iApp', TreeItemCollapsibleState.None, 
                         { command: 'f5-tcl.getApp', title: '', arguments: [el] });
 				});
 				
 			} else if (element.label === 'iApp-Templates'){
 				// todo: get iapp templates stuff
 				treeItems = this._iAppTemplates.map( (el: any) => {
-                    return new TCLitem(el.fullPath, '', '', 'iAppTemplate', vscode.TreeItemCollapsibleState.None, 
+                    return new TCLitem(el.fullPath, '', '', 'iAppTemplate', TreeItemCollapsibleState.None, 
                         { command: 'f5-tcl.getTMPL', title: '', arguments: [el] });
                 });
 			}
@@ -70,15 +94,15 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			const tempCount = this._iAppTemplates.length !== 0 ? this._iAppTemplates.length.toString() : '';
 
 			treeItems.push(
-				new TCLitem('iRules', ruleCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+				new TCLitem('iRules', ruleCount, '', '', TreeItemCollapsibleState.Collapsed, 
 					{ command: '', title: '', arguments: [''] })
 			);
 			treeItems.push(
-				new TCLitem('Deployed-Apps', appCount, '', '', vscode.TreeItemCollapsibleState.Collapsed,
+				new TCLitem('Deployed-Apps', appCount, '', '', TreeItemCollapsibleState.Collapsed,
 					{ command: '', title: '', arguments: [''] })
 			);
 			treeItems.push(
-				new TCLitem('iApp-Templates', tempCount, '', '', vscode.TreeItemCollapsibleState.Collapsed,
+				new TCLitem('iApp-Templates', tempCount, '', '', TreeItemCollapsibleState.Collapsed,
 					{ command: '', title: '', arguments: [''] })
 			);
 		}
@@ -144,9 +168,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		const content = `ltm rule ${item.fullPath} {\r\n` + item.apiAnonymous + '\r\n}';
 
 		// open editor and feed it the content
-		const doc = await vscode.workspace.openTextDocument({ content: content, language: 'irule-lang' });
+		const doc = await workspace.openTextDocument({ content: content, language: 'irule-lang' });
 		// make the editor appear
-		await vscode.window.showTextDocument( doc, { preview: false });
+		await window.showTextDocument( doc, { preview: false });
 		return doc;	// return something for automated testing
 	}
 
@@ -175,9 +199,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	async displayTMPL(item: any) {
 		
 		// open editor and feed it the content
-		const doc = await vscode.workspace.openTextDocument({ content: item, language: 'irule-lang' });
+		const doc = await workspace.openTextDocument({ content: item, language: 'irule-lang' });
 		// make the editor appear
-		await vscode.window.showTextDocument( doc, { preview: false });
+		await window.showTextDocument( doc, { preview: false });
 		return doc;	// return something for automated testing
 	}
 
@@ -302,7 +326,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 				Promise.reject(new Error(`tmsh merge failed with error: ${final}`));
 			} else {
-				vscode.window.showInformationMessage('mergeTCL -> SUCCESSFUL!!!', );
+				window.showInformationMessage('mergeTCL -> SUCCESSFUL!!!', );
 				setTimeout( () => { this.refresh();}, 500);	// refresh after update
 				return 'success';
 			}
@@ -328,13 +352,13 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		if(template.scheme === 'untitled') {
 
 			// get editor text (should be iapp .tmpl)
-			const text = vscode.window.activeTextEditor?.document.getText();
+			const text = window.activeTextEditor?.document.getText();
 			const coreDir = ext.context.extensionPath;	// extension core directory
 			logger.debug('POST iApp .tmpl via editor detected');
 
 			if(!text) {
 				console.error('no text and/or editor');
-				return vscode.window.showErrorMessage('no text and/or editor');;
+				return window.showErrorMessage('no text and/or editor');;
 			}
 			
 			const templateName = text.match(/sys\sapplication\stemplate\s(.*?)\s*{/);
@@ -351,7 +375,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 				// regex failed to find iapp name -> fail with messaging
 				const erTxt = 'Could not find iApp template name in text - use output from "tmsh list" command or original .tmpl format';
 				console.error(erTxt);
-				return vscode.window.showErrorMessage(erTxt);
+				return window.showErrorMessage(erTxt);
 			}
 
 			const dstFilePath = path.join(coreDir, fileName);
@@ -479,14 +503,14 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 }
 
 
-class TCLitem extends vscode.TreeItem {
+class TCLitem extends TreeItem {
 	constructor(
 		public readonly label: string,
 		public description: string,
-		public toolTip: string,
+		public toolTip: string | MarkdownString,
 		public context: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
 	}

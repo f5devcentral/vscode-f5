@@ -189,7 +189,8 @@ The following calls show the outline of how to interact with another f5 while cu
 
 ### raw get to external F5 using basic auth - DEV
 
-### Get F5 Auth Token
+### Create F5 Auth Token
+
 ```json
 {
   "url": "https://192.168.200.131/mgmt/shared/authn/login",
@@ -205,6 +206,7 @@ The following calls show the outline of how to interact with another f5 while cu
 
 
 ### Get All Tokens
+
 ```json
 {
     "url": "https://192.168.200.131/mgmt/shared/authz/tokens/",
@@ -217,7 +219,7 @@ The following calls show the outline of how to interact with another f5 while cu
 ```
 
 
-### get f5 auth token
+### get f5 auth provider
 
 ```yaml
 url: 'https://10.200.244.110:8443/mgmt/tm/auth/source'
@@ -227,6 +229,7 @@ headers:
 ```
 
 ### get nodes
+
 ```json
 {
     "url": "https://192.168.200.131/mgmt/tm/ltm/node",

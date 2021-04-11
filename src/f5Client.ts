@@ -136,7 +136,7 @@ export class F5Client extends _F5Client {
             //********** AS3 info **********/
             if (this.as3) {
 
-                this.cfBar.command = 'f5-as3.getDec';
+                // this.as3Bar.command = 'f5-as3.getDec';
                 this.as3Bar.text = `AS3(${this.as3.version.version})`;
                 this.as3Bar.tooltip = `CLICK FOR ALL TENANTS \r\nschemaCurrent: ${this.as3.version.schemaCurrent} `;
                 this.as3Bar.show();
@@ -148,7 +148,7 @@ export class F5Client extends _F5Client {
             //********** DO info **********/
             if (this.do) {
 
-                this.cfBar.command = 'f5-do.getDec';
+                this.doBar.command = 'f5-do.getDec';
                 this.doBar.text = `DO(${this.do.version.version})`;
                 this.doBar.tooltip = `schemaCurrent: ${this.do.version.version} `;
                 this.doBar.show();
