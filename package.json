@@ -1126,7 +1126,7 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish.old": "npm run compile",
+		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
 		"watch": "tsc -watch -p ./",
@@ -1158,6 +1158,6 @@
 		"f5-conx-core": "github:dumpysquare/f5-conx-core",
 		"f5-corkscrew": "github:f5devcentral/f5-corkscrew#certs",
 		"js-yaml": "4.0.0",
-		"keytar": "^6.0.1"
+		"keytar": "^7.6.0"
 	}
 }
