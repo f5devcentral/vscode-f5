@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.0-beta.13",
+	"version": "3.0.0-beta.14",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -19,7 +19,7 @@
 		"Snippets"
 	],
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.52.0"
 	},
 	"bugs": {
 		"url": "https://github.com/f5devcentral/vscode-f5/issues"
@@ -1142,7 +1142,7 @@
 		"@types/js-yaml": "4.0.0",
 		"@types/mocha": "^7.0.1",
 		"@types/node": "^12.20.6",
-		"@types/vscode": "^1.50.0",
+		"@types/vscode": "^1.52.0",
 		"@typescript-eslint/eslint-plugin": "^2.34.0",
 		"@typescript-eslint/parser": "^2.34.0",
 		"eslint": "^6.8.0",

@@ -70,6 +70,12 @@ The main purpose behind this major release is a complete overhaul of the underly
 - "f5" OUTPUT now becomes visible when main hosts view becomes visible
   - this required some small adjustments to the logging class output
 
+
+- beta.13 - 4.16
+  - rolled back @types/vscode package to 1.50.0 to support older versions of vscode (mainly udf coder)
+- beta.14 - 4.16
+  - pushed up @types/vscode package to 1.52.0 to support new markdown features in view hovers
+
 ---
 
 ## [2.10.7] - (02-09-2021)
