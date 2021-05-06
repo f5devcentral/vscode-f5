@@ -11,7 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [3.0.0] - (04-01-2021)
+## [3.0.1] - (05-06-2021)
 
 The main purpose behind this major release is a complete overhaul of the underlying rest/api calls.  Most of the functionality has been moved to the f5-conx-core project/package so it can be consumed by others.  F5-conx-core is now providing most of the device connectivity and function management within the vscode-f5 extension.  Most of the code within the vscode-f5 extension is focused on providing the UI for all this functionality
 
@@ -75,6 +75,9 @@ The main purpose behind this major release is a complete overhaul of the underly
   - rolled back @types/vscode package to 1.50.0 to support older versions of vscode (mainly udf coder)
 - beta.14 - 4.16
   - pushed up @types/vscode package to 1.52.0 to support new markdown features in view hovers
+- beta.15 - 4.26
+  - Stopped "f5" output from showing at activation.  This was trampling on workflows outside the extension
+  - When the main extension view becomes visible, then the "f5" output will also become visible
 
 ---
 

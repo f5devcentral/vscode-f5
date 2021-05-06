@@ -40,7 +40,7 @@ export class Log {
         // create output channel if not available
         if (!this.outputChannel) {
             this.outputChannel = window.createOutputChannel('f5');
-            this.outputChannel.show(true);
+            // this.outputChannel.show(true);
         }
     }
 
