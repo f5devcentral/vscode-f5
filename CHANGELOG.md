@@ -11,6 +11,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.0.2] - (05-06-2021)
+
+- Updated package lock references to "lodash": ">=4.17.21", for CVE-2021-23337:  <https://github.com/advisories/GHSA-35jh-r3h4-6jhm>
+
+---
+
 ## [3.0.1] - (05-06-2021)
 
 The main purpose behind this major release is a complete overhaul of the underlying rest/api calls.  Most of the functionality has been moved to the f5-conx-core project/package so it can be consumed by others.  F5-conx-core is now providing most of the device connectivity and function management within the vscode-f5 extension.  Most of the code within the vscode-f5 extension is focused on providing the UI for all this functionality
