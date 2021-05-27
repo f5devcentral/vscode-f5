@@ -242,7 +242,17 @@
             "        }",
             "    }",
             "}"
-        ]
+        ],
+        "description": ""
     },
-    "description": ""
+    "ts-clear": {
+        "prefix": "ts-clear",
+        "body": [
+          "{",
+          "    \"class\": \"Telemetry\",",
+          "    \"schemaVersion\": \"1.7.0\"",
+          "}"
+        ],
+        "description": "clears current TS declaration"
+      }
 }

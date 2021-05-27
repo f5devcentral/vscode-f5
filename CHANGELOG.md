@@ -11,6 +11,82 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.0.2] - (05-06-2021)
+
+- Updated package lock references to "lodash": ">=4.17.21", for CVE-2021-23337:  <https://github.com/advisories/GHSA-35jh-r3h4-6jhm>
+
+---
+
+## [3.0.1] - (05-06-2021)
+
+The main purpose behind this major release is a complete overhaul of the underlying rest/api calls.  Most of the functionality has been moved to the f5-conx-core project/package so it can be consumed by others.  F5-conx-core is now providing most of the device connectivity and function management within the vscode-f5 extension.  Most of the code within the vscode-f5 extension is focused on providing the UI for all this functionality
+
+[f5-conx-core repo](https://github.com/DumpySquare/f5-conx-core)
+
+[v3.0 enhancements/refactor](https://github.com/f5devcentral/vscode-f5/milestone/6)
+
+### Added/Modified/Removed
+
+- [#106](https://github.com/f5devcentral/vscode-f5/issues/106) - Documented how to search Config Explorer view
+
+- [#99](https://github.com/f5devcentral/vscode-f5/issues/99) - [RFE] ability to 'label' host entries
+
+- [#92](https://github.com/f5devcentral/vscode-f5/issues/92) - [RFE] F5 Hosts view v2
+  - Extended Hosts view details that include ATC service management and UCS/QKVIEWS
+
+- [#60](https://github.com/f5devcentral/vscode-f5/issues/60) - [RFE] view x509 certificate details
+  - This enabled hovers to show details about certificates but also got expanded to show nexted details in json structures, like cert/iRules/config-objects
+
+- [#118](https://github.com/f5devcentral/vscode-f5/issues/118) - [RFE] corkscrew v0.8.0 updates
+  - cert/key extraction (different depending on mini_ucs/ucs/qkview)
+  - stats extraction from qkview
+  - asyncrounous extraction
+
+- [#109](https://github.com/f5devcentral/vscode-f5/issues/109) - [BUG] Fail to explore config on connected BIG-IP
+  - The new f5-conx-core fixed a bug that failed to download the mini_ucs if it was over a certain size
+
+- [#110](https://github.com/f5devcentral/vscode-f5/issues/110) - [RFE] Sort alphabetically Sources files in config explorer enhancement
+  - Fixed a bug that was causing an error when as3 was installed but had no tenants to display
+
+- [#117](https://github.com/f5devcentral/vscode-f5/issues/117) - [BUG] "Cannot convert undefined or null to object" with as3 (no tenants)
+
+- [#111](https://github.com/f5devcentral/vscode-f5/issues/111) - [RFE] enable post fast template command in editor
+  - Feature actually got removed to provide a clear path to template sets
+
+- [#113](https://github.com/f5devcentral/vscode-f5/issues/113) - [RFE] bigiq view v1
+  - initial bigiq specific features for as3 templates, applications management, scripts, and devices
+
+- [#122](https://github.com/f5devcentral/vscode-f5/issues/122) - [RFE] Ability to identify device as BIG-IQ/BIG-IP in the F5 Hosts
+  - Added icons and tooltip information for identifying bigiq vs bigip devices in the main hosts list
+
+- [#133](https://github.com/f5devcentral/vscode-f5/issues/133) - DEPTH_ZERO_SELF_SIGNED_CERT - self signed certificate
+  - Seems to be an OS update that changed how the underlying node process handles self-signed certs
+  - Axios is configured to handle self-signed, but this was still happening
+  - NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' seems to have fixed for now
+  - will add a config switch in the future
+
+
+
+- Adjusted DO/TS post response logging
+- Setup yaml language output for AS3 Targets/Tenant ToolTips
+- Update README/Docs landing page
+  - fixed broken image links
+  - updated cover page for v3.0 and ATC reference
+- added TS clear declaration snippet
+- "f5" OUTPUT now becomes visible when main hosts view becomes visible
+  - this required some small adjustments to the logging class output
+
+
+- beta.13 - 4.16
+  - rolled back @types/vscode package to 1.50.0 to support older versions of vscode (mainly udf coder)
+- beta.14 - 4.16
+  - pushed up @types/vscode package to 1.52.0 to support new markdown features in view hovers
+- beta.15 - 4.26
+  - Stopped "f5" output from showing at activation.  This was trampling on workflows outside the extension
+  - When the main extension view becomes visible, then the "f5" output will also become visible
+
+---
+
 ## [2.10.7] - (02-09-2021)
 
 ### Modified

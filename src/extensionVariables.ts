@@ -3,13 +3,30 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ExtensionContext, StatusBarItem, workspace, ViewColumn, commands, TextDocument } from "vscode";
+import * as path from 'path';
+import * as fs from 'fs';
+import { 
+    ExtensionContext,
+    StatusBarItem,
+    workspace,
+    ViewColumn,
+    commands,
+    window
+} from "vscode";
 import * as keyTarType from "keytar";
-import { MgmtClient } from './utils/f5DeviceClient';
+// import { MgmtClient } from './utils/f5DeviceClient.ts.old';
 import logger from "./utils/logger";
 import { TextDocumentView } from './editorViews/editorView';
+import { EventEmitter } from "events";
+
+import { F5Client } from "./f5Client";
+import { AtcVersions, AtcVersionsClient, ExtHttp } from 'f5-conx-core';
+import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
+import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 
 type KeyTar = typeof keyTarType;
+
+// path.join(ext.context.extensionPath, 'cache');
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -17,65 +34,117 @@ type KeyTar = typeof keyTarType;
  */
 export namespace ext {
     export let context: ExtensionContext;
-    export let mgmtClient: MgmtClient | undefined;
+    export let f5Client: F5Client | undefined;
+    export let extHttp: ExtHttp;
     export let keyTar: KeyTar;
-    export let hostStatusBar: StatusBarItem;
-    export let hostNameBar: StatusBarItem;
-    export let as3Bar: StatusBarItem;
-    export let fastBar: StatusBarItem;
-    export let doBar: StatusBarItem;
-    export let tsBar: StatusBarItem;
+    export let hostsTreeProvider: F5TreeProvider;
+    export let as3Tree: AS3TreeProvider;
+    export let eventEmitterGlobal: EventEmitter;
+    export let atcVersions: AtcVersions;
     export let connectBar: StatusBarItem;
-    export let iRulesAble: boolean = false;
-    export let as3AsyncPost: boolean | undefined;
     export let panel: TextDocumentView;
-    export let tsExampleView: object | undefined;
-    
+    export let cacheDir: string;
+
     export namespace settings {
         export let as3PostAsync: boolean;
         export let asyncInterval: number;
-        export let irulesEnabled: boolean;
         export let timeoutInMilliseconds: number;
-
         export let previewColumn: ViewColumn;
         export let httpResponseDetails: string;
-        export let enableWebViews: boolean;
         export let preserveEditorFocus: boolean;
         export let newEditorTabForAll: boolean;
-
         export let logLevel: string;
+        export let proxy: ProxyCfg | undefined;
     }
 }
 
-workspace.onDidChangeConfiguration( () => {
-    logger.debug('EXTENSION CONFIGURATION CHANGED!!!');
-    loadConfig();
+workspace.onDidChangeConfiguration(() => {
+    // logger.debug('EXTENSION CONFIGURATION CHANGED!!!');
+    loadSettings();
 });
 
-export async function loadConfig() {
-    logger.debug('loading configuration for ext.settings!!!');
-    ext.settings.as3PostAsync = workspace.getConfiguration().get<boolean>('f5.as3Post.async', true);
-    ext.settings.asyncInterval = workspace.getConfiguration().get<number>('f5.asyncInterval', 5);
-    // ext.settings.irulesEnabled= workspace.getConfiguration().get<boolean>('f5.tcl', false);
-    ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
+/**
+ * initialize extension/settings
+ * @param context extension context
+ */
+export async function initSettings(context: ExtensionContext) {
 
+    // assign context to global name space
+    ext.context = context;
+
+    // todo: setup settings for external http proxy - should probably set environment vars
+    ext.eventEmitterGlobal = new EventEmitter();
+
+    ext.cacheDir = path.join(ext.context.extensionPath, 'cache');
+    process.env.F5_CONX_CORE_EXT_HTTP_AGENT = 'The F5 VScode Extension';
+    process.env.F5_CONX_CORE_CACHE = ext.cacheDir;
+    
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+    ext.extHttp = new ExtHttp({ rejectUnauthorized: false, eventEmitter: ext.eventEmitterGlobal });
+    ext.extHttp.cacheDir = ext.cacheDir;
+
+    ext.eventEmitterGlobal
+        .on('log-debug', msg => logger.debug(msg))
+        .on('log-info', msg => logger.info(msg))
+        .on('log-warn', msg => logger.warn(msg))
+        .on('log-error', msg => logger.error(msg))
+        .on('failedAuth', msg => {
+            window.showErrorMessage('Failed Authentication - Please check password');
+            logger.error('Failed Authentication Event!', ext.f5Client?.device, msg);
+            ext.f5Client?.clearPassword();
+            commands.executeCommand('f5.disconnect');
+        });
+
+
+    // create the atc versions client with external connectivity and event emittier
+    const atcVersionClient = new AtcVersionsClient({
+        extHttp: ext.extHttp,
+        cachePath: ext.cacheDir,
+        eventEmitter: ext.eventEmitterGlobal
+    });
+
+
+
+    if (!fs.existsSync(ext.cacheDir)) {
+        logger.debug('CREATING CACHE DIRECTORY');
+        // ext.cacheDir = cacheDir;
+        fs.mkdirSync(ext.cacheDir);
+    } else {
+        logger.debug(`existing cache directory detected: ${ext.cacheDir}`);
+    };
+
+    // get atc release information
+    await atcVersionClient.getAtcReleasesInfo()
+        .then(versions => {
+            ext.atcVersions = versions;
+        });
+}
+
+type ProxyCfg = {
+    host?: string,
+    port?: number,
+    protocol?: string,
+    auth?: {
+        username?: string,
+        password?: string
+    }
+};
+
+/**
+ * load/reload vscode extension settings
+ */
+export async function loadSettings() {
+    logger.debug('loading configuration');
+    ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
 
     ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.newEditorColumn', 'two'));
     ext.settings.httpResponseDetails = workspace.getConfiguration().get<string>("f5.httpResponseDetails", "full");
-    ext.settings.enableWebViews = workspace.getConfiguration().get('f5.enableWebViews', false);
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
-    
+
     ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
 
-
-    // irule view stuff - in progress
-    ext.settings.irulesEnabled = workspace.getConfiguration().get<boolean>('f5.tcl', true);
-    if(ext.settings.irulesEnabled && ext.iRulesAble){
-        commands.executeCommand('setContext', 'f5.tcl', true);
-    } else {
-        commands.executeCommand('setContext', 'f5.tcl', false);
-    }
 }
 
 
@@ -86,7 +155,7 @@ export namespace git {
 
     export let latestDOschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json';
     export let examplesDO: string = 'https://github.com/F5Networks/f5-declarative-onboarding/tree/master/examples';
-    
+
     export let latestTSschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json';
     export let examplesTS: string = 'https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples/declarations';
 }
@@ -102,6 +171,8 @@ function parseColumn(value: string): ViewColumn {
             return ViewColumn.Beside;
     }
 }
+
+
 
 
 /*

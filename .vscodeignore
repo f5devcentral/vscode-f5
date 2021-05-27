@@ -16,7 +16,7 @@ vsc-extension-quickstart.md
 # **/*.gif
 # ignore cache directories
 atc_ilx_rpm_cache/**
-cache
+cache/**
 fastTemplateFolderUploadTemp/**
 # ignore test seed file
 *.vscode-f5.json

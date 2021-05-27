@@ -109,6 +109,12 @@ Enable TCL functionality under `F5: Tcl`.  This is disabled by default (now enab
 <!-- ![TCL setting](./media/tcl_setting_8.21.2020.PNG) -->
 <img src="./media/tcl_setting_8.21.2020.PNG" alt="drawing" width="80%"/>
 
+## Device labels
+
+For hostnames or IPv6 devices, v3.0.0 brought the ability to lable the host entries.  All changes must be made through the config file, found at ``Command Palette (F1)``, ``Preference: Open Settings (JSON)``
+
+<img src="./media/hostsView_labelsConfig.gif" alt="drawing" width="80%"/>
+
 
 ## Commands
 

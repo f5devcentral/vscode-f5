@@ -2,25 +2,34 @@
 
 # The F5 VSCode Extension
 
-If you consistently use APIs while working with F5s, the F5 VSCode Extension needs to be a permanent addition to your toolkit!
+Let the F5 VSCode Extension supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, and also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
 
-The F5 VSCode Extension will not only only supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, but also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
+It can also help with iRules/iApps, BIG-IQ, and regular configuration/migration.
 
-If you are not excited yet, the extension can also:
-
-- GET/POST/DELETE of all ATC services, including FAST/AS3/DO/TS
+- GET/POST/DELETE of all ATC services, including FAST/AS3/DO/TS/CF
 - links to quickly open related ATC documentation
 - Direct access to ATC examples from git repo
 - Install/UnInstall of ATC rpms
 - Convert JSON <-> YAML
-- Encode/Decode base64 strings
-- Craft generic HTTP REST calls to connected device or external
+- Hovers to view decoded information for (certificates/base64)
 - Extract TMOS applications (per virtual server)
 - Write, deploy and modify iRules/iApps (with vscode-irule extension for language support)
 
+## Documentation
+
+<https://f5devcentral.github.io/vscode-f5/#/>
+
 ## Getting the extension
 
-The best path is to install Visual Studio Code from: https://code.visualstudio.com/
+The best path is to install Visual Studio Code from: <https://code.visualstudio.com/>
+
+### VSCode Marketplace
+
+- <https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5>
+
+### Open Source Marketplace
+
+- <https://open-vsx.org/extension/F5DevCentral/vscode-f5>
 
 ### VSCode Marketplace
 
@@ -32,7 +41,7 @@ The best path is to install Visual Studio Code from: https://code.visualstudio.c
 
 Then install the extension following the steps below:
 
-Select the extensions view 
+Select the extensions view
 
 <img src="./media/vscode_extensions_icon.PNG" alt="drawing" width="5%"/>
 
@@ -66,15 +75,6 @@ Right-click in the editor and select `POST as AS3 Declaration`.  This should pos
 
 <img src="./media/as3SnippetDemo_11.04.2020.gif" alt="drawing" width="80%"/>
 
-
-
 ### To delete deployed AS3 tenant from device
 
 Right-click on the tenant in the AS3 view on the left, then select `Delete Tenant`
-
-
-
-
-<!-- 
-### other wiki I was trying out...
-https://github.com/f5devcentral/vscode-f5.wiki.git -->

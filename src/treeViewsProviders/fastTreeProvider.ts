@@ -149,7 +149,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 	}
 
 	private async getApps() {
-		const apps: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/fast/applications');
+		const apps: any = await ext.f5Client?.https('/mgmt/shared/fast/applications');
 
 		this._apps = apps.data.map( (item: { tenant: string; name: string; }) => { 
 			const tenant = item.tenant;
@@ -159,7 +159,7 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 	}
 
 	private async getTasks() {
-		const tasks: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/fast/tasks');
+		const tasks: any = await ext.f5Client?.https('/mgmt/shared/fast/tasks');
 
 		this._tasks = tasks.data.map( (item: { 
 			id: string;
@@ -185,13 +185,13 @@ export class FastTemplatesTreeProvider implements vscode.TreeDataProvider<FastTr
 	}
 
 	private async getTemplates() {
-		const templates: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/fast/templates');
+		const templates: any = await ext.f5Client?.https('/mgmt/shared/fast/templates');
 
 		this._templates = templates.data.map( (item: string) => item);
 	}
 
 	private async getTemplateSets() {
-		const tSets: any = await ext.mgmtClient?.makeRequest('/mgmt/shared/fast/templatesets');
+		const tSets: any = await ext.f5Client?.https('/mgmt/shared/fast/templatesets');
 		this._templateSets = tSets.data.map( (item: { name:string }) => item.name );
 	}
 }

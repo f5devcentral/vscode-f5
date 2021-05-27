@@ -1,7 +1,7 @@
 # ignore 'out' directory which holds all the js files from TS compile
 out
-# used to build new /out directory and clear old js files from compliling output
-out.old
+# any "old" files I'm pending removal...
+.old
 
 # ignore directory that holds node_modules, these should be installed when npm installs the necessary packages from the package.json file
 node_modules

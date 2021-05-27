@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "2.10.7",
+	"version": "3.0.2",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -19,7 +19,7 @@
 		"Snippets"
 	],
 	"engines": {
-		"vscode": "^1.42.0"
+		"vscode": "^1.52.0"
 	},
 	"bugs": {
 		"url": "https://github.com/f5devcentral/vscode-f5/issues"
@@ -98,6 +98,16 @@
 					"name": "F5 Hosts"
 				},
 				{
+					"id": "ipView",
+					"name": "BIG-IP",
+					"when": "f5.isBigip"
+				},
+				{
+					"id": "iqView",
+					"name": "BIG-IQ",
+					"when": "f5.isBigiq"
+				},
+				{
 					"id": "fastView",
 					"name": "FAST View",
 					"when": "f5.fastInstalled"
@@ -124,7 +134,7 @@
 		},
 		"configuration": [
 			{
-				"title": "f5-fast",
+				"title": "f5",
 				"properties": {
 					"f5.hosts": {
 						"type": "array",
@@ -135,7 +145,7 @@
 								"device": {
 									"type": "string",
 									"description": "Connection details for BIG-IP/FAST hosts in \"<user>@<host/ip>\" format",
-									"pattern": "^[\\w-.]+@[\\w-.]+(:[0-9]+)?$",
+									"pattern": "^[\\w-.]+@[\\w-.:]+(:[0-9]+)?$",
 									"examples": [
 										"admin@192.168.1.254",
 										"usr1@10.40.40.20:8443",
@@ -152,6 +162,35 @@
 										"ldap",
 										"custom"
 									]
+								},
+								"label": {
+									"type": "string",
+									"description": "short device label"
+								},
+								"details": {
+									"type": "object",
+									"description": "device details",
+									"product": {
+										"type": "string"
+									},
+									"platformMarketingName": {
+										"type": "string"
+									},
+									"version": {
+										"type": "string"
+									},
+									"hostname": {
+										"type": "string"
+									},
+									"managementAddress": {
+										"type": "string"
+									},
+									"platform": {
+										"type": "string"
+									},
+									"physicalMemory": {
+										"type": "string"
+									}
 								},
 								"onConnect": {
 									"type": "array",
@@ -172,21 +211,6 @@
 							"default": "admin@192.168.1.254"
 						}
 					},
-					"f5.as3Post.async": {
-						"type": "boolean",
-						"default": true,
-						"description": "Make as3 posts async by default"
-					},
-					"f5.showAuthTokenTimer": {
-						"type": "boolean",
-						"default": false,
-						"description": "Displays a countdown of the auth token lifetime.  Extension will refresh the token as needed with the next call.  This is mainly for visibility/debugging purposes, or for those like a ton of feedback"
-					},
-					"f5.asyncInterval": {
-						"type": "number",
-						"default": 5,
-						"description": "Number of seconds to wait between checking POST task status"
-					},
 					"f5.timeoutinmilliseconds": {
 						"type": "integer",
 						"default": 0,
@@ -198,12 +222,6 @@
 						"default": false,
 						"scope": "resource",
 						"description": "Show everything in a new editor tab"
-					},
-					"f5.enableWebViews": {
-						"type": "boolean",
-						"default": false,
-						"scope": "resource",
-						"description": "*DEV-inProgress*"
 					},
 					"f5.newEditorColumn": {
 						"type": "string",
@@ -240,12 +258,6 @@
 						"default": false,
 						"scope": "resource",
 						"description": "Prevent new editor tab from taking focus when opened or updated\n So, by default(disabled), each new editor that is opened and/or updated with also take focus"
-					},
-					"f5.tcl": {
-						"type": "boolean",
-						"default": true,
-						"scope": "resource",
-						"description": "Enable tcl/irule/iapp functionality."
 					},
 					"f5.logLevel": {
 						"type": "string",
@@ -287,7 +299,54 @@
 			{
 				"command": "f5.getF5HostInfo",
 				"title": "Show Device Info",
+				"category": "F5",
+				"enablement": "f5.device"
+			},
+			{
+				"command": "f5.iqAppMoveApp",
+				"title": "Move App",
+				"category": "F5",
+				"icon": "$(move)"
+			},
+			{
+				"command": "f5.iqAppDelete",
+				"title": "Delete BIG-IQ App",
+				"category": "F5",
+				"icon": "$(trash)"
+			},
+			{
+				"command": "f5.iqTemplatePublish",
+				"title": "Publish/Un-Publish BIG-IQ Template",
+				"category": "F5",
+				"icon": "$(live-share)"
+			},
+			{
+				"command": "f5.iqTemplateDelete",
+				"title": "Delete BIG-IQ Template",
+				"category": "F5",
+				"icon": "$(trash)"
+			},
+			{
+				"command": "f5.iqPostTemplate",
+				"title": "Post BIG-IQ Template",
 				"category": "F5"
+			},
+			{
+				"command": "f5.iqScriptDelete",
+				"title": "Delete BIG-IQ Script",
+				"category": "F5",
+				"icon": "$(trash)"
+			},
+			{
+				"command": "f5.iqScriptPost",
+				"title": "Post BIG-IQ Script",
+				"category": "F5"
+			},
+			{
+				"command": "f5.iqScriptExecute",
+				"title": "Execute Script",
+				"category": "F5",
+				"icon": "$(run)"
 			},
 			{
 				"command": "f5.cfgExploreOnConnect",
@@ -307,7 +366,8 @@
 			{
 				"command": "f5.addHost",
 				"title": "Add Host",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(add)"
 			},
 			{
 				"command": "f5.deviceImport",
@@ -317,7 +377,8 @@
 			{
 				"command": "f5.removeHost",
 				"title": "Remove Host",
-				"category": "F5"
+				"category": "F5",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "f5.remoteCommand",
@@ -389,34 +450,51 @@
 				"command": "f5.unInstallRPM",
 				"title": "Un-Install RPM",
 				"category": "F5",
-				"enablement": "f5.device"
+				"enablement": "f5.device && viewItem == atcService"
+			},
+			{
+				"command": "f5.createUCS",
+				"title": "Create UCS",
+				"category": "F5",
+				"enablement": "f5.device && viewItem == ucsHeader",
+				"icon": "$(add)"
+			},
+			{
+				"command": "f5.deleteUCS",
+				"title": "Delete UCS",
+				"category": "F5",
+				"enablement": "f5.device && viewItem == ucsItem",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "f5.refreshHostsTree",
 				"title": "Refresh Devices",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "f5.refreshBigipTree",
+				"title": "Refresh BIG-IP View",
+				"category": "F5",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "f5.iqViewRefresh",
+				"title": "Refresh BIG-IQ View",
+				"category": "F5",
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5.cfgExploreRefresh",
 				"title": "Refresh Config Explorer",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5.refreshTclTree",
 				"title": "Refresh tcl",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5-fast.getInfo",
@@ -455,12 +533,6 @@
 				"enablement": "f5.fastInstalled"
 			},
 			{
-				"command": "f5-fast.postTemplate",
-				"title": "Post Template",
-				"category": "F5-Fast",
-				"enablement": "f5.fastInstalled"
-			},
-			{
 				"command": "f5-fast.postTemplateSet",
 				"title": "Post Template Set",
 				"category": "F5-Fast",
@@ -493,10 +565,7 @@
 				"title": "Refresh",
 				"category": "F5",
 				"enablement": "f5.fastInstalled",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "f5-as3.postDec",
@@ -519,10 +588,7 @@
 				"command": "f5-as3.refreshTenantsTree",
 				"title": "Refresh Tenants Tree",
 				"category": "F5-AS3",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(sync)"
 			},
 			{
 				"command": "f5-do.inspect",
@@ -565,10 +631,7 @@
 				"command": "f5.editHost",
 				"title": "Edit Host",
 				"category": "F5",
-				"icon": {
-					"light": "resources/light/edit.svg",
-					"dark": "resources/dark/edit.svg"
-				}
+				"icon": "$(edit)"
 			},
 			{
 				"command": "f5.editDeviceProvider",
@@ -621,6 +684,16 @@
 				},
 				{
 					"command": "f5.cfgExplore",
+					"group": "F5"
+				},
+				{
+					"command": "f5.iqPostTemplate",
+					"when": "f5.isBigiq",
+					"group": "F5"
+				},
+				{
+					"command": "f5.iqScriptPost",
+					"when": "f5.isBigiq",
 					"group": "F5"
 				},
 				{
@@ -708,11 +781,6 @@
 					"group": "F5-Fast"
 				},
 				{
-					"when": "f5.fastInstalled && resourceExtname =~ /\\.(mst|ya?ml|fast)/",
-					"command": "f5-fast.postTemplate",
-					"group": "F5-Fast"
-				},
-				{
 					"when": "resourceExtname =~ /\\.(ya?ml)/",
 					"command": "f5-fast.renderHtmlPreview",
 					"group": "F5-Fast"
@@ -727,6 +795,16 @@
 				{
 					"command": "f5.refreshHostsTree",
 					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.refreshBigipTree",
+					"when": "view == ipView",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.iqViewRefresh",
+					"when": "view == iqView",
 					"group": "navigation"
 				},
 				{
@@ -845,10 +923,6 @@
 					"when": "none"
 				},
 				{
-					"command": "f5-fast.postTemplate",
-					"when": "f5.fastInstalled"
-				},
-				{
 					"command": "f5-fast.postTemplateSet",
 					"when": "f5.fastInstalled"
 				},
@@ -940,8 +1014,19 @@
 					"group": "inline"
 				},
 				{
-					"command": "f5.editHost",
-					"when": "view == f5Hosts && viewItem == f5Host"
+					"command": "f5.unInstallRPM",
+					"when": "view == ipView && viewItem == atcService",
+					"group": "inline"
+				},
+				{
+					"command": "f5.createUCS",
+					"when": "view == ipView && viewItem == ucsHeader",
+					"group": "inline"
+				},
+				{
+					"command": "f5.deleteUCS",
+					"group": "inline",
+					"when": "view == ipView && viewItem == ucsItem"
 				},
 				{
 					"command": "f5.editDeviceProvider",
@@ -953,6 +1038,7 @@
 				},
 				{
 					"command": "f5.removeHost",
+					"group": "inline",
 					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
@@ -960,8 +1046,33 @@
 					"when": "view == f5Hosts && viewItem == f5Host"
 				},
 				{
-					"command": "f5.getF5HostInfo",
-					"when": "view == f5Hosts && viewItem == f5Host"
+					"command": "f5.iqAppMoveApp",
+					"group": "inline",
+					"when": "view == iqView && viewItem == iQapp"
+				},
+				{
+					"command": "f5.iqTemplatePublish",
+					"group": "inline",
+					"when": "view == iqView && viewItem == iqTemplate"
+				},
+				{
+					"command": "f5.iqTemplateDelete",
+					"group": "inline",
+					"when": "view == iqView && viewItem == iqTemplate"
+				},
+				{
+					"command": "f5.iqScriptDelete",
+					"group": "inline",
+					"when": "view == iqView && viewItem == iqScript"
+				},
+				{
+					"command": "f5.iqScriptExecute",
+					"group": "inline",
+					"when": "view == iqView && viewItem == iqScript"
+				},
+				{
+					"command": "f5.iqAppDelete",
+					"when": "view == iqView && viewItem == iQglobalApp"
 				},
 				{
 					"command": "f5.cfgExploreOnConnect",
@@ -1023,28 +1134,30 @@
 		"test": "node ./out/test/runTest.js",
 		"docs": "docsify serve docs",
 		"refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
-		"refresh-corkscrew": "rm -rf node_modules/f5-corkscrew && npm install https://github.com/f5devcentral/f5-corkscrew.git"
+		"refresh-corkscrew": "rm -rf node_modules/f5-corkscrew && npm install f5devcentral/f5-corkscrew#certs",
+		"refresh-f5-conx": "rm -rf node_modules/f5-conx-core && npm install dumpysquare/f5-conx-core"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
+		"@types/js-yaml": "4.0.0",
 		"@types/mocha": "^7.0.1",
-		"@types/node": "^12.19.16",
-		"@types/vscode": "^1.42.0",
+		"@types/node": "^12.20.6",
+		"@types/vscode": "^1.52.0",
 		"@typescript-eslint/eslint-plugin": "^2.34.0",
 		"@typescript-eslint/parser": "^2.34.0",
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
-		"mocha": "^8.1.3",
-		"nock": "^13.0.7",
-		"typescript": "^3.9.7",
-		"vscode-test": "^1.5.0"
+		"mocha": "^8.3.2",
+		"nock": "^13.0.11",
+		"typescript": "^3.9.9",
+		"vscode-test": "^1.5.1"
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
-		"@types/js-yaml": "^3.12.6",
 		"axios": "^0.21.1",
-		"f5-corkscrew": "git+https://github.com/f5devcentral/f5-corkscrew.git",
-		"js-yaml": "^3.14.1",
-		"keytar": "^6.0.1"
+		"f5-conx-core": "github:dumpysquare/f5-conx-core",
+		"f5-corkscrew": "github:f5devcentral/f5-corkscrew#certs",
+		"js-yaml": "4.0.0",
+		"keytar": "^7.6.0"
 	}
 }

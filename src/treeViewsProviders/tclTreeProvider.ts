@@ -1,4 +1,25 @@
-import * as vscode from 'vscode';
+/*
+ * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
+ * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
+ * may copy and modify this software product for its internal business purposes.
+ * Further, Licensee may upload, publish and distribute the modified version of
+ * the software product on devcentral.f5.com or github.com/f5devcentral.
+ */
+
+'use strict';
+
+import { 
+	Command,
+	Event,
+	EventEmitter,
+	MarkdownString,
+	TreeDataProvider,
+	TreeItem,
+	TreeItemCollapsibleState,
+	window,
+	workspace
+} from 'vscode';
+
 import { ext } from '../extensionVariables';
 import * as utils from '../utils/utils';
 import * as path from 'path';
@@ -6,11 +27,10 @@ import * as fs from 'fs';
 import * as os from 'os';
 import logger from '../utils/logger';
 
+export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 
-export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
-
-	private _onDidChangeTreeData: vscode.EventEmitter<TCLitem | undefined> = new vscode.EventEmitter<TCLitem | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<TCLitem | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: EventEmitter<TCLitem | undefined> = new EventEmitter<TCLitem | undefined>();
+	readonly onDidChangeTreeData: Event<TCLitem | undefined> = this._onDidChangeTreeData.event;
 
 	private _iRules: string[] = [];  
 	private _apps: string[] = [];  
@@ -23,14 +43,14 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		this._onDidChangeTreeData.fire(undefined);
 	}
 
-	getTreeItem(element: TCLitem): vscode.TreeItem {
+	getTreeItem(element: TCLitem): TreeItem {
 		return element;
 	}
 
 	async getChildren(element?: TCLitem) {
 		let treeItems: any[] = [];
 
-		if (!ext.mgmtClient) {
+		if (!ext.f5Client) {
 			// return nothing if not connected yet
 			return Promise.resolve([]);
 		}
@@ -40,21 +60,25 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			if(element.label === 'iRules'){
                 
                 treeItems = this._iRules.map( (el: any) => {
-                    return new TCLitem(el.fullPath, '', '', 'rule', vscode.TreeItemCollapsibleState.None, 
+					// const as3DecMapStringified = jsYaml.dump(as3DecMap, { indent: 4 });
+					const content = `ltm rule ${el.fullPath} {\r\n` + el.apiAnonymous + '\r\n}';
+					const toolTip = new MarkdownString()
+					.appendCodeblock(content, 'irule-lang');
+                    return new TCLitem(el.fullPath, '', toolTip, 'rule', TreeItemCollapsibleState.None, 
                         { command: 'f5-tcl.getRule', title: '', arguments: [el] });
                 });
 				
 			} else if (element.label === 'Deployed-Apps'){
 				// todo: get iapps stuff
 				treeItems = this._apps.map( (el: any) => {
-                    return new TCLitem(el.fullPath, '', '', 'iApp', vscode.TreeItemCollapsibleState.None, 
+                    return new TCLitem(el.fullPath, '', '', 'iApp', TreeItemCollapsibleState.None, 
                         { command: 'f5-tcl.getApp', title: '', arguments: [el] });
 				});
 				
 			} else if (element.label === 'iApp-Templates'){
 				// todo: get iapp templates stuff
 				treeItems = this._iAppTemplates.map( (el: any) => {
-                    return new TCLitem(el.fullPath, '', '', 'iAppTemplate', vscode.TreeItemCollapsibleState.None, 
+                    return new TCLitem(el.fullPath, '', '', 'iAppTemplate', TreeItemCollapsibleState.None, 
                         { command: 'f5-tcl.getTMPL', title: '', arguments: [el] });
                 });
 			}
@@ -70,15 +94,15 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			const tempCount = this._iAppTemplates.length !== 0 ? this._iAppTemplates.length.toString() : '';
 
 			treeItems.push(
-				new TCLitem('iRules', ruleCount, '', '', vscode.TreeItemCollapsibleState.Collapsed, 
+				new TCLitem('iRules', ruleCount, '', '', TreeItemCollapsibleState.Collapsed, 
 					{ command: '', title: '', arguments: [''] })
 			);
 			treeItems.push(
-				new TCLitem('Deployed-Apps', appCount, '', '', vscode.TreeItemCollapsibleState.Collapsed,
+				new TCLitem('Deployed-Apps', appCount, '', '', TreeItemCollapsibleState.Collapsed,
 					{ command: '', title: '', arguments: [''] })
 			);
 			treeItems.push(
-				new TCLitem('iApp-Templates', tempCount, '', '', vscode.TreeItemCollapsibleState.Collapsed,
+				new TCLitem('iApp-Templates', tempCount, '', '', TreeItemCollapsibleState.Collapsed,
 					{ command: '', title: '', arguments: [''] })
 			);
 		}
@@ -90,9 +114,12 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 */
 	private async getIrules() {
         this._iRules = [];	// clear current irule list
-		const iRules: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule`);
-		const miRules = iRules.data.items.map( (el: any) => el);
-        this._iRules = miRules ? miRules : [];
+		// const iRules = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule`);
+		// const miRules = iRules.data.items.map( (el: any) => el);
+		// this._iRules = miRules ? miRules : [];
+		
+		await ext.f5Client?.https(`/mgmt/tm/ltm/rule`)
+		.then( resp => this._iRules = resp.data.items );
 	}
 
 	/**
@@ -100,9 +127,12 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 */
 	private async getApps() {
 		this._apps = [];	// clear current list
-		const apps: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service`);
-		const mApps = apps.data?.items?.map( (el: any) => el);
-		this._apps = mApps ? mApps : [];
+		// const apps: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service`);
+		// const mApps = apps.data?.items?.map( (el: any) => el);
+		// this._apps = mApps ? mApps : [];
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/service`)
+		.then( resp => this._apps = resp.data.items );
 	}
 
 	/**
@@ -110,9 +140,12 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	 */
 	private async getTemplates() {
 		this._iAppTemplates = [];	// clear current list
-		const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template?expandSubcollections=true`);
-		const mTemplates = templates.data.items.map( (el: any) => el);
-		this._iAppTemplates = mTemplates ? mTemplates : [];
+		// const templates: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template?expandSubcollections=true`);
+		// const mTemplates = templates.data.items.map( (el: any) => el);
+		// this._iAppTemplates = mTemplates ? mTemplates : [];
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/template?expandSubcollections=true`)
+		.then( resp => this._iAppTemplates = resp.data.items );
 	}
 
 	/**
@@ -135,9 +168,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		const content = `ltm rule ${item.fullPath} {\r\n` + item.apiAnonymous + '\r\n}';
 
 		// open editor and feed it the content
-		const doc = await vscode.workspace.openTextDocument({ content: content, language: 'irule-lang' });
+		const doc = await workspace.openTextDocument({ content: content, language: 'irule-lang' });
 		// make the editor appear
-		await vscode.window.showTextDocument( doc, { preview: false });
+		await window.showTextDocument( doc, { preview: false });
 		return doc;	// return something for automated testing
 	}
 
@@ -146,13 +179,17 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 		const name = this.name2uri(item.label);
 
-		const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule/${name}`, {
-			method: 'DELETE'
-		});
+		// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/ltm/rule/${name}`, {
+		// 	method: 'DELETE'
+		// });
 
-		// logger.debug('deteleRule response: ', resp.data);
-		setTimeout( () => { this.refresh();}, 500);	// refresh after update
-		return `${resp.status}-${resp.statusText}`;
+		const resp = await ext.f5Client?.https(`/mgmt/tm/ltm/rule/${name}`, {
+			method: 'DELETE'
+		})
+		.then (resp => {
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
+			return `${resp.status}-${resp.statusText}`;
+		});
 	}
 
 	/**
@@ -162,9 +199,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	async displayTMPL(item: any) {
 		
 		// open editor and feed it the content
-		const doc = await vscode.workspace.openTextDocument({ content: item, language: 'irule-lang' });
+		const doc = await workspace.openTextDocument({ content: item, language: 'irule-lang' });
 		// make the editor appear
-		await vscode.window.showTextDocument( doc, { preview: false });
+		await window.showTextDocument( doc, { preview: false });
 		return doc;	// return something for automated testing
 	}
 
@@ -178,16 +215,24 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 	async getTMPL(tempName: any) {
 		logger.debug('tempName', tempName);
 
-		const getTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+		// const getTMPL: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/util/bash`, {
+		// 	method: 'POST',
+		// 	body: {
+		// 		command: 'run',
+		// 		utilCmdArgs: `-c 'tmsh list sys application template ${tempName.fullPath}'`
+		// 	}
+		// });
+
+		const getTMPL = await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
 			method: 'POST',
-			body: {
+			data: {
 				command: 'run',
 				utilCmdArgs: `-c 'tmsh list sys application template ${tempName.fullPath}'`
 			}
 		});
 
 		let text;
-		if(getTMPL.data.commandResult) {
+		if(getTMPL?.data.commandResult) {
 			// got a response, removing necessary fields for re-import
 			text = getTMPL.data.commandResult;
 
@@ -243,16 +288,20 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		fs.writeFileSync(dstFilePath, text);
 
 		// upload .tmpl file
-		if(ext.mgmtClient) {
-			const upload: any = await ext.mgmtClient.upload(dstFilePath);
-			logger.debug('tcl upload complete -> moving to /tmp/ location', upload);
+		if(ext.f5Client) {
+			// const upload: any = await ext.mgmtClient.upload(dstFilePath);
+
+			await ext.f5Client.upload(dstFilePath, 'FILE')
+			.then (resp => {
+				logger.debug('tcl upload complete -> moving to /tmp/ location', resp.data);
+			});
 
 			await new Promise(r => setTimeout(r, 100)); // pause to finish upload
 			
 			// move file to temp location - required for tmsh merge command
-			const move: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/unix-mv`, {
+			const move: any = await ext.f5Client?.https(`/mgmt/tm/util/unix-mv`, {
 				method: 'POST',
-				body: {
+				data: {
 					command: 'run',
 					utilCmdArgs: `/var/config/rest/downloads/${tmpFile} /tmp/${tmpFile}`
 				}
@@ -261,9 +310,9 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 			await new Promise(r => setTimeout(r, 100)); // pause to finish move
 			logger.debug('tcl upload complete -> merging with running config', move.data);
 	
-			const resp: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
+			const resp: any = await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
 				method: 'POST',
-				body: {
+				data: {
 					command: 'run',
 					utilCmdArgs: `-c 'tmsh load sys config merge file /tmp/${tmpFile}'`
 				}
@@ -277,7 +326,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 
 				Promise.reject(new Error(`tmsh merge failed with error: ${final}`));
 			} else {
-				vscode.window.showInformationMessage('mergeTCL -> SUCCESSFUL!!!', );
+				window.showInformationMessage('mergeTCL -> SUCCESSFUL!!!', );
 				setTimeout( () => { this.refresh();}, 500);	// refresh after update
 				return 'success';
 			}
@@ -303,13 +352,13 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		if(template.scheme === 'untitled') {
 
 			// get editor text (should be iapp .tmpl)
-			const text = vscode.window.activeTextEditor?.document.getText();
+			const text = window.activeTextEditor?.document.getText();
 			const coreDir = ext.context.extensionPath;	// extension core directory
 			logger.debug('POST iApp .tmpl via editor detected');
 
 			if(!text) {
 				console.error('no text and/or editor');
-				return vscode.window.showErrorMessage('no text and/or editor');;
+				return window.showErrorMessage('no text and/or editor');;
 			}
 			
 			const templateName = text.match(/sys\sapplication\stemplate\s(.*?)\s*{/);
@@ -326,7 +375,7 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 				// regex failed to find iapp name -> fail with messaging
 				const erTxt = 'Could not find iApp template name in text - use output from "tmsh list" command or original .tmpl format';
 				console.error(erTxt);
-				return vscode.window.showErrorMessage(erTxt);
+				return window.showErrorMessage(erTxt);
 			}
 
 			const dstFilePath = path.join(coreDir, fileName);
@@ -348,24 +397,38 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		 }
 
 		// upload .tmpl file
-		if(ext.mgmtClient) {
-			const upload = await ext.mgmtClient.upload(filePath);
-			logger.debug('iApp upload complete -> importing iApp via tmsh bash api', upload);
-	
-			const importTMPL: any = await ext.mgmtClient.makeRequest(`/mgmt/tm/util/bash`, {
-				method: 'POST',
-				body: {
-					command: 'run',
-					utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
-				}
-			});
+		if(ext.f5Client) {
+			// const upload = await ext.mgmtClient.upload(filePath);
+			return await ext.f5Client.upload(filePath, 'FILE')
+			.then ( async resp => {
+				logger.debug('iApp upload complete -> importing iApp via tmsh bash api', resp.data);
 
-			if(cleanUp) {
-				logger.debug('deleting iApp temp file at:', cleanUp);
-				fs.unlinkSync(cleanUp);
-			}
-			setTimeout( () => { this.refresh();}, 500);	// refresh after update
-			return importTMPL.data.commandResult;
+				return await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
+					method: 'POST',
+					data: {
+						command: 'run',
+						utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
+					}
+				})
+				.then ( resp => {
+					if(cleanUp) {
+						logger.debug('deleting iApp temp file at:', cleanUp);
+						fs.unlinkSync(cleanUp);
+					}
+					setTimeout( () => { this.refresh();}, 500);	// refresh after update
+				});
+			});
+	
+			// const importTMPL: any = await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
+			// 	method: 'POST',
+			// 	data: {
+			// 		command: 'run',
+			// 		utilCmdArgs: `-c 'tmsh load sys application template /var/config/rest/downloads/${fileName}'`
+			// 	}
+			// });
+
+
+			// return importTMPL.data.commandResult;
 		} else {
 			console.error('iApp .tmpl upload: no connected device, connect to issue command');
 		}
@@ -379,13 +442,21 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		logger.debug('iAppRedeploy: ', item);
 		// const urlName = item.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
-		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// 	method: 'PATCH',
+		// 	body: {
+		// 		'execute-action': 'definition'
+		// 	}
+		// });
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/service/${urlName}`, {
 			method: 'PATCH',
-			body: {
+			data: {
 				'execute-action': 'definition'
 			}
-		});
-		logger.debug('iAppReDeploy: resp-> ', resp);
+		})
+		.then( resp => logger.debug('iAppReDeploy: resp-> ', resp));
+		
 	}
 
 	/**
@@ -396,11 +467,17 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		logger.debug('iAppDelete: ', item);
 		// const urlName = item.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
-		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/service/${urlName}`, {
+		// 	method: 'DELETE'
+		// });
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/service/${urlName}`, {
 			method: 'DELETE'
+		})
+		.then( resp => {
+			logger.debug('iAppDelete: resp-> ', resp);
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
 		});
-		logger.debug('iAppDelete: resp-> ', resp);
-		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 
 	/**
@@ -411,23 +488,29 @@ export class TclTreeProvider implements vscode.TreeDataProvider<TCLitem> {
 		logger.debug('deleteTMPL: ', item);
 		// const urlName = template.label.replace(/\//g, '~');
 		const urlName = this.name2uri(item.label);
-		const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
+		// const resp = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/application/template/${urlName}`, {
+		// 	method: 'DELETE'
+		// });
+
+		await ext.f5Client?.https(`/mgmt/tm/sys/application/template/${urlName}`, {
 			method: 'DELETE'
+		})
+		.then( resp => {
+			logger.debug('deleteTMPL: resp-> ', resp);
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
 		});
-		logger.debug('deleteTMPL: resp-> ', resp);
-		setTimeout( () => { this.refresh();}, 500);	// refresh after update
 	}
 }
 
 
-class TCLitem extends vscode.TreeItem {
+class TCLitem extends TreeItem {
 	constructor(
 		public readonly label: string,
 		public description: string,
-		public toolTip: string,
+		public toolTip: string | MarkdownString,
 		public context: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
 	}

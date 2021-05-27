@@ -7,8 +7,8 @@ import * as vscode from 'vscode';
 import * as nock from 'nock';
 import * as utils from '../../utils/utils';
 import { ext } from '../../extensionVariables';
-import * as extApi from '../../utils/externalAPIs';
-import { MgmtClient } from '../../utils/f5DeviceClient';
+// import * as extApi from '../../utils/externalAPIs';
+// import { MgmtClient } from '../../utils/f5DeviceClient.ts.old';
 
 
 
@@ -68,7 +68,7 @@ suite('device mgmt tasks', () => {
                     "provider":"local"
                 }]
             }
-        }
+        };
 
         const resp = await vscode.commands.executeCommand('f5.removeHost', deviceID);
 
