@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import logger from './logger';
+import { logger } from '../logger';
 
 // /**
 //  * Host Connectivity Status Bar

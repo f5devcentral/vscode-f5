@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.2",
+	"version": "3.1.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -24,7 +24,7 @@
 	"bugs": {
 		"url": "https://github.com/f5devcentral/vscode-f5/issues"
 	},
-	"license": "SEE LICENSE IN LICENSE.txt",
+	"license": "Apache-2.0",
 	"icon": "images/f5.png",
 	"galleryBanner": {
 		"color": "#DCDCDC",
@@ -211,12 +211,6 @@
 							"default": "admin@192.168.1.254"
 						}
 					},
-					"f5.timeoutinmilliseconds": {
-						"type": "integer",
-						"default": 0,
-						"scope": "resource",
-						"description": "*DEV-beta-Preview* Timeout in milliseconds. 0 for infinity"
-					},
 					"f5.newEditorTabForAll": {
 						"type": "boolean",
 						"default": false,
@@ -262,14 +256,14 @@
 					"f5.logLevel": {
 						"type": "string",
 						"enum": [
-							"error",
-							"warn",
-							"info",
-							"verbose"
+							"ERROR",
+							"WARN",
+							"INFO",
+							"DEBUG"
 						],
-						"default": "error",
+						"default": "INFO",
 						"scope": "resource",
-						"description": "*DEV-beta-Preview* The verbosity of logging in the REST output panel"
+						"description": "F5 OUTPUT log level"
 					}
 				}
 			}
@@ -1155,7 +1149,7 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"axios": "^0.21.1",
-		"f5-conx-core": "github:dumpysquare/f5-conx-core",
+		"f5-conx-core": "file:../f5-conx-core",
 		"f5-corkscrew": "github:f5devcentral/f5-corkscrew#certs",
 		"js-yaml": "4.0.0",
 		"keytar": "^7.6.0"

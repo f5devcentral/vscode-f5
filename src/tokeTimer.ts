@@ -14,7 +14,7 @@ import {
     StatusBarAlignment
 } from 'vscode';
 import { ext } from './extensionVariables';
-import logger from './utils/logger';
+import { logger } from './logger';
 
 export function tokeTimer() {
     const tokenTimerBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 50);

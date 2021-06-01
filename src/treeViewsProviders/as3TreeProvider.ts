@@ -27,8 +27,7 @@ import {
 	As3Tenant
 } from '../utils/as3Models';
 import { ext } from '../extensionVariables';
-import logger from '../utils/logger';
-
+import { logger } from '../logger';
 
 export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 

@@ -14,9 +14,9 @@ import {
     ExtensionContext
 } from "vscode";
 import { ext } from "./extensionVariables";
-import logger from "./utils/logger";
 import { TclTreeProvider } from "./treeViewsProviders/tclTreeProvider";
 
+import { logger } from './logger';
 
 /**
  * core tcl commands functionality

@@ -5,9 +5,9 @@ import * as path from 'path';
 import { ConfigurationTarget, window, workspace } from 'vscode';
 import { ext } from './extensionVariables';
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
-import logger from './utils/logger';
-import { isValidJson } from './utils/utils';
 
+import { isValidJson } from './utils/utils';
+import { logger } from './logger';
 
 /**
  * Looks for device seed file based on path

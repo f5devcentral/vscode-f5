@@ -8,7 +8,8 @@ import axios from 'axios';
 // import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
-import logger from './logger';
+import { logger } from '../logger';
+
 // import { MgmtClient } from './f5DeviceClient';
 // import { emitWarning } from 'process';
 

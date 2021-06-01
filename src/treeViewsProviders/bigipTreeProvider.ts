@@ -29,9 +29,10 @@ import {
 } from 'vscode';
 import path from 'path';
 import { ext } from '../extensionVariables';
-import logger from '../utils/logger';
 import jsyaml from "js-yaml";
 import { F5Client } from '../f5Client';
+
+import { logger } from '../logger';
 
 type hostsRefreshType = 'ATC' | 'UCS' | 'QKVIEW';
 
@@ -90,7 +91,7 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
         } else if (this.connected) {
 
             // start getting ucs/qkview 
-            await this.connected.discover();
+            // await this.connected.discover();
             await this.connected.ucs.list()
                 .then(resp => this.ucsList = resp.data.items);
 

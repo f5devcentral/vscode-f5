@@ -8,8 +8,10 @@ import { languages, Position, Range, TextDocument, ViewColumn, window, workspace
 // import { MimeUtility } from './mimeUtility';
 // import { ResponseFormatUtility } from './responseFormatUtility';
 import { ext } from '../extensionVariables';
-import logger from '../utils/logger';
+
 // import * as utils from '../utils/utils';
+import { logger } from '../logger';
+
 
 export class TextDocumentView {
 

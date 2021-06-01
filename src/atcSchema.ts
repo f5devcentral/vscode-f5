@@ -4,7 +4,7 @@ import { isValidJson } from "./utils/utils";
 import { window } from "vscode";
 // import * as fs from 'fs';
 import { git } from './extensionVariables';
-import logger from './utils/logger';
+import { logger } from './logger';
 
 
 /**

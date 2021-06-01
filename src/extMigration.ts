@@ -1,8 +1,7 @@
 import { extensions, window, commands } from "vscode";
 import * as fs from 'fs';
 
-import logger from './utils/logger';
-
+import { logger } from './logger';
 
 /**
  * detects old `DumpySquare.vscode-f5-fast` extension and deletes it's folder

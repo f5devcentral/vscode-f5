@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import * as path from 'path';
 import * as fs from 'fs';
-import logger from './logger';
+import { logger } from '../logger';
 
 /*
 most of these functions are extracted from f5-fast-core cli

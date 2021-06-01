@@ -1,22 +1,23 @@
-/*
- * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
- * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
- * may copy and modify this software product for its internal business purposes.
- * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com or github.com/f5devcentral.
- */
+// /*
+//  * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
+//  * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
+//  * may copy and modify this software product for its internal business purposes.
+//  * Further, Licensee may upload, publish and distribute the modified version of
+//  * the software product on devcentral.f5.com or github.com/f5devcentral.
+//  */
 
-'use strict';
+// 'use strict';
 
-import * as vscode from 'vscode';
-import { request } from 'https';
-var https = require('https');
-import * as fs from 'fs';
-import { ext } from '../extensionVariables';
-import * as path from 'path';
-import axios from 'axios';
-import logger from './logger';
+// import * as vscode from 'vscode';
+// import { request } from 'https';
+// var https = require('https');
+// import * as fs from 'fs';
+// import { ext } from '../extensionVariables';
+// import * as path from 'path';
+// import axios from 'axios';
+// // import logger from './logger';
 
+// import { logger } from '../logger';
 
 
 // /**
@@ -461,64 +462,64 @@ import logger from './logger';
 // // // // };
 
 
-/**
- * @param url to get file
- * @param dest path/file name (./path/test.tar.gz)
- * @param host ip/fqdn where to get file
- * @param port 
- * @param token bigip auth token
- */
-export async function download(file: string, dest: string, host: string, port: number, token: string) {
-    /**
-     * to be used for downloading 
-     * https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
-     * 
-     */
+// /**
+//  * @param url to get file
+//  * @param dest path/file name (./path/test.tar.gz)
+//  * @param host ip/fqdn where to get file
+//  * @param port 
+//  * @param token bigip auth token
+//  */
+// export async function download(file: string, dest: string, host: string, port: number, token: string) {
+//     /**
+//      * to be used for downloading 
+//      * https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
+//      * 
+//      */
 
-    const writer = fs.createWriteStream(dest);
-    const url = `/mgmt/cm/autodeploy/software-image-downloads/${file}`;
+//     const writer = fs.createWriteStream(dest);
+//     const url = `/mgmt/cm/autodeploy/software-image-downloads/${file}`;
 
-    const response = await axios({
-        url,
-        method: 'GET',
-        responseType: 'stream',
-        baseURL: `https://${host}:${port}`,
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: false
-        }),
-        headers: {
-            'X-F5-Auth-Token': token,
-        },
-    });
+//     const response = await axios({
+//         url,
+//         method: 'GET',
+//         responseType: 'stream',
+//         baseURL: `https://${host}:${port}`,
+//         httpsAgent: new https.Agent({
+//             rejectUnauthorized: false
+//         }),
+//         headers: {
+//             'X-F5-Auth-Token': token,
+//         },
+//     });
 
-    response.data.pipe(writer);
+//     response.data.pipe(writer);
 
-    return new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-    });
+//     return new Promise((resolve, reject) => {
+//         writer.on('finish', resolve);
+//         writer.on('error', reject);
+//     });
 
-    /**
-     * was trying to get a better understanding of error handling
-     * by default, if successful, just resolve the promise with no return data
-     *      or fail and provide the failure reason from axios
-     *
-     * the following fed some of the axios response details back
-     *  but I could not get it to return a custom error message
-     */
-    // return new Promise((resolve, reject) => {
-    //     writer.on('finish', x => {
-    //         return resolve({
-    //             x,
-    //             status: response.status,
-    //             statusText: response.statusText
-    //         });
-    //     });
-    //     writer.on('error', x => {
-    //         return reject('file download failed');
-    //     });
-    // });
-}
+//     /**
+//      * was trying to get a better understanding of error handling
+//      * by default, if successful, just resolve the promise with no return data
+//      *      or fail and provide the failure reason from axios
+//      *
+//      * the following fed some of the axios response details back
+//      *  but I could not get it to return a custom error message
+//      */
+//     // return new Promise((resolve, reject) => {
+//     //     writer.on('finish', x => {
+//     //         return resolve({
+//     //             x,
+//     //             status: response.status,
+//     //             statusText: response.statusText
+//     //         });
+//     //     });
+//     //     writer.on('error', x => {
+//     //         return reject('file download failed');
+//     //     });
+//     // });
+// }
 
 
 
@@ -599,75 +600,75 @@ export async function download(file: string, dest: string, host: string, port: n
 
 
 /**
- * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
- * 
- * external Download HTTP payload to file
- *
- * @param url  url
- * @param file local file location where the downloaded contents should go
- *
- * @returns void
- */
-export async function downloadToFile(url: string, file: string): Promise<void> {
-    await new Promise(((resolve) => {
-        axios({
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false
-            }),
-            method: 'GET',
-            url,
-            responseType: 'stream'
-        })
-            .then(function (response) {
-                response.data.pipe(fs.createWriteStream(file))
-                    .on('finish', resolve);
-            });
-    }));
-}
+//  * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
+//  * 
+//  * external Download HTTP payload to file
+//  *
+//  * @param url  url
+//  * @param file local file location where the downloaded contents should go
+//  *
+//  * @returns void
+//  */
+// export async function downloadToFile(url: string, file: string): Promise<void> {
+//     await new Promise(((resolve) => {
+//         axios({
+//             httpsAgent: new https.Agent({
+//                 rejectUnauthorized: false
+//             }),
+//             method: 'GET',
+//             url,
+//             responseType: 'stream'
+//         })
+//             .then(function (response) {
+//                 response.data.pipe(fs.createWriteStream(file))
+//                     .on('finish', resolve);
+//             });
+//     }));
+// }
 
 
 
-/**
- * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
- * 
- * Download HTTP payload to file
- *
- * @param url  url
- * @param file local file location where the downloaded contents should go
- *
- * @returns void
- */
-export async function downloadToFileNew(url: string, file: string): Promise<any> {
+// /**
+//  * GOOD/WORKING!!! -- needs to be moved to externalAPIs.ts
+//  * 
+//  * Download HTTP payload to file
+//  *
+//  * @param url  url
+//  * @param file local file location where the downloaded contents should go
+//  *
+//  * @returns void
+//  */
+// export async function downloadToFileNew(url: string, file: string): Promise<any> {
 
-    const writable = fs.createWriteStream(file);
+//     const writable = fs.createWriteStream(file);
 
-    return await new Promise(((resolve, reject) => {
-        axios({
-            url,
-            responseType: 'stream'
-        })
-            .then(function (resp) {
-                resp.data.pipe(writable)
-                    .on('finish', () => {
+//     return await new Promise(((resolve, reject) => {
+//         axios({
+//             url,
+//             responseType: 'stream'
+//         })
+//             .then(function (resp) {
+//                 resp.data.pipe(writable)
+//                     .on('finish', () => {
 
-                        // over-write response data
-                        resp.data = {
-                            file: writable.path,
-                            bytes: writable.bytesWritten
-                        };
+//                         // over-write response data
+//                         resp.data = {
+//                             file: writable.path,
+//                             bytes: writable.bytesWritten
+//                         };
 
-                        logger.info('external downloader', {
-                            message: 'download complete',
-                            data: resp.data
-                        });
+//                         logger.info('external downloader', {
+//                             message: 'download complete',
+//                             data: resp.data
+//                         });
 
-                        return resolve(resp);
-                    });
-            })
-            .catch(err => {
-                // look at adding more failure details, like,
-                // was it tcp, dns, dest url problem, write file problem, ...
-                return reject(err);
-            });
-    }));
-}
+//                         return resolve(resp);
+//                     });
+//             })
+//             .catch(err => {
+//                 // look at adding more failure details, like,
+//                 // was it tcp, dns, dest url problem, write file problem, ...
+//                 return reject(err);
+//             });
+//     }));
+// }

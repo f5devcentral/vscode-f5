@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { 
+import {
     ExtensionContext,
     StatusBarItem,
     workspace,
@@ -15,7 +15,7 @@ import {
 } from "vscode";
 import * as keyTarType from "keytar";
 // import { MgmtClient } from './utils/f5DeviceClient.ts.old';
-import logger from "./utils/logger";
+import { logger } from "./logger";
 import { TextDocumentView } from './editorViews/editorView';
 import { EventEmitter } from "events";
 
@@ -25,6 +25,9 @@ import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 
 type KeyTar = typeof keyTarType;
+
+// import Logger from 'f5-conx-core/dist/logger';
+// const logger = Logger.getLogger();
 
 // path.join(ext.context.extensionPath, 'cache');
 
@@ -78,13 +81,15 @@ export async function initSettings(context: ExtensionContext) {
     ext.cacheDir = path.join(ext.context.extensionPath, 'cache');
     process.env.F5_CONX_CORE_EXT_HTTP_AGENT = 'The F5 VScode Extension';
     process.env.F5_CONX_CORE_CACHE = ext.cacheDir;
-    
+
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
     ext.extHttp = new ExtHttp({ rejectUnauthorized: false, eventEmitter: ext.eventEmitterGlobal });
     ext.extHttp.cacheDir = ext.cacheDir;
 
     ext.eventEmitterGlobal
+        .on('log-http-request', msg => logger.httpRequest(msg))
+        .on('log-http-response', msg => logger.httpResponse(msg))
         .on('log-debug', msg => logger.debug(msg))
         .on('log-info', msg => logger.info(msg))
         .on('log-warn', msg => logger.warn(msg))
@@ -137,13 +142,19 @@ type ProxyCfg = {
 export async function loadSettings() {
     logger.debug('loading configuration');
     ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
-
+    
     ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.newEditorColumn', 'two'));
     ext.settings.httpResponseDetails = workspace.getConfiguration().get<string>("f5.httpResponseDetails", "full");
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
-
-    ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
+    
+    process.env[logger.logEnv] = workspace.getConfiguration().get<string>('f5.logLevel', 'INFO');
+    
+    logger.info('------ Environment Variables ------');
+    // log envs
+    Object.entries(process.env)
+        .filter( el => el[0].startsWith('F5_CONX_') )
+        .forEach(el => logger.info(`${el[0]}=${el[1]}`) );
 
 }
 

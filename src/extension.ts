@@ -1,9 +1,17 @@
-/*
-* Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
-* license terms. Notwithstanding anything to the contrary in the EULA, Licensee
- * may copy and modify this software product for its internal business purposes.
- * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com or github.com/f5devcentral.
+/**
+ * Copyright 2021 F5 Networks, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 'use strict';
@@ -28,7 +36,7 @@ import * as os from 'os';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
-import * as f5Api from './utils/f5Api';
+
 import * as utils from './utils/utils';
 import { ext, initSettings, loadSettings } from './extensionVariables';
 import { FastWebView } from './editorViews/fastWebView';
@@ -38,28 +46,51 @@ import { deviceImportOnLoad } from './deviceImport';
 import { TextDocumentView } from './editorViews/editorView';
 import { injectSchema } from './atcSchema';
 import devicesCore from './devicesCore';
-// import rpmCore from './rpmCore';
 import tclCore from './tclCore';
 import { ChangeVersion } from './changeVersion';
 import { Hovers } from './hovers';
-import logger from './utils/logger';
 import { cfgExplore } from './cfgExploreCore';
 import { FastCore } from './fastCore';
 import { BigiqCore } from './bigiqCore';
 import { tokeTimer } from './tokeTimer';
-// import { on } from 'node:events';
+import { DoCore } from './doCore';
 
+// instantiate and import logger
+import { logger } from './logger';
+
+// turn off console logging
+logger.console = false;
+
+// create OUTPUT channel
+const f5OutputChannel = window.createOutputChannel('f5');
+
+// inject vscode output into logger
+logger.output = function (log: string) {
+    f5OutputChannel.appendLine(log);
+};
+
+// load project package details to get logged
+const packageJson = require('../package.json');
+
+// provide extension functions for activation
 export async function activate(context: ExtensionContext) {
 
 	process.on('unhandledRejection', error => {
-		logger.error('unhandledRejection', error);
+		logger.error('--- unhandledRejection ---', error);
 	});
 
-	logger.debug(`Host details: `, {
-		hostOS: os.type(),
+	logger.info(`Extension/Host details: `, {
+		name: packageJson.name,
+		displayName: packageJson.displayName,
+		publisher: packageJson.publisher,
+        description: packageJson.description,
+        version: packageJson.version,
+        license: packageJson.license,
+        repository: packageJson.repository.url,
+		host: JSON.stringify({ hostOS: os.type(),
 		platform: os.platform(),
-		release: os.release(),
-		userInfo: `${JSON.stringify(os.userInfo())}`
+		release: os.release()}),
+		userInfo: JSON.stringify(os.userInfo())
 	});
 
 
@@ -90,6 +121,8 @@ export async function activate(context: ExtensionContext) {
 
 	new BigiqCore(context);
 
+	new DoCore(context);
+
 
 	// or do we prefer the function style of importing core blocks?
 
@@ -97,7 +130,7 @@ export async function activate(context: ExtensionContext) {
 	cfgExplore(context);
 
 	// main devices view commands
-	devicesCore(context);
+	devicesCore(context, f5OutputChannel);
 
 	// rpm commands
 	// rpmCore(context);
@@ -144,37 +177,28 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.deployApp', async () => {
 
-		// get editor window
-		var editor = window.activeTextEditor;
-		if (!editor) {
-			return; // No open text editor
-		}
+		await utils.getText()
+		.then( async text => {
 
-		// capture selected text or all text in editor
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
-		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		}
+			// TODO: make this a try sequence to only parse the json once
+			let jsonText: object;
+			if (utils.isValidJson(text)) {
+				jsonText = JSON.parse(text);
+			} else {
+				window.showWarningMessage(`Not valid json object`);
+				return;
+			}
+	
+			const resp = await f5FastApi.deployFastApp(jsonText);
+	
+			ext.panel.render(resp);
+	
+			// give a little time to finish before refreshing trees
+			await new Promise(resolve => { setTimeout(resolve, 3000); });
+			fastTreeProvider.refresh();
+			ext.as3Tree.refresh();
+		});
 
-		// TODO: make this a try sequence to only parse the json once
-		let jsonText: object;
-		if (utils.isValidJson(text)) {
-			jsonText = JSON.parse(text);
-		} else {
-			window.showWarningMessage(`Not valid json object`);
-			return;
-		}
-
-		const resp = await f5FastApi.deployFastApp(jsonText);
-
-		ext.panel.render(resp);
-
-		// give a little time to finish before refreshing trees
-		await new Promise(resolve => { setTimeout(resolve, 3000); });
-		fastTreeProvider.refresh();
-		ext.as3Tree.refresh();
 	}));
 
 
@@ -627,7 +651,7 @@ export async function activate(context: ExtensionContext) {
 					edit.replace(new Range(startPosition, endPosition), newText);
 				});
 			} else {
-				logger.warn('ATC schema inject failed');
+				logger.error('ATC schema inject failed');
 			}
 		}
 
@@ -728,104 +752,6 @@ export async function activate(context: ExtensionContext) {
 
 
 
-
-
-	/**
-	 * #########################################################################
-	 * 
-	 * 			 █████    ██████  
-	 *			 ██   ██ ██    ██ 
-	 *			 ██   ██ ██    ██ 
-	 *			 ██   ██ ██    ██ 
-	 *			 █████    ██████  
-	 * 			
-	 * #########################################################################
-	 * 	http://patorjk.com/software/taag/#p=display&h=0&f=ANSI%20Regular&t=DO
-	 */
-
-	context.subscriptions.push(commands.registerCommand('f5-do.getDec', async () => {
-
-		await window.withProgress({
-			location: ProgressLocation.Notification,
-			title: `Getting DO Dec`
-		}, async () => {
-			// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/`);
-			// ext.panel.render(resp);
-
-			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding`, {
-				validateStatus: function (status: number) {
-					return status >= 200 && status < 300; // default
-				},
-			})
-				.then(resp => ext.panel.render(resp))
-				.catch(err => logger.error('get do declaration failed:', err));
-		});
-
-
-	}));
-
-	context.subscriptions.push(commands.registerCommand('f5-do.postDec', async () => {
-
-		var editor = window.activeTextEditor;
-		if (!editor) {
-			return; // No open text editor
-		}
-
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
-		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		}
-
-		if (!utils.isValidJson(text)) {
-			return window.showErrorMessage('Not valid JSON object');
-		}
-
-		await f5Api.postDoDec(JSON.parse(text))
-			.then(resp => {
-				ext.panel.render(resp);
-			})
-			.catch(err => {
-				ext.panel.render(err);
-			});
-	}));
-
-
-	context.subscriptions.push(commands.registerCommand('f5-do.inspect', async () => {
-
-		await window.withProgress({
-			location: ProgressLocation.Notification,
-			title: `Getting DO Inspect`
-		}, async () => {
-
-			// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/inspect`);
-			// ext.panel.render(resp);
-
-			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding/inspect`)
-				.then(resp => ext.panel.render(resp))
-				.catch(err => logger.error('get do inspect failed:', err));
-
-		});
-
-	}));
-
-
-
-	context.subscriptions.push(commands.registerCommand('f5-do.getTasks', async () => {
-
-		await window.withProgress({
-			location: ProgressLocation.Notification,
-			title: `Getting DO Tasks`
-		}, async () => {
-			// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/declarative-onboarding/task`);
-			// ext.panel.render(resp);
-
-			await ext.f5Client?.https(`/mgmt/shared/declarative-onboarding/task`)
-				.then(resp => ext.panel.render(resp))
-				.catch(err => logger.error('get do tasks failed:', err));
-		});
-	}));
 
 
 
@@ -1004,6 +930,10 @@ export async function activate(context: ExtensionContext) {
 
 					logger.debug('generic https f5 call -> ', text);
 					return await ext.f5Client?.https(text.url, {
+						validateStatus: function (status: number) {
+							// return status >= 200 && status < 300; // default
+							return true;    // return everything
+						},
 						method: text.method,
 						data: text.body
 					})

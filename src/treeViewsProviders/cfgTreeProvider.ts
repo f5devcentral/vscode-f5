@@ -26,7 +26,7 @@ import {
 import { ext } from '../extensionVariables';
 
 import { ConfigFile, Explosion, TmosApp, xmlStats } from 'f5-corkscrew';
-import logger from '../utils/logger';
+import { logger } from '../logger';
 import BigipConfig from 'f5-corkscrew/dist/ltm';
 
 // remodel everything here like this example:  https://github.com/microsoft/vscode-extension-samples/blob/master/tree-view-sample/src/testView.ts

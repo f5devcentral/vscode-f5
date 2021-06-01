@@ -10,16 +10,28 @@
 
 // import { utils } from "mocha";
 import { F5Client } from './f5Client';
-import { window, commands, workspace, ConfigurationTarget, ProgressLocation, Uri, ExtensionContext } from "vscode";
+import { 
+    window,
+    commands,
+    workspace,
+    ConfigurationTarget,
+    ProgressLocation,
+    Uri,
+    ExtensionContext,
+    OutputChannel
+} from "vscode";
 import { deviceImport } from "./deviceImport";
 import { ext } from "./extensionVariables";
 import { BigipHost } from "./models";
 import { F5TreeProvider } from "./treeViewsProviders/hostsTreeProvider";
-import logger from "./utils/logger";
 import * as utils from './utils/utils';
 import { Asset, HttpResponse, isArray, wait } from 'f5-conx-core';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { BigipTreeProvider } from './treeViewsProviders/bigipTreeProvider';
+
+
+import { logger } from './logger';
+
 
 // /**
 //  * #########################################################################
@@ -39,7 +51,7 @@ import { BigipTreeProvider } from './treeViewsProviders/bigipTreeProvider';
 /**
  * core devices/view functionality
  */
-export default function devicesCore(context: ExtensionContext) {
+export default function devicesCore(context: ExtensionContext, f5OutputChannel: OutputChannel) {
 
 
 
@@ -53,7 +65,7 @@ export default function devicesCore(context: ExtensionContext) {
     hostsTreeView.onDidChangeVisibility( e => {
         // set this up to respect if onConnect/terminal has been setup
         if(e.visible) {
-            logger.outputChannel?.show();
+            f5OutputChannel.show();
         }
     });
 
@@ -419,6 +431,10 @@ export default function devicesCore(context: ExtensionContext) {
 			if (!rpm) {
 				// get installed packages
 				const installedRPMs = await rpmMgmt.installedRPMs();
+
+                // utilize new method with 
+                // ext.f5Client.atc.showInstalled();
+
 				// have user select package
 				rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
 			} else {

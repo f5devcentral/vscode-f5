@@ -16,7 +16,6 @@
 // } from "vscode";
 // import { ext } from "./extensionVariables";
 // import * as rpmMgmt from './utils/rpmMgmt';
-// import logger from "./utils/logger";
 // import { Asset, HttpResponse, isArray } from 'f5-conx-core';
 // import { BigipTreeProvider } from "./treeViewsProviders/bigipTreeProvider";
 
