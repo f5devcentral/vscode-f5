@@ -11,6 +11,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.2.0] - (06-01-2021)
+
+- Added disconnect icon to ``F5 Hosts`` header
+  - Only visible when connected to a device
+- Fixed saving of connected device details
+  - This information shows up in the ``F5 Hosts`` view
+- Fixed logging class
+  - Logging Enchancements, like better http logging and error messaging
+  - Better singleton integration
+- 
+
+---
+
 ## [3.0.2] - (05-06-2021)
 
 - Updated package lock references to "lodash": ">=4.17.21", for CVE-2021-23337:  <https://github.com/advisories/GHSA-35jh-r3h4-6jhm>

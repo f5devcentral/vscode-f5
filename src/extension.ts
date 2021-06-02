@@ -52,7 +52,7 @@ import { Hovers } from './hovers';
 import { cfgExplore } from './cfgExploreCore';
 import { FastCore } from './fastCore';
 import { BigiqCore } from './bigiqCore';
-import { tokeTimer } from './tokeTimer';
+import { tokenTimer } from './tokenTimer';
 import { DoCore } from './doCore';
 
 // instantiate and import logger
@@ -109,7 +109,7 @@ export async function activate(context: ExtensionContext) {
 	ext.panel = new TextDocumentView();
 	ext.keyTar = keyTarType;
 
-	tokeTimer();
+	tokenTimer();
 
 
 	// do we prefer the class style of importing core blocks?

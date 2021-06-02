@@ -18,7 +18,7 @@ import {
   Selection,
   window
 } from 'vscode';
-import { isObject } from './treeViewsProviders/as3TreeProvider';
+import { isObject } from 'f5-conx-core';
 
 import { logger } from './logger';
 

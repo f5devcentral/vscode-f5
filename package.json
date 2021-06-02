@@ -283,7 +283,8 @@
 				"command": "f5.disconnect",
 				"title": "Disconnect from Device",
 				"category": "F5",
-				"enablement": "f5.device"
+				"enablement": "f5.device",
+				"icon": "$(debug-disconnect)"
 			},
 			{
 				"command": "f5.clearPassword",
@@ -784,6 +785,11 @@
 				{
 					"command": "f5.addHost",
 					"when": "view == f5Hosts",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.disconnect",
+					"when": "view == f5Hosts && f5.device",
 					"group": "navigation"
 				},
 				{

@@ -28,7 +28,7 @@ import * as utils from './utils/utils';
 import { Asset, HttpResponse, isArray, wait } from 'f5-conx-core';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { BigipTreeProvider } from './treeViewsProviders/bigipTreeProvider';
-
+import { tokenTimer } from './tokenTimer';
 
 import { logger } from './logger';
 
@@ -176,6 +176,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         // refresh host view to clear any dropdown menus
         ext.hostsTreeProvider.refresh();
         ext.hostsTreeProvider.connectedDevice = undefined;
+        tokenTimer(true);
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.clearPassword', async (item) => {
