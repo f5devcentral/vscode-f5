@@ -1,7 +1,20 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/**
+ * Copyright 2021 F5 Networks, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+'use strict';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -25,11 +38,6 @@ import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 
 type KeyTar = typeof keyTarType;
 
-// import Logger from 'f5-conx-core/dist/logger';
-// const logger = Logger.getLogger();
-
-// path.join(ext.context.extensionPath, 'cache');
-
 /**
  * Namespace for common variables used throughout the extension. 
  * They must be initialized in the activate() method of extension.ts
@@ -46,7 +54,8 @@ export namespace ext {
     export let connectBar: StatusBarItem;
     export let panel: TextDocumentView;
     export let cacheDir: string;
-    export let atcAgent: string;
+    export let teemEnv = 'F5_VSCODE_TEEM';
+    export let teemAgent: string;
 
     export namespace settings {
         export let as3PostAsync: boolean;
@@ -142,19 +151,26 @@ type ProxyCfg = {
 export async function loadSettings() {
     logger.debug('loading configuration');
     ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
-    
+
     ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.newEditorColumn', 'two'));
     ext.settings.httpResponseDetails = workspace.getConfiguration().get<string>("f5.httpResponseDetails", "full");
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
-    
+
     process.env[logger.logEnv] = workspace.getConfiguration().get<string>('f5.logLevel', 'INFO');
-    
+
+    process.env[ext.teemEnv] = workspace.getConfiguration().get<boolean>('f5.TEEM', true).toString();
+
     logger.info('------ Environment Variables ------');
     // log envs
     Object.entries(process.env)
-        .filter( el => el[0].startsWith('F5_CONX_') )
-        .forEach(el => logger.info(`${el[0]}=${el[1]}`) );
+        .filter(el => el[0].startsWith('F5_CONX_'))
+        .forEach(el => logger.info(`${el[0]}=${el[1]}`));
+
+    // move to this env format, remove above when conx supports dynamic env assignment at instantiation
+    Object.entries(process.env)
+        .filter(el => el[0].startsWith('F5_VSCODE_'))
+        .forEach(el => logger.info(`${el[0]}=${el[1]}`));
 
 }
 

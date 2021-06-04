@@ -1,16 +1,24 @@
-/*
- * Copyright 2020. F5 Networks, Inc. See End User License Agreement ("EULA") for
- * license terms. Notwithstanding anything to the contrary in the EULA, Licensee
- * may copy and modify this software product for its internal business purposes.
- * Further, Licensee may upload, publish and distribute the modified version of
- * the software product on devcentral.f5.com or github.com/f5devcentral.
+/**
+ * Copyright 2021 F5 Networks, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-'use strict';
+ 'use strict';
 
 // import { utils } from "mocha";
 import { F5Client } from './f5Client';
-import { 
+import {
     window,
     commands,
     workspace,
@@ -62,9 +70,9 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         showCollapseAll: true
     });
 
-    hostsTreeView.onDidChangeVisibility( e => {
+    hostsTreeView.onDidChangeVisibility(e => {
         // set this up to respect if onConnect/terminal has been setup
-        if(e.visible) {
+        if (e.visible) {
             f5OutputChannel.show();
         }
     });
@@ -81,7 +89,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
 
 
-    
+
     context.subscriptions.push(commands.registerCommand('f5.refreshHostsTree', () => ext.hostsTreeProvider.refresh()));
 
     context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {
@@ -117,13 +125,13 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         var [user, host] = device.device.split('@');
 
         let port;
-        if(/:/.test(host)) {
+        if (/:/.test(host)) {
             const hostSplit = host.split(':');
             port = hostSplit.pop();
             host = hostSplit.join(':');
 
             // if we stil have a ":", then it's an IPv6, so wrap it in brackets "[ipv6]"
-            if(/:/.test(host)) {
+            if (/:/.test(host)) {
                 host = `[${host}]`;
             }
         }
@@ -136,7 +144,10 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
             provider: device.provider,
         },
             ext.eventEmitterGlobal,
-            ext.extHttp);
+            ext.extHttp,
+            ext.teemEnv,
+            ext.teemAgent
+        );
 
         await ext.f5Client.connect()
             .then(connect => {
@@ -151,10 +162,10 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
                 bigipProvider.connected = ext.f5Client;
                 bigipProvider.refresh();
-                
+
                 ext.as3Tree.refresh();
             })
-            .catch(err => logger.error('Connect/Discover failed', err) );
+            .catch(err => logger.error('Connect/Discover failed', err));
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {
@@ -341,139 +352,139 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
 
 
-       
-	/**
-	 * ###########################################################################
-	 * 
-	 * 				RRRRRR     PPPPPP     MM    MM 
-	 * 				RR   RR    PP   PP    MMM  MMM 
-	 * 				RRRRRR     PPPPPP     MM MM MM 
-	 * 				RR  RR     PP         MM    MM 
-	 * 				RR   RR    PP         MM    MM 
-	 * 
-	 * ############################################################################
-	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
-	 */
 
-	context.subscriptions.push(commands.registerCommand('f5.installRPM', async (selectedRPM) => {
+    /**
+     * ###########################################################################
+     * 
+     * 				RRRRRR     PPPPPP     MM    MM 
+     * 				RR   RR    PP   PP    MMM  MMM 
+     * 				RRRRRR     PPPPPP     MM MM MM 
+     * 				RR  RR     PP         MM    MM 
+     * 				RR   RR    PP         MM    MM 
+     * 
+     * ############################################################################
+     * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=FAST
+     */
 
-		const downloadResponses = [];
-		const upLoadResponses = [];
-		let rpm: Asset;
-		let signature;
-		let installed: HttpResponse;
+    context.subscriptions.push(commands.registerCommand('f5.installRPM', async (selectedRPM) => {
+
+        const downloadResponses = [];
+        const upLoadResponses = [];
+        let rpm: Asset;
+        let signature;
+        let installed: HttpResponse;
 
 
-		if (isArray(selectedRPM)) {
+        if (isArray(selectedRPM)) {
 
-			window.withProgress({
+            window.withProgress({
                 location: { viewId: 'ipView' }
-			}, async () => {
+            }, async () => {
 
-				rpm = selectedRPM.filter((el: Asset) => el.name.endsWith('.rpm'))[0];
-				signature = selectedRPM.filter((el: Asset) => el.name.endsWith('.sha256'))[0];
+                rpm = selectedRPM.filter((el: Asset) => el.name.endsWith('.rpm'))[0];
+                signature = selectedRPM.filter((el: Asset) => el.name.endsWith('.sha256'))[0];
 
-				// setup logic to see what atc service is being installed, and compare that with what might already be installed
-				//  work through process for un-installing, then installing new package
+                // setup logic to see what atc service is being installed, and compare that with what might already be installed
+                //  work through process for un-installing, then installing new package
 
-				if (rpm) {
+                if (rpm) {
 
-					await ext.f5Client?.atc.download(rpm.browser_download_url)
-						.then(async resp => {
+                    await ext.f5Client?.atc.download(rpm.browser_download_url)
+                        .then(async resp => {
 
-							// assign rpm name to variable
-							downloadResponses.push(resp);
-							await new Promise(resolve => { setTimeout(resolve, 1000); });
+                            // assign rpm name to variable
+                            downloadResponses.push(resp);
+                            await new Promise(resolve => { setTimeout(resolve, 1000); });
 
-							await ext.f5Client?.atc.uploadRpm(resp.data.file)
-								.then(async uploadResp => {
+                            await ext.f5Client?.atc.uploadRpm(resp.data.file)
+                                .then(async uploadResp => {
 
-									await new Promise(resolve => { setTimeout(resolve, 1000); });
-									upLoadResponses.push(uploadResp);
-									await ext.f5Client?.atc.install(rpm.name)
-										.then(resp => installed = resp);
-								});
-						})
-						.catch(err => {
+                                    await new Promise(resolve => { setTimeout(resolve, 1000); });
+                                    upLoadResponses.push(uploadResp);
+                                    await ext.f5Client?.atc.install(rpm.name)
+                                        .then(resp => installed = resp);
+                                });
+                        })
+                        .catch(err => {
 
-							// todo: setup error logging
-							debugger;
-						});
-				}
-				if (signature) {
+                            // todo: setup error logging
+                            debugger;
+                        });
+                }
+                if (signature) {
 
-					await ext.f5Client?.atc.download(rpm.browser_download_url)
-						.then(async resp => {
-							await ext.f5Client?.atc.uploadRpm(resp.data.file);
-						})
-						.catch(err => {
-							// todo: setup error logging
-							debugger;
-						});
-				}
+                    await ext.f5Client?.atc.download(rpm.browser_download_url)
+                        .then(async resp => {
+                            await ext.f5Client?.atc.uploadRpm(resp.data.file);
+                        })
+                        .catch(err => {
+                            // todo: setup error logging
+                            debugger;
+                        });
+                }
 
 
-				if (installed) {
-					await new Promise(resolve => { setTimeout(resolve, 1000); });
-					await ext.f5Client?.connect(); // refresh connect/status bars
-					await new Promise(resolve => { setTimeout(resolve, 1000); });
-					bigipProvider.refresh();
-				}
-			});
-		}
-	}));
+                if (installed) {
+                    await new Promise(resolve => { setTimeout(resolve, 1000); });
+                    await ext.f5Client?.connect(); // refresh connect/status bars
+                    await new Promise(resolve => { setTimeout(resolve, 1000); });
+                    bigipProvider.refresh();
+                }
+            });
+        }
+    }));
 
-	context.subscriptions.push(commands.registerCommand('f5.unInstallRPM', async (rpm) => {
+    context.subscriptions.push(commands.registerCommand('f5.unInstallRPM', async (rpm) => {
 
-		window.withProgress({
-			location: { viewId: 'ipView' }
-		}, async () => {
-			// if no rpm sent in from update command
-			if (!rpm) {
-				// get installed packages
-				const installedRPMs = await rpmMgmt.installedRPMs();
+        window.withProgress({
+            location: { viewId: 'ipView' }
+        }, async () => {
+            // if no rpm sent in from update command
+            if (!rpm) {
+                // get installed packages
+                const installedRPMs = await rpmMgmt.installedRPMs();
 
                 // utilize new method with 
                 // ext.f5Client.atc.showInstalled();
 
-				// have user select package
-				rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
-			} else {
-				// rpm came from new rpm hosts view
-				if (rpm.label && rpm.tooltip) {
+                // have user select package
+                rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
+            } else {
+                // rpm came from new rpm hosts view
+                if (rpm.label && rpm.tooltip) {
 
 
-					await ext.f5Client?.atc.showInstalled()
-						.then(async resp => {
-							// loop through response, find rpm that matches rpm.label, then uninstall
-							const rpmName = resp.data.queryResponse.filter((el: { name: string }) => el.name === rpm.tooltip)[0];
-							return await ext.f5Client?.atc.unInstall(rpmName.packageName);
+                    await ext.f5Client?.atc.showInstalled()
+                        .then(async resp => {
+                            // loop through response, find rpm that matches rpm.label, then uninstall
+                            const rpmName = resp.data.queryResponse.filter((el: { name: string }) => el.name === rpm.tooltip)[0];
+                            return await ext.f5Client?.atc.unInstall(rpmName.packageName);
 
-						});
+                        });
 
 
 
-				}
+                }
 
-			}
+            }
 
-			if (!rpm) {	// return error pop-up if quickPick escaped
-				// return window.showWarningMessage('user exited - did not select rpm to un-install');
-				logger.info('user exited - did not select rpm to un-install');
-			}
+            if (!rpm) {	// return error pop-up if quickPick escaped
+                // return window.showWarningMessage('user exited - did not select rpm to un-install');
+                logger.info('user exited - did not select rpm to un-install');
+            }
 
-			// const status = await rpmMgmt.unInstallRpm(rpm);
-			// window.showInformationMessage(`rpm ${rpm} removal ${status}`);
-			// debugger;
+            // const status = await rpmMgmt.unInstallRpm(rpm);
+            // window.showInformationMessage(`rpm ${rpm} removal ${status}`);
+            // debugger;
 
-			// used to pause between uninstalling and installing a new version of the same atc
-			//		should probably put this somewhere else
-			await new Promise(resolve => { setTimeout(resolve, 10000); });
-			await ext.f5Client?.connect(); // refresh connect/status bars
-			// ext.hostsTreeProvider.refresh();
+            // used to pause between uninstalling and installing a new version of the same atc
+            //		should probably put this somewhere else
+            await new Promise(resolve => { setTimeout(resolve, 10000); });
+            await ext.f5Client?.connect(); // refresh connect/status bars
+            // ext.hostsTreeProvider.refresh();
             await new Promise(resolve => { setTimeout(resolve, 500); });
             bigipProvider.refresh('ATC');
-			
-		});
-	}));
+
+        });
+    }));
 }

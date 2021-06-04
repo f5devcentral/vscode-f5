@@ -101,7 +101,7 @@ export async function activate(context: ExtensionContext) {
 	// load ext config to ext.settings.
 	await loadSettings();
 
-	ext.atcAgent = `${packageJson.name}/${packageJson.version}`;
+	ext.teemAgent = `${packageJson.name}/${packageJson.version}`;
 
 	ext.connectBar = window.createStatusBarItem(StatusBarAlignment.Left, 9);
 	ext.connectBar.command = 'f5.connectDevice';

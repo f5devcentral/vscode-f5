@@ -217,6 +217,12 @@
 						"scope": "resource",
 						"description": "Show everything in a new editor tab"
 					},
+					"f5.TEEM": {
+						"type": "boolean",
+						"default": true,
+						"scope": "resource",
+						"description": "F5 TEEM - anonymous usage analytics"
+					},
 					"f5.newEditorColumn": {
 						"type": "string",
 						"enum": [
