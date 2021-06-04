@@ -14,7 +14,6 @@ import {
     window
 } from "vscode";
 import * as keyTarType from "keytar";
-// import { MgmtClient } from './utils/f5DeviceClient.ts.old';
 import { logger } from "./logger";
 import { TextDocumentView } from './editorViews/editorView';
 import { EventEmitter } from "events";
@@ -47,6 +46,7 @@ export namespace ext {
     export let connectBar: StatusBarItem;
     export let panel: TextDocumentView;
     export let cacheDir: string;
+    export let atcAgent: string;
 
     export namespace settings {
         export let as3PostAsync: boolean;

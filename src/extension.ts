@@ -57,6 +57,7 @@ import { DoCore } from './doCore';
 
 // instantiate and import logger
 import { logger } from './logger';
+import { AdcDeclaration, As3Declaration } from 'f5-conx-core';
 
 // turn off console logging
 logger.console = false;
@@ -99,6 +100,8 @@ export async function activate(context: ExtensionContext) {
 
 	// load ext config to ext.settings.
 	await loadSettings();
+
+	ext.atcAgent = `${packageJson.name}/${packageJson.version}`;
 
 	ext.connectBar = window.createStatusBarItem(StatusBarAlignment.Left, 9);
 	ext.connectBar.command = 'f5.connectDevice';
@@ -584,36 +587,47 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-as3.postDec', async () => {
 
-		var editor = window.activeTextEditor;
-		if (!editor) {
-			return; // No open text editor
-		}
+		// var editor = window.activeTextEditor;
+		// if (!editor) {
+		// 	return; // No open text editor
+		// }
 
-		let text: string;
-		if (editor.selection.isEmpty) {
-			text = editor.document.getText();	// entire editor/doc window
-		} else {
-			text = editor.document.getText(editor.selection);	// highlighted text
-		}
+		// let text: string;
+		// if (editor.selection.isEmpty) {
+		// 	text = editor.document.getText();	// entire editor/doc window
+		// } else {
+		// 	text = editor.document.getText(editor.selection);	// highlighted text
+		// }
 
-		if (!utils.isValidJson(text)) {
-			return window.showErrorMessage('Not valid JSON object');
-		}
+		await utils.getText()
+		.then( async text => {
 
-		await window.withProgress({
-			// location: { viewId: 'as3Tenants'},
-			location: ProgressLocation.Notification,
-			title: `Posting AS3 Declaration`
-		}, async () => {
+			if (!utils.isValidJson(text)) {
+				return window.showErrorMessage('Not valid JSON object');
+			}
 
-			await ext.f5Client?.as3?.postDec(JSON.parse(text))
-				.then(resp => {
-					ext.panel.render(resp);
-					ext.as3Tree.refresh();
-				})
-				.catch(err => logger.error('as3 post dec failed:', err));
+			// const dec: As3Declaration | AdcDeclaration = JSON.parse(text);
+			const dec = JSON.parse(text);
 
+			await window.withProgress({
+				// location: { viewId: 'as3Tenants'},
+				location: ProgressLocation.Notification,
+				title: `Posting AS3 Declaration`
+			}, async () => {
+	
+				await ext.f5Client?.as3?.postDec(dec)
+					.then(resp => {
+						ext.panel.render(resp);
+						ext.as3Tree.refresh();
+					})
+					.catch(err => logger.error('as3 post dec failed:', err));
+	
+			});
 		});
+
+
+
+
 
 
 	}));
