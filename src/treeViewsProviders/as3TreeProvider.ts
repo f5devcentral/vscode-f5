@@ -225,7 +225,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 							const appStats = await as3AppStats(appDec[app[0]] as object);
 							const appCount = Object.keys(appStats as unknown as object).length.toString();
 							treeItems.push(
-								new AS3item(app[0], appCount, toolTip, 'as3App', TreeItemCollapsibleState.Collapsed,
+								new AS3item(app[0], appCount, toolTip, 'as3App', TreeItemCollapsibleState.None,
 									{ command: '', title: '', arguments: [] })
 							);
 						});
@@ -233,36 +233,36 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 
 					treeItems = sortTreeItems(treeItems);
 
-				} else if (element.context === 'as3App') {
+				// } else if (element.context === 'as3App') {
 
-					if (!this.as3DeclareMap) {
-						return; // this should never happen, but TS needs it...
-					}
+				// 	if (!this.as3DeclareMap) {
+				// 		return; // this should never happen, but TS needs it...
+				// 	}
 
-					let as3DecMap: any;
-					if (/\//.test(element.tooltip as string) && this.as3DeclareMap) {
-						if (typeof element.tooltip === 'string') {
-							const [target, tenant] = element.tooltip.split('/');
-							as3DecMap = this.as3DeclareMap[target][tenant][element.label];
-						}
-					} else {
-						if (typeof element.tooltip === 'string') {
-							as3DecMap = this.as3DeclareMap[element.tooltip][element.label];
-						}
-					}
+				// 	let as3DecMap: any;
+				// 	if (/\//.test(element.tooltip as string) && this.as3DeclareMap) {
+				// 		if (typeof element.tooltip === 'string') {
+				// 			const [target, tenant] = element.tooltip.split('/');
+				// 			as3DecMap = this.as3DeclareMap[target][tenant][element.label];
+				// 		}
+				// 	} else {
+				// 		if (typeof element.tooltip === 'string') {
+				// 			as3DecMap = this.as3DeclareMap[element.tooltip][element.label];
+				// 		}
+				// 	}
 
-					Object.entries(as3DecMap).forEach(([key, value]) => {
+				// 	Object.entries(as3DecMap).forEach(([key, value]) => {
 
-						// since value is unknown at this point, cast it to a number, then convert to string
-						const count = (value as number).toString();
-						treeItems.push(
-							new AS3item(key, count, '', '', TreeItemCollapsibleState.None,
-								{ command: '', title: '', arguments: [] }
-							)
-						);
-					});
+				// 		// since value is unknown at this point, cast it to a number, then convert to string
+				// 		const count = (value as number).toString();
+				// 		treeItems.push(
+				// 			new AS3item(key, count, '', '', TreeItemCollapsibleState.None,
+				// 				{ command: '', title: '', arguments: [] }
+				// 			)
+				// 		);
+				// 	});
 
-					treeItems = sortTreeItems(treeItems);
+				// 	treeItems = sortTreeItems(treeItems);
 
 				} else if (element.label === 'Tasks') {
 

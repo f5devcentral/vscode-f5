@@ -92,9 +92,7 @@ export class F5Client extends _F5Client {
                 return new Error(`User canceled device connect`);
             });
 
-            let returnInfo: string[] = [];
-
-            await this.discover();
+            const deviceDetails = await this.discover();
 
             if (this.host) {
 
@@ -108,11 +106,7 @@ export class F5Client extends _F5Client {
                 this.hostNameBar.show();
 
                 ext.connectBar.hide();      // hide connect bar
-                returnInfo.push(
-                    this.host.hostname,
-                    this.host.version,
-                    this.host.product
-                );
+
 
                 //********** enable irules view **********/
                 if (this.host.product === 'BIG-IP') {
@@ -145,7 +139,6 @@ export class F5Client extends _F5Client {
                 this.fastBar.text = `FAST(${this.fast.version.version})`;
                 this.fastBar.show();
                 commands.executeCommand('setContext', 'f5.fastInstalled', true);
-                returnInfo.push(this.fastBar.text);
 
             }
 
@@ -157,7 +150,6 @@ export class F5Client extends _F5Client {
                 this.as3Bar.tooltip = `CLICK FOR ALL TENANTS \r\nschemaCurrent: ${this.as3.version.schemaCurrent} `;
                 this.as3Bar.show();
                 commands.executeCommand('setContext', 'f5.as3Installed', true);
-                returnInfo.push(this.as3Bar.text);
 
             }
 
@@ -169,7 +161,6 @@ export class F5Client extends _F5Client {
                 this.doBar.tooltip = `schemaCurrent: ${this.do.version.version} `;
                 this.doBar.show();
                 commands.executeCommand('setContext', 'f5.doInstalled', true);
-                returnInfo.push(this.doBar.text);
 
             }
 
@@ -181,7 +172,6 @@ export class F5Client extends _F5Client {
                 this.tsBar.tooltip = `nodeVersion: ${this.ts.version.version}\r\nschemaCurrent: ${this.ts.version.schemaCurrent} `;
                 this.tsBar.show();
                 commands.executeCommand('setContext', 'f5.tsInstalled', true);
-                returnInfo.push(this.tsBar.text);
 
             }
 
@@ -193,11 +183,10 @@ export class F5Client extends _F5Client {
                 this.cfBar.tooltip = `nodeVersion: ${this.cf.version.version}\r\nschemaCurrent: ${this.cf.version.schemaCurrent} `;
                 this.cfBar.show();
                 commands.executeCommand('setContext', 'f5.cfInstalled', true);
-                returnInfo.push(this.cfBar.text);
 
             }
 
-            return returnInfo;
+            return deviceDetails;
         });
         this.termConnect();
         return progress;

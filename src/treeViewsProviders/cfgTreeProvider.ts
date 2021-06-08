@@ -80,6 +80,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 .then(exp => {
                     this.explosion = exp;
                     ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extraction complete`);
+                    ext.eventEmitterGlobal.emit('log-info', exp.stats);
                     this.refresh();
                 })
                 .catch(err => logger.error('makeExplosion', err));

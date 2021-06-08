@@ -155,7 +155,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                 // cache password in keytar
                 ext.keyTar.setPassword('f5Hosts', device.device, password);
 
-                logger.debug('F5 Connect Discovered', connect);
+                logger.info('F5 Connect Discovered', connect);
 
                 ext.hostsTreeProvider.connectedDevice = ext.f5Client;
                 ext.hostsTreeProvider.refresh();

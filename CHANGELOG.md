@@ -11,7 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [3.2.0] - (06-01-2021)
+## [3.1.0] - (06-08-2021)
 
 - Added disconnect icon to ``F5 Hosts`` header
   - Only visible when connected to a device
@@ -20,7 +20,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Fixed logging class
   - Logging Enchancements, like better http logging and error messaging
   - Better singleton integration
-- 
+- Updated injectSchema to use schema/examples definitions moved to f5-conx-core
+  - Removed details from extensionVariables
+- Added parent "DO" class detection and schema to "inject schema" command for BIG-IQ declarations
+- fixed config explorer not displaying stats after extraction
+- Removed app components from AS3 tree view to simplify what users see
 
 ---
 
