@@ -67,7 +67,7 @@ const f5OutputChannel = window.createOutputChannel('f5');
 
 // inject vscode output into logger
 logger.output = function (log: string) {
-    f5OutputChannel.appendLine(log);
+	f5OutputChannel.appendLine(log);
 };
 
 // load project package details to get logged
@@ -84,13 +84,15 @@ export async function activate(context: ExtensionContext) {
 		name: packageJson.name,
 		displayName: packageJson.displayName,
 		publisher: packageJson.publisher,
-        description: packageJson.description,
-        version: packageJson.version,
-        license: packageJson.license,
-        repository: packageJson.repository.url,
-		host: JSON.stringify({ hostOS: os.type(),
-		platform: os.platform(),
-		release: os.release()}),
+		description: packageJson.description,
+		version: packageJson.version,
+		license: packageJson.license,
+		repository: packageJson.repository.url,
+		host: JSON.stringify({
+			hostOS: os.type(),
+			platform: os.platform(),
+			release: os.release()
+		}),
 		userInfo: JSON.stringify(os.userInfo())
 	});
 
@@ -181,26 +183,26 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('f5-fast.deployApp', async () => {
 
 		await utils.getText()
-		.then( async text => {
+			.then(async text => {
 
-			// TODO: make this a try sequence to only parse the json once
-			let jsonText: object;
-			if (utils.isValidJson(text)) {
-				jsonText = JSON.parse(text);
-			} else {
-				window.showWarningMessage(`Not valid json object`);
-				return;
-			}
-	
-			const resp = await f5FastApi.deployFastApp(jsonText);
-	
-			ext.panel.render(resp);
-	
-			// give a little time to finish before refreshing trees
-			await new Promise(resolve => { setTimeout(resolve, 3000); });
-			fastTreeProvider.refresh();
-			ext.as3Tree.refresh();
-		});
+				// TODO: make this a try sequence to only parse the json once
+				let jsonText: object;
+				if (utils.isValidJson(text)) {
+					jsonText = JSON.parse(text);
+				} else {
+					window.showWarningMessage(`Not valid json object`);
+					return;
+				}
+
+				const resp = await f5FastApi.deployFastApp(jsonText);
+
+				ext.panel.render(resp);
+
+				// give a little time to finish before refreshing trees
+				await new Promise(resolve => { setTimeout(resolve, 3000); });
+				fastTreeProvider.refresh();
+				ext.as3Tree.refresh();
+			});
 
 	}));
 
@@ -600,30 +602,30 @@ export async function activate(context: ExtensionContext) {
 		// }
 
 		await utils.getText()
-		.then( async text => {
+			.then(async text => {
 
-			if (!utils.isValidJson(text)) {
-				return window.showErrorMessage('Not valid JSON object');
-			}
+				if (!utils.isValidJson(text)) {
+					return window.showErrorMessage('Not valid JSON object');
+				}
 
-			// const dec: As3Declaration | AdcDeclaration = JSON.parse(text);
-			const dec = JSON.parse(text);
+				// const dec: As3Declaration | AdcDeclaration = JSON.parse(text);
+				const dec = JSON.parse(text);
 
-			await window.withProgress({
-				// location: { viewId: 'as3Tenants'},
-				location: ProgressLocation.Notification,
-				title: `Posting AS3 Declaration`
-			}, async () => {
-	
-				await ext.f5Client?.as3?.postDec(dec)
-					.then(resp => {
-						ext.panel.render(resp);
-						ext.as3Tree.refresh();
-					})
-					.catch(err => logger.error('as3 post dec failed:', err));
-	
+				await window.withProgress({
+					// location: { viewId: 'as3Tenants'},
+					location: ProgressLocation.Notification,
+					title: `Posting AS3 Declaration`
+				}, async () => {
+
+					await ext.f5Client?.as3?.postDec(dec)
+						.then(resp => {
+							ext.panel.render(resp);
+							ext.as3Tree.refresh();
+						})
+						.catch(err => logger.error('as3 post dec failed:', err));
+
+				});
 			});
-		});
 
 
 
