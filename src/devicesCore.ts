@@ -165,10 +165,13 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
                 ext.as3Tree.refresh();
             })
-            .catch(err => logger.error('Connect/Discover failed', err));
+            .catch(err => {
+                logger.error('Connect/Discover failed', err);
+            });
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {
+        const x = ext.f5Client;
         ext.f5Client?.https('/mgmt/tm/auth/source')
             .then(resp => ext.panel.render(resp));
     }));

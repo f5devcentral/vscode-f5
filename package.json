@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.1.0",
+	"version": "3.2.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -216,6 +216,12 @@
 						"default": false,
 						"scope": "resource",
 						"description": "Show everything in a new editor tab"
+					},
+					"f5.rejectUnauthorizedBIGIP": {
+						"type": "boolean",
+						"default": false,
+						"scope": "resource",
+						"description": "Enables certificate verification when connecting to BIG-IP/TMOS devices (for enhanced security - does not allow self-signed mgmt certificates)"
 					},
 					"f5.TEEM": {
 						"type": "boolean",
@@ -1161,7 +1167,7 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"axios": "^0.21.1",
-		"f5-conx-core": "file:../f5-conx-core/f5-conx-core-0.10.0.tgz",
+		"f5-conx-core": "file:../f5-conx-core/f5-conx-core-0.11.0.tgz",
 		"f5-corkscrew": "github:f5devcentral/f5-corkscrew#certs",
 		"js-yaml": "4.0.0",
 		"keytar": "^7.6.0"

@@ -91,7 +91,7 @@ export async function initSettings(context: ExtensionContext) {
     process.env.F5_CONX_CORE_EXT_HTTP_AGENT = 'The F5 VScode Extension';
     process.env.F5_CONX_CORE_CACHE = ext.cacheDir;
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
     ext.extHttp = new ExtHttp({ rejectUnauthorized: false, eventEmitter: ext.eventEmitterGlobal });
     ext.extHttp.cacheDir = ext.cacheDir;
@@ -161,6 +161,8 @@ export async function loadSettings() {
 
     process.env[ext.teemEnv] = workspace.getConfiguration().get<boolean>('f5.TEEM', true).toString();
 
+    process.env.F5_CONX_CORE_REJECT_UNAUTORIZED = workspace.getConfiguration().get<boolean>('f5.rejectUnauthorizedBIGIP', false).toString();
+
     logger.info('------ Environment Variables ------');
     // log envs
     Object.entries(process.env)
@@ -171,6 +173,10 @@ export async function loadSettings() {
     Object.entries(process.env)
         .filter(el => el[0].startsWith('F5_VSCODE_'))
         .forEach(el => logger.info(`${el[0]}=${el[1]}`));
+
+    if(process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
+        logger.info(`NODE_TLS_REJECT_UNAUTHORIZED=${process.env.NODE_TLS_REJECT_UNAUTHORIZED}`);
+    }
 
 }
 
