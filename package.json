@@ -217,6 +217,14 @@
 						"scope": "resource",
 						"description": "Show everything in a new editor tab"
 					},
+					"f5.cookie": {
+						"type": "string",
+						"scope": "resource",
+						"examples": [
+							"udf.sid=s%3Amg839-IRnZLDxBQXEQzq_eJgqJtfnGnI.6kWv2OBbcxFWopMn4ZUeOIobomMUHzEBrCO9MYRmUqc;cookie2=peanutbutter"
+						],
+						"markdownDescription": "Cookies to inject into calls made to F5 TMOS devices --- > udf.sid=s%3Amg839-IRnZLDxBQXEQzq_eJgqJtfnGnI.6kWv2OBbcxFWopMn4ZUeOIobomMUHzEBrCO9MYRmUqc;cookie2=peanutbutter"
+					},
 					"f5.rejectUnauthorizedBIGIP": {
 						"type": "boolean",
 						"default": false,

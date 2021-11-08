@@ -162,17 +162,26 @@ export async function loadSettings() {
     process.env[ext.teemEnv] = workspace.getConfiguration().get<boolean>('f5.TEEM', true).toString();
 
     process.env.F5_CONX_CORE_REJECT_UNAUTORIZED = workspace.getConfiguration().get<boolean>('f5.rejectUnauthorizedBIGIP', false).toString();
-
+    
+    // get cookie config from vscode and place in env
+    const cookie = workspace.getConfiguration().get<string>('f5.cookie');
+    if (cookie) {
+        process.env.F5_CONX_CORE_COOKIES = cookie;
+    } else {
+        // clear if not found
+        delete process.env.F5_CONX_CORE_COOKIES;
+    }
+    
     logger.info('------ Environment Variables ------');
     // log envs
     Object.entries(process.env)
-        .filter(el => el[0].startsWith('F5_CONX_'))
+        .filter(el => el[0].startsWith('F5_'))
         .forEach(el => logger.info(`${el[0]}=${el[1]}`));
 
-    // move to this env format, remove above when conx supports dynamic env assignment at instantiation
-    Object.entries(process.env)
-        .filter(el => el[0].startsWith('F5_VSCODE_'))
-        .forEach(el => logger.info(`${el[0]}=${el[1]}`));
+    // // move to this env format, remove above when conx supports dynamic env assignment at instantiation
+    // Object.entries(process.env)
+    //     .filter(el => el[0].startsWith('F5_VSCODE_'))
+    //     .forEach(el => logger.info(`${el[0]}=${el[1]}`));
 
     if(process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
         logger.info(`NODE_TLS_REJECT_UNAUTHORIZED=${process.env.NODE_TLS_REJECT_UNAUTHORIZED}`);
