@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.2.0",
+	"version": "3.2.1",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -1175,8 +1175,8 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"axios": "^0.21.1",
-		"f5-conx-core": "file:../f5-conx-core/f5-conx-core-0.11.0.tgz",
-		"f5-corkscrew": "github:f5devcentral/f5-corkscrew#certs",
+		"f5-conx-core": "^0.11.0",
+		"f5-corkscrew": "^0.9.2",
 		"js-yaml": "4.0.0",
 		"keytar": "^7.6.0"
 	}

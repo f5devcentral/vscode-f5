@@ -11,6 +11,39 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.2.1] - (11-23-2021)
+
+- f5-corkscrew and f5-conx-core packages now install from npm registry
+  - this will allow for better version tracking and automation
+
+---
+
+## [3.2.0] - (11-09-2021)
+
+- f5-conx-core - v0.11.0
+  - added cookie insert to BIGIP mgmt client.  This is for injecting auth cookie for UDF
+    - <https://github.com/f5devcentral/f5-conx-core/issues/1>
+  - fixed atc versions update test
+    - <https://github.com/f5devcentral/f5-conx-core/issues/13>
+  - option to enable/disable cert verification
+    - <https://github.com/f5devcentral/f5-conx-core/issues/2>
+
+- f5-corkscrew - v0.9.0
+  - fixed parsing error when no virtual servers
+  - fixed cli (was not working with new async parser)
+  - added cli options
+    - All output is in json format now
+    - includes command processing logs
+    - added switches to exclude output for:
+      - no_sources
+      - no_file_store
+      - no_command_logs
+      - no_conversion_logs
+  - started creating tests archive generator
+  - started looking into adding an option for exploring archives with passphrase
+
+---
+
 ## [3.1.0] - (06-08-2021)
 
 - Added disconnect icon to ``F5 Hosts`` header
