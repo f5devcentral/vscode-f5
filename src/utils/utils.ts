@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { window, workspace } from 'vscode';
 import { ext } from '../extensionVariables';
 import { logger } from '../logger';
 
@@ -8,12 +8,12 @@ import { logger } from '../logger';
  * @param item json object to display in new editor
  */
 export async function displayJsonInEditor(item: object): Promise<any> {
-    return vscode.workspace.openTextDocument({ 
+    return workspace.openTextDocument({ 
         language: 'json', 
         content: JSON.stringify(item, undefined, 4) 
     })
     .then( doc => 
-        vscode.window.showTextDocument(
+        window.showTextDocument(
             doc, 
             { 
                 preview: false 
@@ -28,12 +28,12 @@ export async function displayJsonInEditor(item: object): Promise<any> {
  * @param item json object to display in new editor for mst
  */
 export async function displayMstInEditor(item: object): Promise<any> {
-    vscode.workspace.openTextDocument({ 
+    workspace.openTextDocument({ 
         language: 'handlebars', 
         content: JSON.stringify(item, undefined, 4) 
     })
     .then( doc => 
-        vscode.window.showTextDocument(
+        window.showTextDocument(
             doc, 
             { 
                 preview: false 
@@ -48,11 +48,11 @@ export async function displayMstInEditor(item: object): Promise<any> {
  * @param item string to display in new editor
  */
 export async function displayInTextEditor(text: string): Promise<void> {
-    vscode.workspace.openTextDocument({ 
+    workspace.openTextDocument({ 
         content: text 
     })
     .then( doc => 
-        vscode.window.showTextDocument(
+        window.showTextDocument(
             doc, 
             { 
                 preview: false 
@@ -92,7 +92,7 @@ export async function getPassword(device: string): Promise<any> {
     // logger.debug(`IS PASSWORD IN KEYTAR?: ${password}`);
     if (!password) {
         // logger.debug(`NO PASSWORD IN KEYTAR! - PROMPTING!!! - ${password}`);
-        password = await vscode.window.showInputBox({
+        password = await window.showInputBox({
             placeHolder: 'Password',
             prompt: 'Input device password:  ',
             password: true
@@ -115,7 +115,7 @@ export async function getPassword(device: string): Promise<any> {
 export async function getText(): Promise<string> {
 
     // get editor window
-    var editor = vscode.window.activeTextEditor;
+    var editor = window.activeTextEditor;
     if (editor) {	
         // capture selected text or all text in editor
         if (editor.selection.isEmpty) {

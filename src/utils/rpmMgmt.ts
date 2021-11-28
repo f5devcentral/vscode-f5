@@ -2,20 +2,9 @@
 
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-// import { downloadToFile } from './coreF5HTTPS';
-// import { callHTTPS } from '../utils/externalAPIs';
-import axios from 'axios';
-// import * as utils from './utils';
 import * as path from 'path';
 import * as fs from 'fs';
 import { logger } from '../logger';
-
-// import { MgmtClient } from './f5DeviceClient';
-// import { emitWarning } from 'process';
-
-
-// axios.defaults.headers.common['Content-Type'] = 'application/json';
-// axios.defaults.headers.common['User-Agent'] = 'F5 VSCode FAST Extension';
 
 const FAST_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-appsvcs-templates/releases';
 const AS3_GIT_RELEASES = 'https://api.github.com/repos/F5Networks/f5-appsvcs-extension/releases';
@@ -315,7 +304,7 @@ export async function rpmInstaller (rpm: string) {
  */
 export async function getRPMgit(assetUrl: string, dir?: string) {
     // get release asset information
-    const resp = await axios(assetUrl);
+    const resp = await ext.extHttp.makeRequest( { url: assetUrl });
     // logger.debug('Getting github asset details', resp);
     
     
@@ -374,7 +363,7 @@ export async function getRPMgit(assetUrl: string, dir?: string) {
  * @returns asset name and download url as object
  */
 export async function listGitReleases(url: string){
-    const resp = await axios.get(url);
+    const resp = await ext.extHttp.makeRequest( { url });
     var mapEd;
     if(resp.status === 200) {
         mapEd = resp.data.map( (item: { name: string; url: string; }) => {
@@ -392,108 +381,8 @@ export async function listGitReleases(url: string){
  */
 export async function rpmDownload (url: string, destPath: string) {
     // https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
-    const writeFile = fs.createWriteStream(destPath);
-    const resp: any = await axios.get(url, {
-        responseType: 'stream',
-        headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'F5 VSCode FAST Extension'
-        }
-    })
+    return await ext.extHttp.download(url)
     .catch( error => {
         logger.debug('npmGetter error', error);
     });
-    resp.data.pipe(writeFile);
-
-    return new Promise((resolve, reject) => {
-        writeFile.on('finish', resolve);
-        writeFile.on('error', reject);
-      });
 }
-
-
-
-
-
-
-    //  //  // ----------- try 1 - returns multiple promises
-    // let finRpm;
-    // // loop through assets in set and download
-    // const assetSet = await resp.data.assets.map( async (item: { name: string; browser_download_url: string; }) => {
-    //     // potentially just return download url or just download them in this loop...
-
-    //     // TODO: filter json examples from download
-    //     // if(item.name === '*.json') { ... }
-
-    //     const destPath = path.join(rpmDir, item.name);
-    //     // if item already exists
-    //     if(fs.existsSync(destPath)) {
-    //         logger.debug(`${destPath} already cached!`);
-    //         return destPath;
-    //     } else {
-    //         logger.debug(`${item.name} not found in local cache, downloading...`);
-    //         await npmGetter(item.browser_download_url, destPath);
-    //     }
-    //     if(destPath === '*.rpm') {
-    //         finRpm = destPath;
-    //     }
-    //     return [item.name, item.browser_download_url];
-    // });
-
-    
-    //  //  //  ------ try 2 doesn't return anything...
-    // const respA = await resp.data.assets.forEach( async (item: { name: string; browser_download_url: string; }) => {
-    //     const destPath = path.join(rpmDir, item.name);
-    //     // if item already exists
-    //     if(fs.existsSync(destPath)) {
-    //         logger.debug(`${destPath} already cached!`);
-    //     } else {
-    //         logger.debug(`${item.name} not found in local cache, downloading...`);
-    //         const writeFile = fs.createWriteStream(destPath);
-    //         const resp = await axios.get(item.browser_download_url, {responseType: 'stream'});
-    //         resp.data.pipe(writeFile);
-    //     }
-    //     if(destPath === '*.rpm') {
-    //         finRpm = destPath;
-    //         return destPath;
-    //     }
-    // });
-
-
-
-            // .filter( (item: any[]) => {
-    //     logger.debug('filter item', item);
-    //     if(item[1].includes(".rpm") {
-    //         return item[1];
-    //     }
-    // })
-    
-    // const asset = resp.data.assets.filter( (item: { name: string; }) => item.name === '*.rpm');
-    // const assetSet = resp.data.assets
-    // .filter( (item: any) => {
-
-    //     logger.debug('item.name', item.name);
-    //     if(item.name.includes(".rpm") {
-    //         return item.name;
-    //     }
-
-    //     // const destPath = path.join(rpmDir, item.name);
-
-    //     // // if item already exists
-    //     // if(fs.existsSync(destPath)) {
-    //     //     logger.debug(`${destPath} already cached!`);
-    //     //     // return destPath;
-    //     // } else {
-    //     //     logger.debug(`${item.name} not found in local cache, downloading...`);
-    //     //     npmGetter(item.browser_download_url, destPath);
-    //     // }
-        
-    // })
-    // // .reduce( (item: any) => {
-    // //     if(item.name.endsWith(".rpm")) {
-    // //         // finRpm = destPath;
-    // //         logger.debug(`******assetItem ${item.browser_download_url}`);
-    // //         // Promise.resolve(item.browser_download_url);
-    // //         return item.browser_download_url;
-    // //     }
-    // // })

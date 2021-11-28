@@ -29,5 +29,5 @@ import Logger from 'f5-conx-core/dist/logger';
  * 
  */
 
-export const logger = new Logger('F5_CONX_CORE_LOG_LEVEL');
+export const logger = new Logger('F5_VSCODE_LOG_LEVEL');
 // export const logger = loggerInst;

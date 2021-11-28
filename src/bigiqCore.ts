@@ -8,7 +8,6 @@
 
 'use strict';
 
-import { AxiosError } from "axios";
 import {
     commands,
     ExtensionContext,
@@ -102,17 +101,4 @@ export class BigiqCore {
         }));
     }
 
-}
-
-
-/**
- * function to try to slim down an axios error a bit...
- * @param err 
- */
-export function slimAxiosError(err: AxiosError) {
-    delete err.config.httpsAgent;
-    delete err.request.agent;
-    delete err.request.socket;
-    delete err.request.res;
-    delete err.request.connection;
 }
