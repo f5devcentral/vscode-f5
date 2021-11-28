@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.0.2",
+	"version": "3.2.1",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -24,7 +24,7 @@
 	"bugs": {
 		"url": "https://github.com/f5devcentral/vscode-f5/issues"
 	},
-	"license": "SEE LICENSE IN LICENSE.txt",
+	"license": "Apache-2.0",
 	"icon": "images/f5.png",
 	"galleryBanner": {
 		"color": "#DCDCDC",
@@ -211,17 +211,31 @@
 							"default": "admin@192.168.1.254"
 						}
 					},
-					"f5.timeoutinmilliseconds": {
-						"type": "integer",
-						"default": 0,
-						"scope": "resource",
-						"description": "*DEV-beta-Preview* Timeout in milliseconds. 0 for infinity"
-					},
 					"f5.newEditorTabForAll": {
 						"type": "boolean",
 						"default": false,
 						"scope": "resource",
 						"description": "Show everything in a new editor tab"
+					},
+					"f5.cookie": {
+						"type": "string",
+						"scope": "resource",
+						"examples": [
+							"udf.sid=s%3Amg839-IRnZLDxBQXEQzq_eJgqJtfnGnI.6kWv2OBbcxFWopMn4ZUeOIobomMUHzEBrCO9MYRmUqc;cookie2=peanutbutter"
+						],
+						"markdownDescription": "Cookies to inject into calls made to F5 TMOS devices --- > udf.sid=s%3Amg839-IRnZLDxBQXEQzq_eJgqJtfnGnI.6kWv2OBbcxFWopMn4ZUeOIobomMUHzEBrCO9MYRmUqc;cookie2=peanutbutter"
+					},
+					"f5.rejectUnauthorizedBIGIP": {
+						"type": "boolean",
+						"default": false,
+						"scope": "resource",
+						"description": "Enables certificate verification when connecting to BIG-IP/TMOS devices (for enhanced security - does not allow self-signed mgmt certificates)"
+					},
+					"f5.TEEM": {
+						"type": "boolean",
+						"default": true,
+						"scope": "resource",
+						"description": "F5 TEEM - anonymous usage analytics"
 					},
 					"f5.newEditorColumn": {
 						"type": "string",
@@ -262,14 +276,14 @@
 					"f5.logLevel": {
 						"type": "string",
 						"enum": [
-							"error",
-							"warn",
-							"info",
-							"verbose"
+							"ERROR",
+							"WARN",
+							"INFO",
+							"DEBUG"
 						],
-						"default": "error",
+						"default": "INFO",
 						"scope": "resource",
-						"description": "*DEV-beta-Preview* The verbosity of logging in the REST output panel"
+						"description": "F5 OUTPUT log level"
 					}
 				}
 			}
@@ -289,7 +303,8 @@
 				"command": "f5.disconnect",
 				"title": "Disconnect from Device",
 				"category": "F5",
-				"enablement": "f5.device"
+				"enablement": "f5.device",
+				"icon": "$(debug-disconnect)"
 			},
 			{
 				"command": "f5.clearPassword",
@@ -793,6 +808,11 @@
 					"group": "navigation"
 				},
 				{
+					"command": "f5.disconnect",
+					"when": "view == f5Hosts && f5.device",
+					"group": "navigation"
+				},
+				{
 					"command": "f5.refreshHostsTree",
 					"when": "view == f5Hosts",
 					"group": "navigation"
@@ -1155,8 +1175,8 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.7.0",
 		"axios": "^0.21.1",
-		"f5-conx-core": "github:dumpysquare/f5-conx-core",
-		"f5-corkscrew": "github:f5devcentral/f5-corkscrew#certs",
+		"f5-conx-core": "^0.11.0",
+		"f5-corkscrew": "^0.9.2",
 		"js-yaml": "4.0.0",
 		"keytar": "^7.6.0"
 	}

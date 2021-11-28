@@ -16,9 +16,9 @@ import {
 } from "vscode";
 import { ext } from "./extensionVariables";
 import { BigiqTreeProvider } from "./treeViewsProviders/bigiqTreeProvider";
-import logger from "./utils/logger";
 import { getText } from "./utils/utils";
 
+import { logger } from './logger';
 
 export class BigiqCore {
 

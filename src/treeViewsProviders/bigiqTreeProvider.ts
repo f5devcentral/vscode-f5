@@ -30,9 +30,10 @@ import {
     workspace
 } from 'vscode';
 import { ext } from '../extensionVariables';
-import logger from '../utils/logger';
 import jsyaml from "js-yaml";
 import { F5Client } from '../f5Client';
+
+import { logger } from '../logger';
 
 
 // https://clouddocs.f5.com/products/big-iq/mgmt-api/v6.1.0/ApiReferences/bigiq_public_api_ref/r_as3_template.html

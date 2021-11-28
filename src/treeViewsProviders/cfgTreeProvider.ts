@@ -26,7 +26,7 @@ import {
 import { ext } from '../extensionVariables';
 
 import { ConfigFile, Explosion, TmosApp, xmlStats } from 'f5-corkscrew';
-import logger from '../utils/logger';
+import { logger } from '../logger';
 import BigipConfig from 'f5-corkscrew/dist/ltm';
 
 // remodel everything here like this example:  https://github.com/microsoft/vscode-extension-samples/blob/master/tree-view-sample/src/testView.ts
@@ -80,6 +80,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 .then(exp => {
                     this.explosion = exp;
                     ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extraction complete`);
+                    ext.eventEmitterGlobal.emit('log-info', exp.stats);
                     this.refresh();
                 })
                 .catch(err => logger.error('makeExplosion', err));
@@ -122,7 +123,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
         if (element) {
 
-            if (element.label === 'Apps' && this.explosion) {
+            if (element.label === 'Apps' && this.explosion.config.apps) {
 
                 treeItems = sortTreeItems(this.explosion.config.apps.map((el: TmosApp) => {
                     const count = el.configs.length.toString();
@@ -175,10 +176,11 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
             // get all the apps configs
             const brkr = '\n\n##################################################\n\n';
-            const allApps = this.explosion?.config.apps.map((el: TmosApp) => el.configs.join('\n').concat(brkr));
+            const allApps = this.explosion?.config.apps?.map((el: TmosApp) => el.configs.join('\n').concat(brkr));
 
             const appsTotal = this.explosion?.config.apps ? this.explosion.config.apps.length.toString() : '';
             const baseTotal = this.explosion?.config.base ? this.explosion.config.base.length.toString() : '';
+            const doTotal = this.explosion?.config.doClasses ? this.explosion.config.doClasses.length.toString() : '';
             const logTotal = this.explosion?.logs ? this.explosion.logs.length.toString() : '';
 
             treeItems.push(new CfgApp('Apps', 'All apps', appsTotal, '', TreeItemCollapsibleState.Collapsed,
@@ -187,6 +189,11 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             if (this.explosion?.config?.base) {
                 treeItems.push(new CfgApp('Base', '', baseTotal, '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion.config.base] }));
+            }
+
+            if (this.explosion?.config?.doClasses) {
+                treeItems.push(new CfgApp('DO', '', doTotal, '', TreeItemCollapsibleState.None,
+                    { command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion.config.doClasses] }));
             }
 
             if (this.bigipConfig?.fileStore && this.bigipConfig?.fileStore.length > 0) {

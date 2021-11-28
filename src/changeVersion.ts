@@ -10,15 +10,12 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import * as cp from 'child_process';
 
-// import { downloadToFileNew } from './utils/coreF5HTTPS';
 import { commands, ExtensionContext, window } from 'vscode';
-import logger from './utils/logger';
 import { getRPMgit, listGitReleases } from './utils/rpmMgmt';
-import axios from 'axios';
-import { ext } from './extensionVariables';
 import { ExtHttp } from 'f5-conx-core';
+
+import { logger } from './logger';
 
 /**
  * Provides command to download github releases of this extension so users can easily access beta versions for testing

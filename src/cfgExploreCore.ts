@@ -9,12 +9,11 @@
 'use strict';
 
 import { window, commands, ExtensionContext } from "vscode";
-// import { makeExplosion } from "./cfgExplorer";
 import { ext } from "./extensionVariables";
 import { CfgProvider } from "./treeViewsProviders/cfgTreeProvider";
-import logger from "./utils/logger";
 import fs from 'fs';
 
+import { logger } from './logger';
 
 export function cfgExplore(context: ExtensionContext) {
 

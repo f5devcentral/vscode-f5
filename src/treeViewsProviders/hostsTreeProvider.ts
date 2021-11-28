@@ -24,7 +24,6 @@ import {
 	workspace
 } from 'vscode';
 import { ext } from '../extensionVariables';
-import logger from '../utils/logger';
 import {
 	AtcRelease,
 	AtcVersion,
@@ -33,6 +32,8 @@ import {
 import { BigipHost } from '../models';
 import jsyaml from 'js-yaml';
 import { F5Client } from '../f5Client';
+
+import { logger } from '../logger';
 
 // icon listing for addin icons to key elements
 // https://code.visualstudio.com/api/references/icons-in-labels#icon-listing
@@ -112,10 +113,10 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 				// if device is connected device, make it expandable
 				let itemCollapsibleState = TreeItemCollapsibleState.None;
-				// if (item.device === this.connectedDevice?.device.device) {
-				// 	itemCollapsibleState = TreeItemCollapsibleState.Expanded;
-				// 	this.saveConnectedDeviceDetails();
-				// }
+				if (item.device === this.connectedDevice?.device.device) {
+					// itemCollapsibleState = TreeItemCollapsibleState.Expanded;
+					this.saveConnectedDeviceDetails();
+				}
 
 				const icon =
 					(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :

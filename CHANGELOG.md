@@ -11,6 +11,56 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.2.1] - (11-23-2021)
+
+- f5-corkscrew and f5-conx-core packages now install from npm registry
+  - this will allow for better version tracking and automation
+
+---
+
+## [3.2.0] - (11-09-2021)
+
+- f5-conx-core - v0.11.0
+  - added cookie insert to BIGIP mgmt client.  This is for injecting auth cookie for UDF
+    - <https://github.com/f5devcentral/f5-conx-core/issues/1>
+  - fixed atc versions update test
+    - <https://github.com/f5devcentral/f5-conx-core/issues/13>
+  - option to enable/disable cert verification
+    - <https://github.com/f5devcentral/f5-conx-core/issues/2>
+
+- f5-corkscrew - v0.9.0
+  - fixed parsing error when no virtual servers
+  - fixed cli (was not working with new async parser)
+  - added cli options
+    - All output is in json format now
+    - includes command processing logs
+    - added switches to exclude output for:
+      - no_sources
+      - no_file_store
+      - no_command_logs
+      - no_conversion_logs
+  - started creating tests archive generator
+  - started looking into adding an option for exploring archives with passphrase
+
+---
+
+## [3.1.0] - (06-08-2021)
+
+- Added disconnect icon to ``F5 Hosts`` header
+  - Only visible when connected to a device
+- Fixed saving of connected device details
+  - This information shows up in the ``F5 Hosts`` view
+- Fixed logging class
+  - Logging Enchancements, like better http logging and error messaging
+  - Better singleton integration
+- Updated injectSchema to use schema/examples definitions moved to f5-conx-core
+  - Removed details from extensionVariables
+- Added parent "DO" class detection and schema to "inject schema" command for BIG-IQ declarations
+- fixed config explorer not displaying stats after extraction
+- Removed app components from AS3 tree view to simplify what users see
+
+---
+
 ## [3.0.2] - (05-06-2021)
 
 - Updated package lock references to "lodash": ">=4.17.21", for CVE-2021-23337:  <https://github.com/advisories/GHSA-35jh-r3h4-6jhm>

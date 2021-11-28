@@ -2,7 +2,7 @@
 import { WebviewPanel, window, commands, ViewColumn, EventEmitter, Event, Uri } from 'vscode';
 
 import { ext } from '../extensionVariables';
-import logger from '../utils/logger';
+import { logger } from '../logger';
 
 const fast = require('@f5devcentral/f5-fast-core');
 

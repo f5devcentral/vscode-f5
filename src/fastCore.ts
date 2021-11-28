@@ -8,9 +8,19 @@
 
 'use strict';
 
-import { commands, EndOfLine, ExtensionContext, languages, Position, Range, Selection, window } from 'vscode';
-import logger from './utils/logger';
-import { isObject } from './treeViewsProviders/as3TreeProvider';
+import { 
+  commands,
+  EndOfLine,
+  ExtensionContext,
+  languages,
+  Position,
+  Range,
+  Selection,
+  window
+} from 'vscode';
+import { isObject } from 'f5-conx-core';
+
+import { logger } from './logger';
 
 /**
  * Provides command to download github releases of this extension so users can easily access beta versions for testing

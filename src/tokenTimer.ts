@@ -14,12 +14,17 @@ import {
     StatusBarAlignment
 } from 'vscode';
 import { ext } from './extensionVariables';
-import logger from './utils/logger';
+import { logger } from './logger';
 
-export function tokeTimer() {
+export function tokenTimer(hide?: boolean) {
+
     const tokenTimerBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 50);
 
     tokenTimerBar.tooltip = 'F5 AuthToken Timer';
+
+    if (hide) {
+        tokenTimerBar.hide();
+    }
 
     ext.eventEmitterGlobal
         .on('token-timer-start', msg => {
@@ -42,7 +47,7 @@ export function tokeTimer() {
             } else {
                 tokenTimerBar.color = 'silver';
             }
-            
+
             tokenTimerBar.text = `${second}`;
         });
 }

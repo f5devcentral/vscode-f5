@@ -1,11 +1,24 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/**
+ * Copyright 2021 F5 Networks, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+'use strict';
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { 
+import {
     ExtensionContext,
     StatusBarItem,
     workspace,
@@ -14,8 +27,7 @@ import {
     window
 } from "vscode";
 import * as keyTarType from "keytar";
-// import { MgmtClient } from './utils/f5DeviceClient.ts.old';
-import logger from "./utils/logger";
+import { logger } from "./logger";
 import { TextDocumentView } from './editorViews/editorView';
 import { EventEmitter } from "events";
 
@@ -25,8 +37,6 @@ import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 
 type KeyTar = typeof keyTarType;
-
-// path.join(ext.context.extensionPath, 'cache');
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -44,6 +54,8 @@ export namespace ext {
     export let connectBar: StatusBarItem;
     export let panel: TextDocumentView;
     export let cacheDir: string;
+    export let teemEnv = 'F5_VSCODE_TEEM';
+    export let teemAgent: string;
 
     export namespace settings {
         export let as3PostAsync: boolean;
@@ -78,13 +90,15 @@ export async function initSettings(context: ExtensionContext) {
     ext.cacheDir = path.join(ext.context.extensionPath, 'cache');
     process.env.F5_CONX_CORE_EXT_HTTP_AGENT = 'The F5 VScode Extension';
     process.env.F5_CONX_CORE_CACHE = ext.cacheDir;
-    
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+    // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
     ext.extHttp = new ExtHttp({ rejectUnauthorized: false, eventEmitter: ext.eventEmitterGlobal });
     ext.extHttp.cacheDir = ext.cacheDir;
 
     ext.eventEmitterGlobal
+        .on('log-http-request', msg => logger.httpRequest(msg))
+        .on('log-http-response', msg => logger.httpResponse(msg))
         .on('log-debug', msg => logger.debug(msg))
         .on('log-info', msg => logger.info(msg))
         .on('log-warn', msg => logger.warn(msg))
@@ -143,21 +157,36 @@ export async function loadSettings() {
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
 
-    ext.settings.logLevel = workspace.getConfiguration().get('f5.logLevel', 'error');
+    process.env[logger.logEnv] = workspace.getConfiguration().get<string>('f5.logLevel', 'INFO');
 
-}
+    process.env[ext.teemEnv] = workspace.getConfiguration().get<boolean>('f5.TEEM', true).toString();
 
+    process.env.F5_CONX_CORE_REJECT_UNAUTORIZED = workspace.getConfiguration().get<boolean>('f5.rejectUnauthorizedBIGIP', false).toString();
+    
+    // get cookie config from vscode and place in env
+    const cookie = workspace.getConfiguration().get<string>('f5.cookie');
+    if (cookie) {
+        process.env.F5_CONX_CORE_COOKIES = cookie;
+    } else {
+        // clear if not found
+        delete process.env.F5_CONX_CORE_COOKIES;
+    }
+    
+    logger.info('------ Environment Variables ------');
+    // log envs
+    Object.entries(process.env)
+        .filter(el => el[0].startsWith('F5_'))
+        .forEach(el => logger.info(`${el[0]}=${el[1]}`));
 
+    // // move to this env format, remove above when conx supports dynamic env assignment at instantiation
+    // Object.entries(process.env)
+    //     .filter(el => el[0].startsWith('F5_VSCODE_'))
+    //     .forEach(el => logger.info(`${el[0]}=${el[1]}`));
 
-export namespace git {
-    export let latestAS3schema: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';
-    export let examplesAS3: string = 'https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json';
+    if(process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
+        logger.info(`NODE_TLS_REJECT_UNAUTHORIZED=${process.env.NODE_TLS_REJECT_UNAUTHORIZED}`);
+    }
 
-    export let latestDOschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json';
-    export let examplesDO: string = 'https://github.com/F5Networks/f5-declarative-onboarding/tree/master/examples';
-
-    export let latestTSschema: string = 'https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json';
-    export let examplesTS: string = 'https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples/declarations';
 }
 
 
@@ -180,4 +209,5 @@ function parseColumn(value: string): ViewColumn {
 https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json
 https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json
 https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json
+https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json
 */

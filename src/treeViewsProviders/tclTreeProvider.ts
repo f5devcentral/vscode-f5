@@ -25,7 +25,8 @@ import * as utils from '../utils/utils';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import logger from '../utils/logger';
+
+import { logger } from '../logger';
 
 export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 
