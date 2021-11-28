@@ -79,13 +79,16 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 	}
 
 	async saveHosts(): Promise<void> {
-		await workspace.getConfiguration()
+		return await workspace.getConfiguration()
 			.update('f5.hosts', this.bigipHosts, ConfigurationTarget.Global);
 	}
 
 
 	async refresh(): Promise<void> {
-		this._onDidChangeTreeData.fire(undefined);
+		return await this.loadHosts()
+		.then( _ => {
+			return this._onDidChangeTreeData.fire(undefined);
+		});
 	}
 
 
@@ -171,7 +174,7 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 		if (!devicesString.includes(`\"${newHost}\"`) && this.deviceRex.test(newHost)) {
 			this.bigipHosts.push({ device: newHost, provider: 'tmos' });
-			this.saveHosts();
+			await this.saveHosts();
 			wait(500, this.refresh());
 			return `${newHost} added to device configuration`;
 		} else {
@@ -226,9 +229,9 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 		if (this.bigipHosts.length === (newBigipHosts.length + 1)) {
 			logger.debug('device removed');
-			this.clearPassword(hostID.label);	// clear cached password for device
+			await this.clearPassword(hostID.label);	// clear cached password for device
 			this.bigipHosts = newBigipHosts;
-			this.saveHosts();
+			await this.saveHosts();
 			wait(500, this.refresh());
 			return `successfully removed ${hostID.label} from devices configuration`;
 		} else {

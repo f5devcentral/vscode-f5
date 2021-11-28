@@ -20,13 +20,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - this will represent the more specific log settings for the extension and not interfere with f5-conx-core development/settings
 - fixed issue where it was uploading ilx atc rpm twice
   - The second loop is supposed to upload the package signature to allow for verification later
+- [bug] "Import Devices" is not populating F5 Hosts section [#149](https://github.com/f5devcentral/vscode-f5/issues/149)
 
 ***pending***
 
 - automate testing/package/publishing with github actions
 - ATC uninstall option does not show up [#150](https://github.com/f5devcentral/vscode-f5/issues/150)
-- [RFE] switch to enable/disable cert validation [#151](https://github.com/f5devcentral/vscode-f5/issues/151)
-- [bug] "Import Devices" is not populating F5 Hosts section [#149](https://github.com/f5devcentral/vscode-f5/issues/149)
+  - confirmed working, pending issue response from OP
 
 
 - [RFE] move to built in keytar secret manager [#155](https://github.com/f5devcentral/vscode-f5/issues/155)
