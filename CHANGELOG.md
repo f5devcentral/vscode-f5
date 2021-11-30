@@ -11,9 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [3.2.1] - (11-23-2021)
-
-***complete***
+## [3.3.0] - (11-30-2021)
 
 - update local axios or move it to f5-conx-core (removed)
 - moved log env from default F5_CONX_CORE_LOG_LEVEL to F5_VSCODE_LOG_LEVEL
@@ -22,9 +20,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - The second loop is supposed to upload the package signature to allow for verification later
 - [bug] "Import Devices" is not populating F5 Hosts section [#149](https://github.com/f5devcentral/vscode-f5/issues/149)
 - [RFE] config explorer - group apps by partition [#156](https://github.com/f5devcentral/vscode-f5/issues/156)
-
-***pending***
-
 - automate testing/package/publishing with github actions
 
 
