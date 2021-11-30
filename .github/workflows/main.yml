@@ -1,0 +1,122 @@
+name: "Main"
+
+on:
+  push:
+    branches: [main]
+
+env:
+  NODE_VERSION: 14.x
+
+jobs:
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    name: Test on ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 & echo "Started xvfb"
+        shell: bash
+        if: ${{ success() && matrix.os == 'ubuntu-latest' }}
+      - run: npm install
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - run: npm test
+        env:
+          DISPLAY: ":99.0"
+        
+  package-release-publish:
+    runs-on: ubuntu-latest
+    environment: publishing
+    needs: test
+    name: Package-Release-Publish
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: setup node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: install node deps
+        run: npm ci
+
+      - name: install vscode marketplace cli (vsce)
+        run: npm install -g vsce
+
+      - name: install open-vsix marketplace cli (ovsx)
+        run: npm install -g ovsx
+
+      - name: package extension
+        run: vsce package
+
+      - name: get extension path
+        run: echo "VSIX_PATH=$(find . -maxdepth 1 -type f -iname "*.vsix" | head -1)" >> $GITHUB_ENV
+
+      - name: get extension name
+        run: echo "VSIX_NAME=$(basename $(find . -maxdepth 1 -type f -iname "*.vsix" | head -1))" >> $GITHUB_ENV
+
+      - name: get extension version
+        run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      - name: create upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ env.VSIX_PATH }}
+          name: ${{ env.VSIX_NAME }}
+
+      - name: create github release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.PACKAGE_VERSION }}
+          release_name: ${{ env.VSIX_NAME }}
+          body: See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5-chariot/blob/main/README.md) for details.
+          draft: false
+          prerelease: false
+      
+      - name: upload releases
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_TOKEN: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.VSIX_PATH }}
+          asset_name: ${{ env.VSIX_NAME }}
+          asset_content_type: application/zip
+
+      - name: publish to marketplace
+        run: vsce publish -i ${{ env.VSIX_PATH }} -p ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
+
+      - name: publish to open-vsix
+        run: ovsx publish ${{ env.VSIX_PATH }} -p ${{ secrets.OPEN_VSX_TOKEN }}
+
+
+
+# good example of action workflow for publishing an extension
+# https://github.com/politie/omt-odt-language/pull/30/files#diff-87db21a973eed4fef5f32b267aa60fcee5cbdf03c67fafdc2a9b553bb0b15f34
+
+# vsce source for understanding switches
+# https://github.com/microsoft/vscode-vsce/tree/main/src
+
+# ovsx source
+# https://github.com/eclipse/openvsx

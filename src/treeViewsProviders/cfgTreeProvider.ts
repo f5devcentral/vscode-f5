@@ -49,6 +49,9 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     bigipConfig: BigipConfig | undefined;
     parsedFileEvents: any = [];
     parsedObjEvents: any = [];
+    partitions: string[] = [];
+    partCounts: {} | undefined;
+    readonly brkr = '\n\n##################################################\n\n';
 
     constructor() {
     }
@@ -123,15 +126,39 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
         if (element) {
 
-            if (element.label === 'Apps' && this.explosion.config.apps) {
+            if (element.label === 'Partitions' && this.explosion.config.apps) {
 
-                treeItems = sortTreeItems(this.explosion.config.apps.map((el: TmosApp) => {
-                    const count = el.configs.length.toString();
-                    return new CfgApp(el.name, '', count, 'cfgAppItem', TreeItemCollapsibleState.None,
-                        { command: 'f5.cfgExplore-show', title: '---newCmd', arguments: [el.configs] });
+                // re-assign the apps so TS knows we have a value here
+                const apps = this.explosion.config.apps;
+
+                treeItems = sortTreeItems(this.partitions.map((el) => {
+
+                    // get all the apps for the given partition
+                    const partitionApps = apps.filter(item => item.name.startsWith(`/${el}`));
+
+                    // collapse all the configs from the apps in the partition
+                    const appConfigs = partitionApps.map(item => item.configs.join('\n'));
+
+                    return new CfgApp(el, 'Partition', partitionApps.length.toString(), 'cfgPartition', TreeItemCollapsibleState.Collapsed,
+                        { command: 'f5.cfgExplore-show', title: '---newCmd', arguments: [appConfigs] });
                 }));
 
-                // treeItems = sortTreeItems(treeItems);
+
+            } else if (element.contextValue === 'cfgPartition' && this.explosion.config.apps) {
+
+                // filter the apps that are in this partition
+                const partitionApps = this.explosion.config.apps.filter(item => item.name.startsWith(`/${element.label}`));
+
+                treeItems = sortTreeItems(partitionApps.map((el) => {
+
+                    // split the app/vs from the partition name
+                    const appName = el.name.split('/').splice(2);
+
+                    // build/return the tree item
+                    return new CfgApp(appName.join('/'), '', el.configs.length.toString(), 'cfgApp', TreeItemCollapsibleState.None,
+                        { command: 'f5.cfgExplore-show', title: '', arguments: [el.configs] });
+                }));
+
 
             } else if (element.label === 'Sources' && this.explosion) {
 
@@ -174,16 +201,21 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             }
             ));
 
+            this.partCounts = this.explosion?.config?.apps?.map(item => item.name.split('/')[1])
+                // @ts-expect-error
+                .reduce((acc, curr) => (acc[curr] = (acc[curr] || 0) + 1, acc), {});
+
+            this.partitions = [...new Set(this.explosion?.config?.apps?.map(item => item.name.split('/')[1]))];
+
             // get all the apps configs
-            const brkr = '\n\n##################################################\n\n';
-            const allApps = this.explosion?.config.apps?.map((el: TmosApp) => el.configs.join('\n').concat(brkr));
+            const allApps = this.explosion?.config.apps?.map((el: TmosApp) => el.configs.join('\n').concat(this.brkr));
 
             const appsTotal = this.explosion?.config.apps ? this.explosion.config.apps.length.toString() : '';
             const baseTotal = this.explosion?.config.base ? this.explosion.config.base.length.toString() : '';
             const doTotal = this.explosion?.config.doClasses ? this.explosion.config.doClasses.length.toString() : '';
             const logTotal = this.explosion?.logs ? this.explosion.logs.length.toString() : '';
 
-            treeItems.push(new CfgApp('Apps', 'All apps', appsTotal, '', TreeItemCollapsibleState.Collapsed,
+            treeItems.push(new CfgApp('Partitions', 'Click for All apps', this.partitions.length.toString(), '', TreeItemCollapsibleState.Collapsed,
                 { command: 'f5.cfgExplore-show', title: '', arguments: [allApps] }));
 
             if (this.explosion?.config?.base) {

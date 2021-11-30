@@ -21,15 +21,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - fixed issue where it was uploading ilx atc rpm twice
   - The second loop is supposed to upload the package signature to allow for verification later
 - [bug] "Import Devices" is not populating F5 Hosts section [#149](https://github.com/f5devcentral/vscode-f5/issues/149)
+- [RFE] config explorer - group apps by partition [#156](https://github.com/f5devcentral/vscode-f5/issues/156)
 
 ***pending***
 
 - automate testing/package/publishing with github actions
-- ATC uninstall option does not show up [#150](https://github.com/f5devcentral/vscode-f5/issues/150)
-  - confirmed working, pending issue response from OP
 
-
-- [RFE] move to built in keytar secret manager [#155](https://github.com/f5devcentral/vscode-f5/issues/155)
 
 ---
 
