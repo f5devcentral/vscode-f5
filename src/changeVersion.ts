@@ -52,7 +52,6 @@ export class ChangeVersion {
 			// if we have a selection from the previous list
 			if (chosenVersion && typeof chosenVersion === 'object' && chosenVersion.asset) {
 
-				// const downloadLocation = await axios(chosenVersion.asset)
 				const downloadLocation = await extHttp.makeRequest({ url: chosenVersion.asset })
 					.then(async resp => {
 

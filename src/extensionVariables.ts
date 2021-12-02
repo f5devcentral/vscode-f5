@@ -157,7 +157,7 @@ export async function loadSettings() {
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
 
-    process.env[logger.logEnv] = workspace.getConfiguration().get<string>('f5.logLevel', 'INFO');
+    process.env.F5_VSCODE_LOG_LEVEL = workspace.getConfiguration().get<string>('f5.logLevel', 'INFO');
 
     process.env[ext.teemEnv] = workspace.getConfiguration().get<boolean>('f5.TEEM', true).toString();
 

@@ -416,7 +416,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                 }
                 if (signature) {
 
-                    await ext.f5Client?.atc.download(rpm.browser_download_url)
+                    await ext.f5Client?.atc.download(signature.browser_download_url)
                         .then(async resp => {
                             await ext.f5Client?.atc.uploadRpm(resp.data.file);
                         })
