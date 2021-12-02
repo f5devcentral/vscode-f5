@@ -38,16 +38,20 @@ suite('Extension GUI tests', () => {
 		);
 
 		// set the end of line for linux
-		textDoc.edit(e => e.setEndOfLine(EndOfLine.LF));
+		await textDoc.edit(e => e.setEndOfLine(EndOfLine.LF));
 
 		// capture editor text
 		const editorText = jsonEditor.getText();
 
 		// get original snippet text to compare
-		const snippet = JSON.parse(snippets).example_F5_AS3_declaration.body.join('\n').replace("\\$schema", "$schema");
+		const snippet = JSON.parse(snippets).example_F5_AS3_declaration.body;
+		const snippet2 = snippet.join('\n').replace('\\$schema', '$schema');
+
+		// const source = JSON.parse(snippet);
+		// const output = JSON.parse(editorText);
 
 		//	check snippet against isolated copy
-		assert.deepStrictEqual(snippet, editorText);
+		assert.deepStrictEqual(snippet2, editorText);
 		
 	}).timeout(5000);
 
