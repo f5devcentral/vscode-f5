@@ -179,7 +179,7 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 			return `${newHost} added to device configuration`;
 		} else {
 			logger.error(`${newHost} exists or invalid format: <user>@<host/ip>:<port>`);
-			return 'FAILED - Already exists or invalid format: <user>@<host/ip>';
+			throw Error('FAILED - Already exists or invalid format: <user>@<host/ip>');
 		}
 	}
 
@@ -222,18 +222,18 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 			});
 	}
 
-	async removeDevice(hostID: F5Host) {
-		logger.debug(`Remove Host command:`, hostID);
+	async removeDevice(device: string, label?: string) {
+		logger.debug(`Remove Host command:`, device, `(label: ${label})`);
 
-		const newBigipHosts = this.bigipHosts.filter(item => item.device !== hostID.device?.device);
+		const newBigipHosts = this.bigipHosts.filter(item => item.device !== device);
 
 		if (this.bigipHosts.length === (newBigipHosts.length + 1)) {
 			logger.debug('device removed');
-			await this.clearPassword(hostID.label);	// clear cached password for device
+			await this.clearPassword(device);	// clear cached password for device
 			this.bigipHosts = newBigipHosts;
 			await this.saveHosts();
 			wait(500, this.refresh());
-			return `successfully removed ${hostID.label} from devices configuration`;
+			return `successfully removed ${device} (label: ${label}) from devices configuration`;
 		} else {
 			logger.debug('something with remove device FAILED!!!');
 			throw new Error('something with remove device FAILED!!!');
@@ -308,27 +308,3 @@ export class F5Host extends TreeItem {
 		super(label, collapsibleState);
 	}
 }
-
-
-// /**
-//  * compares semver
-//  * 
-//  * https://github.com/substack/semver-compare
-//  * 
-//  * @param a 
-//  * @param b 
-//  */
-// export function cmp(a: string, b: string) {
-// 	var pa = a.split('.');
-// 	var pb = b.split('.');
-// 	for (var i = 0; i < 3; i++) {
-// 		var na = Number(pa[i]);
-// 		var nb = Number(pb[i]);
-// 		if (na > nb) { return 1; }
-// 		if (nb > na) { return -1; }
-// 		if (!isNaN(na) && isNaN(nb)) { return 1; }
-// 		if (isNaN(na) && !isNaN(nb)) { return -1; }
-// 	}
-// 	return 0;
-// };
-
