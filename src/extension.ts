@@ -954,7 +954,10 @@ export async function activate(context: ExtensionContext) {
 						data: text.body
 					})
 						.then(resp => resp)
-						.catch(err => logger.error('Generic rest call to connected device failed:', err));
+						.catch(err => {
+							logger.error('Generic rest call to connected device failed:', err);
+							throw Error(err);
+						});
 				});
 			}
 

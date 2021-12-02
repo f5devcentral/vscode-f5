@@ -1,4 +1,4 @@
-import { window, workspace } from 'vscode';
+import { TextDocument, window, workspace } from 'vscode';
 import { ext } from '../extensionVariables';
 import { logger } from '../logger';
 
@@ -28,7 +28,7 @@ export async function displayJsonInEditor(item: object): Promise<any> {
  * @param item json object to display in new editor for mst
  */
 export async function displayMstInEditor(item: object): Promise<any> {
-    workspace.openTextDocument({ 
+    return workspace.openTextDocument({ 
         language: 'handlebars', 
         content: JSON.stringify(item, undefined, 4) 
     })
@@ -47,8 +47,8 @@ export async function displayMstInEditor(item: object): Promise<any> {
  * display text in new editor window
  * @param item string to display in new editor
  */
-export async function displayInTextEditor(text: string): Promise<void> {
-    workspace.openTextDocument({ 
+export async function displayInTextEditor(text: string): Promise<any> {
+    return workspace.openTextDocument({ 
         content: text 
     })
     .then( doc => 
