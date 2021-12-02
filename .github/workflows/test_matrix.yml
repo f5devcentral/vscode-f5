@@ -1,6 +1,7 @@
 name: "test-matrix"
 
 on:
+  workflow_dispatch:
   push:
     branches: 
       - "!main"
