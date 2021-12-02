@@ -5,7 +5,7 @@ import path = require('path');
 
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
-import * as vscode from 'vscode';
+import { window, commands, EndOfLine, workspace} from 'vscode';
 import * as utils from '../../utils/utils';
 
 const snippets = requireText(path.join(__dirname, '..', '..', '..', 'snippets.json'));
@@ -22,23 +22,28 @@ const snippets = requireText(path.join(__dirname, '..', '..', '..', 'snippets.js
 
 
 suite('Extension GUI tests', () => {
-	vscode.window.showInformationMessage('Starting gui tests.');
+	window.showInformationMessage('Starting gui tests.');
 	test('open JSON editor -> insert as3 snippet', async () => {
 
 		//	//	clear all open editors
-		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+		await commands.executeCommand('workbench.action.closeAllEditors');
 		//	// open a new text editor
-		const jsonEditor = await vscode.workspace.openTextDocument({ language: 'json' });
+		const jsonEditor = await workspace.openTextDocument({ language: 'json' });
 		//	//	show new text editor (make active)
-		await vscode.window.showTextDocument(jsonEditor, {preview: false});
+		const textDoc = await window.showTextDocument(jsonEditor, {preview: false});
 
 		//	//	inject sample as3 snippet
-		await vscode.commands.executeCommand('editor.action.insertSnippet', 
+		await commands.executeCommand('editor.action.insertSnippet', 
 			{ name: "example_F5_AS3_declaration"}
 		);
 
+		// set the end of line for linux
+		textDoc.edit(e => e.setEndOfLine(EndOfLine.LF));
+
+		// capture editor text
 		const editorText = jsonEditor.getText();
 
+		// get original snippet text to compare
 		const snippet = JSON.parse(snippets).example_F5_AS3_declaration.body.join('\n').replace("\\$schema", "$schema");
 
 		//	check snippet against isolated copy
@@ -48,7 +53,7 @@ suite('Extension GUI tests', () => {
 
 
 	test('open test json in editor #1 - tests utils.displayJsonInEditor', async () => {
-		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+		await commands.executeCommand('workbench.action.closeAllEditors');
 
 		//	//	option #1 - use the editor object created by the displayJsonInEditor function
 		//			to know which editor has the text we need to test
@@ -58,7 +63,7 @@ suite('Extension GUI tests', () => {
 	});
 
 	test('open test json in editor #2 - tests utils.displayJsonInEditor', async () => {
-		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+		await commands.executeCommand('workbench.action.closeAllEditors');
 
 		//	//	option #2 - capture the active editor since we don't know what it is
 		//			to know which editor has the text we need to test
@@ -68,7 +73,7 @@ suite('Extension GUI tests', () => {
 		await utils.displayJsonInEditor(testObj2);
 
 		// capture currrent editor
-		const editor = vscode.window.activeTextEditor;
+		const editor = window.activeTextEditor;
 		
 		if(!editor) {
 			return Error("uh..oh...");
