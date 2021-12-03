@@ -24,21 +24,10 @@ jobs:
         shell: bash
         if: ${{ success() && matrix.os == 'ubuntu-latest' }}
       - run: npm install
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1.0
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - run: npm test
-        env:
-          DISPLAY: ":99.0"
+          run: npm test
         
   package-release-publish:
     runs-on: ubuntu-latest
@@ -82,16 +71,23 @@ jobs:
           name: ${{ env.VSIX_NAME }}
 
       - name: create github release
-        uses: actions/create-release@v1
-        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.PACKAGE_VERSION }}
-          release_name: ${{ env.VSIX_NAME }}
-          body: See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5-chariot/blob/main/README.md) for details.
-          draft: false
-          prerelease: false
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+        run: npx semantic-release
+
+      # - name: create github release
+      #   uses: actions/create-release@v1
+      #   id: create_release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: v${{ env.PACKAGE_VERSION }}
+      #     release_name: ${{ env.VSIX_NAME }}
+      #     body: See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5-chariot/blob/main/README.md) for details.
+      #     draft: false
+      #     prerelease: false
       
       - name: upload releases
         uses: actions/upload-release-asset@v1

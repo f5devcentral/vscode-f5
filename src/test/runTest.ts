@@ -3,7 +3,7 @@ import * as path from 'path';
 import { runTests } from 'vscode-test';
 
 // set the version of vscode engine to use for tests
-const version = '1.56.2';
+const version = 'stable';
 // https://code.visualstudio.com/updates/
 
 async function main() {
