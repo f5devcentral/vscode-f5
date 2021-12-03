@@ -19,7 +19,7 @@
 		"Snippets"
 	],
 	"engines": {
-		"vscode": "^1.55.0"
+		"vscode": "^1.53.0"
 	},
 	"bugs": {
 		"url": "https://github.com/f5devcentral/vscode-f5/issues"
