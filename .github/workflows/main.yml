@@ -39,6 +39,7 @@ jobs:
       - run: npm test
         env:
           DISPLAY: ":99.0"
+          CI: true
         
   package-release-publish:
     runs-on: ubuntu-latest
