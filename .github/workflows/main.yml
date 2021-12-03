@@ -24,7 +24,7 @@ jobs:
         shell: bash
         if: ${{ success() && matrix.os == 'ubuntu-latest' }}
       - name: install keytar deps
-        run:  sudo apt-get install g++ libgnome-keyring-dev -Y
+        run:  sudo apt-get install g++ libgnome-keyring-dev
       - name: install deps
         run: npm install
       - name: Cache node modules
