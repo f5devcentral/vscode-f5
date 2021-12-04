@@ -26,8 +26,8 @@ suite('device mgmt tasks', () => {
             
             await commands.executeCommand('f5.removeHost', 'tst9843@1.1.1.1');
         } catch (e) {
-        
-            console.log(...logger.journal);
+            
+            console.log(e, logger.journal.join('\n'));
         }
 
 	}).timeout(10000);
