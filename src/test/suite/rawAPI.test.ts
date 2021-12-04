@@ -3,7 +3,7 @@ import fs = require('fs');
 import path = require('path');
 
 
-import { commands, window} from 'vscode';
+import { commands, TextDocument, window} from 'vscode';
 import nock from 'nock';
 import * as utils from '../../utils/utils';
 
@@ -212,18 +212,24 @@ suite('external raw HTTP API tests', () => {
          * execute command to start function
          * should make the api call, then open a new editor with response
          */
-        await commands.executeCommand('f5.makeRequest');
-        
-        await new Promise(r => setTimeout(r, 100)); // let the command finish
+        const respEditor: TextDocument | undefined = await commands.executeCommand('f5.makeRequest');
 
-        const editor = window.activeTextEditor;  // get active editor
-        let text = '';
-        if(editor){
-            // get all text from editor
-            text = editor.document.getText();
+        let respEditorText = '';
+        if (respEditor) {
+            respEditorText = respEditor.getText();
+            respEditorText = JSON.parse(respEditorText);
         }
+        
+        // await new Promise(r => setTimeout(r, 100)); // let the command finish
 
-        assert.deepStrictEqual(JSON.parse(text), recvString);
+        // const editor = window.activeTextEditor;  // get active editor
+        // let text = '';
+        // if(editor){
+        //     // get all text from editor
+        //     text = editor.document.getText();
+        // }
+
+        assert.deepStrictEqual(respEditorText, recvString);
 	}).timeout(10000);
 
 });

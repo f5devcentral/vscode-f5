@@ -58,6 +58,7 @@ import { DoCore } from './doCore';
 // instantiate and import logger
 import { logger } from './logger';
 import { AdcDeclaration, As3Declaration } from 'f5-conx-core';
+import { getText } from './utils/utils';
 
 // turn off console logging
 logger.console = false;
@@ -873,7 +874,8 @@ export async function activate(context: ExtensionContext) {
 		let resp;
 
 		if (editor) {
-			var text: any = editor.document.getText(editor.selection);	// highlighted text
+			// var text: any = editor.document.getText(editor.selection);	// highlighted text
+			var text: any = await getText();	// highlighted text
 
 			// see if it's json or yaml or string
 			if (utils.isValidJson(text)) {
@@ -945,6 +947,9 @@ export async function activate(context: ExtensionContext) {
 					}
 
 					logger.debug('generic https f5 call -> ', text);
+
+					// rewrite this to accept just the options object so users can build any input as needed
+					// this current method requires hooking up any and all params the user may specify
 					return await ext.f5Client?.https(text.url, {
 						validateStatus: function (status: number) {
 							// return status >= 200 && status < 300; // default
@@ -962,7 +967,7 @@ export async function activate(context: ExtensionContext) {
 			}
 
 			if (resp) {
-				ext.panel.render(resp);
+				return ext.panel.render(resp);
 			}
 		}
 

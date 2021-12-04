@@ -67,8 +67,9 @@ export class TextDocumentView {
      * - yml/mst for fast templates?
      * - tcl/irule/iapp? -> NO, handled by that class
      * @param response any data to be displayed in an editor
+     * @returns vscode.TextDocument (mainly for tests)
      */
-    public async render(response: any) {
+    public async render(response: any): Promise<TextDocument> {
 
         /**
          * Where new editor should be opened
@@ -151,7 +152,7 @@ export class TextDocumentView {
         // if no open editor
         if (this.documents.length < 1 || newEditorTabForAll) {
              // create the document with language and content
-            await workspace.openTextDocument({ language, content })
+            return await workspace.openTextDocument({ language, content })
             .then( async (doc) => {
                 await window.showTextDocument(doc, { 
                     viewColumn: viewColumn,
@@ -160,7 +161,7 @@ export class TextDocumentView {
                     // preview: false // not sure if this is actually needed
                 });
                 this.documents.push(doc);  // add the document to this class doc list
-                // return doc;
+                return doc;
             });
         } else {
             // docs in list, re-use last one
@@ -178,6 +179,8 @@ export class TextDocumentView {
                 const endPosition = document.lineAt(document.lineCount - 1).range.end;
                 edit.replace(new Range(startPosition, endPosition), content);
             });
+
+            return document;
         }
     }
 
