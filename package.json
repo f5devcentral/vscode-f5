@@ -62,7 +62,6 @@
 		"glob": "^7.1.6",
 		"mocha": "^8.3.2",
 		"nock": "^13.0.11",
-		"semantic-release": "^18.0.1",
 		"typescript": "^3.9.9",
 		"vscode-test": "^1.5.1"
 	},
@@ -79,7 +78,7 @@
 		],
 		"plugins": [
 			"@semantic-release/commit-analyzer",
-			"@semantic-release/release-notes-generator",
+			"@semantic-release/git",
 			[
 				"@semantic-release/git",
 				{
