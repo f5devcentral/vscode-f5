@@ -3,8 +3,14 @@ import fs = require('fs');
 import path = require('path');
 
 import { commands } from 'vscode';
+import { logger } from '../../logger';
 
 suite('device mgmt tasks', () => {
+
+    // before( function () {
+    //     // await new Promise(r => setTimeout(r, 100)); // let select text settle
+    //     setTimeout(() => {}, 500); // let select text settle
+    // });
 
     test('add new device', async () => {
 
@@ -14,7 +20,15 @@ suite('device mgmt tasks', () => {
 
     test('remove new device just added', async () => {
 
-        await commands.executeCommand('f5.removeHost', 'tst9843@1.1.1.1');
+        await new Promise(r => setTimeout(r, 500));
+
+        try {
+            
+            await commands.executeCommand('f5.removeHost', 'tst9843@1.1.1.1');
+        } catch (e) {
+        
+            console.log(...logger.journal);
+        }
 
 	}).timeout(10000);
 
