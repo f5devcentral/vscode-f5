@@ -20,10 +20,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
-      # - run: /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 & echo "Started xvfb"
-      #   shell: bash
-      #   if: ${{ success() && matrix.os == 'ubuntu-latest' }}
+
       - run: npm install
+      
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1.0
         with:
