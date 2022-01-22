@@ -33,7 +33,6 @@ import * as fs from 'fs';
 import * as keyTarType from 'keytar';
 import * as os from 'os';
 
-import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
 import { FastTemplatesTreeProvider } from './treeViewsProviders/fastTreeProvider';
 
@@ -44,7 +43,6 @@ import * as f5FastApi from './utils/f5FastApi';
 import * as f5FastUtils from './utils/f5FastUtils';
 import { deviceImportOnLoad } from './deviceImport';
 import { TextDocumentView } from './editorViews/editorView';
-import { injectSchema } from './atcSchema';
 import devicesCore from './devicesCore';
 import tclCore from './tclCore';
 import { ChangeVersion } from './changeVersion';
@@ -57,8 +55,10 @@ import { DoCore } from './doCore';
 
 // instantiate and import logger
 import { logger } from './logger';
-import { AdcDeclaration, As3Declaration } from 'f5-conx-core';
+import { injectSchema } from 'f5-conx-core';
 import { getText } from './utils/utils';
+import { CfCore } from './cfCore';
+import { As3Core } from './as3Core';
 
 // turn off console logging
 logger.console = false;
@@ -127,7 +127,11 @@ export async function activate(context: ExtensionContext) {
 
 	new BigiqCore(context);
 
+	new As3Core(context);
+
 	new DoCore(context);
+
+	new CfCore(context);
 
 
 	// or do we prefer the function style of importing core blocks?
@@ -459,218 +463,24 @@ export async function activate(context: ExtensionContext) {
 
 
 
-
-	/**
-	 * ############################################################################
-	 * 
-	 * 				  AAA     SSSSS   333333  
-	 * 				 AAAAA   SS          3333 
-	 * 				AA   AA   SSSSS     3333  
-	 * 				AAAAAAA       SS      333 
-	 * 				AA   AA   SSSSS   333333  
-	 * 
-	 * ############################################################################
-	 * http://patorjk.com/software/taag/#p=display&h=0&f=Letters&t=AS3
-	 */
-
-
-	// setting up as3 tree
-	ext.as3Tree = new AS3TreeProvider();
-	window.registerTreeDataProvider('as3Tenants', ext.as3Tree);
-	commands.registerCommand('f5-as3.refreshTenantsTree', () => ext.as3Tree.refresh());
-
-	context.subscriptions.push(commands.registerCommand('f5-as3.getDecs', async (tenant) => {
-
-		if (typeof tenant === 'object') {
-
-			// just a regular as3 declaration object
-			ext.panel.render(tenant);
-
-		} else {
-
-			// got a simple tenant name as string with uri parameter,
-			// this is typically for extended information
-			// so fetch fresh information with param
-			// await ext.f5Client?.as3?.getDecs({ tenant })
-			await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare/${tenant}`)
-				.then((resp: any) => ext.panel.render(resp.data))
-				.catch(err => logger.error('get as3 tenant with param failed:', err));
-		}
-	}));
-
-
-	context.subscriptions.push(commands.registerCommand('f5-as3.expandedTenant', async (tenant) => {
-		commands.executeCommand('f5-as3.getDecs', `${tenant.label}?show=expanded`);
-	}));
-
-
-	context.subscriptions.push(commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
-
-		await window.withProgress({
-			location: ProgressLocation.Notification,
-			// location: { viewId: 'as3Tenants'},
-			title: `Deleting ${tenant.label} Tenant`
-		}, async (progress) => {
-
-			await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare`, {
-				method: 'POST',
-				data: {
-					class: 'AS3',
-					declaration: {
-						schemaVersion: tenant.command.arguments[0].schemaVersion,
-						class: 'ADC',
-						target: tenant.command.arguments[0].target,
-						[tenant.label]: {
-							class: 'Tenant'
-						}
-						// 			await ext.f5Client?.as3?.deleteTenant({
-						// 				class: 'AS3',
-						// 				declaration: {
-						// 					schemaVersion: tenant.command.arguments[0].schemaVersion,
-						// 					class: 'ADC',
-						// 					target: tenant.command.arguments[0].target,
-						// 					[tenant.label]: {
-						// 						class: 'Tenant'
-					}
-				}
-			})
-				// await ext.f5Client?.https(`/mgmt/shared/appsvcs/declare`, {
-				// 	method: 'POST',
-				// 	data: {
-				// 		class: 'AS3',
-				// 		declaration: {
-				// 			schemaVersion: tenant.command.arguments[0].schemaVersion,
-				// 			class: 'ADC',
-				// 			target: tenant.command.arguments[0].target,
-				// 			[tenant.label]: {
-				// 				class: 'Tenant'
-				// 			}
-				// 		}
-				// 	}
-				// })
-				.then((resp: any) => {
-					const resp2 = resp.data.results[0];
-					progress.report({ message: `${resp2.code} - ${resp2.message}` });
-
-				})
-				.catch(err => {
-					progress.report({ message: `${err.message}` });
-					// might need to adjust logging depending on the error, but this works for now, or at least the main HTTP responses...
-					logger.error('as3 delete tenant failed with:', {
-						respStatus: err.response.status,
-						respText: err.response.statusText,
-						errMessage: err.message,
-						errRespData: err.response.data
-					});
-				});
-
-			// hold the status box for user and let things finish before refresh
-			await new Promise(resolve => { setTimeout(resolve, 5000); });
-		});
-
-		ext.as3Tree.refresh();
-
-	}));
-
-	context.subscriptions.push(commands.registerCommand('f5-as3.getTask', (id) => {
-
-		window.withProgress({
-			location: ProgressLocation.Window,
-			// location: { viewId: 'as3Tenants'},
-			title: `Getting AS3 Task`
-		}, async () => {
-
-			await ext.f5Client?.as3?.getTasks(id)
-				.then(resp => ext.panel.render(resp))
-				.catch(err => logger.error('as3 get task failed:', err));
-
-		});
-
-	}));
-
-	context.subscriptions.push(commands.registerCommand('f5-as3.postDec', async () => {
-
-		// var editor = window.activeTextEditor;
-		// if (!editor) {
-		// 	return; // No open text editor
-		// }
-
-		// let text: string;
-		// if (editor.selection.isEmpty) {
-		// 	text = editor.document.getText();	// entire editor/doc window
-		// } else {
-		// 	text = editor.document.getText(editor.selection);	// highlighted text
-		// }
-
-		await utils.getText()
-			.then(async text => {
-
-				if (!utils.isValidJson(text)) {
-					return window.showErrorMessage('Not valid JSON object');
-				}
-
-				// const dec: As3Declaration | AdcDeclaration = JSON.parse(text);
-				const dec = JSON.parse(text);
-
-				await window.withProgress({
-					// location: { viewId: 'as3Tenants'},
-					location: ProgressLocation.Notification,
-					title: `Posting AS3 Declaration`
-				}, async () => {
-
-					await ext.f5Client?.as3?.postDec(dec)
-						.then(resp => {
-							ext.panel.render(resp);
-							ext.as3Tree.refresh();
-						})
-						.catch(err => logger.error('as3 post dec failed:', err));
-
-				});
-			});
-
-
-
-
-
-
-	}));
-
-
 	context.subscriptions.push(commands.registerCommand('f5.injectSchemaRef', async () => {
 
 		// Get the active text editor
 		const editor = window.activeTextEditor;
 
-		if (editor) {
-			let text: string;
-			const document = editor.document;
-
-			// capture selected text or all text in editor
-			if (editor.selection.isEmpty) {
-				text = editor.document.getText();	// entire editor/doc window
-			} else {
-				text = editor.document.getText(editor.selection);	// highlighted text
-			}
-
-			const [newText, validDec] = await injectSchema(text);
-
-			// check if modification worked
-			if (newText && validDec) {
-				editor.edit(edit => {
-					const startPosition = new Position(0, 0);
-					const endPosition = document.lineAt(document.lineCount - 1).range.end;
-					edit.replace(new Range(startPosition, endPosition), JSON.stringify(newText, undefined, 4));
-				});
-			} else if (newText) {
-				editor.edit(edit => {
-					const startPosition = new Position(0, 0);
-					const endPosition = document.lineAt(document.lineCount - 1).range.end;
-					edit.replace(new Range(startPosition, endPosition), newText);
-				});
-			} else {
-				logger.error('ATC schema inject failed');
-			}
-		}
+		getText()
+			.then(text => {
+				const t = JSON.parse(text);
+				injectSchema(t, logger)
+					.then(newText => {
+						editor?.edit(edit => {
+							const startPosition = new Position(0, 0);
+							const endPosition = editor.document.lineAt(editor.document.lineCount - 1).range.end;
+							edit.replace(new Range(startPosition, endPosition), JSON.stringify(newText, undefined, 4));
+						});
+					});
+			})
+			.catch(e => logger.error('f5 atc schema inject error;', e));
 
 	}));
 

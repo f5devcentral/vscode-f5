@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 'use strict';
+'use strict';
 
 // import { utils } from "mocha";
 import { F5Client } from './f5Client';
@@ -26,7 +26,8 @@ import {
     ProgressLocation,
     Uri,
     ExtensionContext,
-    OutputChannel
+    OutputChannel,
+    QuickPickItem
 } from "vscode";
 import { deviceImport } from "./deviceImport";
 import { ext } from "./extensionVariables";
@@ -202,8 +203,16 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         return await ext.hostsTreeProvider.addDevice(newHost);
     }));
 
+    context.subscriptions.push(commands.registerCommand('f5.codeJsonCfg', async () => {
+        commands.executeCommand('workbench.action.openSettingsJson');
+    }));
+
     context.subscriptions.push(commands.registerCommand('f5.removeHost', async (hostID) => {
-        return await ext.hostsTreeProvider.removeDevice(hostID);
+
+        // re-assign device/label if from view select
+        const device = hostID.device.device ? hostID.device.device : hostID;
+        const label = hostID.label ? hostID.label : device;
+        return await ext.hostsTreeProvider.removeDevice(device, label);
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.editHost', async (hostID) => {
@@ -377,8 +386,36 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         let signature;
         let installed: HttpResponse;
 
+        let prompt: boolean = true;
 
-        if (isArray(selectedRPM)) {
+        if (ext.settings.prompts) {
+            const qpOptions: QuickPickItem[] = [
+                {
+                    label: "$(thumbsup) Yes",
+                    description: 'Install RPM',
+                },
+                {
+                    label: "$(thumbsdown) No",
+                    description: " Cancel Operation"
+                }
+            ];
+
+            // await window.showWarningMessage('Are you sure?', 'Yes', 'Cancel')
+            await window.showQuickPick(qpOptions, { title: 'Are you sure?' })
+                .then(resp => {
+                    if (resp === undefined || JSON.stringify(resp).includes('Cancel' || 'No')) {
+                        prompt = false;
+                    } else {
+                        prompt = true;
+                    }
+                });
+
+            logger.info('prompts enabled, f5.installRPM called, user chose:', prompt);
+        }
+
+
+
+        if (isArray(selectedRPM) && prompt) {
 
             window.withProgress({
                 location: { viewId: 'ipView' }
@@ -439,55 +476,85 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.unInstallRPM', async (rpm) => {
 
-        window.withProgress({
-            location: { viewId: 'ipView' }
-        }, async () => {
-            // if no rpm sent in from update command
-            if (!rpm) {
-                // get installed packages
-                const installedRPMs = await rpmMgmt.installedRPMs();
+        let prompt: boolean = true;
 
-                // utilize new method with 
-                // ext.f5Client.atc.showInstalled();
+        if (ext.settings.prompts) {
+            const qpOptions: QuickPickItem[] = [
+                {
+                    label: "$(thumbsup) Yes",
+                    description: 'Un-Install RPM',
+                },
+                {
+                    label: "$(thumbsdown) No",
+                    description: " Cancel Operation"
+                }
+            ];
 
-                // have user select package
-                rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
-            } else {
-                // rpm came from new rpm hosts view
-                if (rpm.label && rpm.tooltip) {
+            // await window.showWarningMessage('Are you sure?', 'Yes', 'Cancel')
+            await window.showQuickPick(qpOptions, { title: 'Are you sure?' })
+                .then(resp => {
+                    if (resp === undefined || JSON.stringify(resp).includes('Cancel' || 'No')) {
+                        prompt = false;
+                    } else {
+                        prompt = true;
+                    }
+                });
+
+            logger.info('prompts enabled, f5.unInstallRPM called, user chose:', prompt);
+        }
+
+        if (prompt) {
+            window.withProgress({
+                location: { viewId: 'ipView' }
+            }, async () => {
+                // if no rpm sent in from update command
+                if (!rpm) {
+                    // get installed packages
+                    const installedRPMs = await rpmMgmt.installedRPMs();
+
+                    // utilize new method with 
+                    // ext.f5Client.atc.showInstalled();
+
+                    // have user select package
+                    rpm = await window.showQuickPick(installedRPMs, { placeHolder: 'select rpm to remove' });
+                } else {
+                    // rpm came from new rpm hosts view
+                    if (rpm.label && rpm.tooltip) {
 
 
-                    await ext.f5Client?.atc.showInstalled()
-                        .then(async resp => {
-                            // loop through response, find rpm that matches rpm.label, then uninstall
-                            const rpmName = resp.data.queryResponse.filter((el: { name: string }) => el.name === rpm.tooltip)[0];
-                            return await ext.f5Client?.atc.unInstall(rpmName.packageName);
+                        await ext.f5Client?.atc.showInstalled()
+                            .then(async resp => {
+                                // loop through response, find rpm that matches rpm.label, then uninstall
+                                const rpmName = resp.data.queryResponse.filter((el: { name: string }) => el.name === rpm.tooltip)[0];
+                                return await ext.f5Client?.atc.unInstall(rpmName.packageName);
 
-                        });
+                            });
 
 
+
+                    }
 
                 }
 
-            }
+                if (!rpm) {	// return error pop-up if quickPick escaped
+                    // return window.showWarningMessage('user exited - did not select rpm to un-install');
+                    logger.info('user exited - did not select rpm to un-install');
+                }
 
-            if (!rpm) {	// return error pop-up if quickPick escaped
-                // return window.showWarningMessage('user exited - did not select rpm to un-install');
-                logger.info('user exited - did not select rpm to un-install');
-            }
+                // const status = await rpmMgmt.unInstallRpm(rpm);
+                // window.showInformationMessage(`rpm ${rpm} removal ${status}`);
+                // debugger;
 
-            // const status = await rpmMgmt.unInstallRpm(rpm);
-            // window.showInformationMessage(`rpm ${rpm} removal ${status}`);
-            // debugger;
+                // used to pause between uninstalling and installing a new version of the same atc
+                //		should probably put this somewhere else
+                await new Promise(resolve => { setTimeout(resolve, 10000); });
+                await ext.f5Client?.connect(); // refresh connect/status bars
+                // ext.hostsTreeProvider.refresh();
+                await new Promise(resolve => { setTimeout(resolve, 500); });
+                bigipProvider.refresh('ATC');
 
-            // used to pause between uninstalling and installing a new version of the same atc
-            //		should probably put this somewhere else
-            await new Promise(resolve => { setTimeout(resolve, 10000); });
-            await ext.f5Client?.connect(); // refresh connect/status bars
-            // ext.hostsTreeProvider.refresh();
-            await new Promise(resolve => { setTimeout(resolve, 500); });
-            bigipProvider.refresh('ATC');
+            });
 
-        });
+        }
     }));
 }

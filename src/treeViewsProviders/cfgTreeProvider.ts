@@ -155,7 +155,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     const appName = el.name.split('/').splice(2);
 
                     // build/return the tree item
-                    return new CfgApp(appName.join('/'), '', el.configs.length.toString(), 'cfgApp', TreeItemCollapsibleState.None,
+                    return new CfgApp(appName.join('/'), '', el.configs.length.toString(), 'cfgAppItem', TreeItemCollapsibleState.None,
                         { command: 'f5.cfgExplore-show', title: '', arguments: [el.configs] });
                 }));
 

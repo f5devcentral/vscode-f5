@@ -67,6 +67,7 @@ export namespace ext {
         export let newEditorTabForAll: boolean;
         export let logLevel: string;
         export let proxy: ProxyCfg | undefined;
+        export let prompts: boolean;
     }
 }
 
@@ -156,6 +157,7 @@ export async function loadSettings() {
     ext.settings.httpResponseDetails = workspace.getConfiguration().get<string>("f5.httpResponseDetails", "full");
     ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
     ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
+    ext.settings.prompts = workspace.getConfiguration().get('f5.enablePrompts', false);
 
     process.env.F5_VSCODE_LOG_LEVEL = workspace.getConfiguration().get<string>('f5.logLevel', 'INFO');
 
