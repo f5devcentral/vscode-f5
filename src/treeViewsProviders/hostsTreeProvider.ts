@@ -25,8 +25,6 @@ import {
 } from 'vscode';
 import { ext } from '../extensionVariables';
 import {
-	AtcRelease,
-	AtcVersion,
 	wait,
 } from 'f5-conx-core';
 import { BigipHost } from '../models';

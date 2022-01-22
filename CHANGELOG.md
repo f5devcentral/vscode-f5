@@ -11,6 +11,36 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.4.0] - (01-18-2022)
+
+- Cloud Failover (CF) support
+  - commands
+    - f5-cf.inspect
+    - f5-cf.getDec
+    - f5-cf.postDec
+    - f5-cf.getTrigger
+    - f5-cf.triggerDryRun
+    - f5-cf.trigger
+    - f5-cf.reset
+  - exmple CF declaration
+  - Inject schema support for CF
+- update f5-conx-core to v0.12.4
+  - <https://github.com/f5devcentral/f5-conx-core/blob/main/CHANGELOG.md>
+  - Cloud Failover support (CF)
+  - update atc inject schema
+- Multi-App Select not working #160
+  - <https://github.com/f5devcentral/vscode-f5/issues/160>
+- [bug] vscode error when removing f5 host #159
+  - <https://github.com/f5devcentral/vscode-f5/issues/159>
+- [RFE] add gear icon to hosts view for quick config.json access #158
+  - <https://github.com/f5devcentral/vscode-f5/issues/158>
+- [RFE] enable prompt to confirm ATC service install #146
+  - <https://github.com/f5devcentral/vscode-f5/issues/146>
+- [RFE] Confirmation prompt before posting a declaration #132
+  - <https://github.com/f5devcentral/vscode-f5/issues/132>
+
+---
+
 ## [3.3.0] - (11-30-2021)
 
 - update local axios or move it to f5-conx-core (removed)
