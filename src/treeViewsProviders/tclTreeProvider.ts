@@ -277,7 +277,7 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 	 * 
 	 * @param config tmos config as a string 
 	 */
-	async mergeTCL (config: string) {
+	async mergeTCL (config: string, replace?: boolean) {
 		logger.debug('mergeTCL', config);
 
 		const text = await utils.getText();	// get text from editor
@@ -297,7 +297,10 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 				logger.debug('tcl upload complete -> moving to /tmp/ location', resp.data);
 			});
 
-			await new Promise(r => setTimeout(r, 100)); // pause to finish upload
+			await new Promise(r => setTimeout(r, 200)); // pause to finish upload
+			
+			// set our replace vs merge flag
+			const merge = replace ? 'replace' : 'merge';
 			
 			// move file to temp location - required for tmsh merge command
 			const move: any = await ext.f5Client?.https(`/mgmt/tm/util/unix-mv`, {
@@ -308,14 +311,15 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 				}
 			});
 			
-			await new Promise(r => setTimeout(r, 100)); // pause to finish move
-			logger.debug('tcl upload complete -> merging with running config', move.data);
+			await new Promise(r => setTimeout(r, 200)); // pause to finish move
+			logger.debug(`tcl upload complete -> ${merge} with running config`, move.data);
+
 	
 			const resp: any = await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
 				method: 'POST',
 				data: {
 					command: 'run',
-					utilCmdArgs: `-c 'tmsh load sys config merge file /tmp/${tmpFile}'`
+					utilCmdArgs: `-c 'tmsh load sys config ${merge} file /tmp/${tmpFile}'`
 				}
 			});
 
@@ -325,7 +329,7 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 				//  merge failed -> display error in editor tab
 				utils.displayInTextEditor(final);
 
-				Promise.reject(new Error(`tmsh merge failed with error: ${final}`));
+				Promise.reject(new Error(`tmsh ${merge} failed with error: ${final}`));
 			} else {
 				window.showInformationMessage('mergeTCL -> SUCCESSFUL!!!', );
 				setTimeout( () => { this.refresh();}, 500);	// refresh after update

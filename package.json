@@ -478,6 +478,11 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5-tcl.replaceTCL",
+				"title": "Replace TCL/TMOS",
+				"category": "F5"
+			},
+			{
 				"command": "f5-tcl.deleteRule",
 				"title": "DELETE iRule",
 				"category": "F5"
@@ -858,6 +863,11 @@
 				},
 				{
 					"when": "f5.tcl",
+					"command": "f5-tcl.replaceTCL",
+					"group": "F5"
+				},
+				{
+					"when": "f5.tcl",
 					"command": "f5-tcl.postTMPL",
 					"group": "F5"
 				},
@@ -891,6 +901,11 @@
 				{
 					"when": "f5.tcl && resourceExtname =~ /\\.(tcl|conf|rule)/",
 					"command": "f5-tcl.mergeTCL",
+					"group": "F5"
+				},
+				{
+					"when": "f5.tcl && resourceExtname =~ /\\.(tcl|conf|rule)/",
+					"command": "f5-tcl.replaceTCL",
 					"group": "F5"
 				},
 				{
@@ -1017,6 +1032,10 @@
 				},
 				{
 					"command": "f5-tcl.mergeTCL",
+					"when": "none"
+				},
+				{
+					"command": "f5-tcl.replaceTCL",
 					"when": "none"
 				},
 				{
