@@ -118,12 +118,20 @@
 				"url": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
 			},
 			{
-				"fileMatch": "*.do.json",
+				"fileMatch": "*.device.json",
 				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json"
+			},
+			{
+				"fileMatch": "*.do.json",
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/remote.schema.json"
 			},
 			{
 				"fileMatch": "*.ts.json",
 				"url": "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json"
+			},
+			{
+				"fileMatch": "*.cf.json",
+				"url": "'https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json"
 			}
 		],
 		"viewsContainers": {

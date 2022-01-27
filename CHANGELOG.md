@@ -17,6 +17,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - <https://github.com/f5devcentral/vscode-f5/issues/137>
 - [RFE] app.conf editor doesn't scroll back to the top on selection of new app #144
   - <https://github.com/f5devcentral/vscode-f5/issues/144>
+- Tweaked the json schema file associations and added CF
+  - *.do.json for regular DO to BIG-IP
+  - *.device.json for DO through BIG-IQ
+  - *.cf.json for CF
 
 ---
 
