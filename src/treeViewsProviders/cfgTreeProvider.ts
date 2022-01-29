@@ -22,6 +22,7 @@ import {
     workspace,
     TextDocument,
     Range,
+    commands,
 } from 'vscode';
 import { ext } from '../extensionVariables';
 
@@ -332,6 +333,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                         const startPosition = new Position(0, 0);
                         const endPosition = a.lineAt(a.lineCount - 1).range.end;
                         edit.replace(new Range(startPosition, endPosition), docContent);
+                        commands.executeCommand("cursorTop");
                     });
                 });
             });

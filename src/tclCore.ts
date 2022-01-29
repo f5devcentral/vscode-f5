@@ -110,5 +110,9 @@ export default function tclCore(context: ExtensionContext) {
         await tclTreeProvider.mergeTCL(item);
     }));
 
+    context.subscriptions.push(commands.registerCommand('f5-tcl.replaceTCL', async (item) => {
+        await tclTreeProvider.mergeTCL(item, true);
+    }));
+
 
 }

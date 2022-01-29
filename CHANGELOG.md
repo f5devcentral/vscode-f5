@@ -11,6 +11,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.5.0] - (01-23-2022)
+
+- [RFE] merge TCL/TMOS pool member only adds to existing config #137
+  - <https://github.com/f5devcentral/vscode-f5/issues/137>
+- [RFE] app.conf editor doesn't scroll back to the top on selection of new app #144
+  - <https://github.com/f5devcentral/vscode-f5/issues/144>
+- Tweaked the json schema file associations and added CF
+  - *.do.json for regular DO to BIG-IP
+  - *.device.json for DO through BIG-IQ
+  - *.cf.json for CF
+
+---
+
 ## [3.4.0] - (01-18-2022)
 
 - Cloud Failover (CF) support
