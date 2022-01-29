@@ -7,10 +7,6 @@ import { logger } from '../../logger';
 
 suite('device mgmt tasks', () => {
 
-    // before( function () {
-    //     // await new Promise(r => setTimeout(r, 100)); // let select text settle
-    //     setTimeout(() => {}, 500); // let select text settle
-    // });
 
     test('add new device', async () => {
 
