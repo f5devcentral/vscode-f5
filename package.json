@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.6.1",
+	"version": "3.7.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -220,6 +220,10 @@
 										"ldap",
 										"custom"
 									]
+								},
+								"folder": {
+									"type": "string",
+									"description": "View folder"
 								},
 								"label": {
 									"type": "string",
