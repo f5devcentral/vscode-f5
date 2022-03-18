@@ -18,8 +18,6 @@ import {
 import { ext } from './extensionVariables';
 import * as utils from './utils/utils';
 import {
-    DoDecParent,
-    DoDecDevice,
     cfDeclaration
 } from 'f5-conx-core';
 import { logger } from './logger';
@@ -55,7 +53,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.inspect()
-                    .then(resp => ext.panel.render(resp));
+                    .then(resp => utils.displayJsonInEditor(resp));
 
             });
 
@@ -70,7 +68,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.getDeclare()
-                    .then(resp => ext.panel.render(resp));
+                    .then(resp => utils.displayJsonInEditor(resp));
 
             });
 
@@ -96,7 +94,7 @@ export class CfCore {
                         }
 
                         await ext.f5Client?.cf?.postDeclare(dec)
-                            .then(resp => ext.panel.render(resp) );
+                            .then(resp => utils.displayJsonInEditor(resp) );
                     });
 
 
@@ -113,7 +111,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.getTrigger()
-                    .then(resp => ext.panel.render(resp));
+                    .then(resp => utils.displayJsonInEditor(resp));
 
             });
 
@@ -129,7 +127,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.trigger('dry-run')
-                    .then(resp => ext.panel.render(resp));
+                    .then(resp => logger.info('f5-cf.triggerDryRun -> COMPLETE', resp.data));
 
             });
         }));
@@ -142,7 +140,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.trigger()
-                    .then(resp => ext.panel.render(resp));
+                    .then(resp => logger.info('f5-cf.trigger -> COMPLETE', resp.data));
 
             });
         }));
@@ -155,7 +153,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.reset()
-                    .then(resp => ext.panel.render(resp));
+                    .then(resp => logger.info('f5-cf.reset -> COMPLETE', resp.data));
 
             });
         }));

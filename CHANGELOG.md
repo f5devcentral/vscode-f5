@@ -11,6 +11,28 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.6.1] - (02-10-2022)
+
+- [BUG] Documentation text link under Config Explorer is misspelled #166
+  - <https://github.com/f5devcentral/vscode-f5/issues/166>
+- [RFE] When requesting info from CFE open new file instead of overwrite #165
+  - <https://github.com/f5devcentral/vscode-f5/issues/165>
+  - smoothed out cf responses
+- [RFE] debounce device connect #167
+  - <https://github.com/f5devcentral/vscode-f5/issues/167>
+- [RFE] update f5-fast-core package #169
+  - <https://github.com/f5devcentral/vscode-f5/issues/169>
+- f5-conx-core v0.13.1
+  - Model refactoring and adjustments for mocks service and declaration validation research
+  - [bug] schema inject changes declaration to "dec" #20
+    - <https://github.com/f5devcentral/f5-conx-core/issues/20>
+    - <https://github.com/f5devcentral/vscode-f5/issues/171>
+- More deps updates
+  - simple-get vulnerability
+  - follow-redirects vulnerability
+
+---
+
 ## [3.5.0] - (01-23-2022)
 
 - [RFE] merge TCL/TMOS pool member only adds to existing config #137

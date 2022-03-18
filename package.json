@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.5.0",
+	"version": "3.6.1",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -66,8 +66,8 @@
 		"vscode-test": "^1.5.1"
 	},
 	"dependencies": {
-		"@f5devcentral/f5-fast-core": "^0.7.0",
-		"f5-conx-core": "^0.12.4",
+		"@f5devcentral/f5-fast-core": "^0.18.0",
+		"f5-conx-core": "^0.13.1",
 		"f5-corkscrew": "^0.9.2",
 		"js-yaml": "4.0.0",
 		"keytar": "^7.7.0",
@@ -146,7 +146,7 @@
 		"viewsWelcome": [
 			{
 				"view": "cfgTree",
-				"contents": "Import TMOS Config to explore.\n[Documenation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Import Corkscrew output](command:f5.cfgExploreRawCorkscrew)"
+				"contents": "Import TMOS Config to explore.\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Documentation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)"
 			}
 		],
 		"views": {
