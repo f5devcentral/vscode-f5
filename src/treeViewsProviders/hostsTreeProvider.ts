@@ -84,9 +84,9 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 	async refresh(): Promise<void> {
 		return await this.loadHosts()
-		.then( _ => {
-			return this._onDidChangeTreeData.fire(undefined);
-		});
+			.then(_ => {
+				return this._onDidChangeTreeData.fire(undefined);
+			});
 	}
 
 
@@ -100,49 +100,115 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 		if (element) {
 
-			// nothing for now...
+			// map hosts array and return items with matching folder
+			this.bigipHosts.map((item: BigipHost) => {
+				if (item.folder === element.label) {
+
+					// add default provider=local if not defined
+					if (!item.hasOwnProperty('provider')) {
+						item['provider'] = 'tmos';
+					}
+
+					let itemCollapsibleState = TreeItemCollapsibleState.None;
+					if (item.device === this.connectedDevice?.device.device) {
+						this.saveConnectedDeviceDetails();
+					}
+
+					const icon =
+						(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
+							(item.details?.product === 'BIG-IP') ? this.f5Hex : 'file';
+					const tooltip
+						= item.details
+							? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
+							: '';
+
+					const treeItem = new F5Host(
+						(item.label || item.device),
+						item.provider,
+						tooltip,
+						icon,
+						'f5Host',
+						itemCollapsibleState,
+						{
+							command: 'f5.connectDevice',
+							title: 'hostTitle',
+							arguments: [item]
+						}
+					);
+
+					treeItem.device = item;
+					treeItems.push(treeItem);
+				}
+			});
 
 		} else {
 
 			this.bigipHosts.map((item: BigipHost) => {
 
+				// if item has folder, create folder item, else return host item
+				if (item.folder) {
 
-				// add default provider=local if not defined
-				if (!item.hasOwnProperty('provider')) {
-					item['provider'] = 'tmos';
-				}
+					// const x = treeItems.findIndex(x => x.label === item.folder);
 
-				// if device is connected device, make it expandable
-				let itemCollapsibleState = TreeItemCollapsibleState.None;
-				if (item.device === this.connectedDevice?.device.device) {
-					// itemCollapsibleState = TreeItemCollapsibleState.Expanded;
-					this.saveConnectedDeviceDetails();
-				}
+					// filter items in folder and return only labels (hostnames)
+					// const folderItems = this.bigipHosts.filter(x => x.label === item.folder).map(y => y.label);
+					const folderItems = this.bigipHosts.filter(x => x.folder === item.folder).map(y => (y.label || y.device));
+					// count the number of hosts in folder
+					const folderItemCount = folderItems.length.toString();
 
-				const icon =
-					(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
-						(item.details?.product === 'BIG-IP') ? this.f5Hex : '';
-				const tooltip
-					= item.details
-						? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
-						: '';
-
-				const treeItem = new F5Host(
-					(item.label || item.device),
-					item.provider,
-					tooltip,
-					icon,
-					'f5Host',
-					itemCollapsibleState,
-					{
-						command: 'f5.connectDevice',
-						title: 'hostTitle',
-						arguments: [item]
+					if (treeItems.findIndex(x => x.label === item.folder) === -1) {
+						// folder item not found, add to tree
+						treeItems.push(new F5Host(
+							item.folder,
+							folderItemCount,
+							new MarkdownString().appendCodeblock(folderItems.join('\n'), 'yaml'),
+							new ThemeIcon('file-directory'),
+							'f5Host-folder',
+							TreeItemCollapsibleState.Collapsed
+						));
 					}
-				);
 
-				treeItem.device = item;
-				treeItems.push(treeItem);
+
+				} else {
+
+					// add default provider=local if not defined
+					if (!item.hasOwnProperty('provider')) {
+						item['provider'] = 'tmos';
+					}
+
+					let itemCollapsibleState = TreeItemCollapsibleState.None;
+					if (item.device === this.connectedDevice?.device.device) {
+						this.saveConnectedDeviceDetails();
+					}
+
+					const icon =
+						(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
+							(item.details?.product === 'BIG-IP') ? this.f5Hex : '$(file)';
+					const tooltip
+						= item.details
+							? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
+							: '';
+
+					const treeItem = new F5Host(
+						(item.label || item.device),
+						item.provider,
+						tooltip,
+						icon,
+						'f5Host',
+						itemCollapsibleState,
+						{
+							command: 'f5.connectDevice',
+							title: 'hostTitle',
+							arguments: [item]
+						}
+					);
+
+					treeItem.device = item;
+					treeItems.push(treeItem);
+				}
+
+
+
 			});
 
 		}

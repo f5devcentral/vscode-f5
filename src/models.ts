@@ -5,11 +5,12 @@
 
 
 /**
- * extension device model
+ * extension device model for hosts view
  */
 export type BigipHost = {
     device: string,
     label?: string,
+    folder?: string,
     details?: {
         product?: string;
         platformMarketingName?: string;

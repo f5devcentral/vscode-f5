@@ -11,6 +11,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.7.0] - (03-18-2022)
+
+- [RFE] Ability to organize F5 Hosts into Folders #71
+  - <https://github.com/f5devcentral/vscode-f5/issues/71>
+
+---
+
 ## [3.6.1] - (02-10-2022)
 
 - [BUG] Documentation text link under Config Explorer is misspelled #166

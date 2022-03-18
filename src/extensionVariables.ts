@@ -189,6 +189,12 @@ export async function loadSettings() {
         logger.info(`NODE_TLS_REJECT_UNAUTHORIZED=${process.env.NODE_TLS_REJECT_UNAUTHORIZED}`);
     }
 
+    // reload device hosts view
+    if(ext.hostsTreeProvider) {
+        // we have to make sure this has been populated after initial extension loading
+        ext.hostsTreeProvider.refresh();
+    }
+
 }
 
 
