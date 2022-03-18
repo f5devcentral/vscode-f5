@@ -57,12 +57,12 @@ import { logger } from './logger';
 //  * #########################################################################
 //  */
 
+let connecting: boolean = false;
+
 /**
  * core devices/view functionality
  */
 export default function devicesCore(context: ExtensionContext, f5OutputChannel: OutputChannel) {
-
-
 
     ext.hostsTreeProvider = new F5TreeProvider(context);
     // window.registerTreeDataProvider('f5Hosts', ext.hostsTreeProvider);
@@ -94,6 +94,12 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
     context.subscriptions.push(commands.registerCommand('f5.refreshHostsTree', () => ext.hostsTreeProvider.refresh()));
 
     context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {
+
+        if (connecting) { 
+            return;
+        } else {
+            connecting = true;
+        }
 
         logger.info('selected device', device);  // preferred at the moment
 
@@ -169,6 +175,9 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
             .catch(err => {
                 logger.error('Connect/Discover failed', err);
             });
+
+        wait(1000);
+        connecting = false;
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {

@@ -17,10 +17,10 @@ import {
 
 import { ext } from './extensionVariables';
 import * as utils from './utils/utils';
-import {
-    DoDecParent,
-    DoDecDevice
-} from 'f5-conx-core';
+// import {
+//     DoDeclartion,
+//     DeviceDeclartion
+// } from 'f5-conx-core';
 import { logger } from './logger';
 
 /**
@@ -70,7 +70,7 @@ export class DoCore {
                     .then(async text => {
 
                         // convert text into json
-                        let dec: DoDecParent | DoDecDevice = utils.isValidJson(text);
+                        let dec = utils.isValidJson(text);
 
                         if (!dec) {
                             // if not valid json, return error message

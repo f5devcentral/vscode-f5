@@ -74,7 +74,7 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
 
         this.connected = ext.f5Client;
 
-        if (this.connected && type === 'UCS') {
+        if (this.connected && this.connected.ucs && type === 'UCS') {
 
             await this.connected.ucs.list()
                 .then(resp => this.ucsList = resp.data.items);
@@ -88,7 +88,7 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
 
             await this.connected.discover();
 
-        } else if (this.connected) {
+        } else if (this.connected && this.connected.ucs) {
 
             // start getting ucs/qkview 
             // await this.connected.discover();
