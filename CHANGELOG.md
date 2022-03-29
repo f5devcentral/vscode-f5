@@ -11,6 +11,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.7.1] - (03-29-2022)
+
+- as3 declarations/tasks data smoothing (m)
+
+---
+
 ## [3.7.0] - (03-18-2022)
 
 - [RFE] Ability to organize F5 Hosts into Folders #71
