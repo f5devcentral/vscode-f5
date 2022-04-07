@@ -32,6 +32,8 @@ export class BigiqCore {
 
         context.subscriptions.push(commands.registerCommand('f5.iqViewShow', async (el) => {
 
+            ext.telemetry.send({ command: 'f5.iqViewShow' });
+
             if (el.selfLink && el.type === 'app') {
 
                 // overwrite the id with the full app details from response
@@ -47,6 +49,9 @@ export class BigiqCore {
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqPostTemplate', async () => {
+            
+            ext.telemetry.send({ command: 'f5.iqPostTemplate' });
+            
             await getText()
                 .then(async text => {
                     await iqProvider.postTemplate(text);
@@ -55,21 +60,33 @@ export class BigiqCore {
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqTemplatePublish', async (item) => {
+            
+            ext.telemetry.send({ command: 'f5.iqTemplatePublish' });
+
             await iqProvider.publishTemplate(item)
                 .catch(err => logger.error('f5.iqTemplatePublish failed with', err));
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqTemplateDelete', async (item) => {
+            
+            ext.telemetry.send({ command: 'f5.iqTemplateDelete' });
+            
             await iqProvider.deleteTemplate(item)
                 .catch(err => logger.error('f5.iqTemplateDelete failed with', err));
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqAppMoveApp', async (item) => {
+            
+            ext.telemetry.send({ command: 'f5.iqAppMoveApp' });
+            
             await iqProvider.moveApp(item)
                 .catch(err => logger.error('f5.iqAppMoveApp failed with', err));
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqAppDelete', async (item) => {
+            
+            ext.telemetry.send({ command: 'f5.iqAppDelete' });
+            
             await iqProvider.deleteApp(item)
                 .catch(err => logger.error('f5.iqAppDelete failed with', err));
         }));
@@ -81,11 +98,17 @@ export class BigiqCore {
 
 
         context.subscriptions.push(commands.registerCommand('f5.iqScriptDelete', async (item) => {
+            
+            ext.telemetry.send({ command: 'f5.iqScriptDelete' });
+            
             await iqProvider.deleteScript(item)
                 .catch(err => logger.error('f5.iqScriptDelete failed with', err));
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqScriptPost', async (item) => {
+            
+            ext.telemetry.send({ command: 'f5.iqScriptPost' });
+            
             getText().then(async text => {
                 await iqProvider.postScript(text)
                     .catch(err => logger.error('f5.iqScriptPost failed with', err));
@@ -93,6 +116,9 @@ export class BigiqCore {
         }));
 
         context.subscriptions.push(commands.registerCommand('f5.iqScriptExecute', async (item) => {
+            
+            ext.telemetry.send({ command: 'f5.iqScriptExecute' });
+            
             await iqProvider.executeScript(item)
                 .catch(err => {
 

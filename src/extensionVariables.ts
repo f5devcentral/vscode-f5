@@ -35,6 +35,7 @@ import { F5Client } from "./f5Client";
 import { AtcVersions, AtcVersionsClient, ExtHttp } from 'f5-conx-core';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
+import { Telemetry } from './telemtry';
 
 type KeyTar = typeof keyTarType;
 
@@ -48,6 +49,7 @@ export namespace ext {
     export let extHttp: ExtHttp;
     export let keyTar: KeyTar;
     export let hostsTreeProvider: F5TreeProvider;
+    export let telemetry: Telemetry;
     export let as3Tree: AS3TreeProvider;
     export let eventEmitterGlobal: EventEmitter;
     export let atcVersions: AtcVersions;
@@ -88,8 +90,12 @@ export async function initSettings(context: ExtensionContext) {
     // todo: setup settings for external http proxy - should probably set environment vars
     ext.eventEmitterGlobal = new EventEmitter();
 
+    // ext.tele Telemetry
+
+    ext.teemAgent = `${context.extension.packageJSON.name}/${context.extension.packageJSON.version}`;
+
     ext.cacheDir = path.join(ext.context.extensionPath, 'cache');
-    process.env.F5_CONX_CORE_EXT_HTTP_AGENT = 'The F5 VScode Extension';
+    process.env.F5_CONX_CORE_EXT_HTTP_AGENT = ext.teemAgent;
     process.env.F5_CONX_CORE_CACHE = ext.cacheDir;
 
     // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";

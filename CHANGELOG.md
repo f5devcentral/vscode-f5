@@ -11,6 +11,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.8.0] - (04-07-2022)
+
+- deps updates
+- telemtry updates
+
+---
+
 ## [3.7.0] - (03-18-2022)
 
 - [RFE] Ability to organize F5 Hosts into Folders #71

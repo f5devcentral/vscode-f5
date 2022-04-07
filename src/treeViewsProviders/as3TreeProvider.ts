@@ -351,6 +351,20 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				});
 			});
 	}
+
+	as3Stats(dec: any) {
+		// return as3AppStats(dec);
+
+		const stats = {};
+
+		Object.entries(dec).forEach(([aKey, aVal]) => {
+
+			if(aKey === 'class') {
+				// stats[akey] = 1;
+				
+			}
+		});
+	}
 }
 
 /**

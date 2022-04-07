@@ -16,6 +16,7 @@ import { getRPMgit, listGitReleases } from './utils/rpmMgmt';
 import { ExtHttp } from 'f5-conx-core';
 
 import { logger } from './logger';
+import { ext } from './extensionVariables';
 
 /**
  * Provides command to download github releases of this extension so users can easily access beta versions for testing
@@ -29,6 +30,8 @@ export class ChangeVersion {
 	constructor(context: ExtensionContext, extHttp: ExtHttp) {
 
 		context.subscriptions.push(commands.registerCommand('f5.changeVersion', async () => {
+
+			ext.telemetry.send({ command: 'f5.changeVersion' });
 
 			//  1. list releases on github repo
 			//  2. provide list/selector for version

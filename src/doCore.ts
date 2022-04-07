@@ -46,6 +46,8 @@ export class DoCore {
 
         context.subscriptions.push(commands.registerCommand('f5-do.getDec', async () => {
 
+            ext.telemetry.send({ command: 'f5-do.getDec' });
+
             await window.withProgress({
                 location: ProgressLocation.Notification,
                 title: `Getting DO Dec`
@@ -60,6 +62,8 @@ export class DoCore {
         }));
 
         context.subscriptions.push(commands.registerCommand('f5-do.postDec', async () => {
+
+            ext.telemetry.send({ command: 'f5-do.postDec' });
 
             await window.withProgress({
                 location: ProgressLocation.Notification,
@@ -104,6 +108,8 @@ export class DoCore {
 
         context.subscriptions.push(commands.registerCommand('f5-do.inspect', async () => {
 
+            ext.telemetry.send({ command: 'f5-do.inspect' });
+
             await window.withProgress({
                 location: ProgressLocation.Notification,
                 title: `Getting DO Inspect`
@@ -119,6 +125,8 @@ export class DoCore {
 
 
         context.subscriptions.push(commands.registerCommand('f5-do.getTasks', async () => {
+
+            ext.telemetry.send({ command: 'f5-do.getTasks' });
 
             await window.withProgress({
                 location: ProgressLocation.Notification,

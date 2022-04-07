@@ -28,6 +28,8 @@ export function cfgExplore(context: ExtensionContext) {
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreOnConnect', async (item) => {
 
+        ext.telemetry.send({ command: 'f5.cfgExploreOneConnect' });
+
         if (!ext.f5Client) {
             await commands.executeCommand('f5.connectDevice', item.command.arguments[0]);
         }
@@ -47,6 +49,8 @@ export function cfgExplore(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('f5.cfgExplore', async (item) => {
 
         let filePath: string;
+
+        ext.telemetry.send({ command: 'f5.cfgExplore' });
 
         if (!item) {
             // no input means we need to browse for a local file
@@ -167,6 +171,7 @@ export function cfgExplore(context: ExtensionContext) {
 
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreClear', async (text) => {
+        ext.telemetry.send({ command: 'f5.cfgExploreClear' });
         cfgProvider.clear();
     }));
 

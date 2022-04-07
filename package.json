@@ -52,25 +52,25 @@
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
-		"@types/js-yaml": "4.0.0",
+		"@types/js-yaml": "^4.0.5",
 		"@types/mocha": "^7.0.1",
-		"@types/node": "^12.20.42",
+		"@types/node": "^14.18.1",
 		"@types/vscode": "^1.63.0",
 		"@typescript-eslint/eslint-plugin": "^5.10.0",
 		"@typescript-eslint/parser": "^5.10.0",
-		"eslint": "^8.7.0",
+		"eslint": "^8.12.0",
 		"glob": "^7.1.6",
-		"mocha": "^9.2.0",
-		"nock": "^13.2.2",
+		"mocha": "^9.2.2",
+		"nock": "^13.2.4",
 		"typescript": "^3.9.9",
 		"vscode-test": "^1.5.1"
 	},
 	"dependencies": {
-		"@f5devcentral/f5-fast-core": "^0.18.0",
+		"@f5devcentral/f5-fast-core": "^0.19.0",
 		"f5-conx-core": "^0.13.1",
-		"f5-corkscrew": "^0.9.2",
-		"js-yaml": "4.0.0",
-		"keytar": "^7.7.0",
+		"f5-corkscrew": "^0.9.3",
+		"js-yaml": "^4.0.0",
+		"keytar": "^7.9.0",
 		"simple-get": "^4.0.1"
 	},
 	"release": {
@@ -94,7 +94,7 @@
 	"activationEvents": [
 		"*"
 	],
-	"main": "./out/extension.js",
+	"main": "./out/extLoader.js",
 	"contributes": {
 		"snippets": [
 			{
