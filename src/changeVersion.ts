@@ -31,7 +31,7 @@ export class ChangeVersion {
 
 		context.subscriptions.push(commands.registerCommand('f5.changeVersion', async () => {
 
-			ext.telemetry.send({ command: 'f5.changeVersion' });
+			ext.telemetry.capture({ command: 'f5.changeVersion' });
 
 			//  1. list releases on github repo
 			//  2. provide list/selector for version

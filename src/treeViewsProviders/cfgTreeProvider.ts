@@ -85,7 +85,8 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     this.explosion = exp;
                     ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extraction complete`);
                     ext.eventEmitterGlobal.emit('log-info', exp.stats);
-                    ext.telemetry.send({ command: 'f5.cfgExplore', stats: exp.stats });
+                    // ts-todo: add key to telemetry
+                    ext.telemetry.capture({ command: 'corkscrew-explosion', stats: exp.stats });
                     this.refresh();
                 })
                 .catch(err => logger.error('makeExplosion', err));

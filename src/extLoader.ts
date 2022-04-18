@@ -30,7 +30,7 @@ async function activate(ctx: ExtensionContext) {
     perfStats.activate = (perfStats.activationTime - perfStats.loadStartTime);
 
     // now that the entire extension has loaded, we can actually call the following telemtry and logging functions and they work
-    ext.telemetry.send({
+    ext.telemetry.capture({
         command: "extensionActivation",
         stats: perfStats
     });

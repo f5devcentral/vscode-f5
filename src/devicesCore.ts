@@ -95,7 +95,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {
 
-        if (connecting) { 
+        if (connecting) {
             return;
         } else {
             connecting = true;
@@ -166,15 +166,15 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
 
                 // ts-todo: add details about platformMarketinName/VE/m
-                ext.telemetry.send({ 
+                ext.telemetry.capture({
                     command: "f5.connectDevice",
                     connect: {
                         product: connect.product,
                         version: connect.version,
-                        atc: connect.atc
+                        atc: connect.atc,
+                        baseRegKey: ext.f5Client?.host?.license.registrationKey
                     }
-
-             });
+                });
 
                 ext.hostsTreeProvider.connectedDevice = ext.f5Client;
                 ext.hostsTreeProvider.refresh();
@@ -195,7 +195,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.getProvider', async () => {
         const x = ext.f5Client;
-        ext.telemetry.send({ command: "f5.getProvider" });
+        ext.telemetry.capture({ command: "f5.getProvider" });
 
         ext.f5Client?.https('/mgmt/tm/auth/source')
             .then(resp => ext.panel.render(resp));
@@ -203,15 +203,15 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
 
     context.subscriptions.push(commands.registerCommand('f5.getF5HostInfo', async () => {
-        
-        ext.telemetry.send({ command: "f5.getF5HostInfo" });
+
+        ext.telemetry.capture({ command: "f5.getF5HostInfo" });
 
         ext.panel.render(ext.f5Client?.host);
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.disconnect', () => {
 
-        ext.telemetry.send({ command: "f5.disconnect" });
+        ext.telemetry.capture({ command: "f5.disconnect" });
 
         if (ext.f5Client) {
             ext.f5Client.disconnect();
@@ -224,7 +224,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.clearPassword', async (item) => {
-        ext.telemetry.send({ command: "f5.clearPassword" });
+        ext.telemetry.capture({ command: "f5.clearPassword" });
         return ext.hostsTreeProvider.clearPassword(item.label);
     }));
 
@@ -234,7 +234,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.codeJsonCfg', async () => {
-        ext.telemetry.send({ command: "f5.codeJsonCfg" });
+        ext.telemetry.capture({ command: "f5.codeJsonCfg" });
         commands.executeCommand('workbench.action.openSettingsJson');
     }));
 
@@ -248,7 +248,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.editHost', async (hostID) => {
 
-        ext.telemetry.send({ command: "f5.editHost" });
+        ext.telemetry.capture({ command: "f5.editHost" });
 
         return await ext.hostsTreeProvider.editDevice(hostID);
     }));
@@ -309,7 +309,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
     context.subscriptions.push(commands.registerCommand('f5.deviceImport', async (item) => {
 
         // ts-todo: make sure this is only called by user
-        ext.telemetry.send({ command: "f5.deviceImport" });
+        ext.telemetry.capture({ command: "f5.deviceImport" });
 
         return utils.getText()
             .then(async text => {
@@ -325,7 +325,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.createUCS', async () => {
 
-        ext.telemetry.send({ command: 'f5.createUCS' });
+        ext.telemetry.capture({ command: 'f5.createUCS' });
 
         // create ucs on f5
 
@@ -358,7 +358,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.deleteUCS', async (item) => {
 
-        ext.telemetry.send({ command: 'f5.deleteUCS' });
+        ext.telemetry.capture({ command: 'f5.deleteUCS' });
 
         return await window.withProgress({
             location: { viewId: 'ipView' },
@@ -379,7 +379,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
     context.subscriptions.push(commands.registerCommand('f5.downloadUCS', async (filename) => {
         // download ucs from f5
 
-        ext.telemetry.send({ command: 'f5.downloadUCS' });
+        ext.telemetry.capture({ command: 'f5.downloadUCS' });
 
         return await window.withProgress({
             location: ProgressLocation.Window,
@@ -424,7 +424,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.installRPM', async (selectedRPM) => {
 
-        ext.telemetry.send({ command: 'f5.installRPM' });
+        ext.telemetry.capture({ command: 'f5.installRPM' });
 
         const downloadResponses = [];
         const upLoadResponses = [];
@@ -522,7 +522,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.unInstallRPM', async (rpm) => {
 
-        ext.telemetry.send({ command: 'f5.unInstallRPM' });
+        ext.telemetry.capture({ command: 'f5.unInstallRPM' });
 
         let prompt: boolean = true;
 

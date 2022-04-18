@@ -47,7 +47,7 @@ export class CfCore {
 
         context.subscriptions.push(commands.registerCommand('f5-cf.inspect', async () => {
 
-            ext.telemetry.send({ command: 'f5-cf.inspect' });
+            ext.telemetry.capture({ command: 'f5-cf.inspect' });
 
             await window.withProgress({
                 location: ProgressLocation.Notification,
@@ -64,7 +64,7 @@ export class CfCore {
 
         context.subscriptions.push(commands.registerCommand('f5-cf.getDec', async () => {
 
-            ext.telemetry.send({ command: 'f5-cf.getDec' });
+            ext.telemetry.capture({ command: 'f5-cf.getDec' });
 
             await window.withProgress({
                 location: ProgressLocation.Notification,
@@ -81,7 +81,7 @@ export class CfCore {
 
         context.subscriptions.push(commands.registerCommand('f5-cf.postDec', async () => {
 
-            ext.telemetry.send({ command: 'f5-cf.postDec' });
+            ext.telemetry.capture({ command: 'f5-cf.postDec' });
 
             await window.withProgress({
                 location: ProgressLocation.Notification,
@@ -111,7 +111,7 @@ export class CfCore {
 
         context.subscriptions.push(commands.registerCommand('f5-cf.getTrigger', async () => {
 
-            ext.telemetry.send({ command: 'f5-cf.getTrigger' });
+            ext.telemetry.capture({ command: 'f5-cf.getTrigger' });
 
             await window.withProgress({
                 location: ProgressLocation.Notification,
@@ -129,7 +129,7 @@ export class CfCore {
 
         context.subscriptions.push(commands.registerCommand('f5-cf.triggerDryRun', async () => {
 
-            ext.telemetry.send({ command: 'f5-cf.triggerDryRun' });
+            ext.telemetry.capture({ command: 'f5-cf.triggerDryRun' });
             await window.withProgress({
                 location: ProgressLocation.Notification,
                 title: `Posting CF Trigger as Dry-Run`
@@ -143,7 +143,7 @@ export class CfCore {
 
         context.subscriptions.push(commands.registerCommand('f5-cf.trigger', async () => {
 
-            ext.telemetry.send({ command: 'f5-cf.trigger' });
+            ext.telemetry.capture({ command: 'f5-cf.trigger' });
 
             await window.withProgress({
                 location: ProgressLocation.Notification,
@@ -158,7 +158,7 @@ export class CfCore {
 
         context.subscriptions.push(commands.registerCommand('f5-cf.reset', async () => {
 
-            ext.telemetry.send({ command: 'f5-cf.reset' });
+            ext.telemetry.capture({ command: 'f5-cf.reset' });
             await window.withProgress({
                 location: ProgressLocation.Notification,
                 title: `Posting CF RESET`

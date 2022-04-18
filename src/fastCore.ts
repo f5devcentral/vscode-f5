@@ -42,7 +42,7 @@ export class FastCore {
 
         context.subscriptions.push(commands.registerCommand('f5-fast.as3ToFastYml', async (text) => {
 
-            ext.telemetry.send({ command: 'f5-fast.as3ToFastYml' });
+            ext.telemetry.capture({ command: 'f5-fast.as3ToFastYml' });
 
             
             logger.info('f5-fast.as3ToFastYml, converting as3 declaration to fast yaml template');

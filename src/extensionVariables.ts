@@ -35,7 +35,7 @@ import { F5Client } from "./f5Client";
 import { AtcVersions, AtcVersionsClient, ExtHttp } from 'f5-conx-core';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
-import { Telemetry } from './telemtry';
+import { Telemetry } from './telemetry';
 
 type KeyTar = typeof keyTarType;
 
