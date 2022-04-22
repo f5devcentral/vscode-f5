@@ -321,8 +321,13 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 			// get list of items in keytar for the 'f5Hosts' service
 			logger.debug('CLEARING KEYTAR PASSWORD CACHE');
 			await ext.keyTar.findCredentials('f5Hosts').then(list => {
+
+				// map out just the account names
+				const devices = list.map(item => item.account);
+				// log the accounts pending password removal
+				logger.info('removing cached password for following devices;', devices);
 				// map through and delete all
-				list.map(item => ext.keyTar.deletePassword('f5Hosts', item.account));
+				devices.map(device => ext.keyTar.deletePassword('f5Hosts', device));
 			});
 			/**
 			 * future: setup clear all to return an array of touples to show which

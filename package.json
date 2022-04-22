@@ -376,7 +376,7 @@
 			},
 			{
 				"command": "f5.clearPassword",
-				"title": "Clear Password",
+				"title": "Clear Password(s)",
 				"category": "F5"
 			},
 			{
@@ -1007,8 +1007,7 @@
 					"when": "none"
 				},
 				{
-					"command": "f5.clearPassword",
-					"when": "none"
+					"command": "f5.clearPassword"
 				},
 				{
 					"command": "f5.editHost",

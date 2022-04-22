@@ -15,6 +15,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - deps updates
 - telemtry updates
+- [RFE] clear all passwords command #178
+  - <https://github.com/f5devcentral/vscode-f5/issues/178>
 
 ---
 

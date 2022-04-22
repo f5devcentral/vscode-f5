@@ -90,9 +90,14 @@ export class Telemetry {
      */
     instanceGUID: string;
 
-    constructor(ctx: ExtensionContext, https: ExtHttp) {
+    constructor(ctx: ExtensionContext) {
         this.ctx = ctx;
-        this.https = https;
+
+        // uncomment to enable telemetry console logging for debugging
+        process.env.F5_TELEMETRY_DEBUG = 'yes';
+
+        // create external https service just for telemetry
+        this.https = this.createExtHttps();
 
         this.teemAgent = ext.teemAgent;
 
@@ -128,6 +133,47 @@ export class Telemetry {
             default:
                 this.uiKind = "unknown";
         }
+    }
+
+    private createExtHttps() {
+
+        // create external https service just for telemetry
+        const eHttps = new ExtHttp();
+
+        // listen and log the requests/responses
+        eHttps
+            .events
+            .on('log-http-request', config => {
+                if (process.env.F5_TELEMETRY_DEBUG) {
+                    console.log(`f5-telemetry-request`, {
+                        method: config.method,
+                        url: config.url,
+                        uuid: config.uuid,
+                        headers: config.headers,
+                        body: config.data
+                    });
+                }
+            })
+            .on('log-http-response', resp => {
+                if (process.env.F5_TELEMETRY_DEBUG) {
+                    console.log(`f5-telemetry-response`, {
+                        status: resp.status,
+                        statusText: resp.statusText,
+                        uuid: resp.config.uuid,
+                        headers: resp.headers,
+                        request: {
+                            baseURL: resp.config.baseURL,
+                            url: resp.config.url,
+                            method: resp.request.method,
+                            headers: resp.config.headers,
+                            timings: resp.request.timings
+                        },
+                        data: resp.data
+                    });
+                }
+            });
+
+        return eHttps;
     }
 
 
@@ -206,7 +252,7 @@ export class Telemetry {
             )
         };
 
-        console.log(JSON.stringify(reqOpts));
+        // console.log(JSON.stringify(reqOpts));
 
         return this.https.makeRequest(reqOpts as uuidAxiosRequestConfig)
             .then(resp => {

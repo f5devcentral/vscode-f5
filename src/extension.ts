@@ -118,7 +118,8 @@ export async function activateInternal(context: ExtensionContext) {
 	// do we prefer the class style of importing core blocks?
 	new ChangeVersion(context, ext.extHttp);
 
-	ext.telemetry = new Telemetry(context, ext.extHttp);
+	// create the telemetry service
+	ext.telemetry = new Telemetry(context);
 
 	logger.debug(`telemtry instance details`, ext.telemetry.telemetryBase());
 
@@ -532,7 +533,7 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5-ts.info', async () => {
-		
+
 		ext.telemetry.capture({ command: 'f5-ts.info' });
 
 		ext.panel.render(ext.f5Client?.ts?.version);
@@ -540,9 +541,9 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5-ts.getDec', async () => {
-		
+
 		ext.telemetry.capture({ command: 'f5-ts.getDec' });
-		
+
 		await window.withProgress({
 			location: ProgressLocation.Notification,
 			title: `Getting TS Dec`
@@ -603,7 +604,7 @@ export async function activateInternal(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
-		
+
 		ext.telemetry.capture({ command: 'f5.getGitHubExample' });
 
 		await ext.extHttp.makeRequest({ url: decUrl })
@@ -637,9 +638,9 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5.jsonYmlConvert', async () => {
-		
+
 		ext.telemetry.capture({ command: 'f5.jsonYmlConvert' });
-		
+
 		const editor = window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -685,9 +686,9 @@ export async function activateInternal(context: ExtensionContext) {
 	// });
 
 	context.subscriptions.push(commands.registerCommand('f5.b64Encode', () => {
-		
+
 		ext.telemetry.capture({ command: 'f5.b64Encode' });
-		
+
 		const editor = window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -701,9 +702,9 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5.b64Decode', () => {
-		
+
 		ext.telemetry.capture({ command: 'f5.b64Decode' });
-		
+
 		const editor = window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -860,6 +861,6 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 // this method is called when your extension is deactivated
-export async function deactivateInternal(context: ExtensionContext) { 
+export async function deactivateInternal(context: ExtensionContext) {
 	// log deactivation event
 }

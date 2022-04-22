@@ -225,7 +225,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.clearPassword', async (item) => {
         ext.telemetry.capture({ command: "f5.clearPassword" });
-        return ext.hostsTreeProvider.clearPassword(item.label);
+        return ext.hostsTreeProvider.clearPassword(item?.label);
     }));
 
 
