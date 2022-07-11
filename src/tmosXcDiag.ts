@@ -17,16 +17,24 @@ import {
     Uri
 } from "vscode";
 
-import tmosXcRules from './tmosXcRules.json';
 import { logger } from "./logger";
+
+export type xcDiagRule = {
+    code: string;
+    severity: "Error" | "Warning" | "Information" | "Hint";
+    title: string;
+    message: string;
+    regex: string;
+};
+
 
 
 export class XcDiag {
 
     diagXC: DiagnosticCollection;
 
-    settingsFileLocation;
-    rules;
+    settingsFileLocation: string;
+    rules: xcDiagRule[];
 
     constructor(context: ExtensionContext) {
         // create diag collection
@@ -85,7 +93,7 @@ export class XcDiag {
         lines.forEach((value, index) => {
     
             // loop through rules on each line
-            tmosXcRules.forEach(rule => {
+            this.rules.forEach(rule => {
     
                 // if rule empty, pass
                 if (rule.regex === '') { return; }
