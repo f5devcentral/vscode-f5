@@ -60,6 +60,7 @@ import { getText } from './utils/utils';
 import { CfCore } from './cfCore';
 import { As3Core } from './as3Core';
 import { Telemetry } from './telemetry';
+import { XcDiag } from './tmosXcDiag';
 
 // turn off console logging
 logger.console = false;
@@ -120,6 +121,8 @@ export async function activateInternal(context: ExtensionContext) {
 
 	// create the telemetry service
 	ext.telemetry = new Telemetry(context);
+	// initialize telemetry service
+	await ext.telemetry.init();
 
 	logger.debug(`telemtry instance details`, ext.telemetry.telemetryBase());
 
@@ -149,6 +152,9 @@ export async function activateInternal(context: ExtensionContext) {
 
 	// tcl view commands
 	tclCore(context);
+
+	// tmos to xc dianostics command/function
+	ext.xcDiag = new XcDiag(context);
 
 
 	context.subscriptions.push(commands.registerCommand('f5.openSettings', () => {

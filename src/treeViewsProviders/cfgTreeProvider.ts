@@ -23,12 +23,18 @@ import {
     TextDocument,
     Range,
     commands,
+    MarkdownString,
+    ThemeIcon,
 } from 'vscode';
+import jsYaml from 'js-yaml';
+
 import { ext } from '../extensionVariables';
 
 import { ConfigFile, Explosion, TmosApp, xmlStats } from 'f5-corkscrew';
 import { logger } from '../logger';
 import BigipConfig from 'f5-corkscrew/dist/ltm';
+import path from 'path';
+import { stat } from 'fs';
 
 // remodel everything here like this example:  https://github.com/microsoft/vscode-extension-samples/blob/master/tree-view-sample/src/testView.ts
 // it will provide a working 'reveal' function and a browsable tmos config tree in the view
@@ -41,6 +47,12 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     private _onDidChangeTreeData: EventEmitter<CfgApp | undefined> = new EventEmitter<CfgApp | undefined>();
     readonly onDidChangeTreeData: Event<CfgApp | undefined> = this._onDidChangeTreeData.event;
 
+    redDot = ext.context.asAbsolutePath(path.join("images", "redDot.svg"));
+    orangeDot = ext.context.asAbsolutePath(path.join("images", "orangeDot.svg"));
+    yellowDot = ext.context.asAbsolutePath(path.join("images", "yellowDot.svg"));
+    greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
+    greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
+
     explosion: Explosion | undefined;
     // confObj: BigipConfObj | undefined;
     /**
@@ -51,8 +63,10 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     parsedFileEvents: any = [];
     parsedObjEvents: any = [];
     partitions: string[] = [];
-    partCounts: {} | undefined;
+    // partCounts: {} | undefined;
     readonly brkr = '\n\n##################################################\n\n';
+
+    xcDiag: boolean = false;
 
     constructor() {
     }
@@ -100,6 +114,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     }
 
     async refresh(): Promise<void> {
+        ext.xcDiag.loadRules();
         this._onDidChangeTreeData.fire(undefined);
     }
 
@@ -142,7 +157,22 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     // collapse all the configs from the apps in the partition
                     const appConfigs = partitionApps.map(item => item.configs.join('\n'));
 
-                    return new CfgApp(el, 'Partition', partitionApps.length.toString(), 'cfgPartition', TreeItemCollapsibleState.Collapsed,
+                    let diagStatsYmlToolTip: string | MarkdownString = '';
+                    let icon = '';
+
+                    // if xc diag enabled
+                    if (this.xcDiag) {
+                        const diags = ext.xcDiag.getDiagnostic(appConfigs.join('\n'));
+                        const stats = ext.xcDiag.getDiagStats(diags);
+
+                        const diagStatsYml = jsYaml.dump(stats, { indent: 4 });
+                        diagStatsYmlToolTip = new MarkdownString().appendCodeblock(diagStatsYml, 'yaml');
+                        icon = stats.Error ? this.redDot
+                            : stats.Warning ? this.orangeDot
+                                : stats.Information ? this.yellowDot : this.greenDot;
+                    }
+
+                    return new CfgApp(el, diagStatsYmlToolTip, partitionApps.length.toString(), 'cfgPartition', icon, TreeItemCollapsibleState.Collapsed,
                         { command: 'f5.cfgExplore-show', title: '---newCmd', arguments: [appConfigs] });
                 }));
 
@@ -157,8 +187,23 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     // split the app/vs from the partition name
                     const appName = el.name.split('/').splice(2);
 
+                    let diagStatsYmlToolTip: string | MarkdownString = '';
+                    let icon = '';
+
+                    // if xc diag enabled
+                    if (this.xcDiag) {
+                        const diags = ext.xcDiag.getDiagnostic(el.configs.join());
+                        const stats = ext.xcDiag.getDiagStats(diags);
+
+                        const diagStatsYml = jsYaml.dump(stats, { indent: 4 });
+                        diagStatsYmlToolTip = new MarkdownString().appendCodeblock(diagStatsYml, 'yaml');
+                        icon = stats.Error ? this.redDot
+                            : stats.Warning ? this.orangeDot
+                                : stats.Information ? this.yellowDot : this.greenDot;
+                    }
+
                     // build/return the tree item
-                    return new CfgApp(appName.join('/'), '', el.configs.length.toString(), 'cfgAppItem', TreeItemCollapsibleState.None,
+                    return new CfgApp(appName.join('/'), diagStatsYmlToolTip, el.configs.length.toString(), 'cfgAppItem', icon, TreeItemCollapsibleState.None,
                         { command: 'f5.cfgExplore-show', title: '', arguments: [el.configs] });
                 }));
 
@@ -166,37 +211,45 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             } else if (element.label === 'Sources' && this.explosion) {
 
                 treeItems = sortTreeItems(this.explosion.config.sources.map((el: ConfigFile) => {
-                    return new CfgApp(el.fileName, '', '', '', TreeItemCollapsibleState.None,
+                    return new CfgApp(el.fileName, '', '', '', '', TreeItemCollapsibleState.None,
                         { command: 'f5.cfgExplore-show', title: '', arguments: [el.content] });
                 }));
             }
 
         } else {
 
-            const title =
-                // if hostname is available, assign
-                this.explosion.hostname ? this.explosion.hostname
 
-                    // if not, this should be a single file input, grab it's name
-                    : this.explosion.config.sources[0].fileName ? this.explosion.config.sources[0].fileName
-
-                        // default value - this should never happen, but TS needed it...
-                        : 'hostname';
-
-            const version = this.explosion.stats.sourceTmosVersion;
-            const inputFileType = this.explosion.inputFileType;
-            const desc = `${inputFileType} - ${version}`;
-
-            this.viewElement = new CfgApp(title, 'Source Config Details', desc, '', TreeItemCollapsibleState.None);
+            // header element describing source details and explosion stats
+            const title = this.explosion.hostname || this.explosion.config.sources[0].fileName;
+            const desc = `${this.explosion.inputFileType} - ${this.explosion.stats.sourceTmosVersion}`;
+            const expStatsYml = jsYaml.dump(this.explosion.stats, { indent: 4 });
+            const expStatsYmlToolTip = new MarkdownString().appendCodeblock(expStatsYml, 'yaml');
+            this.viewElement = new CfgApp(title, expStatsYmlToolTip, desc, '', '', TreeItemCollapsibleState.None);
             treeItems.push(this.viewElement);
 
-            const allSources = this.explosion.config.sources.map((el) => el.content);
+            // tmos to xc diangostics header/switch
+            const xcDiagStatus = this.xcDiag ? "Enabled" : "Disabled";
+            const icon = xcDiagStatus === "Enabled" ? this.greenCheck : '';
+            treeItems.push(new CfgApp(
+                'XC Diagnostics',
+                '',
+                xcDiagStatus,
+                'xcDiag', icon,
+                TreeItemCollapsibleState.None, {
+                command: 'f5.cfgExplore-xcDiagSwitch',
+                title: '',
+                arguments: []
+            }
+            ));
 
+
+            // sources parent folder
+            const allSources = this.explosion.config.sources.map((el) => el.content);
             treeItems.push(new CfgApp(
                 'Sources',
                 '',
                 this.explosion.config.sources.length.toString(),
-                '',
+                '', '',
                 TreeItemCollapsibleState.Collapsed, {
                 command: 'f5.cfgExplore-show',
                 title: '',
@@ -204,30 +257,31 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             }
             ));
 
-            this.partCounts = this.explosion?.config?.apps?.map(item => item.name.split('/')[1])
-                // @ts-expect-error
-                .reduce((acc, curr) => (acc[curr] = (acc[curr] || 0) + 1, acc), {});
+            // // split off the partition names and count the number of unique occurances
+            // this.partCounts = this.explosion?.config?.apps?.map(item => item.name.split('/')[1])
+            //     // @ts-expect-error
+            //     .reduce((acc, curr) => (acc[curr] = (acc[curr] || 0) + 1, acc), {});
 
             this.partitions = [...new Set(this.explosion?.config?.apps?.map(item => item.name.split('/')[1]))];
 
             // get all the apps configs
             const allApps = this.explosion?.config.apps?.map((el: TmosApp) => el.configs.join('\n').concat(this.brkr));
 
-            const appsTotal = this.explosion?.config.apps ? this.explosion.config.apps.length.toString() : '';
-            const baseTotal = this.explosion?.config.base ? this.explosion.config.base.length.toString() : '';
+            // const appsTotal = this.explosion?.config.apps ? this.explosion.config.apps.length.toString() : '';
+            // const baseTotal = this.explosion?.config.base ? this.explosion.config.base.length.toString() : '';
             const doTotal = this.explosion?.config.doClasses ? this.explosion.config.doClasses.length.toString() : '';
             const logTotal = this.explosion?.logs ? this.explosion.logs.length.toString() : '';
 
-            treeItems.push(new CfgApp('Partitions', 'Click for All apps', this.partitions.length.toString(), '', TreeItemCollapsibleState.Collapsed,
+            treeItems.push(new CfgApp('Partitions', 'Click for All apps', this.partitions.length.toString(), '', '', TreeItemCollapsibleState.Collapsed,
                 { command: 'f5.cfgExplore-show', title: '', arguments: [allApps] }));
 
-            if (this.explosion?.config?.base) {
-                treeItems.push(new CfgApp('Base', '', baseTotal, '', TreeItemCollapsibleState.None,
-                    { command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion.config.base] }));
-            }
+            // if (this.explosion?.config?.base) {
+            //     treeItems.push(new CfgApp('Base', '', baseTotal, '', TreeItemCollapsibleState.None,
+            //         { command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion.config.base] }));
+            // }
 
             if (this.explosion?.config?.doClasses) {
-                treeItems.push(new CfgApp('DO', '', doTotal, '', TreeItemCollapsibleState.None,
+                treeItems.push(new CfgApp('DO', '', doTotal, '', '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion.config.doClasses] }));
             }
 
@@ -240,17 +294,17 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 })
                     .map((el: ConfigFile) => `\n###  ${el.fileName}\n${el.content}\n\n`);
 
-                treeItems.push(new CfgApp('FileStore', '', this.bigipConfig.fileStore.length.toString(), '', TreeItemCollapsibleState.None,
+                treeItems.push(new CfgApp('FileStore', '', this.bigipConfig.fileStore.length.toString(), '', '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [allFileStore.join('\n')] }));
             }
 
             if (this.explosion?.logs) {
-                treeItems.push(new CfgApp('Logs', '', logTotal, '', TreeItemCollapsibleState.None,
+                treeItems.push(new CfgApp('Logs', '', logTotal, '', '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [this.explosion.logs] }));
             }
 
             if (this.bigipConfig?.configObject) {
-                treeItems.push(new CfgApp('Config Object', '', '', '', TreeItemCollapsibleState.None,
+                treeItems.push(new CfgApp('Config Object', '', '', '', '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [this.bigipConfig.configObject] }));
             }
 
@@ -274,17 +328,17 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                         statObj[key] = value;
                     }
                 });
-                treeItems.push(new CfgApp('Stats Object', '', '', '', TreeItemCollapsibleState.None,
+                treeItems.push(new CfgApp('Stats Object', '', '', '', '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [statObj] }));
             }
 
             if (this.bigipConfig?.defaultProfileBase) {
-                treeItems.push(new CfgApp('Default Profile Base', '', '', '', TreeItemCollapsibleState.None,
+                treeItems.push(new CfgApp('Default Profile Base', '', '', '', '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [this.bigipConfig.defaultProfileBase.content] }));
             }
 
             if (this.bigipConfig?.license) {
-                treeItems.push(new CfgApp('License', '', '', '', TreeItemCollapsibleState.None,
+                treeItems.push(new CfgApp('License', '', '', '', '', TreeItemCollapsibleState.None,
                     { command: 'f5.cfgExplore-show', title: '', arguments: [this.bigipConfig.license.content] }));
             }
 
@@ -293,7 +347,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     }
 
 
-    async render(items: string[]) {
+    async render(items: string[], diagTag?: boolean) {
 
         const newEditorColumn = ext.settings.previewColumn;
         const editors = window.visibleTextEditors;
@@ -327,16 +381,22 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         // if vClm has a value assign it, else set column 1
         viewColumn = viewColumn ? viewColumn : newEditorColumn;
 
+
+
         var vDoc: Uri = Uri.parse("untitled:" + docName);
         workspace.openTextDocument(vDoc)
             .then((a: TextDocument) => {
-                window.showTextDocument(a, viewColumn, false).then(e => {
-                    e.edit(edit => {
+                window.showTextDocument(a, viewColumn, false).then(async e => {
+                    await e.edit(edit => {
                         const startPosition = new Position(0, 0);
                         const endPosition = a.lineAt(a.lineCount - 1).range.end;
                         edit.replace(new Range(startPosition, endPosition), docContent);
                         commands.executeCommand("cursorTop");
                     });
+                    if(diagTag && this.xcDiag) {
+                        // if we got a text block with diagnostic tag AND xc diagnostics are enabled, then update the document with diagnosics
+                        ext.xcDiag.updateDiagnostic(a);
+                    }
                 });
             });
     }
@@ -362,9 +422,10 @@ function sortTreeItems(treeItems: CfgApp[]) {
 export class CfgApp extends TreeItem {
     constructor(
         public readonly label: string,
-        public tooltip: string,
+        public tooltip: string | MarkdownString,
         public description: string,
         public contextValue: string,
+        public iconPath: string | ThemeIcon,
         public readonly collapsibleState: TreeItemCollapsibleState,
         public readonly command?: Command
     ) {

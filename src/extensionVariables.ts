@@ -36,6 +36,7 @@ import { AtcVersions, AtcVersionsClient, ExtHttp } from 'f5-conx-core';
 import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { Telemetry } from './telemetry';
+import { XcDiag } from './tmosXcDiag';
 
 type KeyTar = typeof keyTarType;
 
@@ -51,6 +52,7 @@ export namespace ext {
     export let hostsTreeProvider: F5TreeProvider;
     export let telemetry: Telemetry;
     export let as3Tree: AS3TreeProvider;
+    export let xcDiag: XcDiag;
     export let eventEmitterGlobal: EventEmitter;
     export let atcVersions: AtcVersions;
     export let connectBar: StatusBarItem;

@@ -1,12 +1,13 @@
+'use-strict';
+
 import os from 'os';
+import fs from 'fs';
+import path from 'path';
 import { randomUUID } from 'crypto';
 
 import vscode from 'vscode';
 import { ExtHttp, uuidAxiosRequestConfig } from 'f5-conx-core';
-import {
-    ExtensionContext
-} from 'vscode';
-import { logger } from './logger';
+import { ExtensionContext } from 'vscode';
 import { ext } from './extensionVariables';
 
 
@@ -20,8 +21,7 @@ export class Telemetry {
     https: ExtHttp;
     ctx: ExtensionContext;
 
-    apiKeyProd = 'mmhJU2sCd63BznXAXDh4kxLIyfIMm3Ar';
-    apiKeyDev = 'bWMssM43DzDTX1bXA9CVzdKkOIrk1I8Z';
+    apiKey: string | undefined;
 
     /**
      * standard vscode f5 document type param
@@ -135,6 +135,39 @@ export class Telemetry {
         }
     }
 
+
+    /**
+     * loads api key from file or secret
+     */
+    async init() {
+
+        const keyFileName = 'F5_TEEM';
+        const keyFileNamePath = path.join(this.ctx.extensionPath, keyFileName);
+
+        // await fs.promises.writeFile(keyFileNamePath, 'something_not');
+        // await fs.promises.writeFile(keyFileNamePath, 'mmhJU2sCd63BznXAXDh4kxLIyfIMm3Ar');
+
+        console.log(`Looking for ${keyFileName} file at`, keyFileNamePath);
+
+        await fs.promises.readFile(keyFileNamePath)
+            .then(key => {
+                this.ctx.secrets.store(keyFileName, key.toString());
+                console.log(`${keyFileName} FILE FOUND AND KEY STORED AS SECRET:`, key.toString());
+            })
+            .then(() => {
+                console.log(`Deleting ${keyFileName} FILE`);
+                fs.unlinkSync(keyFileNamePath);
+            })
+            .catch( e => {
+                console.log(`${keyFileName} FILE NOT FOUND`, e.message);
+            });
+
+        // set the api key
+        this.apiKey = await this.ctx.secrets.get(keyFileName);
+
+        return;
+    }
+
     private createExtHttps() {
 
         // create external https service just for telemetry
@@ -145,11 +178,13 @@ export class Telemetry {
             .events
             .on('log-http-request', config => {
                 if (process.env.F5_TELEMETRY_DEBUG) {
+
+                    const headers = Object.entries(config.headers).filter(([key, val]) => typeof val === 'string' );
                     console.log(`f5-telemetry-request`, {
                         method: config.method,
                         url: config.url,
                         uuid: config.uuid,
-                        headers: config.headers,
+                        headers,
                         body: config.data
                     });
                 }
@@ -236,7 +271,7 @@ export class Telemetry {
             method: 'POST',
             url: this.endPoint,
             headers: {
-                "F5-ApiKey": this.apiKeyProd,
+                "F5-ApiKey": this.apiKey,
                 "F5-DigitalAssetId": this.instanceGUID,
                 "F5-TraceId": randomUUID(),
             },
@@ -256,13 +291,13 @@ export class Telemetry {
 
         return this.https.makeRequest(reqOpts as uuidAxiosRequestConfig)
             .then(resp => {
-                logger.debug(`telemtry resp: ${resp.statusText}-${resp.status}`);
+                console.debug(`telemtry resp: ${resp.statusText}-${resp.status}`);
 
                 // clear journal on successful send
                 this.journal.length = 0;
             })
             .catch(err => {
-                logger.debug(`telemtry error`, err);
+                console.debug(`telemtry error`, err);
             });
 
 

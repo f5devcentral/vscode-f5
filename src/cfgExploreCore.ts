@@ -101,58 +101,58 @@ export function cfgExplore(context: ExtensionContext) {
     }));
 
 
-    context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
-        // no input means we need to browse for a local file
-        const file = await window.showOpenDialog({
-            canSelectMany: false
-        }).then(x => {
-            if (Array.isArray(x)) {
-                return x[0];
-            }
-        });
+    // context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
+    //     // no input means we need to browse for a local file
+    //     const file = await window.showOpenDialog({
+    //         canSelectMany: false
+    //     }).then(x => {
+    //         if (Array.isArray(x)) {
+    //             return x[0];
+    //         }
+    //     });
 
-        let filePath;
+    //     let filePath;
 
-        if (file?.fsPath) {
+    //     if (file?.fsPath) {
 
-            logger.info(`f5.cfgExploreRawCorkscrew _fsPath recieved:`, file.fsPath);
-            filePath = file.fsPath;
+    //         logger.info(`f5.cfgExploreRawCorkscrew _fsPath recieved:`, file.fsPath);
+    //         filePath = file.fsPath;
 
-        } else if (file?.path) {
+    //     } else if (file?.path) {
 
-            logger.info(`f5.cfgExploreRawCorkscrew path revieved:`, file.path);
-            filePath = file.path;
+    //         logger.info(`f5.cfgExploreRawCorkscrew path revieved:`, file.path);
+    //         filePath = file.path;
 
-        } else {
+    //     } else {
 
-            return logger.error('f5.cfgExploreRawCorkscrew -> Neither path supplied was valid', JSON.stringify(file));
+    //         return logger.error('f5.cfgExploreRawCorkscrew -> Neither path supplied was valid', JSON.stringify(file));
 
-        }
+    //     }
 
-        try {
-            // test that we can access the file
-            const x = fs.statSync(filePath);
-        } catch (e) {
-            // if we couldn't get to the file, trim leading character
-            // remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
-            // filePath = filePath.replace(/^(\\|\/)/, '');
-            logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
-            filePath = filePath.substr(1);
-        }
+    //     try {
+    //         // test that we can access the file
+    //         const x = fs.statSync(filePath);
+    //     } catch (e) {
+    //         // if we couldn't get to the file, trim leading character
+    //         // remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
+    //         // filePath = filePath.replace(/^(\\|\/)/, '');
+    //         logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
+    //         filePath = filePath.substr(1);
+    //     }
 
-        if (filePath) {
-            try {
-                const read = fs.readFileSync(filePath, 'utf-8');
-                // parse json
-                const read2 = JSON.parse(read);
-                await cfgProvider.importExplosion(read2);
-            } catch (e) {
-                logger.error('cfgExploreRawCorkscrew import failed', e);
-            }
-        }
+    //     if (filePath) {
+    //         try {
+    //             const read = fs.readFileSync(filePath, 'utf-8');
+    //             // parse json
+    //             const read2 = JSON.parse(read);
+    //             await cfgProvider.importExplosion(read2);
+    //         } catch (e) {
+    //             logger.error('cfgExploreRawCorkscrew import failed', e);
+    //         }
+    //     }
 
-        cfgProvider.refresh();	// refresh with the new information
-    }));
+    //     cfgProvider.refresh();	// refresh with the new information
+    // }));
 
 
 
@@ -176,6 +176,17 @@ export function cfgExplore(context: ExtensionContext) {
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreRefresh', async (text) => {
+        cfgProvider.refresh();
+    }));
+
+    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-xcDiagSwitch', async (text) => {
+        
+        // flip switch and refresh details
+        if(cfgProvider.xcDiag){
+            cfgProvider.xcDiag = false;
+        } else {
+            cfgProvider.xcDiag = true;
+        }
         cfgProvider.refresh();
     }));
 
@@ -204,7 +215,13 @@ export function cfgExplore(context: ExtensionContext) {
 
         // todo: add logic to catch single right click
 
-        cfgProvider.render(text);
+        let diagTag = false;
+        const y = x[0];
+        if (x[0].contextValue === 'cfgPartition' || x[0].contextValue === 'cfgAppItem') {
+            diagTag = true;
+        }
+
+        cfgProvider.render(text, diagTag);
     }));
 
 

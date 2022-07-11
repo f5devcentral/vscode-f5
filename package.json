@@ -68,7 +68,7 @@
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.19.0",
 		"f5-conx-core": "^0.13.1",
-		"f5-corkscrew": "^0.9.3",
+		"f5-corkscrew": "^0.13.0",
 		"js-yaml": "^4.0.0",
 		"keytar": "^7.9.0",
 		"simple-get": "^4.0.1"
@@ -801,6 +801,23 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.xc-diag",
+				"title": "TMOS -> XC diagnostics",
+				"category": "F5"
+			},
+			{
+				"command": "f5.xc-diagRulesOpen",
+				"title": "TMOS -> XC diagnostics Open Rules",
+				"category": "F5",
+				"icon": "$(edit)"
+			},
+			{
+				"command": "f5.xc-diagRulesRefresh",
+				"title": "TMOS -> XC diagnostics Refresh Rules",
+				"category": "F5",
+				"icon": "$(refresh)"
+			},
+			{
 				"command": "f5.changeVersion",
 				"title": "Change Extension Version",
 				"category": "F5"
@@ -886,6 +903,10 @@
 				{
 					"when": "editorHasSelection",
 					"command": "f5.jsonYmlConvert",
+					"group": "F5"
+				},
+				{
+					"command": "f5.xc-diag",
 					"group": "F5"
 				},
 				{
@@ -1276,6 +1297,16 @@
 				{
 					"command": "f5-fast.renderHtmlPreview",
 					"when": "view == fastView && viewItem == fastTemplate"
+				},
+				{
+					"command": "f5.xc-diagRulesOpen",
+					"group": "inline",
+					"when": "view == cfgTree && viewItem == xcDiag"
+				},
+				{
+					"command": "f5.xc-diagRulesRefresh",
+					"group": "inline",
+					"when": "view == cfgTree && viewItem == xcDiag"
 				},
 				{
 					"command": "f5-as3.expandedTenant",
