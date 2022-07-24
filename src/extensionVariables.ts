@@ -112,10 +112,10 @@ export async function initSettings(context: ExtensionContext) {
         .on('log-info', msg => logger.info(msg))
         .on('log-warn', msg => logger.warn(msg))
         .on('log-error', msg => logger.error(msg))
-        .on('failedAuth', msg => {
+        .on('failedAuth', async msg => {
             window.showErrorMessage('Failed Authentication - Please check password');
             logger.error('Failed Authentication Event!', ext.f5Client?.device, msg);
-            ext.f5Client?.clearPassword();
+            await ext.f5Client?.clearPassword(ext.f5Client?.device.device);
             commands.executeCommand('f5.disconnect');
         });
 

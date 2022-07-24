@@ -318,6 +318,7 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 		} else {
 
+			// delete all passwords
 			// get list of items in keytar for the 'f5Hosts' service
 			logger.debug('CLEARING KEYTAR PASSWORD CACHE');
 			await ext.keyTar.findCredentials('f5Hosts').then(list => {

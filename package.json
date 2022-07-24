@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.8.1",
+	"version": "3.8.2",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -67,7 +67,7 @@
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.19.0",
-		"f5-conx-core": "^0.15.0",
+		"f5-conx-core": "^0.15.1",
 		"f5-corkscrew": "^0.13.0",
 		"js-yaml": "^4.0.0",
 		"keytar": "^7.9.0",
