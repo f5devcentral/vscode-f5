@@ -69,15 +69,15 @@ export class XcDiag {
     }
 
     loadRules() {
-        logger.info("loading tmos->xc rules file");
+        logger.info("loading tmos -> xc rules file");
         return this.rules = JSON.parse(fs.readFileSync(this.settingsFileLocation).toString());
     }
     
     openRules() {
         // const loc = path.join(context.Extens)
         // workspace.openTextDocument(this.settingsFileLocation);
-        logger.info("opening tmos->xc rules file");
-        return commands.executeCommand("vscode.open", Uri.parse(this.settingsFileLocation));
+        logger.info("opening tmos -> xc rules file");
+        return commands.executeCommand("vscode.open", Uri.file(this.settingsFileLocation));
         // workbench.action.files.openFile
     }
 

@@ -11,12 +11,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [3.8.0] - (04-07-2022)
+## [3.8.1] - (07-24-2022)
 
 - deps updates
 - telemtry updates
 - [RFE] clear all passwords command #178
   - <https://github.com/f5devcentral/vscode-f5/issues/178>
+- Added TMOS to XC diagnostics to config explorer
 
 ---
 
