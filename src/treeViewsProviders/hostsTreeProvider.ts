@@ -168,7 +168,6 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 						));
 					}
 
-
 				} else {
 
 					// add default provider=local if not defined

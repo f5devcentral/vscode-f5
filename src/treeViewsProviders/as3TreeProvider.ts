@@ -281,7 +281,7 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 				await this.getTenants(); // refresh tenant information
 				await this.getTasks();	// refresh tasks information
 
-				const taskCount = this.tasks.length !== 0 ? this.tasks.length.toString() : '';
+				const taskCount = this.tasks.length !== 0 ? this.tasks.length.toString() : '0';
 
 				// only try to parse declarations if we have an as3 dec map
 				// sometimes AS3 is installed but has no apps
@@ -342,13 +342,19 @@ export class AS3TreeProvider implements TreeDataProvider<AS3item> {
 		await ext.f5Client?.as3?.getTasks()
 			.then((resp: any) => {
 				this.tasks = [];	// clear current tenant list
-				this.tasks = resp.data.items.map((item: any) => {
-					// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
-					const timeStamp = item.declaration.hasOwnProperty('controls') ? item.declaration.controls.archiveTimestamp : '';
-					const iId = item.id;
 
-					return { iId, timeStamp };
-				});
+				// reassing tasks data cbip returns 'resp.data.items[]', mbip returns 'resp.data[]'
+				const tsks = resp.data.items ? resp.data.items : resp.data;
+
+				// if(resp.data.length > 0) {
+					this.tasks = tsks.map((item: any) => {
+						// if no decs in task or none on box, it returns limited details, but the request still gets an ID, so we blank in what's not there - also happens when getting-tasks
+						const timeStamp = item.declaration.hasOwnProperty('controls') ? item.declaration.controls.archiveTimestamp : '';
+						const iId = item.id;
+	
+						return { iId, timeStamp };
+					});
+				// }
 			});
 	}
 
