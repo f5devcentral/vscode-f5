@@ -243,8 +243,8 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
     context.subscriptions.push(commands.registerCommand('f5.removeHost', async (hostID) => {
 
         // re-assign device/label if from view select
-        const device = hostID.device.device ? hostID.device.device : hostID;
-        const label = hostID.label ? hostID.label : device;
+        const device = hostID?.device?.device ? hostID.device.device : hostID;
+        const label = hostID?.label ? hostID.label : device;
         return await ext.hostsTreeProvider.removeDevice(device, label);
     }));
 
