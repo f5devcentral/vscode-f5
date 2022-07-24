@@ -239,8 +239,8 @@ export class F5Client extends _F5Client {
      *  to be called by http since it won't know current
      *  device details
      */
-    async clearPassword() {
-        await commands.executeCommand('f5.clearPassword', { label: this.device });
+    async clearPassword(device: string) {
+        await commands.executeCommand('f5.clearPassword', { label: device || this.device });
     }
 
 

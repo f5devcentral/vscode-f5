@@ -21,6 +21,7 @@ import {
 import { isObject } from 'f5-conx-core';
 
 import { logger } from './logger';
+import { ext } from './extensionVariables';
 
 /**
  * Provides command to download github releases of this extension so users can easily access beta versions for testing
@@ -41,6 +42,9 @@ export class FastCore {
 
         context.subscriptions.push(commands.registerCommand('f5-fast.as3ToFastYml', async (text) => {
 
+            ext.telemetry.capture({ command: 'f5-fast.as3ToFastYml' });
+
+            
             logger.info('f5-fast.as3ToFastYml, converting as3 declaration to fast yaml template');
             const editor = window.activeTextEditor;
 

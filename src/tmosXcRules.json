@@ -1,0 +1,352 @@
+[
+    {
+        "code": "1360",
+        "severity": "Information",
+        "title": "Virtual References iRules",
+        "message": "Virtual Server references iRule(s), review iRules for compatibility",
+        "regex": "rules {"
+    },
+    {
+        "code": "8e2d",
+        "severity": "Information",
+        "title": "iRule object",
+        "message": "iRule object found in config, review for compatibility",
+        "regex": "ltm rule "
+    },
+    {
+        "code": "e3d6",
+        "severity": "Warning",
+        "title": "Virtual References Local Traffic Policy(s)",
+        "message": "Virtual Server references Local Traffic Policy(s), review policies for compatibility",
+        "regex": "policies {"
+    },
+    {
+        "code": "f297",
+        "severity": "Warning",
+        "title": "Local Traffic Policy(s) object",
+        "message": "Local Traffic Policy(s) found in config, review policies for compatibility",
+        "regex": "ltm policy "
+    },
+    {
+        "code": "6cf2",
+        "severity": "Error",
+        "title": "Access Policy object",
+        "message": "Access Policy(s) found in config, XC does not support Access Solutions",
+        "regex": "apm profile access "
+    },
+    {
+        "code": "1219",
+        "severity": "Error",
+        "title": "FTP not supported",
+        "message": "so, look for tcp ports 21/22",
+        "regex": "ftp"
+    },
+    {
+        "code": "429b",
+        "severity": "Error",
+        "title": "App with match across services",
+        "message": "XC cannot match across services, like ftp, control on tcp/21, data on tcp/22",
+        "regex": "match-across"
+    },
+    {
+        "code": "0776",
+        "severity": "Warning",
+        "title": "Static NAT not supported",
+        "message": "XC can nat, but uses a range of sources -- refine the regex ",
+        "regex": "snat"
+    },
+    {
+        "code": "094d",
+        "severity": "Warning",
+        "title": "snat pool object detected",
+        "message": "NATs are supported, but not statics",
+        "regex": "ltm snatpool /Common/zone1"
+    },
+    {
+        "code": "e66b",
+        "severity": "Error",
+        "title": "Supporting APM profile detected",
+        "message": "While not a direct APM profile, these profiles on the VS indicate that an APM profile is applied",
+        "regex": "(/Common/websso { }|/Common/rba { })"
+    },
+    {
+        "code": "b2b9",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "589b",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "74f7",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "d633",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "05ab",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "0049",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "2671",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "9929",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "5cf0",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "659b",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "b432",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "c5dc",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "86d2",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "f4a6",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "016c",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "7efa",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "fcd6",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "6944",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "78e9",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "f13c",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "b013",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "757b",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "95ed",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "fc18",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "edcb",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "62a1",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "baf6",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "6fac",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "a834",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "812d",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "7f5e",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "77e2",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "8dca",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "c855",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "ce1a",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "e371",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "db44",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "03f6",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "8e0f",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    },
+    {
+        "code": "523b",
+        "severity": "Hint",
+        "title": "",
+        "message": "",
+        "regex": ""
+    }
+]

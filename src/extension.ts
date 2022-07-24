@@ -59,6 +59,8 @@ import { injectSchema } from 'f5-conx-core';
 import { getText } from './utils/utils';
 import { CfCore } from './cfCore';
 import { As3Core } from './as3Core';
+import { Telemetry } from './telemetry';
+import { XcDiag } from './tmosXcDiag';
 
 // turn off console logging
 logger.console = false;
@@ -71,24 +73,23 @@ logger.output = function (log: string) {
 	f5OutputChannel.appendLine(log);
 };
 
-// load project package details to get logged
-const packageJson = require('../package.json');
 
 // provide extension functions for activation
-export async function activate(context: ExtensionContext) {
+export async function activateInternal(context: ExtensionContext) {
 
 	process.on('unhandledRejection', error => {
 		logger.error('--- unhandledRejection ---', error);
+		ext.telemetry.capture({ unhandledRejection: JSON.stringify(error) });
 	});
 
 	logger.info(`Extension/Host details: `, {
-		name: packageJson.name,
-		displayName: packageJson.displayName,
-		publisher: packageJson.publisher,
-		description: packageJson.description,
-		version: packageJson.version,
-		license: packageJson.license,
-		repository: packageJson.repository.url,
+		name: context.extension.packageJSON.name,
+		displayName: context.extension.packageJSON.displayName,
+		publisher: context.extension.packageJSON.publisher,
+		description: context.extension.packageJSON.description,
+		version: context.extension.packageJSON.version,
+		license: context.extension.packageJSON.license,
+		repository: context.extension.packageJSON.repository.url,
 		host: JSON.stringify({
 			hostOS: os.type(),
 			platform: os.platform(),
@@ -104,8 +105,6 @@ export async function activate(context: ExtensionContext) {
 	// load ext config to ext.settings.
 	await loadSettings();
 
-	ext.teemAgent = `${packageJson.name}/${packageJson.version}`;
-
 	ext.connectBar = window.createStatusBarItem(StatusBarAlignment.Left, 9);
 	ext.connectBar.command = 'f5.connectDevice';
 	ext.connectBar.text = 'F5 -> Connect!';
@@ -117,9 +116,15 @@ export async function activate(context: ExtensionContext) {
 
 	tokenTimer();
 
-
 	// do we prefer the class style of importing core blocks?
 	new ChangeVersion(context, ext.extHttp);
+
+	// create the telemetry service
+	ext.telemetry = new Telemetry(context);
+	// initialize telemetry service
+	await ext.telemetry.init();
+
+	logger.debug(`telemtry instance details`, ext.telemetry.telemetryBase());
 
 	new Hovers(context, ext.eventEmitterGlobal);
 
@@ -147,6 +152,9 @@ export async function activate(context: ExtensionContext) {
 
 	// tcl view commands
 	tclCore(context);
+
+	// tmos to xc dianostics command/function
+	ext.xcDiag = new XcDiag(context);
 
 
 	context.subscriptions.push(commands.registerCommand('f5.openSettings', () => {
@@ -187,6 +195,8 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.deployApp', async () => {
 
+		ext.telemetry.capture({ command: 'f5-fast.deployApp' });
+
 		await utils.getText()
 			.then(async text => {
 
@@ -214,6 +224,8 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.getApp', async (tenApp) => {
 
+		ext.telemetry.capture({ command: 'f5-fast.getApp' });
+
 		await ext.f5Client?.https(`/mgmt/shared/fast/applications/${tenApp}`)
 			.then(resp => ext.panel.render(resp))
 			.catch(err => logger.error('get fast app failed:', err));
@@ -224,6 +236,8 @@ export async function activate(context: ExtensionContext) {
 
 		// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/tasks/${taskId}`);
 		// ext.panel.render(resp);
+
+		ext.telemetry.capture({ command: 'f5-fast.getTask' });
 
 		await ext.f5Client?.https(`/mgmt/shared/fast/tasks/${taskId}`)
 			.then(resp => ext.panel.render(resp))
@@ -236,6 +250,8 @@ export async function activate(context: ExtensionContext) {
 		// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templates/${template}`);
 		// ext.panel.render(resp);
 
+		ext.telemetry.capture({ command: 'f5-fast.getTemplate' });
+
 		await ext.f5Client?.https(`/mgmt/shared/fast/templates/${template}`)
 			.then(resp => ext.panel.render(resp))
 			.catch(err => logger.error('get fast task failed:', err));
@@ -246,6 +262,8 @@ export async function activate(context: ExtensionContext) {
 		// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/shared/fast/templatesets/${set}`);
 		// ext.panel.render(resp);
 
+		ext.telemetry.capture({ command: 'f5-fast.getTemplateSets' });
+
 		await ext.f5Client?.https(`/mgmt/shared/fast/templatesets/${set}`)
 			.then(resp => ext.panel.render(resp))
 			.catch(err => logger.error('get fast task failed:', err));
@@ -253,6 +271,8 @@ export async function activate(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.convJson2Mst', async () => {
+
+		ext.telemetry.capture({ command: 'f5-fast.convJson2Mst' });
 
 		// get editor window
 		var editor = window.activeTextEditor;
@@ -316,6 +336,8 @@ export async function activate(context: ExtensionContext) {
 	// }));
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.postTemplateSet', async (sPath) => {
+
+		ext.telemetry.capture({ command: 'f5-fast.postTemplateSet' });
 
 		logger.debug('postTemplateSet selection', sPath);
 		let wkspPath;
@@ -390,6 +412,8 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.deleteFastApp', async (tenApp) => {
 
+		ext.telemetry.capture({ command: 'f5-fast.deleteFastApp' });
+
 		// var device: string | undefined = ext.hostStatusBar.text;
 		// const password = await utils.getPassword(device);
 		const resp = await f5FastApi.delTenApp(tenApp.label);
@@ -403,6 +427,8 @@ export async function activate(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5-fast.deleteFastTempSet', async (tempSet) => {
+
+		ext.telemetry.capture({ command: 'f5-fast.deleteFastTempSet' });
 
 		const resp = await f5FastApi.delTempSet(tempSet.label);
 
@@ -420,6 +446,8 @@ export async function activate(context: ExtensionContext) {
 
 		let text: string = 'empty';
 		let title: string = 'Fast Template';
+
+		ext.telemetry.capture({ command: 'f5-fast.renderHtmlPreview' });
 
 		if (item?.hasOwnProperty('scheme') && item?.scheme === 'file') {
 			// right click from explorer view initiation, so load file contents
@@ -468,6 +496,8 @@ export async function activate(context: ExtensionContext) {
 		// Get the active text editor
 		const editor = window.activeTextEditor;
 
+		ext.telemetry.capture({ command: 'f5.injectSchemaRef' });
+
 		getText()
 			.then(text => {
 				const t = JSON.parse(text);
@@ -509,11 +539,17 @@ export async function activate(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5-ts.info', async () => {
+
+		ext.telemetry.capture({ command: 'f5-ts.info' });
+
 		ext.panel.render(ext.f5Client?.ts?.version);
 	}));
 
 
 	context.subscriptions.push(commands.registerCommand('f5-ts.getDec', async () => {
+
+		ext.telemetry.capture({ command: 'f5-ts.getDec' });
+
 		await window.withProgress({
 			location: ProgressLocation.Notification,
 			title: `Getting TS Dec`
@@ -527,6 +563,8 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5-ts.postDec', async () => {
+
+		ext.telemetry.capture({ command: 'f5-ts.postDec' });
 
 		// if selected text, capture that, if not, capture entire document
 		var editor = window.activeTextEditor;
@@ -572,6 +610,9 @@ export async function activate(context: ExtensionContext) {
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.getGitHubExample', async (decUrl) => {
+
+		ext.telemetry.capture({ command: 'f5.getGitHubExample' });
+
 		await ext.extHttp.makeRequest({ url: decUrl })
 			.then(resp => ext.panel.render(resp))
 			.catch(err => logger.error(err));
@@ -603,6 +644,9 @@ export async function activate(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5.jsonYmlConvert', async () => {
+
+		ext.telemetry.capture({ command: 'f5.jsonYmlConvert' });
+
 		const editor = window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -648,6 +692,9 @@ export async function activate(context: ExtensionContext) {
 	// });
 
 	context.subscriptions.push(commands.registerCommand('f5.b64Encode', () => {
+
+		ext.telemetry.capture({ command: 'f5.b64Encode' });
+
 		const editor = window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -661,6 +708,9 @@ export async function activate(context: ExtensionContext) {
 
 
 	context.subscriptions.push(commands.registerCommand('f5.b64Decode', () => {
+
+		ext.telemetry.capture({ command: 'f5.b64Decode' });
+
 		const editor = window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -678,6 +728,8 @@ export async function activate(context: ExtensionContext) {
 		 * make open/raw https call
 		 * 
 		 */
+
+		ext.telemetry.capture({ command: 'f5.makeRequest' });
 
 		logger.debug('executing f5.makeRequest');
 		const editor = window.activeTextEditor;
@@ -786,6 +838,8 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.remoteCommand', async () => {
 
+		ext.telemetry.capture({ command: 'f5.remoteCommand' });
+
 		await window.showInputBox({ placeHolder: 'Bash Command to Execute?', ignoreFocusOut: true })
 			.then(async cmd => {
 
@@ -813,4 +867,6 @@ export async function activate(context: ExtensionContext) {
 
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export async function deactivateInternal(context: ExtensionContext) {
+	// log deactivation event
+}

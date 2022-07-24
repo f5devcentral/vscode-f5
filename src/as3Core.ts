@@ -45,6 +45,7 @@ export class As3Core {
 
         context.subscriptions.push(commands.registerCommand('f5-as3.getDecs', async (item) => {
 
+            ext.telemetry.capture({ command: 'f5-as3.getDecs' });
             
             if (item.tenant && item.expanded) {
                 // const dd = await tenantFromDec(item.command.arguments[0]);
@@ -63,11 +64,14 @@ export class As3Core {
 
         context.subscriptions.push(commands.registerCommand('f5-as3.expandedTenant', async (tenant) => {
             commands.executeCommand('f5-as3.getDecs', { tenant: tenant.label, expanded: true });
+            ext.telemetry.capture({ command: 'f5-as3.expandedTenant' });
         }));
 
 
         context.subscriptions.push(commands.registerCommand('f5-as3.deleteTenant', async (tenant) => {
             let prompt: boolean = true;
+
+            ext.telemetry.capture({ command: 'f5-as3.deleteTenant' });
 
             if (ext.settings.prompts) {
                 const qpOptions: QuickPickItem[] = [
@@ -127,6 +131,8 @@ export class As3Core {
         }));
 
         context.subscriptions.push(commands.registerCommand('f5-as3.getTask', (id) => {
+
+            ext.telemetry.capture({ command: 'f5-as3.getTask' });
 
             window.withProgress({
                 location: ProgressLocation.Window,
@@ -188,6 +194,10 @@ export class As3Core {
                             title: `Posting AS3 Declaration`
                         }, async () => {
 
+                            // todo: build as3 stats
+                            // const stats = await as3AppStats(dec);  
+                            ext.telemetry.capture({ command: 'f5-as3.expandedTenant' });
+
                             await ext.f5Client?.as3?.postDec(dec)
                                 .then(resp => {
                                     ext.panel.render(resp);
@@ -200,4 +210,9 @@ export class As3Core {
             }
         }));
     }
+}
+
+
+function as3Stats(dec: any) {
+
 }
