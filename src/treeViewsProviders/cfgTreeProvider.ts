@@ -114,7 +114,9 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     }
 
     async refresh(): Promise<void> {
-        ext.xcDiag.loadRules();
+        if(ext.xcDiag?.loadRules()) {
+            ext.xcDiag.loadRules();
+        }
         this._onDidChangeTreeData.fire(undefined);
     }
 
