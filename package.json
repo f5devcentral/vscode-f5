@@ -99,7 +99,7 @@
 		"snippets": [
 			{
 				"language": "json",
-				"path": "./snippets.json"
+				"path": "./snippets/snippets.json"
 			},
 			{
 				"language": "yaml",
