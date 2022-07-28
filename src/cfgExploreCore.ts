@@ -14,6 +14,7 @@ import { CfgProvider } from "./treeViewsProviders/cfgTreeProvider";
 import fs from 'fs';
 
 import { logger } from './logger';
+import { XcDiag } from "./tmosXcDiag";
 
 export function cfgExplore(context: ExtensionContext) {
 
@@ -186,6 +187,12 @@ export function cfgExplore(context: ExtensionContext) {
             cfgProvider.xcDiag = false;
         } else {
             cfgProvider.xcDiag = true;
+            
+            // was having errors about functions undefined, so, make sure everything is loaded as we turn this on
+            if (ext.xcDiag.updateDiagnostic === undefined) {
+                console.log('xc diag updatediagnostics undefined at enable');
+                ext.xcDiag = new XcDiag(context);
+            }
         }
         cfgProvider.refresh();
     }));

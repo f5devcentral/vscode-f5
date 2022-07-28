@@ -4,7 +4,6 @@ import path from "path";
 import fs from "fs";
 
 import {
-    window,
     commands,
     ExtensionContext,
     Diagnostic,
@@ -41,31 +40,8 @@ export class XcDiag {
         this.diagXC = languages.createDiagnosticCollection('f5-tmos-xc');
 
         this.settingsFileLocation = path.join(context.extensionPath, 'out', 'tmosXcRules.json'); 
-        this.rules = JSON.parse(fs.readFileSync(this.settingsFileLocation).toString());
+        this.rules = this.loadRules();
 
-        context.subscriptions.push(commands.registerCommand('f5.xc-diagRulesOpen', async () => {
-            this.openRules();
-        }));
-
-        context.subscriptions.push(commands.registerCommand('f5.xc-diagRulesRefresh', async () => {
-            this.loadRules();
-        }));
-
-
-        context.subscriptions.push(commands.registerCommand('f5.xc-diag', async () => {
-
-            // if somehow this got called without an editor, pass
-            const editor = window.activeTextEditor;
-            if (!editor) {
-                return;
-            }
-    
-            if (editor) {
-                // Since we have an editor
-                this.updateDiagnostic(editor.document);
-            }
-    
-        }));
     }
 
     loadRules() {

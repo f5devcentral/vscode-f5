@@ -153,8 +153,64 @@ export async function activateInternal(context: ExtensionContext) {
 	// tcl view commands
 	tclCore(context);
 
-	// tmos to xc dianostics command/function
+
+
+	
+	
+	
+	/**
+	 * ###########################################################################
+	 * 
+	 * 			XX    XX  CCCCC     DDDDD   iii                 
+	 * 			 XX  XX  CC    C    DD  DD        aa aa  gggggg 
+	 * 			  XXXX   CC         DD   DD iii  aa aaa gg   gg 
+	 * 			 XX  XX  CC    C    DD   DD iii aa  aaa ggggggg 
+	 * 			XX    XX  CCCCC     DDDDDD  iii  aaa aa      gg 
+	 * 			                                         ggggg  
+	 * 
+	 * ############################################################################
+	 * http://patorjk.com/software/taag/#p=display&f=Letters&t=XC%20Diag
+	 */
+
+	// load tmos to xc dianostics functions
 	ext.xcDiag = new XcDiag(context);
+
+	context.subscriptions.push(commands.registerCommand('f5.xc-diagRulesOpen', async () => {
+		ext.telemetry.capture({ command: 'f5.xc-diagRulesOpen' });
+		ext.xcDiag?.openRules();
+	}));
+
+	context.subscriptions.push(commands.registerCommand('f5.xc-diagRulesRefresh', async () => {
+		ext.telemetry.capture({ command: 'f5.xc-diagRulesRefresh' });
+		ext.xcDiag?.loadRules();
+	}));
+
+	context.subscriptions.push(commands.registerCommand('f5.xc-diag', async () => {
+
+		ext.telemetry.capture({ command: 'f5.xc-diag' });
+
+		// if somehow this got called without an editor, pass
+		const editor = window.activeTextEditor;
+		if (!editor) {
+			return;
+		}
+
+		if (editor) {
+			// Since we have an editor
+			ext.xcDiag?.updateDiagnostic(editor.document);
+		}
+
+	}));
+
+
+
+
+
+
+
+
+
+
 
 
 	context.subscriptions.push(commands.registerCommand('f5.openSettings', () => {
