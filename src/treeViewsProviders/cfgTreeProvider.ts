@@ -146,6 +146,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
         if (element) {
 
+            // if parent "partitions" item, then get paritions and details to list 
             if (element.label === 'Partitions' && this.explosion.config.apps) {
 
                 // re-assign the apps so TS knows we have a value here
@@ -179,6 +180,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 }));
 
 
+            // selected app partition
             } else if (element.contextValue === 'cfgPartition' && this.explosion.config.apps) {
 
                 // filter the apps that are in this partition
@@ -190,16 +192,26 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     const appName = el.name.split('/').splice(2);
 
                     let diagStatsYmlToolTip: string | MarkdownString = '';
-                    let icon = '';
+                    let icon: string | ThemeIcon = '';
 
                     // if xc diag enabled
                     if (this.xcDiag) {
-                        const diags = ext.xcDiag.getDiagnostic(el.configs.join());
+
+                        // loop through apps and get exclusions
+                        const exclusions: { vs: string, reasons: string[] }[] = [];
+                        el.configs.forEach(elin => {
+                            const excluded = ext.xcDiag.getDiagnosticExlusion(elin);
+                            if(excluded.reasons.length > 0) {
+                                exclusions.push(excluded);
+                            }
+                        });
+                        const diags = ext.xcDiag.getDiagnostic(el.configs);
                         const stats = ext.xcDiag.getDiagStats(diags);
 
-                        const diagStatsYml = jsYaml.dump(stats, { indent: 4 });
+                        const diagStatsYml = jsYaml.dump({ stats, exclusions}, { indent: 4 });
                         diagStatsYmlToolTip = new MarkdownString().appendCodeblock(diagStatsYml, 'yaml');
-                        icon = stats.Error ? this.redDot
+                        icon = exclusions.length > 0 ? new ThemeIcon('debug-step-over', '#D3D3D3')
+                            : stats.Error ? this.redDot
                             : stats.Warning ? this.orangeDot
                                 : stats.Information ? this.yellowDot : this.greenDot;
                     }
