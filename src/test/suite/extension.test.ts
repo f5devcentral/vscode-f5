@@ -8,7 +8,7 @@ import path = require('path');
 import { window, commands, EndOfLine, workspace} from 'vscode';
 import * as utils from '../../utils/utils';
 
-const snippets = requireText(path.join(__dirname, '..', '..', '..', 'snippets.json'));
+const snippets = requireText(path.join(__dirname, '..', '..', '..', 'snippets', 'snippets.json'));
 
 
 /**
