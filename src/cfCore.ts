@@ -55,7 +55,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.inspect()
-                    .then(resp => utils.displayJsonInEditor(resp));
+                    .then(resp => utils.displayJsonInEditor(resp.data));
 
             });
 
@@ -72,7 +72,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.getDeclare()
-                    .then(resp => utils.displayJsonInEditor(resp));
+                    .then(resp => utils.displayJsonInEditor(resp.data));
 
             });
 
@@ -100,7 +100,7 @@ export class CfCore {
                         }
 
                         await ext.f5Client?.cf?.postDeclare(dec)
-                            .then(resp => utils.displayJsonInEditor(resp) );
+                            .then(resp => utils.displayJsonInEditor(resp.data) );
                     });
 
 
@@ -119,7 +119,7 @@ export class CfCore {
             }, async () => {
 
                 await ext.f5Client?.cf?.getTrigger()
-                    .then(resp => utils.displayJsonInEditor(resp));
+                    .then(resp => utils.displayJsonInEditor(resp.data));
 
             });
 

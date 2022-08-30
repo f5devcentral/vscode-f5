@@ -174,6 +174,7 @@ export function cfgExplore(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreClear', async (text) => {
         ext.telemetry.capture({ command: 'f5.cfgExploreClear' });
         cfgProvider.clear();
+        cfgProvider.xcDiag = false;
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreRefresh', async (text) => {
@@ -185,14 +186,15 @@ export function cfgExplore(context: ExtensionContext) {
         // flip switch and refresh details
         if(cfgProvider.xcDiag){
             cfgProvider.xcDiag = false;
+            console.log('xc diag updatediagnostics disable');
         } else {
             cfgProvider.xcDiag = true;
             
             // was having errors about functions undefined, so, make sure everything is loaded as we turn this on
-            if (ext.xcDiag.updateDiagnostic === undefined) {
-                console.log('xc diag updatediagnostics undefined at enable');
+            // if (ext.xcDiag.updateDiagnostic === undefined) {
+                console.log('xc diag updatediagnostics enable');
                 ext.xcDiag = new XcDiag(context);
-            }
+            // }
         }
         cfgProvider.refresh();
     }));

@@ -25,7 +25,7 @@
         "severity": "Warning",
         "title": "Local Traffic Policy(s) object",
         "message": "Local Traffic Policy(s) found in config, review policies for compatibility",
-        "regex": "ltm policy "
+        "regex": "Ltm policy "
     },
     {
         "code": "6cf2",
@@ -46,7 +46,7 @@
         "severity": "Error",
         "title": "App with match across services",
         "message": "XC cannot match across services, like ftp, control on tcp/21, data on tcp/22",
-        "regex": "match-across"
+        "regex": "match-across-(pools|services|virtuals) enabled"
     },
     {
         "code": "0776",
@@ -71,10 +71,10 @@
     },
     {
         "code": "b2b9",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "no classmatch allowed in iRule",
+        "message": "not really XC but will cause problems",
+        "regex": "classmatch"
     },
     {
         "code": "589b",

@@ -173,7 +173,7 @@ export async function activateInternal(context: ExtensionContext) {
 	 */
 
 	// load tmos to xc dianostics functions
-	ext.xcDiag = new XcDiag(context);
+	// ext.xcDiag = new XcDiag(context);
 
 	context.subscriptions.push(commands.registerCommand('f5.xc-diagRulesOpen', async () => {
 		ext.telemetry.capture({ command: 'f5.xc-diagRulesOpen' });

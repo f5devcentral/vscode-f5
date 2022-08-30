@@ -163,16 +163,18 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     let diagStatsYmlToolTip: string | MarkdownString = '';
                     let icon = '';
 
+                    let diags, stats;
+
                     // if xc diag enabled
                     if (this.xcDiag) {
-                        const diags = ext.xcDiag.getDiagnostic(appConfigs.join('\n'));
-                        const stats = ext.xcDiag.getDiagStats(diags);
+                        diags = ext.xcDiag.getDiagnostic(appConfigs.join('\n'));
+                        stats = ext.xcDiag.getDiagStats(diags);
 
                         const diagStatsYml = jsYaml.dump(stats, { indent: 4 });
                         diagStatsYmlToolTip = new MarkdownString().appendCodeblock(diagStatsYml, 'yaml');
-                        icon = stats.Error ? this.redDot
-                            : stats.Warning ? this.orangeDot
-                                : stats.Information ? this.yellowDot : this.greenDot;
+                        icon = stats?.Error ? this.redDot
+                            : stats?.Warning ? this.orangeDot
+                                : stats?.Information ? this.yellowDot : this.greenDot;
                     }
 
                     return new CfgApp(el, diagStatsYmlToolTip, partitionApps.length.toString(), 'cfgPartition', icon, TreeItemCollapsibleState.Collapsed,
@@ -199,21 +201,21 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
                         // loop through apps and get exclusions
                         const exclusions: { vs: string, reasons: string[] }[] = [];
-                        el.configs.forEach(elin => {
-                            const excluded = ext.xcDiag.getDiagnosticExlusion(elin);
-                            if(excluded.reasons.length > 0) {
-                                exclusions.push(excluded);
-                            }
-                        });
+                        // el.configs.forEach(elin => {
+                        //     const excluded = ext.xcDiag.getDiagnosticExlusion(elin);
+                        //     if(excluded.reasons.length > 0) {
+                        //         exclusions.push(excluded);
+                        //     }
+                        // });
                         const diags = ext.xcDiag.getDiagnostic(el.configs);
                         const stats = ext.xcDiag.getDiagStats(diags);
 
                         const diagStatsYml = jsYaml.dump({ stats, exclusions}, { indent: 4 });
                         diagStatsYmlToolTip = new MarkdownString().appendCodeblock(diagStatsYml, 'yaml');
                         icon = exclusions.length > 0 ? new ThemeIcon('debug-step-over', '#D3D3D3')
-                            : stats.Error ? this.redDot
-                            : stats.Warning ? this.orangeDot
-                                : stats.Information ? this.yellowDot : this.greenDot;
+                            : stats?.Error ? this.redDot
+                            : stats?.Warning ? this.orangeDot
+                                : stats?.Information ? this.yellowDot : this.greenDot;
                     }
 
                     // build/return the tree item
@@ -244,9 +246,33 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             // tmos to xc diangostics header/switch
             const xcDiagStatus = this.xcDiag ? "Enabled" : "Disabled";
             const icon = xcDiagStatus === "Enabled" ? this.greenCheck : '';
+
+            let xcTooltip: string | MarkdownString = '';
+            // let icon
+            
+            // if xc diag enabled
+            if (this.xcDiag) {
+                    const appsList = this.explosion?.config.apps?.map((el: TmosApp) => el.configs.join('\n')) || [];
+                    // const excluded = ext.xcDiag.getDiagnosticExlusion(appsList);
+                    // const defaultRedirect = new RegExp('\/Common\/_sys_https_redirect', 'gm');
+                    // const nnn = defaultRedirect.exec(appsList.join('\n'));
+
+                    const mmm = appsList.join('\n').match(/\/Common\/_sys_https_redirect/g) || [];
+
+                    const diags = ext.xcDiag.getDiagnostic(appsList);
+
+                    const stats = { 
+                        totalApps: appsList.length,
+                        '_sys_https_redirect': mmm.length, 
+                        stats: ext.xcDiag.getDiagStats(diags) };
+
+                    const diagStatsYml = jsYaml.dump(stats, { indent: 4 });
+                    xcTooltip = new MarkdownString().appendCodeblock(diagStatsYml, 'yaml');
+                }
+            
             treeItems.push(new CfgApp(
                 'XC Diagnostics',
-                '',
+                xcTooltip,
                 xcDiagStatus,
                 'xcDiag', icon,
                 TreeItemCollapsibleState.None, {

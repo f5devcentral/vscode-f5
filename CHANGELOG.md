@@ -11,6 +11,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.8.5] - (07-24-2022)
+
+- tmos -> XC diasnostics updates
+  - detection of default '/Common/_sys_https_redirect' irule
+  - global stats output
+  - fix bug where class doesn't load (pending)
+- CF fixed get declaration output
+
+---
+
 ## [3.8.1] - (07-24-2022)
 
 - deps updates

@@ -75,15 +75,21 @@ export class XcDiag {
         // setup the regex for the default redirect
         const defaultRedirect = new RegExp('\/Common\/_sys_https_redirect');
 
-        // test app for default redirect string
-        if (defaultRedirect.test(text)) {
-            reasons.push('default redirect');
-        }
+        // // test app for default redirect string
+        // if (defaultRedirect.test(text)) {
+        //     reasons.push('default redirect');
+        // }
 
         // return vs name and exlusion reasons
         return { vs: vsName, reasons };
     }
 
+    /**
+     * recursive function to dig config for diagnostics
+     * @param text 
+     * @param diags (optional, only called from itself)
+     * @returns array of diagnostics
+     */
     getDiagnostic(text: string | string[], diags: Diagnostic[] = []): Diagnostic[] {
 
         // setup diagnostics array
@@ -129,8 +135,7 @@ export class XcDiag {
                         // look for rule regex
                         const match = value.match(rule.regex);
 
-
-                        if (match && match.index) {
+                        if (match) {
 
                             // set rule severity
                             const severity
@@ -144,8 +149,8 @@ export class XcDiag {
                                 code: rule.code,
                                 message: rule.message,
                                 range: new Range(
-                                    new Position(index, match.index),
-                                    new Position(index, match[0].length + match.index)
+                                    new Position(index, match.index || 0),
+                                    new Position(index, match[0].length + (match.index || 0))
                                 ),
                                 severity
                             });
