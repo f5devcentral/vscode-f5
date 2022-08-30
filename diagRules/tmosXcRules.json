@@ -25,7 +25,7 @@
         "severity": "Warning",
         "title": "Local Traffic Policy(s) object",
         "message": "Local Traffic Policy(s) found in config, review policies for compatibility",
-        "regex": "Ltm policy "
+        "regex": "ltm policy "
     },
     {
         "code": "6cf2",

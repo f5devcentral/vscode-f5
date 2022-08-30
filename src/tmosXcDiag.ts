@@ -42,7 +42,7 @@ export class XcDiag {
         // create diag collection
         this.diagXC = languages.createDiagnosticCollection('f5-tmos-xc');
 
-        this.settingsFileLocation = path.join(context.extensionPath, 'out', 'tmosXcRules.json');
+        this.settingsFileLocation = path.join(context.extensionPath, 'diagRules', 'tmosXcRules.json');
         this.rules = this.loadRules();
 
     }
@@ -119,7 +119,7 @@ export class XcDiag {
             text = text as string;
 
             // if we don't have any app exclusions (this just excludes the app from diagnostics)
-            if (this.getDiagnosticExlusion(text).reasons.length === 0) {
+            if (this.getDiagnosticExlusion(text).reasons.length === 0 && text) {
                 
                 // split the config into lines
                 const lines = text.split('\n');
