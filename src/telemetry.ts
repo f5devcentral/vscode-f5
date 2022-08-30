@@ -165,6 +165,8 @@ export class Telemetry {
         // set the api key
         this.apiKey = await this.ctx.secrets.get(keyFileName);
 
+        console.log(`---${this.apiKey}---`);
+
         return;
     }
 
@@ -243,6 +245,10 @@ export class Telemetry {
      */
     async capture(event: EventType): Promise<void> {
 
+        if (!this.apiKey) {
+            return;
+        }
+
         // append event to journal with unique id and timestamp
         this.journal.push(Object.assign(event, {
             id: randomUUID(),
@@ -262,7 +268,7 @@ export class Telemetry {
      */
     private async send(): Promise<void> {
 
-        if (process.env[ext.teemEnv] === 'false') {
+        if (process.env[ext.teemEnv] === 'false' || !this.apiKey) {
             return;
         }
 
