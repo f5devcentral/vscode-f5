@@ -11,6 +11,18 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.8.5] - (08-30-2022)
+
+- tmos -> XC diasnostics updates
+  - detection of default '/Common/_sys_https_redirect' irule
+  - global stats output
+  - fixed bug where xcDiag class doesn't load
+  - fixed bug with undefined app object
+  - moved rules file
+- CF fixed get declaration output
+
+---
+
 ## [3.8.1] - (07-24-2022)
 
 - deps updates
