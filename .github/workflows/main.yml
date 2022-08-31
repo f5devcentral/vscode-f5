@@ -66,6 +66,9 @@ jobs:
 
       - name: get extension version
         run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: capture latest release notes
+        run: echo "RELEASE_NOTE=$(node src/scripts/changelog.js)" >> $GITHUB_ENV
         
       - name: create upload artifacts
         uses: actions/upload-artifact@v2
@@ -87,7 +90,7 @@ jobs:
         with:
           tag_name: v${{ env.PACKAGE_VERSION }}
           release_name: ${{ env.VSIX_NAME }}
-          body: See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5-chariot/blob/main/README.md) for details.
+          body: ${{env.RELEASE_NOTE}} See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details.
           draft: false
           prerelease: false
       
