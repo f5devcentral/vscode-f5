@@ -31,8 +31,10 @@ export type xcDiagRule = {
 
 
 export class XcDiag {
+    public enabled: boolean = false;
+    public lastDoc: TextDocument | undefined = undefined;
 
-    diagXC: DiagnosticCollection;
+    public diagXC: DiagnosticCollection;
 
     settingsFileLocation: string;
     rules: xcDiagRule[];
@@ -233,12 +235,18 @@ export class XcDiag {
             this.diagXC.clear();
             // clear the current diags in the doc/editor
             this.diagXC.delete(doc.uri);
-            
-            // get the text from the doc/editor and feed through xc diagnostics
-            const diags = this.getDiagnostic(doc.getText());
-    
-            // pubish the diags to document
-            this.diagXC.set(doc.uri, diags);
+
+            if(this.enabled) {
+
+                // capture the doc we are working with
+                this.lastDoc = doc;
+
+                // get the text from the doc/editor and feed through xc diagnostics
+                const diags = this.getDiagnostic(doc.getText());
+        
+                // pubish the diags to document
+                this.diagXC.set(doc.uri, diags);
+            }
             
         }
     }

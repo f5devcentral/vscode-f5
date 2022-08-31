@@ -186,7 +186,12 @@ export function cfgExplore(context: ExtensionContext) {
         // flip switch and refresh details
         if(cfgProvider.xcDiag){
             cfgProvider.xcDiag = false;
+            ext.xcDiag.enabled = false;
             console.log('xc diag updatediagnostics disable');
+            if(ext.xcDiag.lastDoc) {
+                // clear the last editor diags
+                ext.xcDiag.updateDiagnostic(ext.xcDiag.lastDoc);
+            }
         } else {
             cfgProvider.xcDiag = true;
             
@@ -194,6 +199,7 @@ export function cfgExplore(context: ExtensionContext) {
             // if (ext.xcDiag.updateDiagnostic === undefined) {
                 console.log('xc diag updatediagnostics enable');
                 ext.xcDiag = new XcDiag(context);
+                ext.xcDiag.enabled = true;
             // }
         }
         cfgProvider.refresh();
