@@ -13,7 +13,8 @@ import {
     Position,
     Range,
     TextDocument,
-    Uri
+    Uri,
+    workspace
 } from "vscode";
 
 import { logger } from "./logger";
@@ -44,6 +45,14 @@ export class XcDiag {
 
         this.settingsFileLocation = path.join(context.extensionPath, 'diagRules', 'tmosXcRules.json');
         this.rules = this.loadRules();
+
+        context.subscriptions.push(
+            workspace.onDidChangeTextDocument(e => this.updateDiagnostic(e.document))
+        );
+    
+        context.subscriptions.push(
+            workspace.onDidCloseTextDocument(doc => this.diagXC.delete(doc.uri))
+        );
 
     }
 
@@ -217,14 +226,21 @@ export class XcDiag {
     }
 
     updateDiagnostic(doc: TextDocument) {
-        // clear current diags dispalyed
-        this.diagXC.clear();
 
-        // get the text from the doc/editor and feed through xc diagnostics
-        const diags = this.getDiagnostic(doc.getText());
+        if(doc.fileName === 'app.conf') {
 
-        // pubish the diags to document
-        this.diagXC.set(doc.uri, diags);
+            // clear current diags in this class
+            this.diagXC.clear();
+            // clear the current diags in the doc/editor
+            this.diagXC.delete(doc.uri);
+            
+            // get the text from the doc/editor and feed through xc diagnostics
+            const diags = this.getDiagnostic(doc.getText());
+    
+            // pubish the diags to document
+            this.diagXC.set(doc.uri, diags);
+            
+        }
     }
 }
 

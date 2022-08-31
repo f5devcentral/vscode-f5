@@ -230,6 +230,7 @@ export function cfgExplore(context: ExtensionContext) {
             diagTag = true;
         }
 
+        // provide the text and "IF" xc diagnostics "CAN" be applied
         cfgProvider.render(text, diagTag);
     }));
 
