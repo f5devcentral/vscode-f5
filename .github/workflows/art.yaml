@@ -35,6 +35,9 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
         # run: node src/scripts/changelog.js >> releaseNote.txt
 
+      - name: display release notes
+        run: echo "${{ env.RELEASE_NOTE }}"
+
       # - name: append release note reference
       #   run: echo "See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details." >> releaseNote.txt
 
