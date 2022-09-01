@@ -68,23 +68,19 @@ jobs:
         run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       - name: capture latest release notes
-        run: echo "RELEASE_NOTE=$(node src/scripts/changelog.js)" >> $GITHUB_ENV
-        # run: node src/scripts/changelog.js >> releaseNote.txt
-
-      # - name: append release note reference
-      #   run: echo "See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details." >> releaseNote.txt
+        run: |
+          echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
+          echo "$(node src/scripts/changelog.js)" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details and history." >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
         
       - name: create upload artifacts
         uses: actions/upload-artifact@v2
         with:
           path: ${{ env.VSIX_PATH }}
           name: ${{ env.VSIX_NAME }}
-
-      # - name: create github release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      #   run: npm -g install @semantic-release/git semantic-release && semantic-release
 
       - name: create github release
         uses: actions/create-release@v1
@@ -94,7 +90,7 @@ jobs:
         with:
           tag_name: v${{ env.PACKAGE_VERSION }}
           release_name: ${{ env.VSIX_NAME }}
-          body: '"${{env.RELEASE_NOTE}}" See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details.'
+          body: "${{env.RELEASE_NOTE}}"
           draft: false
           prerelease: false
       
