@@ -11,6 +11,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.8.6] - (08-31-2022)
+
+- tmos -> XC diasnostics updates
+  - Better tab/document mgmt while
+- setup pipeline to publish release notes to github release
+
+---
+
 ## [3.8.5] - (08-30-2022)
 
 - tmos -> XC diasnostics updates

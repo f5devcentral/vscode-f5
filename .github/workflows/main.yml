@@ -69,6 +69,10 @@ jobs:
 
       - name: capture latest release notes
         run: echo "RELEASE_NOTE=$(node src/scripts/changelog.js)" >> $GITHUB_ENV
+        # run: node src/scripts/changelog.js >> releaseNote.txt
+
+      # - name: append release note reference
+      #   run: echo "See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details." >> releaseNote.txt
         
       - name: create upload artifacts
         uses: actions/upload-artifact@v2
@@ -90,7 +94,7 @@ jobs:
         with:
           tag_name: v${{ env.PACKAGE_VERSION }}
           release_name: ${{ env.VSIX_NAME }}
-          body: ${{env.RELEASE_NOTE}} See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details.
+          body: '"${{env.RELEASE_NOTE}}" See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details.'
           draft: false
           prerelease: false
       
