@@ -31,7 +31,9 @@ jobs:
         run: |
           echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
           echo "$(node src/scripts/changelog.js)" >> $GITHUB_ENV
-          echo "\nSee [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details.\n" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details." >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
         # run: node src/scripts/changelog.js >> releaseNote.txt
 
@@ -79,16 +81,16 @@ jobs:
           draft: false
           prerelease: false
       
-      - name: upload releases
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_TOKEN: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.VSIX_PATH }}
-          asset_name: ${{ env.VSIX_NAME }}
-          asset_content_type: application/zip
+      # - name: upload releases
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     PUBLISH_TOKEN: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ${{ env.VSIX_PATH }}
+      #     asset_name: ${{ env.VSIX_NAME }}
+      #     asset_content_type: application/zip
 
       # - name: publish to marketplace
       #   run: vsce publish -i ${{ env.VSIX_PATH }} -p ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
