@@ -1,13 +1,13 @@
-import { 
-	TreeDataProvider, 
-	TreeItem, 
-	TreeItemCollapsibleState, 
-	Event, 
-	EventEmitter, 
-	Uri, 
+import {
+	TreeDataProvider,
+	TreeItem,
+	TreeItemCollapsibleState,
+	Event,
+	EventEmitter,
+	Uri,
 	Command
- } from 'vscode';
- 
+} from 'vscode';
+
 import { ext } from '../extensionVariables';
 
 
@@ -37,20 +37,20 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 				await ext.extHttp.makeRequest({
 					url: 'https://api.github.com/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations'
 				})
-				.then( resp => {
-					treeItems = resp.data.map((item: any) => {
-						return new ExampleDec(
-							item.name,
-							'',
-							TreeItemCollapsibleState.None,
-							{
-								command: 'f5.getGitHubExample',
-								title: '',
-								arguments: [item.download_url]
-							}
-						);
+					.then(resp => {
+						treeItems = resp.data.map((item: any) => {
+							return new ExampleDec(
+								item.name,
+								'',
+								TreeItemCollapsibleState.None,
+								{
+									command: 'f5.getGitHubExample',
+									title: '',
+									arguments: [item.download_url]
+								}
+							);
+						});
 					});
-				});
 
 
 			} else if (element.label === 'DO Examples') {
@@ -59,40 +59,40 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 				await ext.extHttp.makeRequest({
 					url: 'https://api.github.com/repos/F5Networks/f5-declarative-onboarding/contents/examples'
 				})
-				.then( resp => {
-					treeItems = resp.data.map((item: any) => {
-						return new ExampleDec(
-							item.name,
-							'',
-							TreeItemCollapsibleState.None,
-							{
-								command: 'f5.getGitHubExample',
-								title: '',
-								arguments: [item.download_url]
-							}
-						);
+					.then(resp => {
+						treeItems = resp.data.map((item: any) => {
+							return new ExampleDec(
+								item.name,
+								'',
+								TreeItemCollapsibleState.None,
+								{
+									command: 'f5.getGitHubExample',
+									title: '',
+									arguments: [item.download_url]
+								}
+							);
+						});
 					});
-				});
 
 			} else if (element.label === 'TS Examples') {
 
 				await ext.extHttp.makeRequest({
 					url: 'https://api.github.com/repos/F5Networks/f5-telemetry-streaming/contents/examples/declarations'
 				})
-				.then( resp => {
-					treeItems = resp.data.map((item: any) => {
-						return new ExampleDec(
-							item.name,
-							'',
-							TreeItemCollapsibleState.None,
-							{
-								command: 'f5.getGitHubExample',
-								title: '',
-								arguments: [item.download_url]
-							}
-						);
+					.then(resp => {
+						treeItems = resp.data.map((item: any) => {
+							return new ExampleDec(
+								item.name,
+								'',
+								TreeItemCollapsibleState.None,
+								{
+									command: 'f5.getGitHubExample',
+									title: '',
+									arguments: [item.download_url]
+								}
+							);
+						});
 					});
-				});
 
 
 			} else if (element.label === 'CF Examples') {
@@ -100,20 +100,39 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 				await ext.extHttp.makeRequest({
 					url: 'https://api.github.com/repos/F5Networks/f5-cloud-failover-extension/contents/examples/declarations'
 				})
-				.then( resp => {
-					treeItems = resp.data.map((item: any) => {
-						return new ExampleDec(
-							item.name,
-							'',
-							TreeItemCollapsibleState.None,
-							{
-								command: 'f5.getGitHubExample',
-								title: '',
-								arguments: [item.download_url]
-							}
-						);
+					.then(resp => {
+						treeItems = resp.data.map((item: any) => {
+							return new ExampleDec(
+								item.name,
+								'',
+								TreeItemCollapsibleState.None,
+								{
+									command: 'f5.getGitHubExample',
+									title: '',
+									arguments: [item.download_url]
+								}
+							);
+						});
 					});
-				});
+			} else if (element.label === 'APM Examples') {
+				// change url to when moved to F5Networks repo
+				await ext.extHttp.makeRequest({
+					url: 'https://api.github.com/repos/f5devcentral/vscode-f5-apm/contents/examples'
+				})
+					.then(resp => {
+						treeItems = resp.data.map((item: any) => {
+							return new ExampleDec(
+								item.name,
+								'',
+								TreeItemCollapsibleState.None,
+								{
+									command: 'f5.getGitHubExample',
+									title: '',
+									arguments: [item.download_url]
+								}
+							);
+						});
+					});
 			}
 
 		} else {
@@ -225,6 +244,19 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 						command: 'vscode.open',
 						title: '',
 						arguments: [Uri.parse('https://github.com/F5Networks/f5-cloud-failover-extension/tree/master/examples')]
+					}
+				)
+			);
+			treeItems.push(
+				new ExampleDec(
+					'APM Examples',
+					'APM examples direct from f5devcentral/vscode-f5-apm repo',
+					TreeItemCollapsibleState.Collapsed,
+					{
+						command: 'vscode.open',
+						title: '',
+						// change url to when moved to F5Networks repo
+						arguments: [Uri.parse('https://github.com/f5devcentral/vscode-f5-apm/tree/main/examples')]
 					}
 				)
 			);
