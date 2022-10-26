@@ -95,6 +95,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
     context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {
 
+        // start de-bounce logic
         if (connecting) {
             return;
         } else {
@@ -189,6 +190,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
             });
 
         // const x = ext.f5Client;
+        // finish debounce logic
         wait(1000);
         connecting = false;
     }));
