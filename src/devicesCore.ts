@@ -40,6 +40,7 @@ import { BigipTreeProvider } from './treeViewsProviders/bigipTreeProvider';
 import { tokenTimer } from './tokenTimer';
 
 import { logger } from './logger';
+import { NextApiTreeProvider } from './treeViewsProviders/nextApiTreeProvider';
 
 
 // /**
@@ -86,6 +87,14 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         showCollapseAll: true
     });
     context.subscriptions.push(commands.registerCommand('f5.refreshBigipTree', () => bigipProvider.refresh()));
+
+
+    // NEXT API tree view registration
+    const nextApiProvider = new NextApiTreeProvider(context);
+    const nextApiTreeView = window.createTreeView('nxtApiView', {
+        treeDataProvider: nextApiProvider,
+    });
+    context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTree', () => nextApiProvider.refresh()));
 
 
 
@@ -184,12 +193,13 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                 bigipProvider.refresh();
 
                 ext.as3Tree.refresh();
+                // nextApiProvider.refresh();
+                commands.executeCommand('f5.refreshNextApiTree');
             })
             .catch(err => {
                 logger.error('Connect/Discover failed', err);
             });
 
-        // const x = ext.f5Client;
         // finish debounce logic
         wait(1000);
         connecting = false;

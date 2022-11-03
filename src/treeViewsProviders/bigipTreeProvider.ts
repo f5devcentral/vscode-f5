@@ -371,7 +371,7 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
 
     async getUcs() {
 
-        return await this.connected?.ucs.list()
+        return await this.connected?.ucs?.list()
             .then(resp => this.ucsList = resp.data.items)
             .then(() => this.refresh());
 

@@ -67,7 +67,7 @@
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.19.0",
-		"f5-conx-core": "file:../f5-conx-core/f5-conx-core-0.17.0-11032022-a.tgz",
+		"f5-conx-core": "file:../f5-conx-core/f5-conx-core-0.17.0-11032022-g.tgz",
 		"f5-corkscrew": "^0.13.0",
 		"js-yaml": "^4.0.0",
 		"keytar": "^7.9.0",
@@ -164,6 +164,11 @@
 					"id": "iqView",
 					"name": "BIG-IQ",
 					"when": "f5.isBigiq"
+				},
+				{
+					"id": "nxtApiView",
+					"name": "NEXT API",
+					"when": "f5.isNext || f5.isNextCM"
 				},
 				{
 					"id": "fastView",
@@ -579,6 +584,12 @@
 				"icon": "$(refresh)"
 			},
 			{
+				"command": "f5.refreshNextApiTree",
+				"title": "Refresh NEXT OPENAPI View",
+				"category": "F5",
+				"icon": "$(refresh)"
+			},
+			{
 				"command": "f5.cfgExploreRefresh",
 				"title": "Refresh Config Explorer",
 				"category": "F5",
@@ -986,6 +997,11 @@
 				{
 					"command": "f5.iqViewRefresh",
 					"when": "view == iqView",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.refreshNextApiTree",
+					"when": "view == nxtApiView",
 					"group": "navigation"
 				},
 				{

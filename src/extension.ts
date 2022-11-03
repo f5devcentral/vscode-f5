@@ -155,9 +155,9 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 
-	
-	
-	
+
+
+
 	/**
 	 * ###########################################################################
 	 * 
@@ -779,7 +779,7 @@ export async function activateInternal(context: ExtensionContext) {
 	}));
 
 
-	context.subscriptions.push(commands.registerCommand('f5.makeRequest', async () => {
+	context.subscriptions.push(commands.registerCommand('f5.makeRequest', async (req) => {
 		/**
 		 * make open/raw https call
 		 * 
@@ -788,10 +788,19 @@ export async function activateInternal(context: ExtensionContext) {
 		ext.telemetry.capture({ command: 'f5.makeRequest' });
 
 		logger.debug('executing f5.makeRequest');
+
 		const editor = window.activeTextEditor;
 		let resp;
 
-		if (editor) {
+		if (req) {
+
+			if(ext.f5Client!.mgmtClient!.hostInfo!.product === 'NEXT') {
+				// if next instance (not CM) append base api path to openapi path
+				req.url = `/api/v1${req.url}`;
+			}
+			text = req;
+
+		} else if (editor) {
 			// var text: any = editor.document.getText(editor.selection);	// highlighted text
 			var text: any = await getText();	// highlighted text
 
@@ -818,71 +827,73 @@ export async function activateInternal(context: ExtensionContext) {
 					text = { url: text };
 				}
 			}
+		}
 
-			/**
-			 * At this point we should have a json object with parameters
-			 * 	depending on the parameters, it's an F5 call, or an external call
-			 */
 
-			if (text.url.includes('http')) {
+		/**
+		 * At this point we should have a json object with parameters
+		 * 	depending on the parameters, it's an F5 call, or an external call
+		 */
 
-				resp = await window.withProgress({
-					location: ProgressLocation.Notification,
-					title: `Making External API Request`,
-					cancellable: true
-				}, async (progress, token) => {
-					token.onCancellationRequested(() => {
-						// this logs but doesn't actually cancel...
-						logger.debug("User canceled External API Request");
-						return new Error(`User canceled External API Request`);
-					});
+		if (text.url.includes('http')) {
 
-					//external call
-					logger.debug('external call -> ', JSON.stringify(text));
-					// return await extAPI.makeRequest(text);
-
-					return await ext.extHttp.makeRequest(text);
-
+			resp = await window.withProgress({
+				location: ProgressLocation.Notification,
+				title: `Making External API Request`,
+				cancellable: true
+			}, async (progress, token) => {
+				token.onCancellationRequested(() => {
+					// this logs but doesn't actually cancel...
+					logger.debug("User canceled External API Request");
+					return new Error(`User canceled External API Request`);
 				});
 
-			} else {
+				//external call
+				logger.debug('external call -> ', JSON.stringify(text));
+				// return await extAPI.makeRequest(text);
 
-				resp = await window.withProgress({
-					location: ProgressLocation.Notification,
-					title: `Making API Request`,
-					cancellable: true
-				}, async (progress, token) => {
-					token.onCancellationRequested(() => {
-						// this logs but doesn't actually cancel...
-						logger.debug("User canceled API Request");
-						return new Error(`User canceled API Request`);
-					});
+				return await ext.extHttp.makeRequest(text);
 
-					// f5 device call
-					if (!ext.f5Client) {
-						// connect to f5 if not already connected
-						await commands.executeCommand('f5.connectDevice');
-					}
+			});
 
-					logger.debug('generic https f5 call -> ', text);
+		} else {
 
-					// rewrite this to accept just the options object so users can build any input as needed
-					// this current method requires hooking up any and all params the user may specify
-					return await ext.f5Client?.https(text.url, {
-						validateStatus: function (status: number) {
-							// return status >= 200 && status < 300; // default
-							return true;    // return everything
-						},
-						method: text.method,
-						data: text.body
-					})
-						.then(resp => resp)
-						.catch(err => {
-							logger.error('Generic rest call to connected device failed:', err);
-							throw Error(err);
-						});
+			resp = await window.withProgress({
+				location: ProgressLocation.Notification,
+				title: `Making API Request`,
+				cancellable: true
+			}, async (progress, token) => {
+				token.onCancellationRequested(() => {
+					// this logs but doesn't actually cancel...
+					logger.debug("User canceled API Request");
+					return new Error(`User canceled API Request`);
 				});
-			}
+
+				// f5 device call
+				if (!ext.f5Client) {
+					// connect to f5 if not already connected
+					await commands.executeCommand('f5.connectDevice');
+				}
+
+				logger.debug('generic https f5 call -> ', text);
+
+				// rewrite this to accept just the options object so users can build any input as needed
+				// this current method requires hooking up any and all params the user may specify
+				return await ext.f5Client?.https(text.url, {
+					validateStatus: function (status: number) {
+						// return status >= 200 && status < 300; // default
+						return true;    // return everything
+					},
+					method: text.method,
+					data: text.body
+				})
+					.then(resp => resp)
+					.catch(err => {
+						logger.error('Generic rest call to connected device failed:', err);
+						throw Error(err);
+					});
+			});
+
 
 			if (resp) {
 				return ext.panel.render(resp);

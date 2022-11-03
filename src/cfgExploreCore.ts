@@ -206,7 +206,7 @@ export function cfgExplore(context: ExtensionContext) {
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExplore-show', async (text) => {
-        const x = cfgView.selection;
+        const x = cfgView?.selection;
         let full: string[] = [];
         // let text2;
         if (Array.isArray(x) && x.length > 1) {
@@ -232,7 +232,7 @@ export function cfgExplore(context: ExtensionContext) {
 
         let diagTag = false;
         const y = x[0];
-        if (x[0].contextValue === 'cfgPartition' || x[0].contextValue === 'cfgAppItem') {
+        if (x[0]?.contextValue === 'cfgPartition' || x[0]?.contextValue === 'cfgAppItem') {
             diagTag = true;
         }
 
