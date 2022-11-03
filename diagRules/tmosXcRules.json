@@ -60,7 +60,7 @@
         "severity": "Warning",
         "title": "snat pool object detected",
         "message": "NATs are supported, but not statics",
-        "regex": "ltm snatpool /Common/zone1"
+        "regex": "ltm snatpool"
     },
     {
         "code": "e66b",
@@ -78,17 +78,17 @@
     },
     {
         "code": "589b",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Warning",
+        "title": "Wildcard port on virtual not supported in XC",
+        "message": "Multiport LBs are not supported yet",
+        "regex": "destination [\/\\w\\.]+:0"
     },
     {
         "code": "74f7",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "Wildcard VIP not supported",
+        "message": "Wildcard VIPs not supported",
+        "regex": "destination [\/\\w\\.]+0.0.0.0:\\d"
     },
     {
         "code": "d633",
