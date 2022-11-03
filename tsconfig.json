@@ -5,7 +5,6 @@
 		"allowJs": false,
 		"experimentalDecorators": true,
 		"esModuleInterop": true,
-		"outDir": "out",
 		"lib": [
 			"es6",
 			"ES2019.Array"
@@ -14,6 +13,7 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"rootDir": "src",
+		"outDir": "out",
 		"strict": true, /* enable all strict type-checking options */
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
@@ -22,6 +22,9 @@
 		// "alwaysStrict": false,
 		// "noImplicitUseStrict": true,
 	},
+	"include": [
+        "src/**/*"
+    ],
 	"exclude": [
 		"node_modules",
 		"test",

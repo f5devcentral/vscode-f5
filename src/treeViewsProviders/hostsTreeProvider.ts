@@ -115,8 +115,8 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 					}
 
 					const icon =
-						(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
-							(item.details?.product === 'BIG-IP') ? this.f5Hex : 'file';
+						(item.product === 'BIG-IQ') ? this.bigiqSvg :
+							(item.product === 'BIG-IP') ? this.f5Hex : 'file';
 					const tooltip
 						= item.details
 							? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
@@ -181,8 +181,8 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 					}
 
 					const icon =
-						(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
-							(item.details?.product === 'BIG-IP') ? this.f5Hex : '$(file)';
+						(item.product === 'BIG-IQ') ? this.bigiqSvg :
+							(item.product === 'BIG-IP') ? this.f5Hex : '$(file)';
 					const tooltip
 						= item.details
 							? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
@@ -239,9 +239,9 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 			this.bigipHosts.push({ device: newHost, provider: 'tmos' });
 			await this.saveHosts();
 			wait(500, this.refresh());
-			return `${newHost} added to device configuration`;
+			return `${JSON.stringify(newHost)} added to device configuration`;
 		} else {
-			logger.error(`${newHost} exists or invalid format: <user>@<host/ip>:<port>`);
+			logger.error(`${JSON.stringify(newHost)} exists or invalid format: <user>@<host/ip>:<port>`);
 			throw Error('FAILED - Already exists or invalid format: <user>@<host/ip>');
 		}
 	}
@@ -348,8 +348,10 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 		// we should have everything we need by now
 		if ((connectedDeviceIndex || connectedDeviceIndex === 0) && this.bigipHosts && this.connectedDevice) {
 			// inject/refresh details
+			
+			this.bigipHosts[connectedDeviceIndex].product = this.connectedDevice.host.product;
+
 			this.bigipHosts[connectedDeviceIndex].details = {
-				product: this.connectedDevice.host?.product,
 				platformMarketingName: this.connectedDevice.host?.platformMarketingName,
 				version: this.connectedDevice.host?.version,
 				managementAddress: this.connectedDevice.host?.managementAddress,

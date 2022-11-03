@@ -173,7 +173,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                         product: connect.product,
                         version: connect.version,
                         atc: connect.atc,
-                        baseRegKey: ext.f5Client?.host?.license.registrationKey
+                        baseRegKey: ext.f5Client?.host?.license?.registrationKey
                     }
                 });
 
@@ -345,7 +345,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
             location: { viewId: 'ipView' },
         }, async () => {
 
-            return await ext.f5Client?.ucs.create()
+            return await ext.f5Client?.ucs?.create()
                 .then(resp => {
 
                     setTimeout(() => { bigipProvider.refresh('UCS'); }, 1000);
@@ -368,7 +368,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
             location: { viewId: 'ipView' },
         }, async () => {
 
-            return await ext.f5Client?.ucs.delete(item.label)
+            return await ext.f5Client?.ucs?.delete(item.label)
                 .then(resp => {
 
                     wait(1000, bigipProvider.refresh('UCS'));
@@ -402,7 +402,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
             const dest = folder ? folder[0].path : ext.cacheDir;
 
-            return await ext.f5Client?.ucs.download(filename, dest)
+            return await ext.f5Client?.ucs?.download(filename, dest)
                 // .then( resp => {
                 //     logger.info(resp);
                 // })
@@ -479,19 +479,19 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
 
                 if (rpm) {
 
-                    await ext.f5Client?.atc.download(rpm.browser_download_url)
+                    await ext.f5Client?.atc?.download(rpm.browser_download_url)
                         .then(async resp => {
 
                             // assign rpm name to variable
                             downloadResponses.push(resp);
                             await new Promise(resolve => { setTimeout(resolve, 1000); });
 
-                            await ext.f5Client?.atc.uploadRpm(resp.data.file)
+                            await ext.f5Client?.atc?.uploadRpm(resp.data.file)
                                 .then(async uploadResp => {
 
                                     await new Promise(resolve => { setTimeout(resolve, 1000); });
                                     upLoadResponses.push(uploadResp);
-                                    await ext.f5Client?.atc.install(rpm.name)
+                                    await ext.f5Client?.atc?.install(rpm.name)
                                         .then(resp => installed = resp);
                                 });
                         })
@@ -503,9 +503,9 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                 }
                 if (signature) {
 
-                    await ext.f5Client?.atc.download(signature.browser_download_url)
+                    await ext.f5Client?.atc?.download(signature.browser_download_url)
                         .then(async resp => {
-                            await ext.f5Client?.atc.uploadRpm(resp.data.file);
+                            await ext.f5Client?.atc?.uploadRpm(resp.data.file);
                         })
                         .catch(err => {
                             // todo: setup error logging
@@ -574,11 +574,11 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                     if (rpm.label && rpm.tooltip) {
 
 
-                        await ext.f5Client?.atc.showInstalled()
+                        await ext.f5Client?.atc?.showInstalled()
                             .then(async resp => {
                                 // loop through response, find rpm that matches rpm.label, then uninstall
                                 const rpmName = resp.data.queryResponse.filter((el: { name: string }) => el.name === rpm.tooltip)[0];
-                                return await ext.f5Client?.atc.unInstall(rpmName.packageName);
+                                return await ext.f5Client?.atc?.unInstall(rpmName.packageName);
 
                             });
 

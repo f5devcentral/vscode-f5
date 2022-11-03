@@ -67,7 +67,7 @@
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.19.0",
-		"f5-conx-core": "file:../f5-conx-core/f5-conx-core-0.17.0-a1.tgz",
+		"f5-conx-core": "file:../f5-conx-core/f5-conx-core-0.17.0-11032022-a.tgz",
 		"f5-corkscrew": "^0.13.0",
 		"js-yaml": "^4.0.0",
 		"keytar": "^7.9.0",
@@ -229,12 +229,12 @@
 									"type": "string",
 									"description": "short device label"
 								},
+								"product": {
+									"type": "string"
+								},
 								"details": {
 									"type": "object",
 									"description": "device details",
-									"product": {
-										"type": "string"
-									},
 									"platformMarketingName": {
 										"type": "string"
 									},
