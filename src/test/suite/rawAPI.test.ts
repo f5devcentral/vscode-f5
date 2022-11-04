@@ -60,16 +60,11 @@ suite('external raw HTTP API tests', () => {
          * execute command to start function
          * should make the api call, then open a new editor with response
          */
-        await commands.executeCommand('f5.makeRequest');
+        const newEditor = await commands.executeCommand('f5.makeRequest') as TextDocument;
         
         await new Promise(r => setTimeout(r, 1000)); // let the command finish
 
-        const editor = window.activeTextEditor;  // get active editor
-        let text = '';
-        if(editor){
-            // get all text from editor
-            text = editor.document.getText();
-        }
+        const text = newEditor.getText();
 
         assert.deepStrictEqual(JSON.parse(text), recvString);
 	}).timeout(10000);
@@ -101,16 +96,11 @@ suite('external raw HTTP API tests', () => {
          * execute command to start function
          * should make the api call, then open a new editor with response
          */
-        await commands.executeCommand('f5.makeRequest');
+        const newEditor = await commands.executeCommand('f5.makeRequest') as TextDocument;
         
         await new Promise(r => setTimeout(r, 1000)); // let the command finish
 
-        const editor = window.activeTextEditor;  // get active editor
-        let text = '';
-        if(editor){
-            // get all text from editor
-            text = editor.document.getText();
-        }
+        const text = newEditor.getText();
 
         assert.deepStrictEqual(JSON.parse(text), recvString);
 	}).timeout(10000);
@@ -166,16 +156,11 @@ suite('external raw HTTP API tests', () => {
          * execute command to start function
          * should make the api call, then open a new editor with response
          */
-        await commands.executeCommand('f5.makeRequest');
+        const newEditor = await commands.executeCommand('f5.makeRequest') as TextDocument;
         
         await new Promise(r => setTimeout(r, 100)); // let the command finish
 
-        const editor = window.activeTextEditor;  // get active editor
-        let text = '';
-        if(editor){
-            // get all text from editor
-            text = editor.document.getText();
-        }
+        const text = newEditor.getText();
 
         assert.deepStrictEqual(JSON.parse(text), recvString);
 	}).timeout(10000);

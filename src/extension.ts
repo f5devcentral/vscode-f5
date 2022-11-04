@@ -910,11 +910,12 @@ export async function activateInternal(context: ExtensionContext) {
 			});
 
 
-			if (resp) {
-				return ext.panel.render(resp);
-			}
 		}
-
+		
+		if (resp) {
+			return ext.panel.render(resp);
+		}
+		
 	}));
 
 
