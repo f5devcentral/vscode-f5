@@ -92,21 +92,21 @@
     },
     {
         "code": "d633",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "iRule stream profile detected",
+        "message": "F5 TMOS stream profile functionality not supported",
+        "regex": "stream::"
     },
     {
         "code": "05ab",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Warning",
+        "title": "XC reserved ports",
+        "message": "Http failure response: 400 Bad Request \nFor tcp_loadbalancer dude/test configuration for child object advertise_policy ves-io-tcp-loadbalancer-test-df9979789 is wrong - 8443 is a reserved port, list of reserved ports 28000 - 32767 (kubernetes),28000 - 32767 (volterra),2379,9090,9999,18091,22222,23790,23791,1067,2380,8005,18092,9153,10250,10252,10259,500,8007,8443,10251,18095,23801,5355,8507,9007,68,323,23802,8444,8505,10249,10257,22,4500,8087,18093,53,6443,10256",
+        "regex": ":(8443|2379|9090|9999|18091|22222|23790|23791|1067|2380|8005|18092|9153|10250|10252|10259|500|8007|10251|18095|23801|5355|8507|9007|68|323|23802|8444|8505|10249|10257|22|4500|8087|18093|53|6443|10256)"
     },
     {
         "code": "0049",
-        "severity": "Hint",
+        "severity": "Information",
         "title": "",
         "message": "",
         "regex": ""
