@@ -182,7 +182,22 @@ export async function activateInternal(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.xc-diagRulesRefresh', async () => {
 		ext.telemetry.capture({ command: 'f5.xc-diagRulesRefresh' });
-		ext.xcDiag?.loadRules();
+		// ext.xcDiag?.loadRules();
+
+		// the following is just to make everything update once the rules have been saved and "refreshed"
+		// capture the current open doc
+		const lastDoc = ext?.xcDiag?.lastDoc;
+
+		//	cycle diag switch to refresh everything
+		await commands.executeCommand("f5.cfgExplore-xcDiagSwitch");
+		await commands.executeCommand("f5.cfgExplore-xcDiagSwitch");
+
+		if (ext?.xcDiag && lastDoc) {
+			// make sure it's enabled before we re-assess the current open doc
+			ext.xcDiag.lastDoc = lastDoc;
+			ext.xcDiag.updateDiagnostic(ext.xcDiag.lastDoc);
+		}
+
 	}));
 
 	context.subscriptions.push(commands.registerCommand('f5.xc-diag', async () => {
