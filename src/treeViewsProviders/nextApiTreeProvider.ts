@@ -62,47 +62,50 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
     async getChildren(element?: NxtApiTreeItem) {
         let treeItems: NxtApiTreeItem[] = [];
 
-        if(!this.connected) {
+        if( !this.connected ) {
             return [];
         }
 
-        if (element) {
-
+        if (this.connected?.mgmtClient?.hostInfo?.product.includes('NEXT')) {
             
-        } else {
-            
-
-            const toolTip = new MarkdownString()
-            .appendCodeblock(jsyaml.dump({
-                openApi: this.connected.openApi!.openapi,
-                info: this.connected.openApi!.info,
-                servers: this.connected.openApi!.servers
-            }, { indent: 4 }), 'yaml');
-
-            treeItems.push(
-                new NxtApiTreeItem(
-                    this.connected.openApi!.info.title,
-                    this.connected.openApi!.info.version,
-                    toolTip, this.swaggerSvg, 'nextApiItem', TreeItemCollapsibleState.None,
-                    { command: 'f5.cfgExplore-show', title: '', arguments: [this.connected.openApi] }
-                )
-            );
-
-            Object.entries(this.connected!.openApi!.paths).forEach(([key, value]) => {
-
-                // 
+            if (element) {
+    
+                
+            } else {
+                
+    
                 const toolTip = new MarkdownString()
-                .appendCodeblock(jsyaml.dump(value, { indent: 4 }), 'yaml');
-
-                const methods = Object.keys(value).join('/');
-
+                .appendCodeblock(jsyaml.dump({
+                    openApi: this.connected.openApi!.openapi,
+                    info: this.connected.openApi!.info,
+                    servers: this.connected.openApi!.servers
+                }, { indent: 4 }), 'yaml');
+    
                 treeItems.push(
-                    new NxtApiTreeItem(key, methods, toolTip, '', 'nextApiItem', TreeItemCollapsibleState.None,
-                        { command: 'f5.makeRequest', title: '', arguments: [{ url: key }] }
+                    new NxtApiTreeItem(
+                        this.connected.openApi!.info.title,
+                        this.connected.openApi!.info.version,
+                        toolTip, this.swaggerSvg, 'nextApiItem', TreeItemCollapsibleState.None,
+                        { command: 'f5.cfgExplore-show', title: '', arguments: [this.connected.openApi] }
                     )
                 );
-            });
-
+    
+                Object.entries(this.connected!.openApi!.paths).forEach(([key, value]) => {
+    
+                    // 
+                    const toolTip = new MarkdownString()
+                    .appendCodeblock(jsyaml.dump(value, { indent: 4 }), 'yaml');
+    
+                    const methods = Object.keys(value).join('/');
+    
+                    treeItems.push(
+                        new NxtApiTreeItem(key, methods, toolTip, '', 'nextApiItem', TreeItemCollapsibleState.None,
+                            { command: 'f5.makeRequest', title: '', arguments: [{ url: key }] }
+                        )
+                    );
+                });
+    
+            }
         }
 
 

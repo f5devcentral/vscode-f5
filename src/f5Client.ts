@@ -237,6 +237,8 @@ export class F5Client extends _F5Client {
         commands.executeCommand('setContext', 'f5.cfInstalled', false);
         commands.executeCommand('setContext', 'f5.isBigip', false);
         commands.executeCommand('setContext', 'f5.isBigiq', false);
+        commands.executeCommand('setContext', 'f5.isNext', false);
+        commands.executeCommand('setContext', 'f5.isNextCM', false);
         // ext.iRulesAble = false;
 
         // show connect status bar
