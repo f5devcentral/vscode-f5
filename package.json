@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.8.6",
+	"version": "3.9.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -61,17 +61,16 @@
 		"eslint": "^8.12.0",
 		"glob": "^7.1.6",
 		"mocha": "^9.2.2",
-		"nock": "^13.2.4",
-		"typescript": "^3.9.9",
+		"nock": "^13.2.9",
+		"typescript": "^4.8.4",
 		"vscode-test": "^1.5.1"
 	},
 	"dependencies": {
-		"@f5devcentral/f5-fast-core": "^0.19.0",
-		"f5-conx-core": "^0.15.1",
+		"@f5devcentral/f5-fast-core": "^0.19.1",
+		"f5-conx-core": "^0.17.0",
 		"f5-corkscrew": "^0.13.0",
 		"js-yaml": "^4.0.0",
-		"keytar": "^7.9.0",
-		"simple-get": "^4.0.1"
+		"keytar": "^7.9.0"
 	},
 	"release": {
 		"branches": [
@@ -166,6 +165,11 @@
 					"when": "f5.isBigiq"
 				},
 				{
+					"id": "nxtApiView",
+					"name": "NEXT API",
+					"when": "f5.isNext || f5.isNextCM"
+				},
+				{
 					"id": "fastView",
 					"name": "FAST View",
 					"when": "f5.fastInstalled"
@@ -229,12 +233,12 @@
 									"type": "string",
 									"description": "short device label"
 								},
+								"product": {
+									"type": "string"
+								},
 								"details": {
 									"type": "object",
 									"description": "device details",
-									"product": {
-										"type": "string"
-									},
 									"platformMarketingName": {
 										"type": "string"
 									},
@@ -575,6 +579,12 @@
 			{
 				"command": "f5.iqViewRefresh",
 				"title": "Refresh BIG-IQ View",
+				"category": "F5",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "f5.refreshNextApiTree",
+				"title": "Refresh NEXT OPENAPI View",
 				"category": "F5",
 				"icon": "$(refresh)"
 			},
@@ -986,6 +996,11 @@
 				{
 					"command": "f5.iqViewRefresh",
 					"when": "view == iqView",
+					"group": "navigation"
+				},
+				{
+					"command": "f5.refreshNextApiTree",
+					"when": "view == nxtApiView",
 					"group": "navigation"
 				},
 				{

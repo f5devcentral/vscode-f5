@@ -25,7 +25,7 @@ import {
     StatusBarAlignment
 } from 'vscode';
 import { ext } from './extensionVariables';
-import { ExtHttp, F5Client as _F5Client } from 'f5-conx-core';
+import { ExtHttp, F5Client as _F5Client, F5TmosProduct } from 'f5-conx-core';
 import { BigipHost } from './models';
 import EventEmitter from 'events';
 
@@ -92,7 +92,8 @@ export class F5Client extends _F5Client {
                 return new Error(`User canceled device connect`);
             });
 
-            const deviceDetails = await this.discover();
+            // pass in the product type if we know it, to speed up discovery
+            const deviceDetails = await this.discover(this.device?.product as F5TmosProduct );
 
             if (this.host) {
 
@@ -119,6 +120,16 @@ export class F5Client extends _F5Client {
 
                     commands.executeCommand('setContext', 'f5.device', true);
                     commands.executeCommand('setContext', 'f5.isBigiq', true);
+
+                } else if (this.host.product === 'NEXT') {
+
+                    commands.executeCommand('setContext', 'f5.device', true);
+                    commands.executeCommand('setContext', 'f5.isNext', true);
+
+                } else if (this.host.product === 'NEXT-CM') {
+
+                    commands.executeCommand('setContext', 'f5.device', true);
+                    commands.executeCommand('setContext', 'f5.isNextCM', true);
 
                 } else {
 
@@ -226,6 +237,8 @@ export class F5Client extends _F5Client {
         commands.executeCommand('setContext', 'f5.cfInstalled', false);
         commands.executeCommand('setContext', 'f5.isBigip', false);
         commands.executeCommand('setContext', 'f5.isBigiq', false);
+        commands.executeCommand('setContext', 'f5.isNext', false);
+        commands.executeCommand('setContext', 'f5.isNextCM', false);
         // ext.iRulesAble = false;
 
         // show connect status bar

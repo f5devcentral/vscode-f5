@@ -1,3 +1,4 @@
+import { F5TmosProduct } from "f5-conx-core";
 
 
 
@@ -11,8 +12,8 @@ export type BigipHost = {
     device: string,
     label?: string,
     folder?: string,
+    product?: F5TmosProduct;
     details?: {
-        product?: string;
         platformMarketingName?: string;
         version?: string;
         hostname?: string;

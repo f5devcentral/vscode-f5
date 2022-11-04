@@ -48,7 +48,8 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 	private f524 = ext.context.asAbsolutePath(path.join("images", "f5_white_24x24.svg"));
 	private bigiqSvg = ext.context.asAbsolutePath(path.join("images", "BIG-IQ-sticker_transparent.png"));
 	// other svg recolored to match the mustard yellow of the png
-	// private bigiqSvg = ext.context.asAbsolutePath(path.join("images", "big-iq-centralized-mngmnt.svg"));
+	private nextSvg = ext.context.asAbsolutePath(path.join("images", "next12.svg"));
+	private nextCmSvg = ext.context.asAbsolutePath(path.join("images", "next12-cm.svg"));
 
 	/**
 	 * regex for confirming host entry <user>@<host/ip>:<port>
@@ -115,8 +116,10 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 					}
 
 					const icon =
-						(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
-							(item.details?.product === 'BIG-IP') ? this.f5Hex : 'file';
+						(item.product === 'BIG-IQ') ? this.bigiqSvg :
+						(item.product === 'NEXT') ? this.nextSvg :
+						(item.product === 'NEXT-CM') ? this.nextCmSvg :
+							(item.product === 'BIG-IP') ? this.f5Hex : 'file';
 					const tooltip
 						= item.details
 							? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
@@ -181,8 +184,10 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 					}
 
 					const icon =
-						(item.details?.product === 'BIG-IQ') ? this.bigiqSvg :
-							(item.details?.product === 'BIG-IP') ? this.f5Hex : '$(file)';
+						(item.product === 'BIG-IQ') ? this.bigiqSvg :
+						(item.product === 'NEXT') ? this.nextSvg :
+						(item.product === 'NEXT-CM') ? this.nextCmSvg :
+							(item.product === 'BIG-IP') ? this.f5Hex : '$(file)';
 					const tooltip
 						= item.details
 							? new MarkdownString().appendCodeblock(jsyaml.dump(item), 'yaml')
@@ -239,9 +244,9 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 			this.bigipHosts.push({ device: newHost, provider: 'tmos' });
 			await this.saveHosts();
 			wait(500, this.refresh());
-			return `${newHost} added to device configuration`;
+			return `${JSON.stringify(newHost)} added to device configuration`;
 		} else {
-			logger.error(`${newHost} exists or invalid format: <user>@<host/ip>:<port>`);
+			logger.error(`${JSON.stringify(newHost)} exists or invalid format: <user>@<host/ip>:<port>`);
 			throw Error('FAILED - Already exists or invalid format: <user>@<host/ip>');
 		}
 	}
@@ -254,7 +259,7 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 			value: hostID.label,
 			ignoreFocusOut: true
 		})
-			.then(input => {
+			.then(async input => {
 
 				logger.debug('user input', input);
 
@@ -275,7 +280,7 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 					// update device using index
 					this.bigipHosts[modifiedDeviceIndex].device = input;
 
-					this.saveHosts();
+					await this.saveHosts();
 					wait(500, this.refresh());
 
 				} else {
@@ -348,8 +353,10 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 		// we should have everything we need by now
 		if ((connectedDeviceIndex || connectedDeviceIndex === 0) && this.bigipHosts && this.connectedDevice) {
 			// inject/refresh details
+			
+			this.bigipHosts[connectedDeviceIndex].product = this.connectedDevice.host.product;
+
 			this.bigipHosts[connectedDeviceIndex].details = {
-				product: this.connectedDevice.host?.product,
 				platformMarketingName: this.connectedDevice.host?.platformMarketingName,
 				version: this.connectedDevice.host?.version,
 				managementAddress: this.connectedDevice.host?.managementAddress,
