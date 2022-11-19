@@ -95,7 +95,8 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         treeDataProvider: nextApiProvider,
     });
     context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTree', () => nextApiProvider.refresh()));
-
+    
+    context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTreeLocal', () => nextApiProvider.refresh('local')));
 
 
 
