@@ -11,6 +11,25 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.10.0] - (11-8-2022)
+
+- Next api schema validation work (pending)
+
+---
+
+## [3.9.0] - (11-04-2022)
+
+- tmos -> XC diasnostics updates
+  - Better rule refresh flow
+  - Updated rules
+- NEXT/CM integration (gen2)
+  - manages regular connectivity
+  - discover some information about instance
+  - provides raw api call functionality
+  - explore openapi spec
+
+---
+
 ## [3.8.6] - (08-31-2022)
 
 - tmos -> XC diasnostics updates

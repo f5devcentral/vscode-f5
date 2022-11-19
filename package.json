@@ -130,7 +130,11 @@
 			},
 			{
 				"fileMatch": "*.cf.json",
-				"url": "'https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json"
+			},
+			{
+				"fileMatch": "*.nextcm.json",
+				"url": "./openapi_nextCm.json"
 			}
 		],
 		"viewsContainers": {
@@ -146,6 +150,10 @@
 			{
 				"view": "cfgTree",
 				"contents": "Import TMOS Config to explore.\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Documentation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)"
+			},
+			{
+				"view": "nxtApiView",
+				"contents": "Connect to a NEXT instance to explore OpenAPI.\n[Browse CM OPENAPI (local)](command:f5.refreshNextApiTreeLocal)"
 			}
 		],
 		"views": {
@@ -166,8 +174,7 @@
 				},
 				{
 					"id": "nxtApiView",
-					"name": "NEXT API",
-					"when": "f5.isNext || f5.isNextCM"
+					"name": "NEXT API"
 				},
 				{
 					"id": "fastView",
