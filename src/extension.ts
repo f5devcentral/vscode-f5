@@ -61,6 +61,7 @@ import { CfCore } from './cfCore';
 import { As3Core } from './as3Core';
 import { Telemetry } from './telemetry';
 import { XcDiag } from './tmosXcDiag';
+import { NextApi } from './nextApi';
 
 // turn off console logging
 logger.console = false;
@@ -137,6 +138,8 @@ export async function activateInternal(context: ExtensionContext) {
 	new DoCore(context);
 
 	new CfCore(context);
+
+	new NextApi(context, ext.eventEmitterGlobal);
 
 
 	// or do we prefer the function style of importing core blocks?

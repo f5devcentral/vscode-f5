@@ -89,18 +89,6 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
     context.subscriptions.push(commands.registerCommand('f5.refreshBigipTree', () => bigipProvider.refresh()));
 
 
-    // NEXT API tree view registration
-    const nextApiProvider = new NextApiTreeProvider(context);
-    const nextApiTreeView = window.createTreeView('nxtApiView', {
-        treeDataProvider: nextApiProvider,
-    });
-    context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTree', () => nextApiProvider.refresh()));
-    
-    context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTreeLocal', () => nextApiProvider.refresh('local')));
-
-
-
-
     context.subscriptions.push(commands.registerCommand('f5.refreshHostsTree', () => ext.hostsTreeProvider.refresh()));
 
     context.subscriptions.push(commands.registerCommand('f5.connectDevice', async (device) => {

@@ -74,6 +74,12 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
         return element;
     }
 
+    getSchema(schemaRef: string) {
+        const baseSchemaName = schemaRef.split('/').pop()!;
+        const schema = this.oai?.components.schemas[baseSchemaName];
+        return schema;
+    }
+
     async getChildren(element?: NxtApiTreeItem) {
         let treeItems: NxtApiTreeItem[] = [];
 
@@ -81,7 +87,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
 
             if (element) {
 
-                console.log('incoming element', element.path)
+                // console.log('incoming element', element.path)
 
                 // get object for element
                 const elObj = deepGet(this.pathsTreeObj!, element.path!) as Object;
@@ -114,13 +120,16 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
 
                             // examples location:  /api/change-password.post.requestBody.content.application/json.example
                             // scehema location:  /api/change-password.post.requestBody.content.application/json.schema
-
-                            const schemaRef = leafObj.post!.requestBody!.content!['application/json']!.schema!['$ref']!;
+                            // /api/device/v1/inventory
+                            const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.['$ref'];
                             const example = leafObj?.post?.requestBody?.content?.['application/json']?.example;
+
+                            const schema = schemaRef ? this.getSchema(schemaRef) : logger.error('next oai schema reference not found')
+
                             treeItems.push(
                                 new NxtApiTreeItem('POST', '', '', '', 'nextApiTreeItem', thisPathKey, TreeItemCollapsibleState.None,
-                                {title: '', command: 'oaiPost', arguments: [new OaiPost(
-                                    pathString, schemaRef, example
+                                {title: 'OpenApiPost', command: 'f5.oaiPost', arguments: [new OaiPost(
+                                    pathString, "POST", schemaRef, example, schema
                                 )]})
                             );
                         }
@@ -152,16 +161,16 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                     if(leafObj.hasOwnProperty('post')) {
                         // if we have post details
                         treeItems.push(
-                            new NxtApiTreeItem('POST', 'leaf', '', '', 'nextApiTreeItem', [], TreeItemCollapsibleState.None)
+                            new NxtApiTreeItem('POST----', 'leaf', '', '', 'nextApiTreeItem', [], TreeItemCollapsibleState.None)
                         );
                     }
 
-                    if(leafObj.hasOwnProperty('put')) {
-                        // if we have put details
-                        treeItems.push(
-                            new NxtApiTreeItem('key', 'leaf', '', '', 'nextApiTreeItem', ['thisPathKey'], TreeItemCollapsibleState.Collapsed)
-                        );
-                    }
+                    // if(leafObj.hasOwnProperty('put')) {
+                    //     // if we have put details
+                    //     treeItems.push(
+                    //         new NxtApiTreeItem('key', 'leaf', '', '', 'nextApiTreeItem', ['thisPathKey'], TreeItemCollapsibleState.Collapsed)
+                    //     );
+                    // }
 
                     // add DELETE method?
                 }
@@ -285,8 +294,10 @@ class NxtApiTreeItem extends TreeItem {
 export class OaiPost {
     constructor(
         public path: string,
-        public schemaRef: string,
+        public method: "POST" | "PUT",
+        public schemaRef?: string,
         public example?: string | unknown,
+        public schema?: unknown
     ) {}
 }
 
