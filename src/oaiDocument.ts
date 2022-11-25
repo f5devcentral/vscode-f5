@@ -54,14 +54,14 @@ export class OaiDoc {
 
     getDiagnostic(jsn: unknown, oaiPost: OaiPost): Diagnostic[] {
 
-        const ncmAjv = new ajv();
-        const validate = ncmAjv.compile(oaiPost?.schema as AnySchema);
-        const valid = validate(jsn);
+        // const ncmAjv = new ajv();
+        // const validate = ncmAjv.compile(oaiPost?.schema as AnySchema);
+        // const valid = validate(jsn);
 
-        if(!valid) {
-            const x = validate.errors;
-            debugger;
-        }
+        // if(!valid) {
+        //     const x = validate.errors;
+        //     debugger;
+        // }
 
 
         return [];
