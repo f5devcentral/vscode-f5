@@ -34,6 +34,7 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 	readonly onDidChangeTreeData: Event<TCLitem | undefined> = this._onDidChangeTreeData.event;
 
 	private _iRules: string[] = [];  
+	private _iCallScripts: string[] = [];
 	private _apps: string[] = [];  
 	private _iAppTemplates: string[] = [];
 
@@ -69,6 +70,14 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
                         { command: 'f5-tcl.getRule', title: '', arguments: [el] });
                 });
 				
+			} else if (element.label === 'iCall-Scripts'){
+				treeItems = this._iCallScripts.map( (el: any) => {
+                	const content = `sys icall script ${el.fullPath} {\r\n` + el.definition + '\r\n}';
+                    const toolTip = new MarkdownString()
+                    .appendCodeblock(content, 'irule-lang');
+		    		return new TCLitem(el.fullPath, '', '', 'iCallScript', TreeItemCollapsibleState.None,
+						{ command: 'f5-tcl.getIcallscript', title: '', arguments: [el] });
+				});
 			} else if (element.label === 'Deployed-Apps'){
 				// todo: get iapps stuff
 				treeItems = this._apps.map( (el: any) => {
@@ -82,20 +91,26 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
                     return new TCLitem(el.fullPath, '', '', 'iAppTemplate', TreeItemCollapsibleState.None, 
                         { command: 'f5-tcl.getTMPL', title: '', arguments: [el] });
                 });
-			}
+			} 
 
 		} else {
 
 			await this.getIrules(); // refresh tenant information
+			await this.getIcallscripts(); // refresh tenant information
 			await this.getApps();	// refresh tasks information
 			await this.getTemplates();	// refresh tasks information
 
 			const ruleCount = this._iRules.length !== 0 ? this._iRules.length.toString() : '';
+			const icallscriptsCount = this._iCallScripts.length !== 0 ? this._iCallScripts.length.toString() : '';
 			const appCount = this._apps.length !== 0 ? this._apps.length.toString() : '';
 			const tempCount = this._iAppTemplates.length !== 0 ? this._iAppTemplates.length.toString() : '';
 
 			treeItems.push(
 				new TCLitem('iRules', ruleCount, '', '', TreeItemCollapsibleState.Collapsed, 
+					{ command: '', title: '', arguments: [''] })
+			);
+			treeItems.push(
+				new TCLitem('iCall-Scripts', icallscriptsCount, '', '', TreeItemCollapsibleState.Collapsed,
 					{ command: '', title: '', arguments: [''] })
 			);
 			treeItems.push(
@@ -121,6 +136,15 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 		
 		await ext.f5Client?.https(`/mgmt/tm/ltm/rule`)
 		.then( resp => this._iRules = resp.data.items );
+	}
+
+	/**
+	 * Get all iCall scripts to hold in "this" view class
+	 */
+	private async getIcallscripts() {
+	this._iCallScripts = []
+		await ext.f5Client?.https(`/mgmt/tm/sys/icall/script`)
+		.then( resp => this._iCallScripts = resp.data.items );
 	}
 
 	/**
@@ -192,6 +216,43 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 			return `${resp.status}-${resp.statusText}`;
 		});
 	}
+
+
+
+	/**
+	 * crafts iCall tcl object and displays in editor with icall language
+	 * @param item iCule item passed from view click
+	 */
+	async displayIcallscript(item: any) {
+
+		// make it look like a tcl irule object so it can be merged back with changes
+		const content = `sys icall script ${item.fullPath} {\r\n` + item.definition + '\r\n}';
+
+		// open editor and feed it the content
+		const doc = await workspace.openTextDocument({ content: content, language: 'icallscript-lang' });
+		// make the editor appear
+		await window.showTextDocument( doc, { preview: false });
+		return doc;	// return something for automated testing
+	}
+	
+	async deleteIcallscript(item: any) {
+		logger.debug('deleteIcallscript: ', item);
+
+		const name = this.name2uri(item.label);
+
+		// const resp: any = await ext.mgmtClient?.makeRequest(`/mgmt/tm/sys/icall/script/${name}`, {
+		// 	method: 'DELETE'
+		// });
+
+		const resp = await ext.f5Client?.https(`/mgmt/tm/sys/icall/script/${name}`, {
+			method: 'DELETE'
+		})
+		.then (resp => {
+			setTimeout( () => { this.refresh();}, 500);	// refresh after update
+			return `${resp.status}-${resp.statusText}`;
+		});
+	}
+
 
 	/**
 	 * display .tmpl from f5 in editor

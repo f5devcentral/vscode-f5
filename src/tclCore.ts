@@ -57,6 +57,14 @@ export default function tclCore(context: ExtensionContext) {
         return tclTreeProvider.deleteRule(rule);
     }));
 
+    // --- ICALL COMMANDS ---
+    context.subscriptions.push(commands.registerCommand('f5-tcl.getIcallscript', async (icallscript) => {
+        return tclTreeProvider.displayIcallscript(icallscript);
+    }));
+
+    context.subscriptions.push(commands.registerCommand('f5-tcl.deleteIcallscript', async (icallscript) => {
+        return tclTreeProvider.deleteIcallscript(icallscript);
+    }));
 
 
 
