@@ -74,7 +74,7 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 				treeItems = this._iCallScripts.map( (el: any) => {
                 	const content = `sys icall script ${el.fullPath} {\r\n` + el.definition + '\r\n}';
                     const toolTip = new MarkdownString()
-                    .appendCodeblock(content, 'irule-lang');
+                    .appendCodeblock(content, 'icallscript-lang');
 		    		return new TCLitem(el.fullPath, '', '', 'iCallScript', TreeItemCollapsibleState.None,
 						{ command: 'f5-tcl.getIcallscript', title: '', arguments: [el] });
 				});
