@@ -181,7 +181,7 @@
 				},
 				{
 					"id": "as3Tasks",
-					"name": "iRules/iApps",
+					"name": "Tcl Objects",
 					"when": "f5.tcl"
 				},
 				{
