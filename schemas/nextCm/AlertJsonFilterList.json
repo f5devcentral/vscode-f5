@@ -1,0 +1,13 @@
+{
+    "description": "list of alert json filters",
+    "properties": {
+        "filters": {
+            "description": "json filters",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        }
+    },
+    "type": "object"
+}

@@ -1,0 +1,17 @@
+{
+    "description": "list of notification ids",
+    "properties": {
+        "notifications": {
+            "description": "notification ids",
+            "items": {
+                "format": "uuid",
+                "type": "string"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "notifications"
+    ],
+    "type": "object"
+}

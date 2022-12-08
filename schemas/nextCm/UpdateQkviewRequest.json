@@ -1,0 +1,11 @@
+{
+    "properties": {
+        "ihealth_user": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "ihealth_user"
+    ],
+    "type": "object"
+}

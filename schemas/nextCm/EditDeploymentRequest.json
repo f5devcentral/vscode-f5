@@ -1,0 +1,16 @@
+{
+    "properties": {
+        "template_params_id": {
+            "format": "uuid",
+            "type": "string"
+        },
+        "wf_type": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "template_params_id",
+        "wf_type"
+    ],
+    "type": "object"
+}

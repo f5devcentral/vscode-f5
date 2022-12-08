@@ -1,11 +1,8 @@
-import * as assert from 'assert';
 import fs = require('fs');
 import path = require('path');
 
 
-import { commands, TextDocument, window } from 'vscode';
-import nock from 'nock';
-import * as utils from '../../utils/utils';
+
 import { OpenApiValidator } from 'openapi-data-validator';
 import { OpenApiRequest } from 'openapi-data-validator/dist/framework/types';
 

@@ -1,0 +1,39 @@
+{
+    "properties": {
+        "cert_passphrase": {
+            "description": "certificate password for pkcs12 import",
+            "type": "string"
+        },
+        "cert_text": {
+            "description": "certificate content",
+            "type": "string"
+        },
+        "id": {
+            "description": "uuid of the certificate",
+            "format": "uuid",
+            "type": "string"
+        },
+        "import_type": {
+            "enum": [
+                "PEM",
+                "PKCS12"
+            ],
+            "type": "string"
+        },
+        "key_passphrase": {
+            "description": "key passphrase",
+            "pattern": "[^`$&()|\\\";'<>?]+",
+            "type": "string"
+        },
+        "key_text": {
+            "description": "key content",
+            "type": "string"
+        },
+        "name": {
+            "description": "the unique user-given name of the certificate. Certificate names cannot contain spaces or special characters. allowed characters are a-z, A-Z, 0-9, dot(.), dash (-) and underscore (_) starting with only a-z, A-Z.",
+            "pattern": "^[^\\d._-][\\w\\d._-]+$",
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

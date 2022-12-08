@@ -1,0 +1,31 @@
+{
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "partition_address": {
+            "type": "string"
+        },
+        "partition_password": {
+            "type": "string"
+        },
+        "partition_port": {
+            "type": "integer"
+        },
+        "partition_user": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "type",
+        "name",
+        "partition_address",
+        "partition_port",
+        "partition_user",
+        "partition_password"
+    ],
+    "type": "object"
+}

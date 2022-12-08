@@ -1,0 +1,12 @@
+{
+    "properties": {
+        "suggestions": {
+            "items": null,
+            "type": "array"
+        }
+    },
+    "required": [
+        "suggestions"
+    ],
+    "type": "object"
+}

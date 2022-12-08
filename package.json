@@ -67,6 +67,7 @@
 		"vscode-test": "^1.5.1"
 	},
 	"dependencies": {
+		"@apidevtools/json-schema-ref-parser": "^9.1.0",
 		"@f5devcentral/f5-fast-core": "^0.19.1",
 		"ajv": "^8.11.2",
 		"f5-conx-core": "^0.17.0",

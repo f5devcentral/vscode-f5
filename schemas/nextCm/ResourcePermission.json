@@ -1,0 +1,29 @@
+{
+    "properties": {
+        "id": {
+            "format": "uuid",
+            "type": "string"
+        },
+        "method": {
+            "enum": [
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE"
+            ],
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "resource": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "name",
+        "resource",
+        "method"
+    ],
+    "type": "object"
+}

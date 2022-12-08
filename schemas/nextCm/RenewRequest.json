@@ -1,0 +1,125 @@
+{
+    "properties": {
+        "administrator_email": {
+            "description": "administrator email",
+            "format": "email",
+            "type": "string"
+        },
+        "challenge_password": {
+            "description": "challenge password",
+            "type": "string"
+        },
+        "common_name": {
+            "description": "the common_name of the certificate cannot be empty",
+            "minLength": 1,
+            "type": "string"
+        },
+        "country": {
+            "description": "country",
+            "items": {
+                "maxLength": 2,
+                "minLength": 2,
+                "pattern": "^[A-Z]{2}$",
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "division": {
+            "description": "division",
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "duration_in_days": {
+            "description": "duration in days",
+            "format": "int64",
+            "minimum": 1,
+            "type": "integer"
+        },
+        "email": {
+            "description": "email",
+            "items": {
+                "format": "email",
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "id": {
+            "format": "uuid",
+            "type": "string"
+        },
+        "issuer": {
+            "description": "issuer details",
+            "enum": [
+                "Self",
+                "CA"
+            ],
+            "type": "string"
+        },
+        "key_curve_name": {
+            "description": "supported curve names for ECDSA",
+            "enum": [
+                "prime256v1",
+                "secp384r1",
+                "secp521r1"
+            ],
+            "type": "string"
+        },
+        "key_passphrase": {
+            "description": "key passphrase",
+            "pattern": "[^`$&()|\\\";'<>?]+",
+            "type": "string"
+        },
+        "key_size": {
+            "description": "supported key size for RSA",
+            "enum": [
+                2048,
+                3072,
+                4096,
+                8192
+            ],
+            "format": "int64",
+            "type": "integer"
+        },
+        "key_type": {
+            "enum": [
+                "RSA",
+                "ECDSA"
+            ],
+            "type": "string"
+        },
+        "locality": {
+            "description": "locality",
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "organization": {
+            "description": "organization",
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "state": {
+            "description": "state/province",
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "subject_alternative_name": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "id"
+    ],
+    "type": "object"
+}

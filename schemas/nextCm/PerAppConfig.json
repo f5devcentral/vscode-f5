@@ -1,0 +1,44 @@
+{
+    "properties": {
+        "merging_overlapping_objects": {
+            "example": [
+                "ltm pool",
+                "ltm virtual-address",
+                "ltm monitor",
+                "ltm rule",
+                "ltm profile",
+                "sys folder",
+                "auth partition"
+            ],
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "regexes": {
+            "items": {
+                "properties": {
+                    "field": {
+                        "enum": [
+                            "name",
+                            "description"
+                        ],
+                        "type": "string"
+                    },
+                    "regex": {
+                        "description": "Regular expression containing at least one of named groups: application_name, tenant_name",
+                        "example": "app: (?P<application_name>.*)",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "field",
+                    "regex"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        }
+    },
+    "type": "object"
+}
