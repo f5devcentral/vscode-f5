@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: 14.x
+  NODE_VERSION: 16.x
 
 jobs:
 
@@ -23,10 +23,7 @@ jobs:
 
       - run: npm install
       
-      - name: Run headless test
-        uses: GabrielBB/xvfb-action@v1.0
-        with:
-          run: npm test
+      - run: npm test
         
   package-release-publish:
     runs-on: ubuntu-latest
