@@ -23,12 +23,12 @@ jobs:
 
       - run: npm install
       
-      - run: npm test
+      # - run: npm test
         
   package-release-publish:
     runs-on: ubuntu-latest
     environment: publishing
-    needs: test
+    # needs: test
     name: Package-Release-Publish
     steps:
 
