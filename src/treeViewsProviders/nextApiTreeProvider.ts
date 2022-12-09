@@ -122,7 +122,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                             // scehema location:  /api/change-password.post.requestBody.content.application/json.schema
                             // /api/device/v1/inventory
                             const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.['$ref'];
-                            const example = leafObj?.post?.requestBody?.content?.['application/json']?.example;
+                            const example = leafObj?.post?.requestBody?.content?.['application/json']?.example as Record<string, string>;
 
                             const schema = schemaRef ? this.getSchema(schemaRef) : logger.error('next oai schema reference not found')
 
@@ -296,7 +296,7 @@ export class OaiPost {
         public path: string,
         public method: "POST" | "PUT",
         public schemaRef?: string,
-        public example?: string | unknown,
+        public example?: Record<string, string>,
         public schema?: unknown
     ) {}
 }

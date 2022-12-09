@@ -1,8 +1,26 @@
 
 import ajv, { AnySchema } from 'ajv';
 
-import { workspace, window, TextDocument, languages, ExtensionContext, Diagnostic, CodeLensProvider, CodeLens, Range, Command } from "vscode";
+import { workspace, window, TextDocument, languages, ExtensionContext, Diagnostic, CodeLensProvider, CodeLens, Range, Command, commands, Uri, Position } from "vscode";
 import { OaiPost } from "./treeViewsProviders/nextApiTreeProvider";
+
+
+
+workspace.onDidChangeTextDocument(e => {
+
+    // const cDoc = this.docs.filter(x => x.doc === e.document )[0];
+    // this.updateDiagnostic(e.document, cDoc.oaiPost);
+    const x = "";
+});
+
+workspace.onDidOpenTextDocument( e => {
+    const x = "";
+});
+
+workspace.onDidCloseTextDocument(doc => {
+    // this.diag.delete(doc.uri);
+    const x = "";
+});
 
 
 export class OaiDoc {
@@ -14,33 +32,68 @@ export class OaiDoc {
     constructor(context: ExtensionContext) {
         //nothing for now
 
-        context.subscriptions.push(
-            workspace.onDidChangeTextDocument(e => {
+        // context.subscriptions.push(
 
-                const cDoc = this.docs.filter(x => x.doc === e.document )[0];
-                this.updateDiagnostic(e.document, cDoc.oaiPost);
-            })
-        );
+        // );
 
-        context.subscriptions.push(
-            workspace.onDidCloseTextDocument(doc => this.diag.delete(doc.uri))
-        );
+        // context.subscriptions.push(
+        //     workspace.onDidCloseTextDocument(doc => this.diag.delete(doc.uri))
+        // );
     }
 
 
     async displayDoc(oaiPost: OaiPost): Promise<any> {
 
-        const doc = await workspace.openTextDocument({
-            language: 'json',
-            content: JSON.stringify(oaiPost.example, undefined, 4)
-        })
-            .then(doc => {
-                window.showTextDocument(doc, { preview: false });
-                // doc.oaiPost = item;
-                this.updateDiagnostic(doc, oaiPost);
+        // https://raw.githubusercontent.com/f5devcentral/vscode-f5/v3.10.0/schemas/nextCm/DeviceDiscoveryRequest.json
 
-                return doc;
+        const baseUrl = 'https://raw.githubusercontent.com/f5devcentral/vscode-f5/main/schemas/nextCm/';
+        const schemaRefName = oaiPost.schemaRef?.split('/').pop() as string;
+        // const schemaRef = oaiPost.schemaRef;
+        if (oaiPost.example && schemaRefName) {
+            // the following may seem a bit excessive, but gets the schema at the top of the object
+            //      If you just add it as an object param, it gets added to the end/bottom
+
+            // create a new object with the schema reference
+            const tempObj = {
+                "$schema": `${baseUrl}${schemaRefName}.json`
+            };
+
+            // merge the example object with the temp object above that already has the schema reference
+            Object.assign(tempObj, oaiPost.example);
+
+            // re-assing the new object back into the example
+            oaiPost.example = tempObj;
+        }
+
+        const title = [
+            oaiPost.method,
+            oaiPost.path,
+        ].join('-');
+
+        var vDoc: Uri = Uri.parse("untitled:" + `${title}.json`);
+        const doc = await workspace.openTextDocument(vDoc)
+            .then((a: TextDocument) => {
+                window.showTextDocument(a, undefined, false).then(async e => {
+                    await e.edit(edit => {
+                        const startPosition = new Position(0, 0);
+                        const endPosition = a.lineAt(a.lineCount - 1).range.end;
+                        edit.replace(new Range(startPosition, endPosition), JSON.stringify(oaiPost.example, undefined, 4));
+                        commands.executeCommand("cursorTop");
+                    });
+                });
+                return a;
             });
+        // const doc = await workspace.openTextDocument({
+        //     language: 'json',
+        //     content: JSON.stringify(oaiPost.example, undefined, 4)
+        // })
+        //     .then(doc => {
+        //         window.showTextDocument(doc, { preview: false });
+        //         // doc.oaiPost = item;
+        //         this.updateDiagnostic(doc, oaiPost);
+
+        //         return doc;
+        //     });
 
         // now use the doc to push diagnostics/schema-validation and codeLense
         
@@ -76,19 +129,19 @@ export class OaiDoc {
 
     updateDiagnostic( doc: TextDocument, oaiPost: OaiPost ) {
 
-        // clear current diags in this class
-        this.diag.clear();
-        // clear the current diags in the doc/editor
-        this.diag.delete(doc.uri);
+        // // clear current diags in this class
+        // this.diag.clear();
+        // // clear the current diags in the doc/editor
+        // this.diag.delete(doc.uri);
 
-        // capture the doc we are working with
-        this.lastDoc = doc;
+        // // capture the doc we are working with
+        // this.lastDoc = doc;
 
-        // get the text from the doc/editor and feed through xc diagnostics
-        const diags = this.getDiagnostic(doc.getText(), oaiPost);
+        // // get the text from the doc/editor and feed through xc diagnostics
+        // const diags = this.getDiagnostic(doc.getText(), oaiPost);
 
-        // pubish the diags to document
-        this.diag.set(doc.uri, diags);
+        // // pubish the diags to document
+        // this.diag.set(doc.uri, diags);
     }
 }
 

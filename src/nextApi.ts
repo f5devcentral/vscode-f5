@@ -47,7 +47,6 @@ export class NextApi {
         // codeLens provider
         this.codeLensProviderDisposable = languages.registerCodeLensProvider({
             language: 'json',
-            scheme: 'untitled',
         },
             this.oaiCodeLensProvider
         );
@@ -101,6 +100,7 @@ export class OaiCodeLensProvider implements CodeLensProvider {
 
     async provideCodeLenses(document: TextDocument): Promise<CodeLens[]> {
 
+        // return [];
         // search list of oai docs and find a match
         const cDoc = this.oaiDoc.filter(x => {
             return x.doc === document;
