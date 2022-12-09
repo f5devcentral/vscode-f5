@@ -11,6 +11,42 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.10.0] - (12-8-2022)
+
+- Next api schema validation work initial
+- XC Diagnostics: Missing Rule for UDP VIP #199 - added
+  - <https://github.com/f5devcentral/vscode-f5/issues/199>
+- XC Diagnostics Rule: 05ab needs to be more specific. #198 - updated
+  - <https://github.com/f5devcentral/vscode-f5/issues/198>
+- PR - Enhancement.icall tmsh #200
+  - <https://github.com/f5devcentral/vscode-f5/pull/200>
+  - Update IRULES/IAPPS navigation to include icall/tmsh scripts #195
+    - <https://github.com/f5devcentral/vscode-f5/issues/195>
+  - Adds support for:
+    - iCall scripts
+    - TMSH scripts
+  - Modifies the nomenclature for:
+    - IRULES/IAPPS navigation, is now: TCL OBJECTS
+    - iCall Scripts added to menu
+    - TMSH Scripts added to menu
+    - Deployed-Apps, is now: iApps (Deployed)
+    - iApp-Templates, is now: iApps (Templates)
+
+---
+
+## [3.9.0] - (11-04-2022)
+
+- tmos -> XC diasnostics updates
+  - Better rule refresh flow
+  - Updated rules
+- NEXT/CM integration (gen2)
+  - manages regular connectivity
+  - discover some information about instance
+  - provides raw api call functionality
+  - explore openapi spec
+
+---
+
 ## [3.8.6] - (08-31-2022)
 
 - tmos -> XC diasnostics updates

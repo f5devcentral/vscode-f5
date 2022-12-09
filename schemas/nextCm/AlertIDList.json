@@ -1,0 +1,17 @@
+{
+    "description": "list of alert ids",
+    "properties": {
+        "alerts": {
+            "description": "alert ids",
+            "items": {
+                "format": "uuid",
+                "type": "string"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "alerts"
+    ],
+    "type": "object"
+}

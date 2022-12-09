@@ -1,0 +1,1767 @@
+{
+    "components": {
+        "responses": {
+            "Forbidden": {
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "message": "user not authorized",
+                            "status": 403
+                        },
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                },
+                "description": "Forbidden"
+            },
+            "NotFound": {},
+            "InternalError": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                },
+                "description": "Internal Error"
+            },
+            "TaskCreatedResponse": {},
+            "Unauthorized": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                },
+                "description": "Unauthorized"
+            }
+        },
+        "schemas": {
+            "urls-items": {},
+            "OpenAPIResponse": {
+                "type": "object"
+            },
+            "DeleteLicenseRequest": {
+                "properties": {
+                    "deactivate": {
+                        "default": false,
+                        "description": "deactivate license on deletion",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "hal.GetAllInstanceLicensesResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/hal._links.Plural"
+                    },
+                    {
+                        "properties": {
+                            "_embedded": {
+                                "properties": {
+                                    "types": {
+                                        "items": {
+                                            "$ref": "#/components/schemas/hal.GetInstanceLicensesResponse"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "hal.GetInstanceLicensesResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/GetInstanceLicensesResponse"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "GetInstanceLicensesResponse": {
+                "properties": {
+                    "connected": {
+                        "description": "license connection mode",
+                        "type": "boolean"
+                    },
+                    "id": {
+                        "description": "license id",
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "instances": {
+                        "description": "instance details",
+                        "items": {
+                            "$ref": "#/components/schemas/InstanceResponse"
+                        },
+                        "type": "array"
+                    },
+                    "message": {
+                        "description": "status message",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "status code",
+                        "type": "integer"
+                    },
+                    "type": {
+                        "description": "license type",
+                        "type": "string"
+                    },
+                    "version": {
+                        "description": "license version",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "GetInstanceLicensesWithBasicAuthRequest": {
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "format": "password",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "port": {
+                        "format": "int",
+                        "maximum": 65535,
+                        "minimum": 1,
+                        "type": "integer"
+                    },
+                    "username": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "address",
+                    "port",
+                    "username",
+                    "password"
+                ],
+                "type": "object"
+            },
+            "InstanceLicenseVersionInfo": {
+                "properties": {
+                    "schema_version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "schema_version"
+                ],
+                "type": "object"
+            },
+            "InstanceResponse": {
+                "properties": {
+                    "activation_date": {
+                        "description": "activation date",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "epoch_time": {
+                        "description": "epoch time",
+                        "type": "integer"
+                    },
+                    "expiry_date": {
+                        "description": "expiry time",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "instance_id": {
+                        "description": "instance id",
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "instance_ip": {
+                        "description": "instance ip",
+                        "type": "string"
+                    },
+                    "message": {
+                        "description": "status message",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "status code",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateInstanceLicensesRequest": {
+                "properties": {
+                    "connected": {
+                        "default": true,
+                        "type": "boolean"
+                    },
+                    "instances": {
+                        "description": "instance ids",
+                        "items": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                    },
+                    "jwt": {
+                        "description": "jwt token to activate the license to given instances.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "instances"
+                ],
+                "type": "object"
+            },
+            "DeviceDetails": {
+                "properties": {
+                    "host": {
+                        "example": "10.0.0.1",
+                        "type": "string"
+                    },
+                    "platform": {
+                        "example": "Z101",
+                        "type": "string"
+                    },
+                    "version": {
+                        "example": "14.1.1.0",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "DeviceDiscoveryRequest": {
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "device_group": {
+                        "type": "string"
+                    },
+                    "device_password": {
+                        "format": "password",
+                        "type": "string"
+                    },
+                    "device_user": {
+                        "type": "string"
+                    },
+                    "management_password": {
+                        "format": "password",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "management_user": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "port": {
+                        "format": "int32",
+                        "maximum": 65535,
+                        "minimum": 1,
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "address",
+                    "port",
+                    "device_user",
+                    "device_password",
+                    "management_user",
+                    "management_password"
+                ],
+                "type": "object"
+            },
+            "DeviceDiscoveryTask": {
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "completed": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "created": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "device_group": {
+                        "type": "string"
+                    },
+                    "device_password": {
+                        "format": "password",
+                        "type": "string"
+                    },
+                    "device_user": {
+                        "type": "string"
+                    },
+                    "discovered_device_id": {
+                        "type": "string"
+                    },
+                    "discovered_device_path": {
+                        "type": "string"
+                    },
+                    "failure_reason": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "port": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "SystemInfo": {
+                "properties": {
+                    "build_number": {
+                        "type": "string"
+                    },
+                    "release_version": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "SystemVersionInfo": {
+                "properties": {
+                    "schema_version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "schema_version"
+                ],
+                "type": "object"
+            },
+            "TargetInstanceDefinition": {
+                "description": "IP address, hostname, or both, of the target instance, expressed in JSON format (for example:{\"target\":{\"address\":\"1.2.3.4\",\"hostname\":\"example.host.net\"}}).",
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "hostname": {
+                        "format": "hostname",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "hal.SystemInfo": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SystemInfo"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "hal._links.Plural": {
+                "properties": {
+                    "_links": {
+                        "properties": {
+                            "first": {
+                                "$ref": "#/components/schemas/hal.linkObject"
+                            },
+                            "last": {
+                                "$ref": "#/components/schemas/hal.linkObject"
+                            },
+                            "next": {
+                                "$ref": "#/components/schemas/hal.linkObject"
+                            },
+                            "prev": {
+                                "$ref": "#/components/schemas/hal.linkObject"
+                            },
+                            "self": {
+                                "$ref": "#/components/schemas/hal.linkObject"
+                            }
+                        }
+                    }
+                }
+            },
+            "hal._links.Singular": {
+                "properties": {
+                    "_links": {
+                        "properties": {
+                            "self": {
+                                "$ref": "#/components/schemas/hal.linkObject"
+                            }
+                        }
+                    }
+                }
+            },
+            "hal.linkObject": {
+                "description": "hal+json Link Object",
+                "properties": {
+                    "href": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "href"
+                ],
+                "type": "object"
+            },
+            "hal.SystemVersionInfo": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SystemVersionInfo"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "hal.Task": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Task"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "hal.TaskCreatedResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/TaskCreatedResponse"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "hal.Tasks": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/hal._links.Plural"
+                    },
+                    {
+                        "properties": {
+                            "_embedded": {
+                                "properties": {
+                                    "tasks": {
+                                        "items": {
+                                            "$ref": "#/components/schemas/hal.Task"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "Task": {
+                "properties": {
+                    "completed": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "created": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "failure_reason": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "task_type": {
+                        "type": "string"
+                    },
+                    "updated": {
+                        "format": "date-time",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "type": "object"
+            },
+            "TaskCreatedResponse": {
+                "properties": {
+                    "path": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "hal.DeviceVersionInfo": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/DeviceVersionInfo"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "Device": {
+                "properties": {
+                    "address": {
+                        "readOnly": true,
+                        "title": "IP Address",
+                        "type": "string"
+                    },
+                    "certificate_validated": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "certificate_validation_error": {
+                        "type": "string"
+                    },
+                    "certificate_validity": {
+                        "type": "boolean"
+                    },
+                    "hostname": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "mode": {
+                        "enum": [
+                            "STANDALONE",
+                            "HA"
+                        ],
+                        "type": "string"
+                    },
+                    "platform_type": {
+                        "description": "Specifies the platform of this BIG-IP Next instance.",
+                        "maxLength": 16,
+                        "type": "string"
+                    },
+                    "port": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "status": {
+                        "enum": [
+                            "HEALTHY",
+                            "UNHEALTHY",
+                            "UNKNOWN"
+                        ],
+                        "type": "string"
+                    },
+                    "version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "type": "object"
+            },
+            "hal.LicenseTask": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/LicenseTask"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "LicenseTask": {
+                "properties": {
+                    "completed": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "created": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "current_step": {
+                        "type": "string"
+                    },
+                    "failure_reason": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "license_id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "response": {
+                        "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "status"
+                ],
+                "type": "object"
+            },
+            "AuthenticationRequest": {
+                "properties": {
+                    "password": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "username"
+                ],
+                "type": "object"
+            },
+            "AuthenticationResponse": {
+                "properties": {
+                    "expires": {
+                        "description": "Expiration time for the authenticated request.",
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "BadRequest": {
+                "properties": {
+                    "detail": {
+                        "additionalProperties": true,
+                        "example": {
+                            "__all__": [
+                                "Invalid request body"
+                            ],
+                            "field": [
+                                "Invalid name"
+                            ]
+                        },
+                        "items": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "status": {
+                        "example": 400,
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "GeneralResponse": {
+                "properties": {
+                    "id": {
+                        "example": "404b7e5e-42e7-4bd8-acb0-a6b57c013b9f",
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "message": {
+                        "description": "status message",
+                        "example": "QKView task have been successfully done",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "status code",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "GeneralTask": {
+                "description": "Defines WAF general task properties.",
+                "properties": {
+                    "completed": {
+                        "description": "Task completed time.",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "created": {
+                        "description": "Task created time.",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "failure_reason": {
+                        "description": "Task failure reason.",
+                        "example": "",
+                        "type": "string"
+                    },
+                    "id": {
+                        "description": "UUID of task.",
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "policy_id": {
+                        "description": "UUID of WAF policy.",
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "state": {
+                        "description": "Task state.",
+                        "example": "completeTask",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "Task status.",
+                        "example": "Completed",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "hal.LicenseTasks": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/hal._links.Plural"
+                    },
+                    {
+                        "properties": {
+                            "_embedded": {
+                                "properties": {
+                                    "tasks": {
+                                        "items": {
+                                            "$ref": "#/components/schemas/hal.LicenseTask"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "hal.Device": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Device"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "hal.Devices": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/hal._links.Plural"
+                    },
+                    {
+                        "properties": {
+                            "_embedded": {
+                                "properties": {
+                                    "devices": {
+                                        "items": {
+                                            "$ref": "#/components/schemas/hal.Device"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "DeviceVersionInfo": {
+                "properties": {
+                    "schema_version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "schema_version"
+                ],
+                "type": "object"
+            },
+            "hal.InstanceLicenseVersionInfo": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/InstanceLicenseVersionInfo"
+                    },
+                    {
+                        "$ref": "#/components/schemas/hal._links.Singular"
+                    }
+                ]
+            },
+            "UpdateLicensesRequest": {
+                "properties": {
+                    "connected": {
+                        "description": "license connect mode",
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "description": "license status",
+                        "enum": [
+                            "VALID",
+                            "INVALID"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "hal.GatewayVersionInfo": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/GatewayVersionInfo"
+                    },
+                    {
+                        "properties": {
+                            "_links": {
+                                "$ref": "#/components/schemas/hal._links.Singular"
+                            }
+                        }
+                    }
+                ]
+            },
+            "hal.GeneralResponse": {
+                "$ref": "#/components/schemas/GeneralResponse"
+            },
+            "GatewayVersionInfo": {
+                "properties": {
+                    "schema_version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "schema_version"
+                ],
+                "type": "object"
+            },
+            "TokenResponse": {
+                "properties": {
+                    "access_token": {
+                        "type": "string"
+                    },
+                    "force_change_password": {
+                        "type": "boolean"
+                    },
+                    "refresh_token": {
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Error": {
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "format": "int32",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "status",
+                    "message"
+                ],
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "basicAuth": {
+                "scheme": "basic",
+                "type": "http"
+            },
+            "bearerAuth": {
+                "bearerFormat": "JWT",
+                "scheme": "bearer",
+                "type": "http"
+            }
+        }
+    },
+    "info": {
+        "description": "Enables the F5® BIG-IP® Next Central Manager to perform certain Gateway feature operations, such as to log in and log out a user.",
+        "title": "BIG-IQ MBIP API",
+        "version": "1.0.0"
+    },
+    "openapi": "3.0.1",
+    "paths": {
+        "/api/device/openapi": {
+            "get": {
+                "description": "Requests the OpenAPI specification of the instance feature of BIG-IP Next Central Manager.",
+                "operationId": "GetOpenAPI",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OpenAPIResponse"
+                                }
+                            }
+                        },
+                        "description": "The OpenAPI specification of the instance feature of BIG-IP Next Central Manager."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "Return OpenAPI specification",
+                "tags": [
+                    "DeviceFeature"
+                ]
+            }
+        },
+        "/api/device/v1/inventory": {
+            "get": {
+                "description": "Requests a list of all managed BIG-IP Next instances.",
+                "operationId": "ListDevices",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "examples": {
+                                    "example1": {
+                                        "summary": "A list of managed BIG-IP Next instances",
+                                        "value": {
+                                            "_embedded": {
+                                                "devices": [
+                                                    {
+                                                        "_links": {
+                                                            "self": {
+                                                                "href": "/v1/inventory/c9796e86-21f7-4182-be1c-c737ed430242"
+                                                            }
+                                                        },
+                                                        "address": "10.145.10.1",
+                                                        "certificate_validated": "2021-05-04T00:05:43.1025576Z",
+                                                        "certificate_validation_error": "x509: cannot validate certificate for 10.145.10.1 because it doesn't contain any IP SANs",
+                                                        "certificate_validity": false,
+                                                        "hostname": "mbip94.sample.com",
+                                                        "id": "c9796e86-21f7-4182-be1c-c737ed430242",
+                                                        "mode": "STANDALONE",
+                                                        "platform_type": "ve",
+                                                        "port": 5443,
+                                                        "version": "2022-07.0.7.0-2.1.8"
+                                                    },
+                                                    {
+                                                        "_links": {
+                                                            "self": {
+                                                                "href": "/v1/inventory/b8796e86-21f7-4182-be1c-c737ed430543"
+                                                            }
+                                                        },
+                                                        "address": "10.145.10.2",
+                                                        "certificate_validated": "2021-05-04T00:05:43.1025576Z",
+                                                        "certificate_validation_error": "x509: cannot validate certificate for 10.145.10.2 because it doesn't contain any IP SANs",
+                                                        "certificate_validity": false,
+                                                        "hostname": "mbip-cluster.sample.com",
+                                                        "id": "b8796e86-21f7-4182-be1c-c737ed430543",
+                                                        "mode": "HA",
+                                                        "platform_type": "velos",
+                                                        "port": 5443,
+                                                        "version": "2022-07.0.7.0-2.1.8"
+                                                    }
+                                                ]
+                                            },
+                                            "_links": {
+                                                "self": {
+                                                    "href": "/v1/inventory"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "example2": {
+                                        "summary": "A list of BIG-IP Next instances and their health status",
+                                        "value": {
+                                            "_embedded": {
+                                                "devices": [
+                                                    {
+                                                        "_links": {
+                                                            "self": {
+                                                                "href": "/v1/inventory/8e09491e-f2b0-4b82-ba83-ad75e940831a"
+                                                            }
+                                                        },
+                                                        "address": "10.145.77.26",
+                                                        "hostname": "mbip-1.sample.com",
+                                                        "id": "8e09491e-f2b0-4b82-ba83-ad75e940831a",
+                                                        "mode": "STANDALONE",
+                                                        "platform_type": "ve",
+                                                        "port": 5443,
+                                                        "status": "HEALTHY",
+                                                        "version": "2021.09.0.5.0"
+                                                    }
+                                                ]
+                                            },
+                                            "_links": {
+                                                "self": {
+                                                    "href": "/v1/inventory"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "List of all managed BIG-IP Next instances."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "Return all managed BIG-IP Next instances",
+                "tags": [
+                    "DeviceFeature"
+                ]
+            },
+            "post": {
+                "description": "Requests a task to add (discover) a BIG-IP Next instance to BIG-IP Next Central Manager for management.",
+                "operationId": "RunDeviceDiscoveryTask",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "address": "10.145.10.1",
+                                "device_password": "admin",
+                                "device_user": "admin",
+                                "management_password": "admin",
+                                "management_user": "sample_mgmt_admin",
+                                "port": 5443
+                            },
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceDiscoveryRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "content": {
+                            "application/hal+json": {
+                                "example": {
+                                    "_links": {
+                                        "self": {
+                                            "href": "/v1/discovery-tasks/43b7bd5b-5b61-4a64-8fe4-68ef8ed910f2"
+                                        }
+                                    },
+                                    "path": "/v1/discovery-tasks/43b7bd5b-5b61-4a64-8fe4-68ef8ed910f2"
+                                },
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.TaskCreatedResponse"
+                                }
+                            }
+                        },
+                        "description": "Successful response."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "Discover and bring a BIG-IP Next instance under management",
+                "tags": [
+                    "DeviceFeature"
+                ]
+            }
+        },
+        "/api/device/v1/version": {
+            "get": {
+                "description": "Requests the schema version of the BIG-IP Next instance feature set. This is for internal use only.",
+                "operationId": "GetDeviceSchemaVersion",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "example": {
+                                    "_links": {
+                                        "self": {
+                                            "href": "/v1/version"
+                                        }
+                                    },
+                                    "schema_version": "1.10"
+                                },
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.DeviceVersionInfo"
+                                }
+                            }
+                        },
+                        "description": "Schema version of the BIG-IP Next instance feature set."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "Return the schema version of the BIG-IP Next instance feature set",
+                "tags": [
+                    "DeviceFeature"
+                ]
+            }
+        },
+        "/api/forgot-password": {
+            "post": {
+                "description": "User forgot password. A temporary password will be generated and sent to user's email.",
+                "operationId": "UserForgotPassword",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "username": "user01"
+                            },
+                            "schema": {
+                                "properties": {
+                                    "username": {
+                                        "description": "User name.",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "username"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "Forgot password response message."
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "User forgot password",
+                "tags": [
+                    "GatewayFeature"
+                ]
+            }
+        },
+        "/api/instance-license/openapi": {
+            "get": {
+                "description": "request openapi specification for instance license feature.",
+                "operationId": "GetOpenAPI",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OpenAPIResponse"
+                                }
+                            }
+                        },
+                        "description": "OpenAPI response"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "unexpected error"
+                    }
+                },
+                "summary": "return openapi specification",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            }
+        },
+        "/api/instance-license/v1/license-tasks": {
+            "get": {
+                "description": "Requests a list of all license tasks.",
+                "operationId": "GetAllLicenseTasks",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.LicenseTasks"
+                                }
+                            }
+                        },
+                        "description": "List of tasks"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "Return all license-specific tasks",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            }
+        },
+        "/api/instance-license/v1/license-tasks/{id}": {
+            "get": {
+                "description": "Requests the result of a license-specific task.",
+                "operationId": "GetLicenseTask",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.LicenseTask"
+                                }
+                            }
+                        },
+                        "description": "A license-specific task"
+                    }
+                },
+                "summary": "Return license-specific task process",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            },
+            "parameters": [
+                {
+                    "description": "UUID of the task process",
+                    "in": "path",
+                    "name": "id",
+                    "required": true,
+                    "schema": {
+                        "format": "uuid",
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        "/api/instance-license/v1/licenses": {
+            "get": {
+                "description": "get all license details",
+                "operationId": "GetAllLicenseDetails",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.GetAllInstanceLicensesResponse"
+                                }
+                            }
+                        },
+                        "description": "specific instance license"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "get all license details",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            },
+            "post": {
+                "description": "add or activate instance licenses. activate instance license if jwt does exist in request payload otherwise add the license details in central manager",
+                "operationId": "CreateInstanceLicenses",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateInstanceLicensesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "$ref": "#/components/responses/TaskCreatedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "add or activate instance licenses",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            }
+        },
+        "/api/instance-license/v1/licenses/basic-auth": {
+            "post": {
+                "description": "get instance license details with bsic auth",
+                "operationId": "GetLicenseDetailsWithBasicAuth",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetInstanceLicensesWithBasicAuthRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.GetInstanceLicensesResponse"
+                                }
+                            }
+                        },
+                        "description": "Status of instances license"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "get instance license details with basic auth",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            }
+        },
+        "/api/instance-license/v1/licenses/{id}": {
+            "delete": {
+                "description": "Delete / Uninstall License.",
+                "operationId": "DeleteLicense",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeleteLicenseRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "$ref": "#/components/responses/TaskCreatedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "Delete License",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            },
+            "get": {
+                "description": "get instance license details",
+                "operationId": "GetLicenseDetails",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.GetInstanceLicensesResponse"
+                                }
+                            }
+                        },
+                        "description": "specific instance license"
+                    }
+                },
+                "summary": "get instance license details",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            },
+            "parameters": [
+                {
+                    "description": "uuid of license",
+                    "in": "path",
+                    "name": "id",
+                    "required": true,
+                    "schema": {
+                        "format": "uuid",
+                        "type": "string"
+                    }
+                }
+            ],
+            "put": {
+                "description": "update license details",
+                "operationId": "UpdateLicenseDetails",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateLicensesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "$ref": "#/components/responses/TaskCreatedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "update license details",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            }
+        },
+        "/api/instance-license/v1/version": {
+            "get": {
+                "description": "request the schema version of the instance-license feature.",
+                "operationId": "GetInstanceLicenseSchemaVersion",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "example": {
+                                    "_links": {
+                                        "self": {
+                                            "href": "/v1/version"
+                                        }
+                                    },
+                                    "schema_version": "1.10"
+                                },
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.InstanceLicenseVersionInfo"
+                                }
+                            }
+                        },
+                        "description": "instance-license feature schema version information"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "return schema version",
+                "tags": [
+                    "InstanceLicenseFeature"
+                ]
+            }
+        },
+        "/api/login": {
+            "post": {
+                "description": "Login with user name and password. Validates the username and password and returns an authentication token and a refresh token. The authentication token has a short lifetime and should be included in subsequent API requests. The refresh token has a longer lifetime and can be used to get a new authentication token.",
+                "operationId": "UserLogin",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "password": "Pass2022!",
+                                "username": "user01"
+                            },
+                            "schema": {
+                                "properties": {
+                                    "password": {
+                                        "description": "Password",
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "description": "User name",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        },
+                        "description": "Authentication token"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "User login",
+                "tags": [
+                    "GatewayFeature"
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "description": "Logs out the user by closing their session state.",
+                "operationId": "UserLogout",
+                "responses": {
+                    "204": {
+                        "description": "Logged out"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "summary": "User logout",
+                "tags": [
+                    "GatewayFeature"
+                ]
+            }
+        },
+        "/api/openapi": {
+            "get": {
+                "description": "Returns OpenAPI specification for the BIG-IP Next Central Manager. This is the full collection for all features.",
+                "operationId": "GetAllOpenAPI",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OpenAPIResponse"
+                                }
+                            }
+                        },
+                        "description": "BIG-IP Next Central Manager OpenAPI specification"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "summary": "Return OpenAPI specification for the BIG-IP Next Central Manager.",
+                "tags": [
+                    "GatewayFeature"
+                ]
+            }
+        },
+        "/api/system/v1/version": {
+            "get": {
+                "description": "Requests schema version of the system.",
+                "operationId": "GetSystemSchemaVersion",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "example": {
+                                    "_links": {
+                                        "self": {
+                                            "href": "/v1/version"
+                                        }
+                                    },
+                                    "schema_version": "1.10"
+                                },
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.SystemVersionInfo"
+                                }
+                            }
+                        },
+                        "description": "System schema version information"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "Return system schema version",
+                "tags": [
+                    "SystemFeature"
+                ]
+            }
+        },
+        "/api/token-refresh": {
+            "post": {
+                "description": "User refresh token to produce an auth token",
+                "operationId": "RefreshToken",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "refreshtoken": "refresh test token"
+                            },
+                            "schema": {
+                                "properties": {
+                                    "refresh_token": {
+                                        "description": "Refresh token",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "refresh_token"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        },
+                        "description": "Authentication token"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "summary": "User refresh token to produce an auth token",
+                "tags": [
+                    "GatewayFeature"
+                ]
+            }
+        },
+        "/v1/version": {
+            "get": {
+                "description": "Returns schema version of the Gateway feature.",
+                "operationId": "GetSharedSchemaVersion",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/hal+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hal.GatewayVersionInfo"
+                                }
+                            }
+                        },
+                        "description": "Gateway schema version information"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/InternalError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "summary": "Return schema version",
+                "tags": [
+                    "GatewayFeature"
+                ]
+            }
+        }
+    },
+    "x-components": {},
+    "x-global-options": {
+        "go_package": "gateway"
+    }
+}

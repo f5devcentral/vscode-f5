@@ -1,0 +1,92 @@
+{
+    "description": "create alert requests",
+    "properties": {
+        "alerts": {
+            "description": "alerts",
+            "items": {
+                "description": "create alert",
+                "properties": {
+                    "annotations": {
+                        "description": "annotations",
+                        "properties": {
+                            "description": {
+                                "description": "alert description",
+                                "type": "string"
+                            },
+                            "summary": {
+                                "description": "alert summary",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "summary",
+                            "description"
+                        ],
+                        "type": "object"
+                    },
+                    "endsAt": {
+                        "description": "alert ends at",
+                        "type": "string"
+                    },
+                    "labels": {
+                        "description": "levels",
+                        "properties": {
+                            "alertname": {
+                                "description": "alert name",
+                                "type": "string"
+                            },
+                            "helpLink": {
+                                "description": "help link",
+                                "type": "string"
+                            },
+                            "job": {
+                                "description": "alert job",
+                                "type": "string"
+                            },
+                            "notificationConfigName": {
+                                "description": "notification config name",
+                                "type": "string"
+                            },
+                            "severity": {
+                                "description": "alert severity",
+                                "enum": [
+                                    "INFO",
+                                    "WARNING",
+                                    "SEVERE"
+                                ],
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "alertname",
+                            "job"
+                        ],
+                        "type": "object"
+                    },
+                    "startsAt": {
+                        "description": "alert starts at",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "alert status",
+                        "enum": [
+                            "firing",
+                            "resolved"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "annotations",
+                    "labels"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "alerts"
+    ],
+    "type": "object"
+}

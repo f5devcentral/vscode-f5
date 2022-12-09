@@ -1,0 +1,25 @@
+{
+    "properties": {
+        "connected": {
+            "default": true,
+            "type": "boolean"
+        },
+        "instances": {
+            "description": "instance ids",
+            "items": {
+                "format": "uuid",
+                "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+        },
+        "jwt": {
+            "description": "jwt token to activate the license to given instances.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "instances"
+    ],
+    "type": "object"
+}

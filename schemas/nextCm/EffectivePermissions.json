@@ -1,0 +1,36 @@
+{
+    "properties": {
+        "effectivepermissions": {
+            "items": {
+                "properties": {
+                    "action": {
+                        "enum": [
+                            "GET",
+                            "POST",
+                            "PUT",
+                            "DELETE"
+                        ],
+                        "type": "string"
+                    },
+                    "allowed": {
+                        "type": "boolean"
+                    },
+                    "resource": {
+                        "type": "string"
+                    },
+                    "user_name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "user_name",
+                    "resource",
+                    "action"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        }
+    },
+    "type": "object"
+}

@@ -11,6 +11,7 @@
 - [Device Importing](device_importing.md)
 - [ATC RPM Mgmt](atc_rpm_mgmt.md)
 - [Generic Rest Calls](generic_rest_calls.md)
+- [TMOS -> XC Diagnostics](xcDiagnostics.md)
 - [Utilities](utilities.md)
 - [Change Log](/changelog)
 

@@ -1,0 +1,49 @@
+{
+    "description": "SMTP server information.",
+    "properties": {
+        "authentication_enabled": {
+            "description": "Authentication enabled status.",
+            "type": "boolean"
+        },
+        "description": {
+            "description": "A one-line description of the SMTP server.",
+            "type": "string"
+        },
+        "encryption": {
+            "description": "Encryption used to send emails.",
+            "type": "string"
+        },
+        "from_address": {
+            "description": "Email address used to send emails from.",
+            "format": "email",
+            "type": "string"
+        },
+        "host": {
+            "description": "SMTP server host.",
+            "type": "string"
+        },
+        "id": {
+            "description": "UUID of the SMTP server.",
+            "format": "uuid",
+            "type": "string"
+        },
+        "password": {
+            "description": "Password for the SMTP server.",
+            "type": "string"
+        },
+        "port": {
+            "description": "SMTP server port.",
+            "format": "int32",
+            "type": "integer"
+        },
+        "server_name": {
+            "description": "SMTP server name.",
+            "type": "string"
+        },
+        "username": {
+            "description": "Username of the SMTP server.",
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

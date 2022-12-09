@@ -1,0 +1,9 @@
+{
+    "properties": {
+        "id": {
+            "format": "uuid",
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

@@ -1,0 +1,41 @@
+{
+    "properties": {
+        "address": {
+            "type": "string"
+        },
+        "device_group": {
+            "type": "string"
+        },
+        "device_password": {
+            "format": "password",
+            "type": "string"
+        },
+        "device_user": {
+            "type": "string"
+        },
+        "management_password": {
+            "format": "password",
+            "minLength": 1,
+            "type": "string"
+        },
+        "management_user": {
+            "minLength": 1,
+            "type": "string"
+        },
+        "port": {
+            "format": "int32",
+            "maximum": 65535,
+            "minimum": 1,
+            "type": "integer"
+        }
+    },
+    "required": [
+        "address",
+        "port",
+        "device_user",
+        "device_password",
+        "management_user",
+        "management_password"
+    ],
+    "type": "object"
+}

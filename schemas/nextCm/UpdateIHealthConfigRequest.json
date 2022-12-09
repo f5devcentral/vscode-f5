@@ -1,0 +1,11 @@
+{
+    "properties": {
+        "password": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "password"
+    ],
+    "type": "object"
+}

@@ -1,0 +1,21 @@
+{
+    "properties": {
+        "device_id": {
+            "format": "uuid",
+            "type": "string"
+        },
+        "template_params_id": {
+            "format": "uuid",
+            "type": "string"
+        },
+        "wf_type": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "device_id",
+        "template_params_id",
+        "wf_type"
+    ],
+    "type": "object"
+}

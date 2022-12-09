@@ -1,0 +1,66 @@
+{
+    "properties": {
+        "alert_types": {
+            "description": "list of IDs to link and/or removal",
+            "properties": {
+                "delink": {
+                    "description": "IDs to delink",
+                    "items": {
+                        "description": "ID",
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "link": {
+                    "description": "IDs link",
+                    "items": {
+                        "description": "ID",
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "location": {
+            "type": "string"
+        },
+        "name": {
+            "minLength": 1,
+            "type": "string"
+        },
+        "notification_type": {
+            "enum": [
+                "SMTP",
+                "UI"
+            ],
+            "type": "string"
+        },
+        "periodicity": {
+            "minLength": 1,
+            "type": "string"
+        },
+        "server_config": {
+            "type": "string"
+        },
+        "suppressed": {
+            "type": "boolean"
+        },
+        "to_emails": {
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "name",
+        "notification_type"
+    ],
+    "type": "object"
+}

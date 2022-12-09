@@ -1,0 +1,33 @@
+{
+    "properties": {
+        "created": {
+            "format": "date-time",
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "id": {
+            "format": "uuid",
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "parameters": {
+            "type": "object"
+        },
+        "source_device_id": {
+            "format": "uuid",
+            "type": "string"
+        },
+        "template_id": {
+            "format": "uuid",
+            "type": "string"
+        }
+    },
+    "required": [
+        "template_id"
+    ],
+    "type": "object"
+}

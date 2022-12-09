@@ -1,0 +1,76 @@
+{
+    "properties": {
+        "description": {
+            "description": "Upload description",
+            "type": "string"
+        },
+        "f5_support_case": {
+            "description": "F5 Support Case Number",
+            "type": "string"
+        },
+        "filename": {
+            "description": "Qkview file name",
+            "type": "string"
+        },
+        "ha_node_ips": {
+            "description": "List of HA Node Control Plane Addresses",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "ihealth_password": {
+            "description": "Ihealth password",
+            "type": "string"
+        },
+        "ihealth_user": {
+            "description": "Ihealth username",
+            "type": "string"
+        },
+        "instance_id": {
+            "description": "The UUID of a BIG-IP Next instance.",
+            "format": "uuid",
+            "type": "string"
+        },
+        "save_credentials": {
+            "default": false,
+            "description": "Save ihealth credentials",
+            "type": "boolean"
+        },
+        "share_with_case_owner": {
+            "description": "Share with case owner",
+            "type": "boolean"
+        },
+        "source": {
+            "default": "INSTANCE",
+            "enum": [
+                "CM",
+                "INSTANCE"
+            ],
+            "type": "string"
+        },
+        "storage": {
+            "default": "EXTERNAL",
+            "description": "Storage of qkview file",
+            "enum": [
+                "LOCAL",
+                "EXTERNAL"
+            ],
+            "type": "string"
+        },
+        "user_agent": {
+            "default": "CM",
+            "description": "User Agent",
+            "type": "string"
+        },
+        "visible_in_gui": {
+            "description": "Upload visible in gui",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "filename",
+        "ihealth_user"
+    ],
+    "type": "object"
+}

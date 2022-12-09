@@ -1,0 +1,35 @@
+{
+    "properties": {
+        "allowOverwrite": {
+            "description": "Allow application with the same name to be overwritten.",
+            "type": "boolean"
+        },
+        "name": {
+            "description": "Name of the template in templateSetName/templateName format.",
+            "type": "string"
+        },
+        "parameters": {
+            "description": "Parameters for the template.",
+            "type": "object"
+        },
+        "target": {
+            "description": "IP address, hostname, or both, of the target instance, expressed in JSON format (for example:{\"target\":{\"address\":\"1.2.3.4\",\"hostname\":\"example.host.net\"}}).",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "hostname": {
+                    "format": "hostname",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "required": [
+        "name",
+        "parameters",
+        "target"
+    ],
+    "type": "object"
+}

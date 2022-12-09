@@ -115,9 +115,7 @@ https://code.visualstudio.com/docs/editor/userdefinedsnippets
 
 Install the RedHat YAML extension
 
->https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml
-
-><https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml>
+> <https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml>
 
 In the vscode settings for that extension:
 
