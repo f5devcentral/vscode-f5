@@ -17,7 +17,7 @@ There are two main ways schema validation can be applied:
 
 ## Untitled document schema or in-declaration direct reference
 
-Just as documented here: https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/validate.html, the necessary json schema can be referenced diretly within the declaration.
+Just as documented here: <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/validate.html>, the necessary json schema can be referenced diretly within the declaration.
 
 This scenario is common when first starting out with automation since it is very easy to open an editor, copy an example declaration and start editing.  Since the file has not been saved (with the appropriate file type discussed later), VSCode does not know what schema to apply, therefore, just providing basic json syntax validation.  
 
@@ -78,14 +78,14 @@ Examples can be found in the f5-fasting repo
 
 Snippets are code blocks that are used to quickly insert code within an editor in VSCode.  The extension includes the basic example for each of the ATC services (AS3/DO/TS).  
 
-To access the snippets, open an editor file, change the language to JSON, then start typing 'as3', 'do' or 'ts', the hit 'enter".  This should insert the example snippet for the respective ATC service. 
+To access the snippets, open an editor file, change the language to JSON, then start typing 'as3', 'do' or 'ts', the hit 'enter".  This should insert the example snippet for the respective ATC service.
 
 > NOTE:  these snippets include the direct schema reference
 
 <img src="./media/as3_snippet_9.9.2020.gif" alt="drawing" width="80%"/>
 
 VSCode guide for defining customer user snippets
-https://code.visualstudio.com/docs/editor/userdefinedsnippets
+<https://code.visualstudio.com/docs/editor/userdefinedsnippets>
 
 <!-- <p>&nbsp;</p> -->
 
