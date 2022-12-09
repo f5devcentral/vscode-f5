@@ -57,8 +57,24 @@ export default function tclCore(context: ExtensionContext) {
         return tclTreeProvider.deleteRule(rule);
     }));
 
+    // --- ICALL Script COMMANDS ---
+    context.subscriptions.push(commands.registerCommand('f5-tcl.getIcallscript', async (icallscript) => {
+        return tclTreeProvider.displayIcallscript(icallscript);
+    }));
+
+    context.subscriptions.push(commands.registerCommand('f5-tcl.deleteIcallscript', async (icallscript) => {
+        return tclTreeProvider.deleteIcallscript(icallscript);
+    }));
 
 
+    // --- TMSH Script COMMANDS ---
+    context.subscriptions.push(commands.registerCommand('f5-tcl.getTMSHscript', async (tmshscript) => {
+        return tclTreeProvider.displayTMSHscript(tmshscript);
+    }));
+
+    context.subscriptions.push(commands.registerCommand('f5-tcl.deleteTMSHscript', async (tmshscript) => {
+        return tclTreeProvider.deleteTMSHscript(tmshscript);
+    }));
 
 
     // --- IAPP COMMANDS ---
