@@ -2,6 +2,7 @@ import fs = require('fs');
 import path = require('path');
 
 import { OpenApiValidator } from 'openapi-data-validator';
+import { OpenApiRequest } from 'openapi-data-validator/dist/framework/types';
 
 const localOaiPath = path.join(__dirname, '..', '..', '..', 'openapi_nextCm_minor.json');
 const apiSpec = JSON.parse(fs.readFileSync(localOaiPath).toString());
@@ -11,7 +12,7 @@ suite('NEXT CM OpenApi Schema Validation', () => {
 
     test('simple validate', async () => {
 
-        const body = {
+        const reqBody = {
             "address": "10.145.10.1",
             "device_password": "admin",
             "device_user": "admin",
@@ -21,10 +22,10 @@ suite('NEXT CM OpenApi Schema Validation', () => {
         };
 
 
-        const req = {
+        const req: OpenApiRequest = {
             method: "POST",
             route: "/api/device/v1/inventory",
-            body
+            body: reqBody
         };
 
         const openApiValidator = new OpenApiValidator({
