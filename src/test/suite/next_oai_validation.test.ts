@@ -12,7 +12,7 @@ suite('NEXT CM OpenApi Schema Validation', () => {
 
     test('simple validate', async () => {
 
-        const reqBody = {
+        const reqBody: unknown = {
             "address": "10.145.10.1",
             "device_password": "admin",
             "device_user": "admin",
@@ -25,7 +25,7 @@ suite('NEXT CM OpenApi Schema Validation', () => {
         const req: OpenApiRequest = {
             method: "POST",
             route: "/api/device/v1/inventory",
-            body: reqBody
+            body: reqBody as unknown
         };
 
         const openApiValidator = new OpenApiValidator({
