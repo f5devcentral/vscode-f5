@@ -14,7 +14,6 @@
 		"skipLibCheck": true,
 		"rootDir": "src",
 		"outDir": "out",
-		"useUnknownInCatchVariables": false,
 		"strict": true, /* enable all strict type-checking options */
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
@@ -25,12 +24,5 @@
 	},
 	"include": [
         "src/**/*"
-    ],
-	"exclude": [
-		"./node_modules/**/*",
-		"test",
-		".vscode-test",
-		"*f5-conx-core*",
-		"**/*.http"
-	]
+    ]
 }

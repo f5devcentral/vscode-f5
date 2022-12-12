@@ -27,12 +27,12 @@ import jsyaml from "js-yaml";
 import { F5Client } from '../f5Client';
 
 import { logger } from '../logger';
-import { NextOpenApi } from 'f5-conx-core/dist/bigip/nextModels';
+import { OpenApi } from "f5-conx-core/dist/bigip/OpenApiModels";
 
 export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
     context: ExtensionContext;
     connected: F5Client | undefined;
-    oai: NextOpenApi | undefined;
+    oai: OpenApi | undefined;
 
     private _onDidChangeTreeData: EventEmitter<NxtApiTreeItem | undefined> = new EventEmitter<NxtApiTreeItem | undefined>();
     readonly onDidChangeTreeData: Event<NxtApiTreeItem | undefined> = this._onDidChangeTreeData.event;
@@ -76,7 +76,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
 
     getSchema(schemaRef: string) {
         const baseSchemaName = schemaRef.split('/').pop()!;
-        const schema = this.oai?.components.schemas[baseSchemaName];
+        const schema = (this.oai?.components?.schemas as any)[baseSchemaName];
         return schema;
     }
 
@@ -111,7 +111,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                         const leaf1 = thisPathKey.map(x=>x);   // add an empty element to the front for the join to append '/' to the beginning
                         leaf1.unshift('')
                         const pathString = leaf1.join('/')  // join to make original path
-                        const leafObj = this.oai!.paths[pathString];    // get the full details from this object/path
+                        const leafObj: any = this.oai!.paths[pathString];    // get the full details from this object/path
 
                         // if leafObj has get/post/put, create action items
                         if(leafObj?.hasOwnProperty('post')) {
@@ -121,7 +121,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                             // examples location:  /api/change-password.post.requestBody.content.application/json.example
                             // scehema location:  /api/change-password.post.requestBody.content.application/json.schema
                             // /api/device/v1/inventory
-                            const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.['$ref'];
+                            const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.$ref;
                             const example = leafObj?.post?.requestBody?.content?.['application/json']?.example as Record<string, string>;
 
                             const schema = schemaRef ? this.getSchema(schemaRef) : logger.error('next oai schema reference not found')

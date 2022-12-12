@@ -56,7 +56,7 @@ export class FastWebView {
          */
         try {
             this.fastEngine = await fast.Template.loadYaml(fastYml);
-        } catch (e) {
+        } catch (e: any) {
             logger.error(e);
             window.showErrorMessage(e.message);
         }

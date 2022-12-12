@@ -4,13 +4,13 @@ import path = require('path');
 
 
 import $RefParser from "@apidevtools/json-schema-ref-parser";
-import { NextOpenApi } from 'f5-conx-core/dist/bigip/nextModels';
+import { OpenApi } from 'f5-conx-core/dist/bigip/OpenApiModels';
 
 const localOaiPath = path.join(__dirname, '..', '..', '..', 'openapi_nextCm.json');
 const publicSchemaBasePath = path.join(__dirname, '..', '..', '..', 'schemas', 'nextCm');  //home/ted/projects/vscode-f5/schemas/nextCm
 const apiSpec = fs.readFileSync(localOaiPath).toString();
 const apiSpecOriginal = JSON.parse(apiSpec);
-let apiSpecDeRefed: NextOpenApi;
+let apiSpecDeRefed: OpenApi;
 
 type PathDeets = {
     path: string;
@@ -93,7 +93,7 @@ suite('Generate NEXT schema files', () => {
         pathsDeets.forEach(item => {
             const schemaRefName = item.schemaRef?.split('/').pop() as string;
             const filePath = path.join(publicSchemaBasePath, `${schemaRefName}.json`);
-            const schema = apiSpecDeRefed.components.schemas[schemaRefName];
+            const schema = (apiSpecDeRefed?.components?.schemas as any)[schemaRefName];
             if(schema) {
                 // make sure we actually found the schema before we try to write it to a file
                 fs.writeFileSync(filePath, JSON.stringify(schema, undefined, 4));
