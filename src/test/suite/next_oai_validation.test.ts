@@ -28,24 +28,24 @@ suite('NEXT CM OpenApi Schema Validation', () => {
             body: reqBody as unknown
         };
 
-        const openApiValidator = new OpenApiValidator({
-            apiSpec,
-            validateRequests: {
-                allowUnknownQueryParameters: true
-            }
-        });
+        // const openApiValidator = new OpenApiValidator({
+        //     apiSpec,
+        //     validateRequests: {
+        //         allowUnknownQueryParameters: true
+        //     }
+        // });
 
-        const validator = openApiValidator.createValidator();
+        // const validator = openApiValidator.createValidator();
 
-        await validator(req)
-            .then(x => {
-                const v = x;
-                console.log(v);
-            })
-            .catch(err => {
-                const zz = err;
-                console.log(zz);
-            });
+        // await validator(req)
+        //     .then(x => {
+        //         const v = x;
+        //         console.log(v);
+        //     })
+        //     .catch(err => {
+        //         const zz = err;
+        //         console.log(zz);
+        //     });
 
 
     }).timeout(10000);
