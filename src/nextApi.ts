@@ -16,11 +16,12 @@ import {
     workspace,
     Disposable
 } from "vscode";
+import { ext } from './extensionVariables';
 import { logger } from './logger';
 import { OaiDoc } from './oaiDocument';
-import { NextApiTreeProvider, OaiPost } from "./treeViewsProviders/nextApiTreeProvider";
+import { NextApiTreeProvider, NxtApiTreeItem, OaiPost } from "./treeViewsProviders/nextApiTreeProvider";
 
-
+import * as utils from './utils/utils';
 
 
 
@@ -65,16 +66,63 @@ export class NextApi {
         // not registered in pjson file...
         context.subscriptions.push(commands.registerCommand('f5.oaiPost', (x) => {
             // next-cm openapi post example for viewing, and posting
+
+            if( typeof NxtApiTreeItem) {
+                x = x.command.arguments[0];
+            }
             this.oaiDoc.displayDoc(x);
         }));
 
         // not registered in pjson file...
-        context.subscriptions.push(commands.registerCommand('f5.postOia', (x) => {
+        context.subscriptions.push(commands.registerCommand('f5.postOia', async (x) => {
             // when the user clicks the codeLens to post the editor from f5.oaiPost, this will post to next and follow the job to completion
-            window.showErrorMessage('f5.postOia - called, but not implemented yet');
+
+            const path = x.oaiPost.path;
+            const method = x.oaiPost.method;
+            const doc = x.doc as TextDocument;
+            const text = doc.getText();
+
+            let data = utils.isValidJson(text);
+
+
+            if (ext.f5Client) {
+
+                // logger.info()
+                await ext.f5Client?.mgmtClient.makeRequest(path, {
+                    method,
+                    data
+                })
+                .then( resp => {
+                    logger.info('next oa post/put call successful');
+                })
+                .catch( err => {
+                    
+                    logger.error('next oa post/put call FAILED');
+                });
+                
+            } else {
+
+                window.showErrorMessage('Connect to Next instance to post/put data');
+                logger.error('would call following', {
+                    path,
+                    method,
+                    data
+                });
+            }
+
         }));
 
-
+        context.subscriptions.push(commands.registerCommand('f5.oaFilterPost', async (text) => {
+        
+            // flip switch and refresh details
+            if(this.nextApiTreeProvider.filterPost){
+                this.nextApiTreeProvider.filterPost = false;
+                // console.log('xc diag updatediagnostics disable');
+            } else {
+                this.nextApiTreeProvider.filterPost = true;
+            }
+            this.nextApiTreeProvider.refresh();
+        }));
 
 
     }

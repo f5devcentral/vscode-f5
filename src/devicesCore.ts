@@ -40,7 +40,6 @@ import { BigipTreeProvider } from './treeViewsProviders/bigipTreeProvider';
 import { tokenTimer } from './tokenTimer';
 
 import { logger } from './logger';
-import { NextApiTreeProvider } from './treeViewsProviders/nextApiTreeProvider';
 
 
 // /**

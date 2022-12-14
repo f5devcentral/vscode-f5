@@ -34,7 +34,6 @@ import { ConfigFile, Explosion, TmosApp, xmlStats } from 'f5-corkscrew';
 import { logger } from '../logger';
 import BigipConfig from 'f5-corkscrew/dist/ltm';
 import path from 'path';
-import { stat } from 'fs';
 
 // remodel everything here like this example:  https://github.com/microsoft/vscode-extension-samples/blob/master/tree-view-sample/src/testView.ts
 // it will provide a working 'reveal' function and a browsable tmos config tree in the view
