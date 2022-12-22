@@ -858,6 +858,11 @@
 				"category": "F5"
 			},
 			{
+				"command": "f5.oaiPut",
+				"title": "PUT",
+				"category": "F5"
+			},
+			{
 				"command": "f5.xc-diagRulesOpen",
 				"title": "TMOS -> XC diagnostics Open Rules",
 				"category": "F5",
@@ -1358,7 +1363,12 @@
 				{
 					"command": "f5.oaiPost",
 					"group": "inline",
-					"when": "view == nxtApiView && viewItem == nextApiTreeItemPost"
+					"when": "view == nxtApiView && viewItem =~ /^nextApiTreeItemPost(Put)?/"
+				},
+				{
+					"command": "f5.oaiPut",
+					"group": "inline",
+					"when": "view == nxtApiView && viewItem =~ /^nextApiTreeItem(Post)?Put/"
 				},
 				{
 					"command": "f5.xc-diagRulesOpen",

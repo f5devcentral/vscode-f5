@@ -74,6 +74,16 @@ export class NextApi {
         }));
 
         // not registered in pjson file...
+        context.subscriptions.push(commands.registerCommand('f5.oaiPut', (x) => {
+            // next-cm openapi post example for viewing, and posting
+
+            if( typeof NxtApiTreeItem) {
+                x = x.command.arguments[0];
+            }
+            this.oaiDoc.displayDoc(x);
+        }));
+
+        // not registered in pjson file...
         context.subscriptions.push(commands.registerCommand('f5.postOia', async (x) => {
             // when the user clicks the codeLens to post the editor from f5.oaiPost, this will post to next and follow the job to completion
 

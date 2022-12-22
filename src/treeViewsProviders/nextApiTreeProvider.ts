@@ -187,7 +187,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                             const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.$ref;
                             const example = leafObj?.post?.requestBody?.content?.['application/json']?.example as Record<string, string>;
                             const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST/PUT-${pathString}`,)
-                            desc = "POST/PUT"
+                            desc = "POST"
                             toolTip = pathString;
                             itemCxt = 'nextApiTreeItemPost'
                             cmdArgs.push(new OaiPost(pathString, 'POST', schemaRef, example, schema));
@@ -199,7 +199,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                             const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST-${pathString}`,)
                             desc = "PUT"
                             toolTip = pathString;
-                            itemCxt = 'nextApiTreeItemPost'
+                            itemCxt = 'nextApiTreeItemPut'
                             cmdArgs.push(new OaiPost(pathString, 'PUT', schemaRef, example, schema));
                         }
 
