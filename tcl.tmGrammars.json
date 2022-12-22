@@ -1,0 +1,71 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "fileTypes": [
+        "irul",
+        "f5",
+        "f5-tcl",
+        "conf",
+        "irule",
+        "iRule",
+        "tcl"
+    ],
+    "scopeName": "source.tcl",
+    "name": "f5-tcl",
+    "patterns": [
+        {
+            "include": "#root"
+        }
+    ],
+    "repository": {
+        "root": {
+            "patterns": [
+                {
+                    "include": "#comment-blocks"
+                }
+            ]
+        },
+        "comment-blocks": {
+            "patterns": [
+                {
+                    "contentName": "comment.line.number-sign.irule",
+                    "begin": "(?<=^|;|{)\\s*((#+))",
+                    "end": "(?=$|\\n)|((#))(?=\\s*(?:[}\\n]))",
+                    "captures": {
+                        "1": {
+                            "name": "comment.line.number-sign.irule"
+                        },
+                        "2": {
+                            "name": "punctuation.definition.comment.irule"
+                        }
+                    }
+                },
+                {
+                    "contentName": "comment.block.irule",
+                    "begin": "(?<=^|;|\\{)\\s*((?:\\%\\s+\\{)|(?:\\bif\\s+{?0}?\\s+{))",
+                    "end": "\\s*(\\})",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "comment.block.multi.start.irule"
+                        },
+                        "2": {
+                            "name": "punctuation.definition.comment.irule"
+                        }
+                    },
+                    "endCaptures": {
+                        "1": {
+                            "name": "comment.block.multi.end.irule"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#annotate"
+                        },
+                        {
+                            "include": "#variable-non-substituting"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

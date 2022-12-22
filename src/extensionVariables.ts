@@ -70,6 +70,7 @@ export namespace ext {
         export let preserveEditorFocus: boolean;
         export let newEditorTabForAll: boolean;
         export let logLevel: string;
+        export let preview: boolean;
         export let proxy: ProxyCfg | undefined;
         export let prompts: boolean;
     }
@@ -144,37 +145,34 @@ export async function initSettings(context: ExtensionContext) {
         });
 }
 
-type ProxyCfg = {
-    host?: string,
-    port?: number,
-    protocol?: string,
-    auth?: {
-        username?: string,
-        password?: string
-    }
-};
 
 /**
  * load/reload vscode extension settings
  */
 export async function loadSettings() {
     logger.debug('loading configuration');
-    ext.settings.timeoutInMilliseconds = workspace.getConfiguration().get('f5.timeoutinmilliseconds', 0);
 
-    ext.settings.previewColumn = parseColumn(workspace.getConfiguration().get<string>('f5.newEditorColumn', 'two'));
-    ext.settings.httpResponseDetails = workspace.getConfiguration().get<string>("f5.httpResponseDetails", "full");
-    ext.settings.preserveEditorFocus = workspace.getConfiguration().get<boolean>('f5.preserveEditorFocus', true);
-    ext.settings.newEditorTabForAll = workspace.getConfiguration().get('f5.newEditorTabForAll', false);
-    ext.settings.prompts = workspace.getConfiguration().get('f5.enablePrompts', false);
+    const f5Cfg = workspace.getConfiguration('f5');
+    
+    ext.settings.timeoutInMilliseconds = f5Cfg.get('f5.timeoutinmilliseconds')!;
+    ext.settings.previewColumn = parseColumn(f5Cfg.get('newEditorColumn')!);
+    ext.settings.httpResponseDetails = f5Cfg.get('httpResponseDetails')!;
+    ext.settings.preserveEditorFocus = f5Cfg.get('preserveEditorFocus')!;
+    ext.settings.newEditorTabForAll = f5Cfg.get('newEditorTabForAll', false);
+    ext.settings.prompts = f5Cfg.get('enablePrompts', false);
+    
+    ext.settings.preview = f5Cfg.get('preview')!;
+    // plugin preview setting to view context
+    commands.executeCommand('setContext', 'f5.preview', ext.settings.preview);
 
-    process.env.F5_VSCODE_LOG_LEVEL = workspace.getConfiguration().get<string>('f5.logLevel', 'INFO');
+    process.env.F5_VSCODE_LOG_LEVEL = f5Cfg.get('logLevel');
 
-    process.env[ext.teemEnv] = workspace.getConfiguration().get<boolean>('f5.TEEM', true).toString();
+    process.env[ext.teemEnv] = f5Cfg.get('f5.TEEM')!;
 
-    process.env.F5_CONX_CORE_REJECT_UNAUTORIZED = workspace.getConfiguration().get<boolean>('f5.rejectUnauthorizedBIGIP', false).toString();
+    process.env.F5_CONX_CORE_REJECT_UNAUTORIZED = f5Cfg.get('rejectUnauthorizedBIGIP')!.toString();
     
     // get cookie config from vscode and place in env
-    const cookie = workspace.getConfiguration().get<string>('f5.cookie');
+    const cookie = f5Cfg.get('cookie')!.toString();
     if (cookie) {
         process.env.F5_CONX_CORE_COOKIES = cookie;
     } else {
@@ -218,6 +216,16 @@ function parseColumn(value: string): ViewColumn {
 }
 
 
+
+type ProxyCfg = {
+    host?: string,
+    port?: number,
+    protocol?: string,
+    auth?: {
+        username?: string,
+        password?: string
+    }
+};
 
 
 /*

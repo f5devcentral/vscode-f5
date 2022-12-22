@@ -140,7 +140,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                         const leafObj: any = this.oai!.paths[pathString];    // get the full details from this object/path
 
                         let itemCxt = 'nextApiTreeItem';
-                        let oaPost = undefined;
+                        let cmdArgs = [];
                         let toolTip = "make list of children options?"
                         let desc = ""
                         let collapsed = TreeItemCollapsibleState.Collapsed;
@@ -160,13 +160,21 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                         if (hasPost && hasPut) {
                             const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.$ref;
                             const example = leafObj?.post?.requestBody?.content?.['application/json']?.example as Record<string, string>;
+
                             const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST-${pathString}`,)
+                            
+                            const schemaRefPut = leafObj.put?.requestBody?.content?.['application/json']?.schema?.$ref;
+                            const examplePut = leafObj?.put?.requestBody?.content?.['application/json']?.example as Record<string, string>;
+                            const schemaPut = schemaRefPut ? this.getSchema(schemaRefPut) : logger.error(`next oai schema reference not found for PUT-${pathString}`)
+
                             desc = "POST/PUT"
                             toolTip = pathString;
-                            itemCxt = 'nextApiTreeItemPost'
-                            oaPost = new OaiPost(
-                                pathString, "POST", schemaRef, example, schema
-                            );
+                            itemCxt = 'nextApiTreeItemPostPut'
+                            
+                            cmdArgs.push(
+                                new OaiPost(pathString, 'POST', schemaRef, example, schema),
+                                new OaiPost(pathString, 'PUT', schemaRefPut, examplePut, schemaPut)
+                                );
                             logger.error(`POST AND PUT found on ${pathString}`)
 
                         } else if (hasPost) {
@@ -178,18 +186,13 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                             // /api/device/v1/inventory
                             const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.$ref;
                             const example = leafObj?.post?.requestBody?.content?.['application/json']?.example as Record<string, string>;
-                            const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST-${pathString}`,)
-                            desc = "POST"
+                            const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST/PUT-${pathString}`,)
+                            desc = "POST/PUT"
                             toolTip = pathString;
                             itemCxt = 'nextApiTreeItemPost'
-                            oaPost = new OaiPost(
-                                pathString, "POST", schemaRef, example, schema
-                            );
+                            cmdArgs.push(new OaiPost(pathString, 'POST', schemaRef, example, schema));
 
-                            // treeItems.push(
-                            //     new NxtApiTreeItem('POST', '', '', new ThemeIcon('indent'), itemCxt, thisPathKey, TreeItemCollapsibleState.None,
-                            //     {title: 'OpenApiPost', command: 'f5.oaiPost', arguments: []})
-                            // );
+
                         } else if (hasPut) {
                             const schemaRef = leafObj.put?.requestBody?.content?.['application/json']?.schema?.$ref;
                             const example = leafObj?.put?.requestBody?.content?.['application/json']?.example as Record<string, string>;
@@ -197,56 +200,15 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                             desc = "PUT"
                             toolTip = pathString;
                             itemCxt = 'nextApiTreeItemPost'
-                            oaPost = new OaiPost(
-                                pathString, "PUT", schemaRef, example, schema
-                            );
+                            cmdArgs.push(new OaiPost(pathString, 'PUT', schemaRef, example, schema));
                         }
 
                         treeItems.push(
                             new NxtApiTreeItem(key, desc, toolTip, '', itemCxt, thisPathKey, collapsed,
-                                { title: 'OpenApiPost', command: 'f5.oaiPost', arguments: [oaPost] })
+                                { title: 'OpenApiPost', command: 'f5.oaiPost', arguments: cmdArgs })
                         );
 
-                        // // no keys, means we have a leaf
-                        // if (sub2Keys.length === 0) {
-
-                        //     // return a leaf
-                        //     treeItems.push(
-                        //         new NxtApiTreeItem(key, 'leaf', pathString, '', itemCxt, thisPathKey, TreeItemCollapsibleState.Collapsed, 
-                        //         {title: 'OpenApiPost', command: 'f5.oaiPost', arguments: [oaPost]})
-                        //     );
-
-                        // } else {
-
-                        //     // return a branch
-                        //     treeItems.push(
-                        //         new NxtApiTreeItem(key, 'branch', '', '', itemCxt, thisPathKey, TreeItemCollapsibleState.Collapsed, 
-                        //         {title: 'OpenApiPost', command: 'f5.oaiPost', arguments: [oaPost]})
-                        //     );
-                        // }
                     })
-
-                    // } else {
-                    // since no keys/children, return leaf details
-                    // element.path!.unshift('')   // add an empty element to the front for the join to append '/' to the beginning
-                    // const pathString = element.path!.join('/')  // join to make original path
-                    // const leafObj = this.oai!.paths[pathString];    // get the full details from this object/path
-
-                    // if (leafObj.hasOwnProperty('post')) {
-                    //     // if we have post details
-                    //     treeItems.push(
-                    //         new NxtApiTreeItem('POST----', 'leaf', '', '', 'nextApiTreeItem', [], TreeItemCollapsibleState.None)
-                    //     );
-                    // }
-
-                    // if(leafObj.hasOwnProperty('put')) {
-                    //     // if we have put details
-                    //     treeItems.push(
-                    //         new NxtApiTreeItem('key', 'leaf', '', '', 'nextApiTreeItem', ['thisPathKey'], TreeItemCollapsibleState.Collapsed)
-                    //     );
-                    // }
-
-                    // add DELETE method?
                 }
 
 
@@ -339,6 +301,11 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
         return pathsTreeObj;
     }
 
+    /**
+     * 
+     * @param obj open api path item object
+     * @returns boolean -> true if contains sub paths
+     */
     isLeaf(obj: Record<string, unknown>): boolean {
 
         if (obj === undefined || typeof obj !== 'object') {
@@ -362,46 +329,6 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * open api class tree item
  */
@@ -421,7 +348,7 @@ export class NxtApiTreeItem extends TreeItem {
 }
 
 /**
- * open api post details for json editor magic
+ * open api post/put details for json editor magic
  */
 export class OaiPost {
     constructor(

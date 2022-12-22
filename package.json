@@ -3,12 +3,13 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.10.0",
+	"version": "3.11.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
 		"AS3",
 		"FAST",
+		"NEXT",
 		"DO",
 		"TS",
 		"TCL",
@@ -19,7 +20,8 @@
 		"Snippets"
 	],
 	"engines": {
-		"vscode": "^1.63.0"
+		"vscode": "^1.63.0",
+		"node": "^16"
 	},
 	"bugs": {
 		"url": "https://github.com/f5devcentral/vscode-f5/issues"
@@ -109,6 +111,23 @@
 				"path": "./snippets/fastYamlSnippets.json"
 			}
 		],
+		"languages": [{
+			"id": "f5-tcl",
+			"extensions": [
+				".conf",
+				".tmos",
+				".f5"
+			],
+			"aliases": [ "f5-tcl", "tmos", "f5", "tcl", "f5-tmos"],
+			"configuration": "./language-configuration.json"
+		}],
+		"grammars": [
+			{
+				"language": "f5-tcl",
+				"scopeName": "source.tcl",
+				"path": "./tcl.tmGrammars.json"
+			}
+		],
 		"yamlValidation": [
 			{
 				"fileMatch": "*.fast.yml",
@@ -178,7 +197,8 @@
 				},
 				{
 					"id": "nxtApiView",
-					"name": "NEXT API"
+					"name": "NEXT API",
+					"when": "f5.preview"
 				},
 				{
 					"id": "fastView",
@@ -355,6 +375,12 @@
 						"default": false,
 						"scope": "resource",
 						"description": "Prevent new editor tab from taking focus when opened or updated\n So, by default(disabled), each new editor that is opened and/or updated with also take focus"
+					},
+					"f5.preview": {
+						"type": "boolean",
+						"default": false,
+						"scope": "resource",
+						"description": "Enable Preview features"
 					},
 					"f5.logLevel": {
 						"type": "string",
