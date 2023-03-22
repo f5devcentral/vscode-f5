@@ -11,6 +11,23 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.11.0] - (03-22-2022)
+
+- Setup preview features flag
+  - moved openapi/next work to preview
+- start basic language for tmos/tcl configs
+  - "f5-tcl"
+  - heavily influenced by vscode-irule/vscode-iapp
+  - currently provides easy commenting, bracket closing and line folding
+- improved openapi/next browser view
+  - setup filter post/put switch
+  - moved post/put options to inline buttons
+- tweak telemetry
+- Added Config Explorer Report
+  - Includes XC diagnostics output when xc diagnostics is enabled
+
+---
+
 ## [3.10.0] - (12-8-2022)
 
 - Next api schema validation work initial

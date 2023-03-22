@@ -34,12 +34,37 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
     connected: F5Client | undefined;
     oai: OpenApi | undefined;
 
+    filterPost: boolean = false;
+    greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
+
+
     private _onDidChangeTreeData: EventEmitter<NxtApiTreeItem | undefined> = new EventEmitter<NxtApiTreeItem | undefined>();
     readonly onDidChangeTreeData: Event<NxtApiTreeItem | undefined> = this._onDidChangeTreeData.event;
 
     swaggerSvg = ext.context.asAbsolutePath(path.join("images", "swagger.svg"));
 
     localOaiPath = path.join(ext.context.extensionPath, 'openapi_nextCm.json');
+
+    /**
+     * nested object representing OpenApi paths broken down and nested by folder.  Build by pathTree function
+     * 
+     * - /api/device/v1/instance
+     * - /api/device/v1/inventory/{id}/backup
+     * - /api/device/v1/inventory/{id}/health
+     * - /api/device/v1/backupTasks
+     * 
+     * Becomes:
+     * 
+     * api
+     *  - device
+     *    - v1
+     *      - instance
+     *      - backupTasks
+     *      - inventory
+     *        - {id}
+     *          - backup
+     *          - health
+     */
     pathsTreeObj: { [key: string]: { [key: string]: { [key: string]: { [key: string]: {}; }; }; }; } | undefined;
 
     constructor(context: ExtensionContext) {
@@ -57,12 +82,12 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
 
             this.connected = ext?.f5Client;
             this.oai = ext.f5Client.openApi;
-            this.pathsTreeObj = pathTree(Object.keys(this.oai!.paths));
+            this.pathsTreeObj = this.pathTree();
 
         } else if (local) {
 
             this.oai = JSON.parse(fs.readFileSync(this.localOaiPath).toString());
-            this.pathsTreeObj = pathTree(Object.keys(this.oai!.paths));
+            this.pathsTreeObj = this.pathTree();
         }
 
 
@@ -87,10 +112,12 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
 
             if (element) {
 
-                // console.log('incoming element', element.path)
 
                 // get object for element
                 const elObj = deepGet(this.pathsTreeObj!, element.path!) as Object;
+
+                const fullPath = `/${element.path?.join('/')}`;
+                console.log('incoming element', element.path, fullPath)
 
                 const elObjKeys = Object.keys(elObj);
 
@@ -103,18 +130,54 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                         // copy the path array
                         const thisPathKey: string[] = element.path!.map(x => x);
                         thisPathKey.push(key)   // append local key to array path
-
+                        const leaf1 = thisPathKey.map(x => x);   // add an empty element to the front for the join to append '/' to the beginning
+                        leaf1.unshift('')
+                        const pathString = leaf1.join('/')  // join to make original path
 
                         const sub2 = deepGet(this.pathsTreeObj!, thisPathKey) as Object;
                         const sub2Keys = Object.keys(sub2)
 
-                        const leaf1 = thisPathKey.map(x=>x);   // add an empty element to the front for the join to append '/' to the beginning
-                        leaf1.unshift('')
-                        const pathString = leaf1.join('/')  // join to make original path
                         const leafObj: any = this.oai!.paths[pathString];    // get the full details from this object/path
 
+                        let itemCxt = 'nextApiTreeItem';
+                        let cmdArgs = [];
+                        let toolTip = "make list of children options?"
+                        let desc = ""
+                        let collapsed = TreeItemCollapsibleState.Collapsed;
+
+                        if (sub2Keys.length > 0) {
+                            // we have a leaf with more branches
+                        }
+
+                        const hasPost = leafObj?.hasOwnProperty('post');
+                        const hasPut = leafObj?.hasOwnProperty('put');
+                        if (this.isLeaf(leafObj)){
+                            collapsed = TreeItemCollapsibleState.None;
+                            // console.log(`${pathString} is leafy`, Object.keys(leafObj));
+                        }
+
                         // if leafObj has get/post/put, create action items
-                        if(leafObj?.hasOwnProperty('post')) {
+                        if (hasPost && hasPut) {
+                            const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.$ref;
+                            const example = leafObj?.post?.requestBody?.content?.['application/json']?.example as Record<string, string>;
+
+                            const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST-${pathString}`,)
+                            
+                            const schemaRefPut = leafObj.put?.requestBody?.content?.['application/json']?.schema?.$ref;
+                            const examplePut = leafObj?.put?.requestBody?.content?.['application/json']?.example as Record<string, string>;
+                            const schemaPut = schemaRefPut ? this.getSchema(schemaRefPut) : logger.error(`next oai schema reference not found for PUT-${pathString}`)
+
+                            desc = "POST/PUT"
+                            toolTip = pathString;
+                            itemCxt = 'nextApiTreeItemPostPut'
+                            
+                            cmdArgs.push(
+                                new OaiPost(pathString, 'POST', schemaRef, example, schema),
+                                new OaiPost(pathString, 'PUT', schemaRefPut, examplePut, schemaPut)
+                                );
+                            logger.error(`POST AND PUT found on ${pathString}`)
+
+                        } else if (hasPost) {
                             // if we have post details
                             // add in example post and provide codeLense to post payload
 
@@ -123,61 +186,35 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                             // /api/device/v1/inventory
                             const schemaRef = leafObj.post?.requestBody?.content?.['application/json']?.schema?.$ref;
                             const example = leafObj?.post?.requestBody?.content?.['application/json']?.example as Record<string, string>;
+                            const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST/PUT-${pathString}`,)
+                            desc = "POST"
+                            toolTip = pathString;
+                            itemCxt = 'nextApiTreeItemPost'
+                            cmdArgs.push(new OaiPost(pathString, 'POST', schemaRef, example, schema));
 
-                            const schema = schemaRef ? this.getSchema(schemaRef) : logger.error('next oai schema reference not found')
 
-                            treeItems.push(
-                                new NxtApiTreeItem('POST', '', '', '', 'nextApiTreeItem', thisPathKey, TreeItemCollapsibleState.None,
-                                {title: 'OpenApiPost', command: 'f5.oaiPost', arguments: [new OaiPost(
-                                    pathString, "POST", schemaRef, example, schema
-                                )]})
-                            );
+                        } else if (hasPut) {
+                            const schemaRef = leafObj.put?.requestBody?.content?.['application/json']?.schema?.$ref;
+                            const example = leafObj?.put?.requestBody?.content?.['application/json']?.example as Record<string, string>;
+                            const schema = schemaRef ? this.getSchema(schemaRef) : logger.error(`next oai schema reference not found for POST-${pathString}`,)
+                            desc = "PUT"
+                            toolTip = pathString;
+                            itemCxt = 'nextApiTreeItemPut'
+                            cmdArgs.push(new OaiPost(pathString, 'PUT', schemaRef, example, schema));
                         }
 
-
-                        // no keys, means we have a leaf
-                        if (sub2Keys.length === 0) {
-
-                            // return a leaf
-                            treeItems.push(
-                                new NxtApiTreeItem(key, 'leaf', '', '', 'nextApiTreeItem', thisPathKey, TreeItemCollapsibleState.Collapsed)
-                            );
-
-                        } else {
-
-                            // return a branch
-                            treeItems.push(
-                                new NxtApiTreeItem(key, 'branch', '', '', 'nextApiTreeItem', thisPathKey, TreeItemCollapsibleState.Collapsed)
-                            );
-                        }
-                    })
-
-                } else {
-                    // since no keys/children, return leaf details
-                    element.path!.unshift('')   // add an empty element to the front for the join to append '/' to the beginning
-                    const pathString = element.path!.join('/')  // join to make original path
-                    const leafObj = this.oai!.paths[pathString];    // get the full details from this object/path
-
-                    if(leafObj.hasOwnProperty('post')) {
-                        // if we have post details
                         treeItems.push(
-                            new NxtApiTreeItem('POST----', 'leaf', '', '', 'nextApiTreeItem', [], TreeItemCollapsibleState.None)
+                            new NxtApiTreeItem(key, desc, toolTip, '', itemCxt, thisPathKey, collapsed,
+                                { title: 'OpenApiPost', command: 'f5.oaiPost', arguments: cmdArgs })
                         );
-                    }
 
-                    // if(leafObj.hasOwnProperty('put')) {
-                    //     // if we have put details
-                    //     treeItems.push(
-                    //         new NxtApiTreeItem('key', 'leaf', '', '', 'nextApiTreeItem', ['thisPathKey'], TreeItemCollapsibleState.Collapsed)
-                    //     );
-                    // }
-
-                    // add DELETE method?
+                    })
                 }
 
 
             } else {
 
+                // no element passed here, so return all the parent items
 
                 const toolTip = new MarkdownString()
                     .appendCodeblock(jsyaml.dump({
@@ -195,6 +232,19 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
                     )
                 );
 
+                // enable/disable filter post/put header/switch
+                const filterStatus = this.filterPost ? "Enabled" : "Disabled";
+                const icon = filterStatus === "Enabled" ? this.greenCheck : '';
+                treeItems.push(
+                    new NxtApiTreeItem(
+                        'Filter POST/PUTs',
+                        filterStatus,
+                        'Only show paths with POST/PUT?', icon, '', undefined, TreeItemCollapsibleState.None,
+                        { command: 'f5.oaFilterPost', title: '', arguments: [] }
+                    )
+                );
+
+                // loop through all the paths and provide parents
                 if (this.pathsTreeObj) {
                     Object.keys(this.pathsTreeObj).forEach(key => {
                         const item = new NxtApiTreeItem(key, '', '', '', 'nextApiTreeItem', [key], TreeItemCollapsibleState.Collapsed)
@@ -208,72 +258,81 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
             return treeItems;
         }
     }
+
+    pathTree() {
+
+        const paths: string[] = [];
+        // paths: string[]
+        if (this.filterPost) {
+            const x = Object.entries(this.oai!.paths).filter( ([k, v]) => {
+                const methods = Object.keys(v);
+                if (methods.includes('post') || methods.includes('put')) {
+                    return k;
+                }
+                
+                if (methods.includes('post') && methods.includes('put')) {
+                    console.log(`Next OpenApi path=${k} includes both post+put`)
+                }
+            });
+
+            // map out just the keys and spread into the holding array
+            paths.push(...x.map(e=>e[0]))
+            
+        } else {
+            // no filter, so return all paths
+            paths.push(...Object.keys(this.oai!.paths));
+        }
+    
+        // type the tree we are making.  4 levels seems sufficient for now...
+        const pathsTreeObj: { [key: string]: { [key: string]: { [key: string]: { [key: string]: { [key: string]: { [key: string]: {} } } } } } } = {};
+    
+        // https://codereview.stackexchange.com/questions/158134/generate-a-nested-structure-based-on-a-list-of-file-paths
+        // https://codereview.stackexchange.com/a/277982
+    
+        // loop through all the full paths
+        paths.forEach(el => {
+            const el2 = el.split('/')
+            el2.shift() // shift the first element off '/'
+    
+            // remove duplicates and nest into an object tree
+            el2.reduce((o, k) => (o[k] = o[k] || {}), pathsTreeObj);
+        });
+    
+        return pathsTreeObj;
+    }
+
+    /**
+     * 
+     * @param obj open api path item object
+     * @returns boolean -> true if contains sub paths
+     */
+    isLeaf(obj: Record<string, unknown>): boolean {
+
+        if (obj === undefined || typeof obj !== 'object') {
+            return false;
+        }
+
+        // https://swagger.io/specification/#path-item-object
+        // list of expected swagger path methods
+        const defaults = [
+            'get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace', 'servers', 'parameters'
+        ]
+
+        const keys = Object.keys(obj);
+        // console.log(`isLeaf keys: `, keys);
+
+        // https://www.geeksforgeeks.org/how-to-find-if-two-arrays-contain-any-common-item-in-javascript/
+        return keys.some( e => defaults.includes(e))
+    }
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function pathTree(paths: string[]) {
-    // type the tree we are making.  4 levels seems sufficient for now...
-    const pathsTreeObj: { [key: string]: { [key: string]: { [key: string]: { [key: string]: { [key: string]: { [key: string]: { }}}}}}} = {};
-
-    // https://codereview.stackexchange.com/questions/158134/generate-a-nested-structure-based-on-a-list-of-file-paths
-    // https://codereview.stackexchange.com/a/277982
-
-    // loop through all the full paths
-    paths.forEach(el => {
-        const el2 = el.split('/')
-        el2.shift() // shift the first element off '/'
-
-        // remove duplicates and nest into an object tree
-        el2.reduce((o, k) => (o[k] = o[k] || {}), pathsTreeObj);
-    });
-
-    return pathsTreeObj;
-}
 
 
 /**
  * open api class tree item
  */
-class NxtApiTreeItem extends TreeItem {
+export class NxtApiTreeItem extends TreeItem {
     constructor(
         public readonly label: string,
         public description: string,
@@ -289,7 +348,7 @@ class NxtApiTreeItem extends TreeItem {
 }
 
 /**
- * open api post details for json editor magic
+ * open api post/put details for json editor magic
  */
 export class OaiPost {
     constructor(
@@ -298,7 +357,7 @@ export class OaiPost {
         public schemaRef?: string,
         public example?: Record<string, string>,
         public schema?: unknown
-    ) {}
+    ) { }
 }
 
 

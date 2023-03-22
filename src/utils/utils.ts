@@ -112,7 +112,9 @@ export async function getPassword(device: string): Promise<any> {
 /**
  * capture entire active editor text or selected text
  */
-export async function getText(): Promise<string> {
+export async function getText(doc?: TextDocument): Promise<string> {
+
+    // todo: update function to accept doc and a flag to confirm/parse json
 
     // get editor window
     var editor = window.activeTextEditor;

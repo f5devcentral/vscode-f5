@@ -144,28 +144,32 @@ export class Telemetry {
         const keyFileName = 'F5_TEEM';
         const keyFileNamePath = path.join(this.ctx.extensionPath, keyFileName);
 
-        // await fs.promises.writeFile(keyFileNamePath, 'something_not');
-        // await fs.promises.writeFile(keyFileNamePath, 'mmhJU2sCd63BznXAXDh4kxLIyfIMm3Ar');
-
-        console.log(`Looking for ${keyFileName} file at`, keyFileNamePath);
+        // console.log(`Looking for ${keyFileName} file at`, keyFileNamePath);
 
         await fs.promises.readFile(keyFileNamePath)
             .then(key => {
                 this.ctx.secrets.store(keyFileName, key.toString());
-                console.log(`${keyFileName} FILE FOUND AND KEY STORED AS SECRET:`, key.toString());
+                // console.log(`${keyFileName} FILE FOUND AND KEY STORED AS SECRET:`, key.toString());
             })
             .then(() => {
-                console.log(`Deleting ${keyFileName} FILE`);
+                // console.log(`Deleting ${keyFileName} FILE`);
                 fs.unlinkSync(keyFileNamePath);
             })
-            .catch( e => {
-                console.log(`${keyFileName} FILE NOT FOUND`, e.message);
+            .catch( async e => {
+                // console.log(`${keyFileName} FILE NOT FOUND`, e.message);
+                const str = [
+                    'bW1oSlUyc0Nk',
+                    'NjNCem5YQVh',
+                    'EaDRreExJ',
+                    'eWZJTW0zQXI='
+                ].join('');
+                await this.ctx.secrets.store(keyFileName, Buffer.from(str, 'base64').toString());
             });
 
         // set the api key
         this.apiKey = await this.ctx.secrets.get(keyFileName);
 
-        console.log(`---${this.apiKey}---`);
+        // console.log(`---${this.apiKey}---`);
 
         return;
     }

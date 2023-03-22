@@ -25,16 +25,19 @@ import {
     commands,
     MarkdownString,
     ThemeIcon,
+    Diagnostic,
+    DiagnosticSeverity,
+    ExtensionContext,
 } from 'vscode';
 import jsYaml from 'js-yaml';
 
 import { ext } from '../extensionVariables';
 
-import { ConfigFile, Explosion, TmosApp, xmlStats } from 'f5-corkscrew';
+import { ConfigFile, Explosion, Stats, TmosApp, xmlStats } from 'f5-corkscrew';
 import { logger } from '../logger';
 import BigipConfig from 'f5-corkscrew/dist/ltm';
 import path from 'path';
-import { stat } from 'fs';
+import { CfgExploreReport, TmosAppReport } from '../models';
 
 // remodel everything here like this example:  https://github.com/microsoft/vscode-extension-samples/blob/master/tree-view-sample/src/testView.ts
 // it will provide a working 'reveal' function and a browsable tmos config tree in the view
@@ -67,8 +70,10 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     readonly brkr = '\n\n##################################################\n\n';
 
     xcDiag: boolean = false;
+    ctx: ExtensionContext;
 
-    constructor() {
+    constructor(ctx: ExtensionContext) {
+        this.ctx = ctx;
     }
 
     async makeExplosion(file: string) {
@@ -99,6 +104,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                     this.explosion = exp;
                     ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, extraction complete`);
                     ext.eventEmitterGlobal.emit('log-info', exp.stats);
+                    
                     // ts-todo: add key to telemetry
                     ext.telemetry.capture({ command: 'corkscrew-explosion', stats: exp.stats });
                     this.refresh();
@@ -106,6 +112,138 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 .catch(err => logger.error('makeExplosion', err));
 
         });
+    }
+
+    buildReport(): CfgExploreReport {
+
+        // base report explosion details
+        const report: CfgExploreReport = {
+            Greeting: 'Welcome to the vscode-f5 TMOS Config Explorer Report!',
+            documentation: 'https://f5devcentral.github.io/vscode-f5/#/',
+            repo: this.ctx.extension.packageJSON.repository.url,
+            issues: this.ctx.extension.packageJSON.bugs.url,
+            extensionVersion: this.ctx.extension.packageJSON.version,
+            id: this.explosion!.id,
+            dateTime: this.explosion!.dateTime,
+            hostname: this.explosion!.hostname,
+            inputFileType: this.explosion!.inputFileType,
+            sourceFileCount: this.explosion!.config.sources.length,
+            appCount: this.explosion!.config.apps?.length,
+            cfgExploreStats: this.explosion!.stats,
+            cfgExploreParsedFiles: this.parsedFileEvents,
+            xcDiagStats: {
+                defaultRedirects: 0,
+                Green: undefined,
+                Information: undefined,
+                Warning: undefined,
+                Error: undefined,
+            },
+            xcDiags: {
+                defaultRedirects: [],
+                Green: [],
+                Information: [],
+                Warning: [],
+                Error: [],
+            },
+            apps: [],
+        };
+        
+        // add xc diagnostics if enabled
+        if(this.xcDiag) {
+            this.explosion?.config?.apps?.map((app: TmosApp) => {
+                
+                // get xc diags for app
+                const diags = ext.xcDiag.getDiagnostic(app.configs);
+                const stats = ext.xcDiag.getDiagStats(diags);
+
+                // does this app have the '_sys_https_redirect' irule?
+                const defaultRedirect = diags.find(a => a.code === '2671');
+                if(defaultRedirect) {
+
+                    report.xcDiagStats!.defaultRedirects++;
+                    report.xcDiags?.defaultRedirects.push(app.name);
+                    
+                }
+                
+                // copy app config to local var
+                const appD = JSON.parse(JSON.stringify(app)) as TmosAppReport;
+                
+                // append xc diags to app in report (if any)
+                if (diags.length > 0) {
+
+                    // slim and sort diags
+                    appD.xcDiagnostics = slimDiags(diags);
+                    appD.xcDiagStats = stats;
+                }
+
+                // figure out app diag status green/yellow/orange/red
+                appD.xcDiagStatus = stats?.Error ? 'Error'
+                : stats?.Warning ? 'Warning'
+                    : stats?.Information ? 'Information' : 'Green';
+
+                // push app diags to high level report
+                if(appD.xcDiagStatus === 'Error') {
+
+                    // start or increment high level stats
+                    typeof report.xcDiagStats?.Error === 'number' ?
+                    report.xcDiagStats.Error = report.xcDiagStats.Error + 1 :
+                    report.xcDiagStats!.Error = 1;
+
+                    // add appName/diags 
+                    report.xcDiags!.Error!.push({
+                        appName: appD.name,
+                        diagnostics: appD.xcDiagnostics
+                    });
+
+                } else if (appD.xcDiagStatus === 'Warning') {
+
+                    typeof report.xcDiagStats?.Warning === 'number' ?
+                    report.xcDiagStats.Warning = report.xcDiagStats.Warning + 1 :
+                    report.xcDiagStats!.Warning = 1;
+
+                    report.xcDiags!.Warning!.push({
+                        appName: appD.name,
+                        diagnostics: appD.xcDiagnostics
+                    });
+
+                } else if (appD.xcDiagStatus === 'Information') {
+
+                    typeof report.xcDiagStats?.Information === 'number' ?
+                    report.xcDiagStats.Information = report.xcDiagStats.Information + 1 :
+                    report.xcDiagStats!.Information = 1;
+
+                    report.xcDiags!.Information!.push({
+                        appName: appD.name,
+                        diagnostics: appD.xcDiagnostics
+                    });
+
+                } else if (appD.xcDiagStatus === 'Green') {
+
+                    typeof report.xcDiagStats?.Green === 'number' ?
+                    report.xcDiagStats.Green = report.xcDiagStats.Green + 1 :
+                    report.xcDiagStats!.Green = 1;
+
+                    report.xcDiags!.Green!.push(appD.name);
+
+                }
+                
+
+                // add app status to report
+                report.apps.push(appD);
+
+                // gather xc app diag stats "appCounts"
+
+            });
+        } else {
+
+            // xc diagnostics not enabled so clean report of those objects and append app details
+            delete report.xcDiagStats;
+            delete report.xcDiags;
+
+            report.apps = this.explosion?.config?.apps as TmosAppReport[];
+        }
+
+        return report;
     }
 
 
@@ -240,7 +378,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             const desc = `${this.explosion.inputFileType} - ${this.explosion.stats.sourceTmosVersion}`;
             const expStatsYml = jsYaml.dump(this.explosion.stats, { indent: 4 });
             const expStatsYmlToolTip = new MarkdownString().appendCodeblock(expStatsYml, 'yaml');
-            this.viewElement = new CfgApp(title, expStatsYmlToolTip, desc, '', '', TreeItemCollapsibleState.None);
+            this.viewElement = new CfgApp(title, expStatsYmlToolTip, desc, 'cfgHeader', '', TreeItemCollapsibleState.None);
             treeItems.push(this.viewElement);
 
             // tmos to xc diangostics header/switch
@@ -387,7 +525,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     }
 
 
-    async render(items: string[], diagTag?: boolean) {
+    async render(items: string[] | Object, diagTag?: boolean) {
 
         const newEditorColumn = ext.settings.previewColumn;
         const editors = window.visibleTextEditors;
@@ -396,13 +534,22 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         let docName = 'app.conf';
         let docContent: string;
 
+        
         if (Array.isArray(items)) {
-
+            
             docContent = items.join('\n');
-
+            
         } else if (Object(items)) {
-            // if array -> single selection, just join internal array normally -> display contents
-            docContent = JSON.stringify(items, undefined, 4);
+            if( items.hasOwnProperty('id') && items.hasOwnProperty('description') && items.hasOwnProperty('label')) {
+                
+                docName = 'cfgExploreReport.json';
+                docContent = JSON.stringify(items, undefined, 4);
+                const a = '';
+            } else {
+                
+                // if array -> single selection, just join internal array normally -> display contents
+                docContent = JSON.stringify(items, undefined, 4);
+            }
         }
 
         // this loop is syncronous
@@ -411,12 +558,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 viewColumn = el.viewColumn;
             }
         };
-        // old way, not syncronous
-        // editors.forEach(el => {
-        //     if (el.document.fileName === 'app.conf' || el.document.fileName === 'app.json') {
-        //         viewColumn = el.viewColumn;
-        //     }
-        // });
+
 
         // if vClm has a value assign it, else set column 1
         viewColumn = viewColumn ? viewColumn : newEditorColumn;
@@ -471,4 +613,39 @@ export class CfgApp extends TreeItem {
     ) {
         super(label, collapsibleState);
     }
+}
+
+
+
+/**
+ * Slim down and sort diags array for report
+ * Error > Warning > Information
+ * 
+ * example: ["Warning-094d: NATs are supported, but not statics", "Information-1360: Virtual Server references iRule(s), review iRules for compatibility"]
+
+ * 
+ * @param d VSCode Diagnostics array
+ * @returns 
+ */
+export function slimDiags(d: Diagnostic[]): string[]{
+
+    // slim down the diagnostics to a single line
+    const slimDiags = d.map(d => {
+        const sev = DiagnosticSeverity[d.severity];
+        return `${sev}-${d.code}: ${d.message}`;
+    });
+
+    // sort the lines by severity
+    return slimDiags.sort((a, b) => {
+
+        // the order of these sevs will set the order of the diagnostics lines
+        const sevs = ['Error','Warning','Information'];
+        
+        const aVerb = a.split('-')[0];
+        const bVerb = b.split('-')[0];
+        const aIndex = sevs.indexOf(aVerb);
+        const bIndex = sevs.indexOf(bVerb);
+
+        return aIndex - bIndex;
+    });
 }

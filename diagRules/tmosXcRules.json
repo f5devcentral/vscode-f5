@@ -113,10 +113,10 @@
     },
     {
         "code": "2671",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Information",
+        "title": "Default Redirect iRule Detected",
+        "message": "The default http->https redirect irule has been detected.",
+        "regex": "\/Common\/_sys_https_redirect"
     },
     {
         "code": "9929",
