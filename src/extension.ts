@@ -810,7 +810,7 @@ export async function activateInternal(context: ExtensionContext) {
 		const editor = window.activeTextEditor;
 		let resp;
 
-		if (req.url) {
+		if (req?.url) {
 
 			if(ext.f5Client!.mgmtClient!.hostInfo!.product === 'NEXT') {
 				// if next instance (not CM) append base api path to openapi path

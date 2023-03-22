@@ -81,14 +81,21 @@
         "severity": "Warning",
         "title": "Wildcard port on virtual not supported in XC",
         "message": "Multiport LBs are not supported yet",
-        "regex": "destination [\/\\w\\.]+:0"
+        "regex": "destination [\\S]+[%\\d{1,2}]?:(0)"
     },
     {
         "code": "74f7",
         "severity": "Error",
         "title": "Wildcard VIP not supported",
         "message": "Wildcard VIPs not supported",
-        "regex": "destination [\/\\w\\.]+0.0.0.0:\\d"
+        "regex": "destination [\\S]+(0.0.0.0)(%\\d{1,2})?:\\d"
+    },
+    {
+        "code": "9929",
+        "severity": "Warning",
+        "title": "TMOS Route Domain not supported",
+        "message": "Route domains are note support in XC",
+        "regex": "destination [\\S]+%(\\d{1,2}):\\d{1,5}"
     },
     {
         "code": "d633",
@@ -117,13 +124,6 @@
         "title": "Default Redirect iRule Detected",
         "message": "The default http->https redirect irule has been detected.",
         "regex": "\/Common\/_sys_https_redirect"
-    },
-    {
-        "code": "9929",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
     },
     {
         "code": "5cf0",
