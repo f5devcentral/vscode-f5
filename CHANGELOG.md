@@ -11,6 +11,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.12.0] - (03-30-2022)
+
+- XC rule update (git #204)
+
+---
+
 ## [3.11.0] - (03-22-2022)
 
 - Setup preview features flag
