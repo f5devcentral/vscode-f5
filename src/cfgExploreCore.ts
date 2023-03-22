@@ -19,7 +19,7 @@ import { XcDiag } from "./tmosXcDiag";
 export function cfgExplore(context: ExtensionContext) {
 
 
-    const cfgProvider = new CfgProvider();
+    const cfgProvider = new CfgProvider(context);
     // const cfgView = window.registerTreeDataProvider('cfgTree', cfgProvider);
     const cfgView = window.createTreeView('cfgTree', {
         treeDataProvider: cfgProvider,
@@ -100,61 +100,6 @@ export function cfgExplore(context: ExtensionContext) {
         commands.executeCommand('cfgTree.focus');
 
     }));
-
-
-    // context.subscriptions.push(commands.registerCommand('f5.cfgExploreRawCorkscrew', async (text) => {
-    //     // no input means we need to browse for a local file
-    //     const file = await window.showOpenDialog({
-    //         canSelectMany: false
-    //     }).then(x => {
-    //         if (Array.isArray(x)) {
-    //             return x[0];
-    //         }
-    //     });
-
-    //     let filePath;
-
-    //     if (file?.fsPath) {
-
-    //         logger.info(`f5.cfgExploreRawCorkscrew _fsPath recieved:`, file.fsPath);
-    //         filePath = file.fsPath;
-
-    //     } else if (file?.path) {
-
-    //         logger.info(`f5.cfgExploreRawCorkscrew path revieved:`, file.path);
-    //         filePath = file.path;
-
-    //     } else {
-
-    //         return logger.error('f5.cfgExploreRawCorkscrew -> Neither path supplied was valid', JSON.stringify(file));
-
-    //     }
-
-    //     try {
-    //         // test that we can access the file
-    //         const x = fs.statSync(filePath);
-    //     } catch (e) {
-    //         // if we couldn't get to the file, trim leading character
-    //         // remove leading slash -> i think this is a bug like:  https://github.com/microsoft/vscode-remote-release/issues/1583
-    //         // filePath = filePath.replace(/^(\\|\/)/, '');
-    //         logger.info(`could not find file with supplied path of ${filePath}, triming leading character`);
-    //         filePath = filePath.substr(1);
-    //     }
-
-    //     if (filePath) {
-    //         try {
-    //             const read = fs.readFileSync(filePath, 'utf-8');
-    //             // parse json
-    //             const read2 = JSON.parse(read);
-    //             await cfgProvider.importExplosion(read2);
-    //         } catch (e) {
-    //             logger.error('cfgExploreRawCorkscrew import failed', e);
-    //         }
-    //     }
-
-    //     cfgProvider.refresh();	// refresh with the new information
-    // }));
-
 
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreReveal', async (text) => {
@@ -238,6 +183,20 @@ export function cfgExplore(context: ExtensionContext) {
 
         // provide the text and "IF" xc diagnostics "CAN" be applied
         cfgProvider.render(text, diagTag);
+    }));
+
+
+    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-report', async (text) => {
+        const report = {
+            label: text.label,
+            description: text.description
+        };
+
+        ext.telemetry.capture({ command: 'f5.cfgExplore-report' });
+
+        Object.assign(report, cfgProvider.buildReport());
+
+        cfgProvider.render(report, false);
     }));
 
 

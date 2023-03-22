@@ -11,7 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [3.11.0] - (12-25-2022)
+## [3.11.0] - (03-22-2022)
 
 - Setup preview features flag
   - moved openapi/next work to preview
@@ -22,6 +22,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - improved openapi/next browser view
   - setup filter post/put switch
   - moved post/put options to inline buttons
+- tweak telemetry
+- Added Config Explorer Report
+  - Includes XC diagnostics output when xc diagnostics is enabled
 
 ---
 

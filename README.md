@@ -33,15 +33,15 @@ The best path is to install Visual Studio Code from: <https://code.visualstudio.
 
 ### VSCode Marketplace
 
-- https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5
+- <https://marketplace.visualstudio.com/items?itemName=F5DevCentral.vscode-f5>
 
 ### Open Source Marketplace
 
-- https://open-vsx.org/extension/F5DevCentral/vscode-f5
+- <https://open-vsx.org/extension/F5DevCentral/vscode-f5>
 
 Then install the extension following the steps below:
 
-Select the extensions view 
+Select the extensions view
 
 <img src="./images/vscode_extensions_icon.PNG" alt="drawing" width="5%"/>
 
@@ -86,6 +86,7 @@ Right-click on the tenant in the AS3 view on the left, then select `Delete Tenan
 ## Known Issues
 
 HTTP/422 responses - Can happen for a handful of reasons:
+
 - Getting DO declaration when device has settings DO can configure but device was not deployed with DO (it can't manage the settings that are already there)
 - Improperly formatted/wrong declaration
   - Sometimes this is from the '$schema' reference in the declaration
@@ -152,7 +153,7 @@ If you still need to install from vsix, they can be downloaded under the 'releas
 
 Different ways to install vsix:
 
-- https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix
+- <https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix>
 - <https://github.com/eamodio/vscode-gitlens/wiki/Installing-Prereleases-(vsix>)
 
 
