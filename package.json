@@ -73,7 +73,7 @@
 		"@f5devcentral/f5-fast-core": "^0.19.1",
 		"ajv": "^8.11.2",
 		"f5-conx-core": "^0.17.2",
-		"f5-corkscrew": "^0.13.0",
+		"f5-corkscrew": "^1.0.0",
 		"js-yaml": "^4.0.0",
 		"keytar": "^7.9.0",
 		"openapi-data-validator": "^2.0.44"
