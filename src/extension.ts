@@ -26,6 +26,7 @@ import {
 	ProgressLocation,
 	Range,
 	Position,
+	languages,
 } from 'vscode';
 import jsYaml from 'js-yaml';
 import * as path from 'path';
@@ -62,6 +63,7 @@ import { As3Core } from './as3Core';
 import { Telemetry } from './telemetry';
 import { XcDiag } from './tmosXcDiag';
 import { NextApi } from './nextApi';
+import { CodeLensProvider } from './codeLens';
 
 // turn off console logging
 logger.console = false;
@@ -141,7 +143,11 @@ export async function activateInternal(context: ExtensionContext) {
 
 	new NextApi(context, ext.eventEmitterGlobal);
 
-
+	languages.registerCodeLensProvider({
+		language: 'json',
+	},
+		new CodeLensProvider()
+	);
 	// or do we prefer the function style of importing core blocks?
 
 	// config explorer
@@ -185,17 +191,17 @@ export async function activateInternal(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('f5.xc-diagRulesRefresh', async () => {
 		ext.telemetry.capture({ command: 'f5.xc-diagRulesRefresh' });
-		// ext.xcDiag?.loadRules();
+		ext.cfgProvider.refresh();
 
 		// the following is just to make everything update once the rules have been saved and "refreshed"
 		// capture the current open doc
 		const lastDoc = ext?.xcDiag?.lastDoc;
 
 		//	cycle diag switch to refresh everything
-		await commands.executeCommand("f5.cfgExplore-xcDiagSwitch");
-		await commands.executeCommand("f5.cfgExplore-xcDiagSwitch");
+		// await commands.executeCommand("f5.cfgExplore-diagSwitch");
+		// await commands.executeCommand("f5.cfgExplore-diagSwitch");
 
-		if (ext?.xcDiag && lastDoc) {
+		if (ext?.xcDiag.enabled && lastDoc) {
 			// make sure it's enabled before we re-assess the current open doc
 			ext.xcDiag.lastDoc = lastDoc;
 			ext.xcDiag.updateDiagnostic(ext.xcDiag.lastDoc);
@@ -810,9 +816,9 @@ export async function activateInternal(context: ExtensionContext) {
 		const editor = window.activeTextEditor;
 		let resp;
 
-		if (req.url) {
+		if (req?.url) {
 
-			if(ext.f5Client!.mgmtClient!.hostInfo!.product === 'NEXT') {
+			if (ext.f5Client!.mgmtClient!.hostInfo!.product === 'NEXT') {
 				// if next instance (not CM) append base api path to openapi path
 				req.url = `/api/v1${req.url}`;
 			}
@@ -914,11 +920,11 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 		}
-		
+
 		if (resp) {
 			return ext.panel.render(resp);
 		}
-		
+
 	}));
 
 
@@ -926,7 +932,17 @@ export async function activateInternal(context: ExtensionContext) {
 
 		ext.telemetry.capture({ command: 'f5.remoteCommand' });
 
-		await window.showInputBox({ placeHolder: 'Bash Command to Execute?', ignoreFocusOut: true })
+		// todo: add a setting to hold the command and future history
+		await window.showQuickPick(
+			[
+				'cat /config/bigip.conf',
+				'cat bigip.license',
+				'tail -100 /var/log/ltm',
+				'tmsh show /apm license'
+			],{
+			ignoreFocusOut: true,
+			title: 'Enter command to execute on the BIG-IP'
+		})
 			.then(async cmd => {
 
 				if (cmd) {

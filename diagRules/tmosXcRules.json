@@ -81,14 +81,21 @@
         "severity": "Warning",
         "title": "Wildcard port on virtual not supported in XC",
         "message": "Multiport LBs are not supported yet",
-        "regex": "destination [\/\\w\\.]+:0"
+        "regex": "destination [\\S]+[%\\d{1,2}]?:(0)"
     },
     {
         "code": "74f7",
         "severity": "Error",
         "title": "Wildcard VIP not supported",
         "message": "Wildcard VIPs not supported",
-        "regex": "destination [\/\\w\\.]+0.0.0.0:\\d"
+        "regex": "destination [\\S]+(0.0.0.0)(%\\d{1,2})?:\\d"
+    },
+    {
+        "code": "9929",
+        "severity": "Warning",
+        "title": "TMOS Route Domain not supported",
+        "message": "Route domains are note support in XC",
+        "regex": "destination [\\S]+%(\\d{1,2}):\\d{1,5}"
     },
     {
         "code": "d633",
@@ -101,14 +108,14 @@
         "code": "05ab",
         "severity": "Warning",
         "title": "XC reserved ports",
-        "message": "Http failure response: 400 Bad Request \nFor tcp_loadbalancer dude/test configuration for child object advertise_policy ves-io-tcp-loadbalancer-test-df9979789 is wrong - 8443 is a reserved port, list of reserved ports 28000 - 32767 (kubernetes),28000 - 32767 (volterra),2379,9090,9999,18091,22222,23790,23791,1067,2380,8005,18092,9153,10250,10252,10259,500,8007,8443,10251,18095,23801,5355,8507,9007,68,323,23802,8444,8505,10249,10257,22,4500,8087,18093,53,6443,10256",
-        "regex": "/(?=.*destination)(:(8443|2379|9090|9999|18091|22222|23790|23791|1067|2380|8005|18092|9153|10250|10252|10259|500|8007|10251|18095|23801|5355|8507|9007|68|323|23802|8444|8505|10249|10257|22|4500|8087|18093|53|6443|10256))/si"
+        "message": "List of reserved ports 22|53|68|323|500|1067|2379|2380|4500|5355|6443|8005|8007|8087|8443|8444|8505|8507|9007|9090|9153|9999|10249|10250|10251|10252|10256|10257|10259|18091|18092|18093|18095|22222|23790|23791|23801|23802|28000-32767|65000-65535 (github issue #209)",
+        "regex": "(?<=\\bdestination\\s\\/\\S+\/\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:)(?:2[89][0-9]{3}|3[01][0-9]{3}|32[0-6][0-9]{2}|327[0-5][0-9]|6[5-9][0-9]{3}|65[0-4][0-9]{2}|6553[0-5]|(?:22|53|68|323|500|1067|2379|2380|4500|5355|6443|8005|8007|8087|8443|8444|8505|8507|9007|9090|9153|9999|10249|10250|10251|10252|10256|10257|10259|18091|18092|18093|18095|22222|23790|23791|23801|23802))"
     },
     {
         "code": "0049",
-        "severity": "Error",
-        "title": "XC UDP Unsupported",
-        "message": "XC does not currently support UDP",
+        "severity": "Information",
+        "title": "XC UDP LB",
+        "message": "XC supports UDP LB under Virtual Host settings. Internal DNS LB is not supported. (github issue #207)",
         "regex": "ip-protocol udp"
     },
     {
@@ -119,18 +126,11 @@
         "regex": "\/Common\/_sys_https_redirect"
     },
     {
-        "code": "9929",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
-    },
-    {
         "code": "5cf0",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "Clone Pool detected",
+        "message": "Clone Pool functionality is not supported. (github issue #208)",
+        "regex": " clone-pools "
     },
     {
         "code": "659b",

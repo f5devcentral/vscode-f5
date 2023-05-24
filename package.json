@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.11.0",
+	"version": "3.12.1",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -73,7 +73,7 @@
 		"@f5devcentral/f5-fast-core": "^0.19.1",
 		"ajv": "^8.11.2",
 		"f5-conx-core": "^0.17.2",
-		"f5-corkscrew": "^0.13.0",
+		"f5-corkscrew": "^1.1.2",
 		"js-yaml": "^4.0.0",
 		"keytar": "^7.9.0",
 		"openapi-data-validator": "^2.0.44"
@@ -111,16 +111,24 @@
 				"path": "./snippets/fastYamlSnippets.json"
 			}
 		],
-		"languages": [{
-			"id": "f5-tcl",
-			"extensions": [
-				".conf",
-				".tmos",
-				".f5"
-			],
-			"aliases": [ "f5-tcl", "tmos", "f5", "tcl", "f5-tmos"],
-			"configuration": "./language-configuration.json"
-		}],
+		"languages": [
+			{
+				"id": "f5-tcl",
+				"extensions": [
+					".conf",
+					".tmos",
+					".f5"
+				],
+				"aliases": [
+					"f5-tcl",
+					"tmos",
+					"f5",
+					"tcl",
+					"f5-tmos"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
 		"grammars": [
 			{
 				"language": "f5-tcl",
@@ -491,6 +499,13 @@
 				"command": "f5.cfgExplore-show",
 				"title": "Show Apps",
 				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExplore-showJson",
+				"title": "JSON Output",
+				"category": "F5",
+				"icon": "$(json)",
+				"enablement": "view == cfgTree"
 			},
 			{
 				"command": "f5.cfgExplore-report",
@@ -889,9 +904,21 @@
 				"command": "chuckJoke",
 				"title": "Chuck Joke",
 				"category": "F5"
+			},
+			{
+				"command": "f5.cfgExplore-save",
+				"title": "--- Save Diagnostics Rules ---",
+				"group": "F5"
 			}
 		],
 		"menus": {
+			"editor/title": [
+				{
+					"command": "f5.cfgExplore-save",
+					"group": "navigation",
+					"when": "resourceFilename === tmosXcRules.json"
+				}
+			],
 			"editor/context": [
 				{
 					"when": "editorHasSelection",
@@ -1333,6 +1360,11 @@
 				{
 					"command": "f5.cfgExplore-show",
 					"when": "view == cfgTree && viewItem == cfgAppItem"
+				},
+				{
+					"command": "f5.cfgExplore-showJson",
+					"when": "view == cfgTree && viewItem == cfgAppItem",
+					"group": "inline"
 				},
 				{
 					"command": "f5.cfgExplore-report",
