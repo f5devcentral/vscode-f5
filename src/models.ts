@@ -7,6 +7,7 @@ export type CfgExploreReport = {
     Greeting: string;
     repo: string;
     extensionVersion: string;
+    corkscrewVersion: string;
     issues: string;
     documentation: string;
     label?: string;
@@ -43,6 +44,7 @@ export type CfgExploreReport = {
         defaultRedirects: string[];
     }
     apps: TmosAppReport[];
+    gslb?: any;
 };
 
 export interface TmosAppReport extends TmosApp {

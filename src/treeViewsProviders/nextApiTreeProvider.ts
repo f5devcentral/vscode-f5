@@ -27,12 +27,12 @@ import jsyaml from "js-yaml";
 import { F5Client } from '../f5Client';
 
 import { logger } from '../logger';
-import { OpenApi } from "f5-conx-core/dist/bigip/OpenApiModels";
+// import { OpenApi } from "f5-conx-core/dist/bigip/OpenApiModels";
 
 export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
     context: ExtensionContext;
     connected: F5Client | undefined;
-    oai: OpenApi | undefined;
+    oai: any | undefined;
 
     filterPost: boolean = false;
     greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
@@ -265,7 +265,8 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
         // paths: string[]
         if (this.filterPost) {
             const x = Object.entries(this.oai!.paths).filter( ([k, v]) => {
-                const methods = Object.keys(v);
+                
+                const methods = Object.keys(v as Object);
                 if (methods.includes('post') || methods.includes('put')) {
                     return k;
                 }

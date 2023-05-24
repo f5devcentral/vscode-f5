@@ -8,23 +8,38 @@
 
 'use strict';
 
-import { window, commands, ExtensionContext } from "vscode";
+import { window, commands, ExtensionContext, workspace, TextDocument } from "vscode";
 import { ext } from "./extensionVariables";
-import { CfgProvider } from "./treeViewsProviders/cfgTreeProvider";
+import { CfgApp, CfgProvider } from "./treeViewsProviders/cfgTreeProvider";
 import fs from 'fs';
 
 import { logger } from './logger';
 import { XcDiag } from "./tmosXcDiag";
+import path from "path";
 
 export function cfgExplore(context: ExtensionContext) {
 
+    ext.xcDiag = new XcDiag(context);
+    ext.xcDiag.enabled = true;
 
-    const cfgProvider = new CfgProvider(context);
+    ext.cfgProvider = new CfgProvider(context);
     // const cfgView = window.registerTreeDataProvider('cfgTree', cfgProvider);
     const cfgView = window.createTreeView('cfgTree', {
-        treeDataProvider: cfgProvider,
+        treeDataProvider: ext.cfgProvider,
         showCollapseAll: true,
         canSelectMany: true
+    });
+
+    // watch for fileSave events
+    workspace.onDidSaveTextDocument((document: TextDocument) => {
+
+        const justFileName = path.parse(document.fileName).base;
+
+        // if this is our diagnostics rules file, then refresh the rules/tree when the file is saved. :)
+        if (justFileName === 'tmosXcRules.json') {
+            // refresh the view and all the diagnostics
+            ext.cfgProvider.refresh();
+        }
     });
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreOnConnect', async (item) => {
@@ -39,7 +54,7 @@ export function cfgExplore(context: ExtensionContext) {
         return await ext.f5Client?.ucs?.get({ mini: true, localDestPathFile: ext.cacheDir })
             .then(async resp => {
                 logger.debug('Got mini_ucs -> extracting config with corkscrew');
-                cfgProvider.makeExplosion(resp.data.file);
+                ext.cfgProvider.makeExplosion(resp.data.file);
             });
     }));
 
@@ -94,7 +109,7 @@ export function cfgExplore(context: ExtensionContext) {
 
         logger.info(`f5.cfgExplore: exploding config @ ${filePath}`);
 
-        cfgProvider.makeExplosion(filePath);
+        ext.cfgProvider.makeExplosion(filePath);
 
         await new Promise(resolve => { setTimeout(resolve, 2000); });
         commands.executeCommand('cfgTree.focus');
@@ -118,36 +133,61 @@ export function cfgExplore(context: ExtensionContext) {
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreClear', async (text) => {
         ext.telemetry.capture({ command: 'f5.cfgExploreClear' });
-        cfgProvider.clear();
-        cfgProvider.xcDiag = false;
+        ext.cfgProvider.clear();
+        ext.cfgProvider.xcDiag = true;
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExploreRefresh', async (text) => {
-        cfgProvider.refresh();
+        ext.cfgProvider.refresh();
     }));
 
-    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-xcDiagSwitch', async (text) => {
-        
+    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-diagSwitch', async (text) => {
+
         // flip switch and refresh details
-        if(cfgProvider.xcDiag){
-            cfgProvider.xcDiag = false;
+        if (ext.cfgProvider.xcDiag) {
+
+            ext.cfgProvider.xcDiag = false;
             ext.xcDiag.enabled = false;
-            console.log('xc diag updatediagnostics disable');
-            if(ext.xcDiag.lastDoc) {
+            console.log('diagnostics disabled');
+            if (ext.xcDiag.lastDoc) {
+                // todo: update this to work like flipper
+                // all diagnostics are computed at instantiation and added to the apps
                 // clear the last editor diags
                 ext.xcDiag.updateDiagnostic(ext.xcDiag.lastDoc);
             }
+
         } else {
-            cfgProvider.xcDiag = true;
-            
-            // was having errors about functions undefined, so, make sure everything is loaded as we turn this on
-            // if (ext.xcDiag.updateDiagnostic === undefined) {
-                console.log('xc diag updatediagnostics enable');
-                ext.xcDiag = new XcDiag(context);
-                ext.xcDiag.enabled = true;
-            // }
+
+            ext.cfgProvider.xcDiag = true;
+            ext.xcDiag.enabled = true;
+            console.log('diagnostics enabled');
+            if (ext.xcDiag.lastDoc) {
+                // todo: update this to work like flipper
+                // all diagnostics are computed at instantiation and added to the apps
+                // clear the last editor diags
+                ext.xcDiag.updateDiagnostic(ext.xcDiag.lastDoc);
+            }
+
         }
-        cfgProvider.refresh();
+        ext.cfgProvider.refresh();
+    }));
+
+    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-showJson', async (item) => {
+
+        if (item instanceof CfgApp && item.contextValue === 'cfgAppItem') {
+
+            const idx = ext.cfgProvider.explosion?.config.apps!.findIndex(a => a.name === item.label)
+            // 0 is a valid index but considered falsy
+            if (idx !== undefined) {
+                // get the app config and display it
+                const app = ext.cfgProvider.explosion!.config.apps![idx]
+                commands.executeCommand('f5.cfgExplore-show', app);
+            }
+            item;
+        }
+
+
+
     }));
 
     context.subscriptions.push(commands.registerCommand('f5.cfgExplore-show', async (text) => {
@@ -182,7 +222,7 @@ export function cfgExplore(context: ExtensionContext) {
         }
 
         // provide the text and "IF" xc diagnostics "CAN" be applied
-        cfgProvider.render(text, diagTag);
+        ext.cfgProvider.render(text, diagTag);
     }));
 
 
@@ -194,9 +234,13 @@ export function cfgExplore(context: ExtensionContext) {
 
         ext.telemetry.capture({ command: 'f5.cfgExplore-report' });
 
-        Object.assign(report, cfgProvider.buildReport());
+        Object.assign(report, ext.cfgProvider.buildReport());
 
-        cfgProvider.render(report, false);
+        ext.cfgProvider.render(report, false);
+    }));
+
+    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-save', async () => {
+        commands.executeCommand('workbench.action.files.save');
     }));
 
 

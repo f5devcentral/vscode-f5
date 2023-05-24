@@ -37,6 +37,7 @@ import { AS3TreeProvider } from './treeViewsProviders/as3TreeProvider';
 import { F5TreeProvider } from './treeViewsProviders/hostsTreeProvider';
 import { Telemetry } from './telemetry';
 import { XcDiag } from './tmosXcDiag';
+import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 
 type KeyTar = typeof keyTarType;
 
@@ -53,6 +54,7 @@ export namespace ext {
     export let telemetry: Telemetry;
     export let as3Tree: AS3TreeProvider;
     export let xcDiag: XcDiag;
+    export let cfgProvider: CfgProvider;
     export let eventEmitterGlobal: EventEmitter;
     export let atcVersions: AtcVersions;
     export let connectBar: StatusBarItem;
