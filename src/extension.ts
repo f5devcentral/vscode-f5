@@ -78,7 +78,7 @@ logger.output = function (log: string) {
 
 
 // provide extension functions for activation
-export async function activateInternal(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 
 	process.on('unhandledRejection', error => {
 		logger.error('--- unhandledRejection ---', error);
@@ -969,6 +969,6 @@ export async function activateInternal(context: ExtensionContext) {
 
 
 // this method is called when your extension is deactivated
-export async function deactivateInternal(context: ExtensionContext) {
+export async function deactivate(context: ExtensionContext) {
 	// log deactivation event
 }

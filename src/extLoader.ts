@@ -15,7 +15,10 @@ const perfStats: PerfStats = {
 // Object.defineProperty(exports, "__esModule", { value: true });
 
 import { ExtensionContext } from 'vscode';
-import { activateInternal, deactivateInternal } from './extension';
+import { 
+    activate as activateInternal,
+    deactivate as deactivateInternal
+} from './extension';
 
 // while this may load the code/references, it will be empty
 import { ext } from './extensionVariables';
