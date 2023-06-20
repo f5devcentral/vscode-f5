@@ -143,7 +143,7 @@ export async function activate(context: ExtensionContext) {
 
 	new CfCore(context);
 
-	new NextApi(context, ext.eventEmitterGlobal);
+	// new NextApi(context, ext.eventEmitterGlobal);
 
 	languages.registerCodeLensProvider({
 		language: 'json',
