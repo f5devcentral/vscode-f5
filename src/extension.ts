@@ -27,6 +27,7 @@ import {
 	Range,
 	Position,
 	languages,
+	ThemeIcon,
 } from 'vscode';
 import jsYaml from 'js-yaml';
 import * as path from 'path';
@@ -64,6 +65,7 @@ import { Telemetry } from './telemetry';
 import { XcDiag } from './tmosXcDiag';
 import { NextApi } from './nextApi';
 import { CodeLensProvider } from './codeLens';
+import { createRequire } from 'module';
 
 // turn off console logging
 logger.console = false;
@@ -932,32 +934,132 @@ export async function activate(context: ExtensionContext) {
 
 		ext.telemetry.capture({ command: 'f5.remoteCommand' });
 
-		// todo: add a setting to hold the command and future history
-		await window.showQuickPick(
-			[
-				'cat /config/bigip.conf',
-				'cat bigip.license',
-				'tail -100 /var/log/ltm',
-				'tmsh show /apm license'
-			],{
-			ignoreFocusOut: true,
-			title: 'Enter command to execute on the BIG-IP'
-		})
-			.then(async cmd => {
+		// get the cmd history from vscode global state
+		const histary: string[] = context.globalState.get('f5-rc-history', []);
 
-				if (cmd) {
+		const historyDefaults = [
+			'cat /config/bigip.conf',
+			'cat bigip.license',
+			'tail -100 /var/log/ltm',
+			'tmsh show /apm license'
+		];
 
-					await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
-						method: 'POST',
-						data: {
-							command: 'run',
-							utilCmdArgs: `-c '${cmd}'`
-						}
-					})
-						.then(resp => ext.panel.render(resp.data.commandResult))
-						.catch(err => logger.error('bash command failed:', err));
+		const cmd = await new Promise((resolve) => {
+
+			const qp = window.createQuickPick()
+
+			//build all the history items with delete buttons
+			const i = histary.map(label => ({
+				label,
+				buttons: [{ iconPath: new ThemeIcon("trash"), tooltip: "Remove this item" }]
+			}))
+
+			// build all the defaults (no delete button)
+			const ii = historyDefaults.map(label => ({ label }))
+
+			// spread all the options together
+			qp.items = [...i, ...ii];
+
+			// allow focus out
+			qp.ignoreFocusOut = true;
+
+			// event for history button (trash)
+			qp.onDidTriggerItemButton(async (_button) => {
+
+				// isolat the value
+				const item = _button.item.label;
+
+				// filter out this button item from the history array
+				const newHistary = histary.filter(x => x !== item)
+				// clear the history array
+				histary.length = 0
+				// spread all the filtered records back into the history array
+				histary.push(...newHistary)
+
+				// rerun the command to get new values
+				return commands.executeCommand('f5.remoteCommand')
+
+			}),
+
+			qp.onDidAccept(a => {
+
+				// main quick pick object
+				const b = qp;
+				// if new item typed in
+				const bv = b.value;
+				// if existing item selected;
+				const bs = b.selectedItems[0]?.label;
+
+				resolve(bv || bs);
+				qp.hide();
+			})
+
+			qp.show();
+		}) as string;
+
+		if (cmd) {
+
+			// console.log(cmd)
+
+			await ext.f5Client?.https(`/mgmt/tm/util/bash`, {
+				method: 'POST',
+				data: {
+					command: 'run',
+					utilCmdArgs: `-c '${cmd}'`
 				}
-			});
+			})
+				.then(resp => {
+
+					// render the output for the user
+					ext.panel.render(resp.data.commandResult)
+
+					// is command part of the historyDefaults
+					const isDefaultCmd = historyDefaults.indexOf(cmd);
+
+					if (isDefaultCmd < 0) {
+
+						//is command already in the history
+						const idx = histary.indexOf(cmd)
+
+						// command is not in history
+						if(idx < 0) {
+
+							// add the cmd to the top of the history array
+							histary.unshift(cmd)
+
+						} else {
+
+							// command found in history
+							// remove command by index
+							histary.splice(idx, 1)
+							// re-add command back to the top
+							histary.unshift(cmd)
+						}
+
+						// if we exceed 5, remove oldest
+						if (histary.length > 5) histary.pop();
+
+						// save the array to the vscode global state
+						context.globalState.update('f5-rc-history', histary)
+					}
+
+				})
+				.catch(err => logger.error('bash command failed:', err));
+		}
+
+
+		// }
+
+
+
+		// // merge the history and defaults to disply for user, with latest history on top
+		// await window.showQuickPick([...histary, ...historyDefaults], {
+		// 	ignoreFocusOut: true,
+		// 	title: 'Enter command to execute on the BIG-IP'
+		// })
+		// 	.then(async cmd => {
+
+
 
 	}));
 
