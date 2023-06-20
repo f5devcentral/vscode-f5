@@ -13,9 +13,31 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 
+- [RFE] Can't delete tmsh scripts #214
+
 ### Changed
 
+
 ### Fixed
+
+- [RFE] Config Explorer doesn't include cipher groups with the applications #213
+
+---
+
+## [3.13.0] - (06-20-2023)
+
+### Added
+
+- [RFE] add history to remote command execute #211
+
+### Fixed
+
+- f5-corkscrew v1.3.0
+  - [BUG] Monitor no more display in Config explorer #217
+- deps updates
+- [BUG] Error running command f5.addHost: command 'f5.addHost' not found. #206
+- [BUG] Error connecting to BIG-IP --- TypeError: Cannot read properties of undefined (reading 'paths') #215
+
 
 ---
 

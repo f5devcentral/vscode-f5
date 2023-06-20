@@ -206,7 +206,7 @@
 				{
 					"id": "nxtApiView",
 					"name": "NEXT API",
-					"when": "f5.preview"
+					"when": "false"
 				},
 				{
 					"id": "fastView",
@@ -643,6 +643,7 @@
 			{
 				"command": "f5.refreshNextApiTree",
 				"title": "Refresh NEXT OPENAPI View",
+				"enablement": "false",
 				"category": "F5",
 				"icon": "$(refresh)"
 			},
