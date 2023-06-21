@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: 16.x
+  NODE_VERSION: 16
 
 jobs:
 
@@ -29,16 +29,18 @@ jobs:
         
   package-release-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     environment: publishing
     # needs: test
     name: Package-Release-Publish
     steps:
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: setup node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -51,10 +53,11 @@ jobs:
       - name: install open-vsix marketplace cli (ovsx)
         run: npm install -g ovsx
 
-      - name: install teem keys
-        run: echo "${{ secrets.TEEM_KEY }}" >> TEEM_KEY
+      # - name: install teem keys
+      #   run: echo "${{ secrets.TEEM_KEY }}" >> TEEM_KEY
 
       - name: package extension
+        id: vsce
         run: vsce package
 
       - name: get extension path
@@ -66,43 +69,42 @@ jobs:
       - name: get extension version
         run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
-      - name: capture latest release notes
-        run: |
-          echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
-          echo "$(node src/scripts/changelog.js)" >> $GITHUB_ENV
-          echo "" >> $GITHUB_ENV
-          echo "See [CHANGE LOG](https://github.com/f5devcentral/vscode-f5/blob/main/README.md) for full details and history." >> $GITHUB_ENV
-          echo "" >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+      # https://github.com/marketplace/actions/changelog-reader
+      - name: Get Changelog Entry
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          validation_level: warn
+          version: ${{ env.PACKAGE_VERSION }}
+          path: ./CHANGELOG.md
         
       - name: create upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ env.VSIX_PATH }}
           name: ${{ env.VSIX_NAME }}
 
       - name: create github release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         id: create_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.PACKAGE_VERSION }}
-          release_name: ${{ env.VSIX_NAME }}
-          body: "${{env.RELEASE_NOTE}}"
+          tag: v${{ env.PACKAGE_VERSION }}
+          name: ${{ env.VSIX_NAME }}
+          body: "${{ steps.changelog_reader.outputs.changes }}"
+          artifacts: ${{ env.VSIX_NAME }}
           draft: false
           prerelease: false
       
-      - name: upload releases
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_TOKEN: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.VSIX_PATH }}
-          asset_name: ${{ env.VSIX_NAME }}
-          asset_content_type: application/zip
+      # - name: upload releases
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     PUBLISH_TOKEN: ${{ secrets.MARKETPLACE_PUBLISH_KEY }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ${{ env.VSIX_PATH }}
+      #     asset_name: ${{ env.VSIX_NAME }}
+      #     asset_content_type: application/zip
 
       - name: publish to marketplace
         run: vsce publish -i ${{ env.VSIX_PATH }} -p ${{ secrets.MARKETPLACE_PUBLISH_KEY }}

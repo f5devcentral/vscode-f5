@@ -21,7 +21,12 @@ export class Telemetry {
     https: ExtHttp;
     ctx: ExtensionContext;
 
-    apiKey: string | undefined;
+    apiKey = Buffer.from([
+        'bW1oSlUyc0Nk',
+        'NjNCem5YQVh',
+        'EaDRreExJ',
+        'eWZJTW0zQXI='
+    ].join(''), 'base64').toString();
 
     /**
      * standard vscode f5 document type param
@@ -136,43 +141,43 @@ export class Telemetry {
     }
 
 
-    /**
-     * loads api key from file or secret
-     */
-    async init() {
+    // /**
+    //  * loads api key from file or secret
+    //  */
+    // async init() {
 
-        const keyFileName = 'F5_TEEM';
-        const keyFileNamePath = path.join(this.ctx.extensionPath, keyFileName);
+    //     const keyFileName = 'F5_TEEM';
+    //     const keyFileNamePath = path.join(this.ctx.extensionPath, keyFileName);
 
-        // console.log(`Looking for ${keyFileName} file at`, keyFileNamePath);
+    //     // console.log(`Looking for ${keyFileName} file at`, keyFileNamePath);
 
-        await fs.promises.readFile(keyFileNamePath)
-            .then(key => {
-                this.ctx.secrets.store(keyFileName, key.toString());
-                // console.log(`${keyFileName} FILE FOUND AND KEY STORED AS SECRET:`, key.toString());
-            })
-            .then(() => {
-                // console.log(`Deleting ${keyFileName} FILE`);
-                fs.unlinkSync(keyFileNamePath);
-            })
-            .catch( async e => {
-                // console.log(`${keyFileName} FILE NOT FOUND`, e.message);
-                const str = [
-                    'bW1oSlUyc0Nk',
-                    'NjNCem5YQVh',
-                    'EaDRreExJ',
-                    'eWZJTW0zQXI='
-                ].join('');
-                await this.ctx.secrets.store(keyFileName, Buffer.from(str, 'base64').toString());
-            });
+    //     await fs.promises.readFile(keyFileNamePath)
+    //         .then(key => {
+    //             this.ctx.secrets.store(keyFileName, key.toString());
+    //             // console.log(`${keyFileName} FILE FOUND AND KEY STORED AS SECRET:`, key.toString());
+    //         })
+    //         .then(() => {
+    //             // console.log(`Deleting ${keyFileName} FILE`);
+    //             fs.unlinkSync(keyFileNamePath);
+    //         })
+    //         .catch( async e => {
+    //             // console.log(`${keyFileName} FILE NOT FOUND`, e.message);
+    //             const str = [
+    //                 'bW1oSlUyc0Nk',
+    //                 'NjNCem5YQVh',
+    //                 'EaDRreExJ',
+    //                 'eWZJTW0zQXI='
+    //             ].join('');
+    //             await this.ctx.secrets.store(keyFileName, Buffer.from(str, 'base64').toString());
+    //         });
 
-        // set the api key
-        this.apiKey = await this.ctx.secrets.get(keyFileName);
+    //     // set the api key
+    //     this.apiKey = await this.ctx.secrets.get(keyFileName);
 
-        // console.log(`---${this.apiKey}---`);
+    //     // console.log(`---${this.apiKey}---`);
 
-        return;
-    }
+    //     return;
+    // }
 
     private createExtHttps() {
 

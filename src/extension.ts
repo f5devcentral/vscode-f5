@@ -1,19 +1,3 @@
-/**
- * Copyright 2021 F5 Networks, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 'use strict';
 
 import {
@@ -62,10 +46,10 @@ import { getText } from './utils/utils';
 import { CfCore } from './cfCore';
 import { As3Core } from './as3Core';
 import { Telemetry } from './telemetry';
-import { XcDiag } from './tmosXcDiag';
-import { NextApi } from './nextApi';
+// import { XcDiag } from './tmosXcDiag';
+// import { NextApi } from './nextApi';
 import { CodeLensProvider } from './codeLens';
-import { createRequire } from 'module';
+// import { createRequire } from 'module';
 
 // turn off console logging
 logger.console = false;
@@ -81,6 +65,11 @@ logger.output = function (log: string) {
 
 // provide extension functions for activation
 export async function activate(context: ExtensionContext) {
+
+	// create the telemetry service
+	ext.telemetry = new Telemetry(context);
+	// initialize telemetry service
+	// await ext.telemetry.init();
 
 	process.on('unhandledRejection', error => {
 		logger.error('--- unhandledRejection ---', error);
@@ -123,11 +112,6 @@ export async function activate(context: ExtensionContext) {
 
 	// do we prefer the class style of importing core blocks?
 	new ChangeVersion(context, ext.extHttp);
-
-	// create the telemetry service
-	ext.telemetry = new Telemetry(context);
-	// initialize telemetry service
-	await ext.telemetry.init();
 
 	logger.debug(`telemtry instance details`, ext.telemetry.telemetryBase());
 
@@ -981,18 +965,18 @@ export async function activate(context: ExtensionContext) {
 
 			}),
 
-			qp.onDidAccept(a => {
+				qp.onDidAccept(a => {
 
-				// main quick pick object
-				const b = qp;
-				// if new item typed in
-				const bv = b.value;
-				// if existing item selected;
-				const bs = b.selectedItems[0]?.label;
+					// main quick pick object
+					const b = qp;
+					// if new item typed in
+					const bv = b.value;
+					// if existing item selected;
+					const bs = b.selectedItems[0]?.label;
 
-				resolve(bv || bs);
-				qp.hide();
-			})
+					resolve(bv || bs);
+					qp.hide();
+				})
 
 			qp.show();
 		}) as string;
@@ -1022,7 +1006,7 @@ export async function activate(context: ExtensionContext) {
 						const idx = histary.indexOf(cmd)
 
 						// command is not in history
-						if(idx < 0) {
+						if (idx < 0) {
 
 							// add the cmd to the top of the history array
 							histary.unshift(cmd)

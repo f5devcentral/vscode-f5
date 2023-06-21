@@ -24,6 +24,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.13.1] - (06-21-2023)
+
+### Changed
+
+- updated github actions for testing/building/deployment of extension to marketplace
+
+### Fixed
+
+- [BUG] Error running command f5.addHost: command 'f5.addHost' not found. #206 (continued...)
+- more nextApi and telemetry clean up
+
+---
+
 ## [3.13.0] - (06-20-2023)
 
 ### Added
