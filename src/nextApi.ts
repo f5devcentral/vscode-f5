@@ -58,9 +58,9 @@ export class NextApi {
         const nextApiTreeView = window.createTreeView('nxtApiView', {
             treeDataProvider: this.nextApiTreeProvider,
         });
-        context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTree', () => this.nextApiTreeProvider.refresh()));
+        // context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTree', () => this.nextApiTreeProvider.refresh()));
 
-        context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTreeLocal', () => this.nextApiTreeProvider.refresh('local')));
+        // context.subscriptions.push(commands.registerCommand('f5.refreshNextApiTreeLocal', () => this.nextApiTreeProvider.refresh('local')));
 
 
         // not registered in pjson file...

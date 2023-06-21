@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.13.0",
+	"version": "3.13.1",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -181,10 +181,6 @@
 			{
 				"view": "cfgTree",
 				"contents": "Import TMOS Config to explore.\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Documentation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)"
-			},
-			{
-				"view": "nxtApiView",
-				"contents": "Connect to a NEXT instance to explore OpenAPI.\n[Browse CM OPENAPI (local)](command:f5.refreshNextApiTreeLocal)"
 			}
 		],
 		"views": {
@@ -641,13 +637,6 @@
 				"icon": "$(refresh)"
 			},
 			{
-				"command": "f5.refreshNextApiTree",
-				"title": "Refresh NEXT OPENAPI View",
-				"enablement": "false",
-				"category": "F5",
-				"icon": "$(refresh)"
-			},
-			{
 				"command": "f5.cfgExploreRefresh",
 				"title": "Refresh Config Explorer",
 				"category": "F5",
@@ -1077,11 +1066,6 @@
 				{
 					"command": "f5.iqViewRefresh",
 					"when": "view == iqView",
-					"group": "navigation"
-				},
-				{
-					"command": "f5.refreshNextApiTree",
-					"when": "view == nxtApiView",
 					"group": "navigation"
 				},
 				{
