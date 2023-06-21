@@ -272,45 +272,46 @@ export class Telemetry {
      */
     private async send(): Promise<void> {
 
-        if (process.env[ext.teemEnv] === 'false' || !this.apiKey) {
-            return;
+        const teemEnvLabel = ext.teemEnv;
+        const teemEnv = process.env[teemEnvLabel];
+
+        if (teemEnv === 'true' && this.apiKey) {
+
+            // combine base telemetry details with 
+            const reqOpts = {
+                method: 'POST',
+                url: this.endPoint,
+                headers: {
+                    "F5-ApiKey": this.apiKey,
+                    "F5-DigitalAssetId": this.instanceGUID,
+                    "F5-TraceId": randomUUID(),
+                },
+                data: Object.assign(
+                    this.telemetryBase(),
+                    {
+                        observationStartTime: new Date().toISOString(),
+                        observationEndTime: new Date().toISOString(),
+                        epochTime: Date.now(),
+                        telemtryId: randomUUID(),
+                        telemetryRecords: this.journal
+                    }
+                )
+            };
+
+            // console.log(JSON.stringify(reqOpts));
+
+            return this.https.makeRequest(reqOpts as uuidAxiosRequestConfig)
+                .then(resp => {
+                    console.debug(`telemtry resp: ${resp.statusText}-${resp.status}`);
+
+                    // clear journal on successful send
+                    this.journal.length = 0;
+                })
+                .catch(err => {
+                    console.debug(`telemtry error`, err);
+                });
+
         }
-
-        // combine base telemetry details with 
-        const reqOpts = {
-            method: 'POST',
-            url: this.endPoint,
-            headers: {
-                "F5-ApiKey": this.apiKey,
-                "F5-DigitalAssetId": this.instanceGUID,
-                "F5-TraceId": randomUUID(),
-            },
-            data: Object.assign(
-                this.telemetryBase(),
-                {
-                    observationStartTime: new Date().toISOString(),
-                    observationEndTime: new Date().toISOString(),
-                    epochTime: Date.now(),
-                    telemtryId: randomUUID(),
-                    telemetryRecords: this.journal
-                }
-            )
-        };
-
-        // console.log(JSON.stringify(reqOpts));
-
-        return this.https.makeRequest(reqOpts as uuidAxiosRequestConfig)
-            .then(resp => {
-                console.debug(`telemtry resp: ${resp.statusText}-${resp.status}`);
-
-                // clear journal on successful send
-                this.journal.length = 0;
-            })
-            .catch(err => {
-                console.debug(`telemtry error`, err);
-            });
-
-
     }
 
 

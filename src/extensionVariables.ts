@@ -169,7 +169,7 @@ export async function loadSettings() {
 
     process.env.F5_VSCODE_LOG_LEVEL = f5Cfg.get('logLevel');
 
-    process.env[ext.teemEnv] = f5Cfg.get('f5.TEEM')!;
+    process.env[ext.teemEnv] = f5Cfg.get('TEEM');
 
     process.env.F5_CONX_CORE_REJECT_UNAUTORIZED = f5Cfg.get('rejectUnauthorizedBIGIP')!.toString();
     

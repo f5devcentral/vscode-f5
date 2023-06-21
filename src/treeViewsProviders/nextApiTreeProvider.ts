@@ -82,7 +82,7 @@ export class NextApiTreeProvider implements TreeDataProvider<NxtApiTreeItem> {
 
             this.connected = ext?.f5Client;
             this.oai = ext.f5Client.openApi;
-            this.pathsTreeObj = this.pathTree();
+            // this.pathsTreeObj = this.pathTree();
 
         } else if (local) {
 

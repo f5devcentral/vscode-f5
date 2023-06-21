@@ -1,6 +1,3 @@
-import * as assert from 'assert';
-import fs = require('fs');
-import path = require('path');
 
 import { commands } from 'vscode';
 import { logger } from '../../logger';
