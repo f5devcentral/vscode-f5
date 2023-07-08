@@ -24,6 +24,18 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.13.2] - (07-08-2023)
+
+### Fixed
+
+- [BUG] Error running command f5.addHost: command 'f5.addHost' not found. #206 (continued...)
+  - changed activation event from "*" to "onStartupFinished"
+- github actions tests tweaks
+- npm audit fix for vulnerabilities
+
+
+---
+
 ## [3.13.1] - (06-21-2023)
 
 ### Changed

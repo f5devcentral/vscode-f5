@@ -22,11 +22,11 @@ suite('NEXT CM OpenApi Schema Validation', () => {
         };
 
 
-        const req: OpenApiRequest = {
-            method: "POST",
-            route: "/api/device/v1/inventory",
-            body: reqBody
-        };
+        // const req: OpenApiRequest = {
+        //     method: "POST",
+        //     route: "/api/device/v1/inventory",
+        //     body: reqBody
+        // };
 
         // const openApiValidator = new OpenApiValidator({
         //     apiSpec,
