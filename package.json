@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.13.2",
+	"version": "3.14.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -73,7 +73,7 @@
 		"@f5devcentral/f5-fast-core": "^0.19.1",
 		"ajv": "^8.11.2",
 		"f5-conx-core": "^0.17.2",
-		"f5-corkscrew": "^1.2.0",
+		"f5-corkscrew": "^1.3.0",
 		"js-yaml": "^4.0.0",
 		"keytar": "^7.9.0",
 		"openapi-data-validator": "^2.0.44"
@@ -180,7 +180,7 @@
 		"viewsWelcome": [
 			{
 				"view": "cfgTree",
-				"contents": "Import TMOS Config to explore.\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Documentation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)"
+				"contents": "Import TMOS Config to explore.\n[Import .conf/UCS/QKVIEW from local file](command:f5.cfgExplore)\n[Load Example QKVIEW](command:f5.cfgExplore-exampleQkview)\n[Documentation](https://f5devcentral.github.io/vscode-f5/#/config_explorer)"
 			}
 		],
 		"views": {
@@ -505,6 +505,12 @@
 			},
 			{
 				"command": "f5.cfgExplore-report",
+				"title": "Report",
+				"category": "F5",
+				"icon": "$(output)"
+			},
+			{
+				"command": "f5.cfgExplore-reportTop",
 				"title": "Report",
 				"category": "F5",
 				"icon": "$(output)"
@@ -1349,11 +1355,6 @@
 				{
 					"command": "f5.cfgExplore-showJson",
 					"when": "view == cfgTree && viewItem == cfgAppItem",
-					"group": "inline"
-				},
-				{
-					"command": "f5.cfgExplore-report",
-					"when": "view == cfgTree && viewItem == cfgHeader",
 					"group": "inline"
 				},
 				{

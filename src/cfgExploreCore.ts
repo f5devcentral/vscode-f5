@@ -176,11 +176,11 @@ export function cfgExplore(context: ExtensionContext) {
 
         if (item instanceof CfgApp && item.contextValue === 'cfgAppItem') {
 
-            const idx = ext.cfgProvider.explosion?.config.apps!.findIndex(a => a.name === item.label)
+            const idx = ext.cfgProvider.explosion?.config.apps!.findIndex(a => a.name === item.label);
             // 0 is a valid index but considered falsy
             if (idx !== undefined) {
                 // get the app config and display it
-                const app = ext.cfgProvider.explosion!.config.apps![idx]
+                const app = ext.cfgProvider.explosion!.config.apps![idx];
                 commands.executeCommand('f5.cfgExplore-show', app);
             }
             item;
@@ -239,9 +239,50 @@ export function cfgExplore(context: ExtensionContext) {
         ext.cfgProvider.render(report, false);
     }));
 
+    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-reportTop', async (text) => {
+        const report = {
+            label: text.label,
+            description: text.description
+        };
+
+        ext.telemetry.capture({ command: 'f5.cfgExplore-reportTop' });
+
+        Object.assign(report, ext.cfgProvider.topTalkersReport());
+
+        ext.cfgProvider.render(report, false);
+    }));
+
     context.subscriptions.push(commands.registerCommand('f5.cfgExplore-save', async () => {
         commands.executeCommand('workbench.action.files.save');
     }));
+
+
+    context.subscriptions.push(commands.registerCommand('f5.cfgExplore-exampleQkview', async (text) => {
+
+        // get latest asset information from github
+        const url = 'https://api.github.com/repos/f5devcentral/f5-corkscrew/releases/latest';
+        const a = text;
+
+        ext.extHttp.makeRequest({ url }).then(resp => {
+            const assets = resp.data.assets;
+            const qkview = assets.find((asset: any) => asset.name.includes('qkview'));
+            const url = qkview.browser_download_url;
+
+            ext.extHttp.download(url).then(resp => {
+                logger.debug('downloaded qkview', resp);
+                ext.cfgProvider.makeExplosion(resp.data.file);
+            
+            });
+            // commands.executeCommand('f5.cfgExplore', url);
+        });
+
+
+        // download example qkview
+
+        //  launch cfgExplor with downloaded qkview
+    }));
+
+
 
 
 

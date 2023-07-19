@@ -46,10 +46,8 @@ import { getText } from './utils/utils';
 import { CfCore } from './cfCore';
 import { As3Core } from './as3Core';
 import { Telemetry } from './telemetry';
-// import { XcDiag } from './tmosXcDiag';
-// import { NextApi } from './nextApi';
+
 import { CodeLensProvider } from './codeLens';
-// import { createRequire } from 'module';
 
 // turn off console logging
 logger.console = false;
@@ -126,8 +124,6 @@ export async function activate(context: ExtensionContext) {
 	new DoCore(context);
 
 	new CfCore(context);
-
-	// new NextApi(context, ext.eventEmitterGlobal);
 
 	languages.registerCodeLensProvider({
 		language: 'json',
@@ -807,6 +803,7 @@ export async function activate(context: ExtensionContext) {
 			if (ext.f5Client!.mgmtClient!.hostInfo!.product === 'NEXT') {
 				// if next instance (not CM) append base api path to openapi path
 				req.url = `/api/v1${req.url}`;
+				logger.warn('next instance detected -> appending /api/v1 to url - NOT SUPPORTED AT THIS TIME!!!');
 			}
 			text = req;
 
@@ -930,16 +927,16 @@ export async function activate(context: ExtensionContext) {
 
 		const cmd = await new Promise((resolve) => {
 
-			const qp = window.createQuickPick()
+			const qp = window.createQuickPick();
 
 			//build all the history items with delete buttons
 			const i = histary.map(label => ({
 				label,
 				buttons: [{ iconPath: new ThemeIcon("trash"), tooltip: "Remove this item" }]
-			}))
+			}));
 
 			// build all the defaults (no delete button)
-			const ii = historyDefaults.map(label => ({ label }))
+			const ii = historyDefaults.map(label => ({ label }));
 
 			// spread all the options together
 			qp.items = [...i, ...ii];
@@ -954,14 +951,14 @@ export async function activate(context: ExtensionContext) {
 				const item = _button.item.label;
 
 				// filter out this button item from the history array
-				const newHistary = histary.filter(x => x !== item)
+				const newHistary = histary.filter(x => x !== item);
 				// clear the history array
-				histary.length = 0
+				histary.length = 0;
 				// spread all the filtered records back into the history array
-				histary.push(...newHistary)
+				histary.push(...newHistary);
 
 				// rerun the command to get new values
-				return commands.executeCommand('f5.remoteCommand')
+				return commands.executeCommand('f5.remoteCommand');
 
 			}),
 
@@ -976,7 +973,7 @@ export async function activate(context: ExtensionContext) {
 
 					resolve(bv || bs);
 					qp.hide();
-				})
+				});
 
 			qp.show();
 		}) as string;
@@ -995,7 +992,7 @@ export async function activate(context: ExtensionContext) {
 				.then(resp => {
 
 					// render the output for the user
-					ext.panel.render(resp.data.commandResult)
+					ext.panel.render(resp.data.commandResult);
 
 					// is command part of the historyDefaults
 					const isDefaultCmd = historyDefaults.indexOf(cmd);
@@ -1003,28 +1000,28 @@ export async function activate(context: ExtensionContext) {
 					if (isDefaultCmd < 0) {
 
 						//is command already in the history
-						const idx = histary.indexOf(cmd)
+						const idx = histary.indexOf(cmd);
 
 						// command is not in history
 						if (idx < 0) {
 
 							// add the cmd to the top of the history array
-							histary.unshift(cmd)
+							histary.unshift(cmd);
 
 						} else {
 
 							// command found in history
 							// remove command by index
-							histary.splice(idx, 1)
+							histary.splice(idx, 1);
 							// re-add command back to the top
-							histary.unshift(cmd)
+							histary.unshift(cmd);
 						}
 
 						// if we exceed 5, remove oldest
-						if (histary.length > 5) histary.pop();
+						if (histary.length > 5) {histary.pop();}
 
 						// save the array to the vscode global state
-						context.globalState.update('f5-rc-history', histary)
+						context.globalState.update('f5-rc-history', histary);
 					}
 
 				})

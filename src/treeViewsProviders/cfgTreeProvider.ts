@@ -33,7 +33,7 @@ import jsYaml from 'js-yaml';
 
 import { ext } from '../extensionVariables';
 
-import { ConfigFile, Explosion, Stats, TmosApp, xmlStats } from 'f5-corkscrew';
+import { ConfigFile, Explosion, TmosApp } from 'f5-corkscrew';
 import { logger } from '../logger';
 import BigipConfig from 'f5-corkscrew/dist/ltm';
 import path from 'path';
@@ -55,6 +55,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
     yellowDot = ext.context.asAbsolutePath(path.join("images", "yellowDot.svg"));
     greenDot = ext.context.asAbsolutePath(path.join("images", "greenDot.svg"));
     greenCheck = ext.context.asAbsolutePath(path.join("images", "greenCheck.svg"));
+    f5Logo = ext.context.asAbsolutePath(path.join("images", "f5_white_24x24.svg"));
 
     explosion: Explosion | undefined;
     // confObj: BigipConfObj | undefined;
@@ -100,6 +101,9 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
         }, async () => {
             this.bigipConfig = new BigipConfig();
 
+            // todo: put in some env/var/setting to allow users to change this
+            this.bigipConfig.xmlStats.topN = 10000;
+
             this.bigipConfig.on('parseFile', x => {
                 this.parsedFileEvents.push(x);
                 ext.eventEmitterGlobal.emit('log-info', `f5.cfgExplore, parsing file -> ${x}`);
@@ -121,25 +125,18 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                             // ts-todo: add key to telemetry
                             ext.telemetry.capture({ command: 'corkscrew-explosion', stats: exp.stats });
                             this.refresh();
-                        })
+                        });
                 })
                 .catch(err => logger.error('makeExplosion', err));
 
         });
     }
 
-    // addDiagnostics(): void {
+    topTalkersReport(): void {
 
-    //     this.explosion?.config?.apps?.map((app: TmosApp) => {
+        return this.bigipConfig?.xmlStats?.stats;
 
-    //         // get xc diags for app
-    //         const diags = ext.xcDiag.getDiagnostic(app.lines);
-    //         // const stats = ext.xcDiag.getDiagStats(diags);
-
-    //         app.diagnostics = diags;
-
-    //     });
-    // }
+    }
 
     buildReport(): CfgExploreReport {
 
@@ -154,6 +151,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             id: this.explosion!.id,
             dateTime: this.explosion!.dateTime,
             hostname: this.explosion!.hostname,
+            baseRegKey: this.explosion!.baseRegKey,
             inputFileType: this.explosion!.inputFileType,
             sourceFileCount: this.explosion!.config.sources.length,
             appCount: this.explosion!.config.apps?.length,
@@ -276,7 +274,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
 
     async refresh(): Promise<void> {
-        logger.info('refreshing diagnostic rules and cfgTree view')
+        logger.info('refreshing diagnostic rules and cfgTree view');
         ext.xcDiag.loadRules();
 
         //loop throught the apps and update diagnostics
@@ -285,7 +283,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             const diags = ext.xcDiag.getDiagnostic(app.lines);
             this.diags.push({ appName: app.name, diags });
 
-        })
+        });
 
 
         this._onDidChangeTreeData.fire(undefined);
@@ -354,6 +352,34 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                 }));
 
 
+                // selected reports header
+            } else if (element.contextValue === 'reportsHeader') {
+                // "f5.cfgExplore-report"
+                treeItems.push(new CfgApp('Apps Abstraction Report', '', '', 'AppsAbstractionReport', '', TreeItemCollapsibleState.None,
+                    {
+                        command: 'f5.cfgExplore-report', title: '---newCmd', arguments: [{
+                            label: 'Apps Abstraction Report',
+                            description: 'TMOS Application Abstraction Report'
+                        }]
+                    }));
+
+
+                if (this.bigipConfig?.xmlStats?.stats) {
+
+                    treeItems.push(new CfgApp('Top Talkers Report', '', '', 'TopTalkersReport', '', TreeItemCollapsibleState.None,
+                        {
+                            command: 'f5.cfgExplore-reportTop', title: '---newCmd', arguments: [{
+                                label: 'Top Talkers Report',
+                                description: 'TMOS Application/GSLB Top Talkers report'
+                            }]
+                        }));
+
+
+                }
+
+
+
+
                 // selected app partition
             } else if (element.contextValue === 'cfgPartition' && this.explosion.config.apps) {
 
@@ -376,8 +402,8 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
                         const diagStatsYml = jsYaml.dump(stats, { indent: 4 });
                         diagStatsYmlToolTip = new MarkdownString().appendCodeblock(diagStatsYml, 'yaml');
                         icon = stats?.Error ? this.redDot
-                                : stats?.Warning ? this.orangeDot
-                                    : stats?.Information ? this.yellowDot : this.greenDot;
+                            : stats?.Warning ? this.orangeDot
+                                : stats?.Information ? this.yellowDot : this.greenDot;
                     }
 
                     // build/return the tree item
@@ -434,8 +460,22 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             const desc = `${this.explosion.inputFileType} - ${this.explosion.stats.sourceTmosVersion}`;
             const expStatsYml = jsYaml.dump(this.explosion.stats, { indent: 4 });
             const expStatsYmlToolTip = new MarkdownString().appendCodeblock(expStatsYml, 'yaml');
-            this.viewElement = new CfgApp(title, expStatsYmlToolTip, desc, 'cfgHeader', '', TreeItemCollapsibleState.None);
+            this.viewElement = new CfgApp(title, expStatsYmlToolTip, desc, 'cfgHeader', this.f5Logo, TreeItemCollapsibleState.None);
             treeItems.push(this.viewElement);
+
+
+            treeItems.push(new CfgApp(
+                'Reports',
+                '',
+                '',
+                'reportsHeader', new ThemeIcon('report'),
+                TreeItemCollapsibleState.Collapsed, {
+                command: '',
+                title: '',
+                arguments: []
+            }
+            ));
+
 
             // tmos to xc diangostics header/switch
             const diagStatus = this.xcDiag ? "Enabled" : "Disabled";
@@ -463,7 +503,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
                 const diagStatsYml = jsYaml.dump(stats, { indent: 4 });
                 tooltip = new MarkdownString('Enable/Disable Diagnostics\n---\nLooking to expand ruleset to include tmos/nginx migrations')
-                .appendCodeblock(diagStatsYml, 'yaml');
+                    .appendCodeblock(diagStatsYml, 'yaml');
             }
 
             treeItems.push(new CfgApp(
@@ -554,33 +594,45 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
             }
 
             if (this.bigipConfig?.configObject) {
-                treeItems.push(new CfgApp('Config Object', '', '', '', '', TreeItemCollapsibleState.None,
-                    { command: 'f5.cfgExplore-show', title: '', arguments: [this.bigipConfig.configObject] }));
+
+                treeItems.push(new CfgApp('Config Object', 'TMOS Config as a JSON tree\n + License details', '', '', '', TreeItemCollapsibleState.None,
+                    {
+                        command: 'f5.cfgExplore-show', title: '', arguments: [{
+                            configObject: this.bigipConfig.configObject,
+                            license: this.bigipConfig.license
+                        }]
+                    }));
             }
 
-            if (this.bigipConfig?.deviceXmlStats?.['mcp_module.xml']?.Qkproc) {
+            if (this.bigipConfig?.xmlStats?.xmlStats) {
 
-                const statObj: {
-                    [key: string]: unknown
-                } = {};
-
-                const mcpTree = this.bigipConfig?.deviceXmlStats?.['mcp_module.xml'].Qkproc;
-
-                Object.entries(mcpTree).filter(([key, value]) => {
-                    // if (['admin_ip', 'system_information', 'cert_status_object', 'system_module', 'tmm_stat', 'traffic_group',
-                    //     'virtual_address', 'virtual_address_stat', 'virtual_server', 'virtual_server_stat',
-                    //     'interface', 'interface_stat', 'pool', 'pool_member', 'pool_member_metadata', 'pool_member_stat', 'pool_stat',
-                    //     'profile_dns_stat', 'profile_http_stat', 'profile_tcp_stat',
-                    //     'rule_stat'].includes(key)) {
-                    //     statObj[key] = value;
-                    // }
-                    if (['virtual_server', 'virtual_server_stat', 'rule_stat'].includes(key)) {
-                        statObj[key] = value;
-                    }
-                });
-                treeItems.push(new CfgApp('Stats Object', '', '', '', '', TreeItemCollapsibleState.None,
-                    { command: 'f5.cfgExplore-show', title: '', arguments: [statObj] }));
+                treeItems.push(new CfgApp('Xml Stats Object', 'XML files/stats as a JSON tree', '', '', '', TreeItemCollapsibleState.None,
+                    {command: 'f5.cfgExplore-show', title: '', arguments: [this.bigipConfig?.xmlStats?.xmlStats]}));
             }
+
+            // if (this.bigipConfig?.deviceXmlStats?.['mcp_module.xml']?.Qkproc) {
+
+            //     const statObj: {
+            //         [key: string]: unknown
+            //     } = {};
+
+            //     const mcpTree = this.bigipConfig?.deviceXmlStats?.['mcp_module.xml'].Qkproc;
+
+            //     Object.entries(mcpTree).filter(([key, value]) => {
+            //         // if (['admin_ip', 'system_information', 'cert_status_object', 'system_module', 'tmm_stat', 'traffic_group',
+            //         //     'virtual_address', 'virtual_address_stat', 'virtual_server', 'virtual_server_stat',
+            //         //     'interface', 'interface_stat', 'pool', 'pool_member', 'pool_member_metadata', 'pool_member_stat', 'pool_stat',
+            //         //     'profile_dns_stat', 'profile_http_stat', 'profile_tcp_stat',
+            //         //     'rule_stat'].includes(key)) {
+            //         //     statObj[key] = value;
+            //         // }
+            //         if (['virtual_server', 'virtual_server_stat', 'rule_stat'].includes(key)) {
+            //             statObj[key] = value;
+            //         }
+            //     });
+            //     treeItems.push(new CfgApp('Stats Object', '', '', '', '', TreeItemCollapsibleState.None,
+            //         { command: 'f5.cfgExplore-show', title: '', arguments: [statObj] }));
+            // }
 
             if (this.bigipConfig?.defaultProfileBase) {
                 treeItems.push(new CfgApp('Default Profile Base', '', '', '', '', TreeItemCollapsibleState.None,
@@ -589,7 +641,7 @@ export class CfgProvider implements TreeDataProvider<CfgApp> {
 
             if (this.bigipConfig?.license) {
                 treeItems.push(new CfgApp('License', '', '', '', '', TreeItemCollapsibleState.None,
-                    { command: 'f5.cfgExplore-show', title: '', arguments: [this.bigipConfig.license.content] }));
+                    { command: 'f5.cfgExplore-show', title: '', arguments: [this.bigipConfig.license?.content] }));
             }
 
         }
