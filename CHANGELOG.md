@@ -24,6 +24,25 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.14.0] - (07-19-2023)
+
+### Added
+
+- corkscrew v1.3.0
+  - xml parsing and stats/rank output
+  - fixing of minor bugs/deps update
+
+### Changed
+
+- corkscrew updates to disply new reports in Config Explorer
+
+### Fixed
+
+- [BUG] Error running command f5.addHost: command 'f5.addHost' not found. #206 (continued...)
+  - continue to remove next features
+
+---
+
 ## [3.13.2] - (07-08-2023)
 
 ### Fixed
