@@ -157,7 +157,7 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 	 * Get all iCall scripts to hold in "this" view class
 	 */
 	private async getIcallscripts() {
-	this._iCallScripts = []
+	this._iCallScripts = [];
 		await ext.f5Client?.https(`/mgmt/tm/sys/icall/script`)
 		.then( resp => this._iCallScripts = resp.data.items );
 	}
@@ -166,7 +166,7 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 	 * Get all TMSH scripts to hold in "this" view class
 	 */
 	 private async getTMSHscripts() {
-		this._TMSHScripts = []
+		this._TMSHScripts = [];
 			await ext.f5Client?.https(`/mgmt/tm/cli/script`)
 			.then( resp => this._TMSHScripts = resp.data.items );
 		}
@@ -355,18 +355,6 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 			// got a response, removing necessary fields for re-import
 			text = getTMPL.data.commandResult;
 
-			/**
-			 * The section below removes the necessary iapp fields to allow for import
-			 * 	** this option was hidden in favor of the next option (comment out)
-			 */
-			// text = text.replace(/partition\s(.*?)\s/, '');
-			// text = text.replace(/signing-key\s(.*?)\s/, '');
-			// text = text.replace(/tmpl-checksum\s(.*?)\s/, '');
-			// text = text.replace(/tmpl-signature\s(.*?)\s/, '');
-			// text = text.replace(/total-signing-status\s(.*?)\s/, '');
-			// // fix extra whitespace at end
-			// text = text.replace(/\s+}/, '}');
-			
 			/**
 			 * Comment out meta-data to allow for re/import
 			 */

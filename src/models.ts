@@ -15,6 +15,7 @@ export type CfgExploreReport = {
     id: string;
     dateTime: Date;
     hostname?: string;
+    baseRegKey?: string;
     inputFileType: string;
     sourceFileCount?: number;
     appCount?: number;

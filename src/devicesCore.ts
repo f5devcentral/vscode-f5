@@ -181,8 +181,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                 bigipProvider.refresh();
 
                 ext.as3Tree.refresh();
-                // nextApiProvider.refresh();
-                // commands.executeCommand('f5.refreshNextApiTree');
+
             })
             .catch(err => {
                 logger.error('Connect/Discover failed', err);
