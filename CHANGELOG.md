@@ -36,6 +36,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - fixed bug with corkscrew erroring on ucs (was expecting qkview stats)
 - [BUG] no feedback when importing single object in device import #202
 - [BUG] password focus away issues #228
+- v.3.14 keytar.node is not a valid Win32 application #232
+- Unable to add BIG-IP after upgrade to VSCode 1.83 #230
+- September 2023 (version 1.83) fails to load extension #229
+- [BUG] Error running command f5.addHost: command 'f5.addHost' not found. #206
 
 ### Changed
 
