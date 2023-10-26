@@ -24,6 +24,30 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.15.0] - (08-18-2023)
+
+### Added
+
+- added/updated several diagnostic rules
+
+### Fixed
+
+- fixed iapp template bug that was commenting out template params
+- fixed bug with corkscrew erroring on ucs (was expecting qkview stats)
+- [BUG] no feedback when importing single object in device import #202
+- [BUG] password focus away issues #228
+- v.3.14 keytar.node is not a valid Win32 application #232
+- Unable to add BIG-IP after upgrade to VSCode 1.83 #230
+- September 2023 (version 1.83) fails to load extension #229
+- [BUG] Error running command f5.addHost: command 'f5.addHost' not found. #206
+
+### Changed
+
+- Continue to remove old/unused items
+  - removed api/swagger parsers/validators
+
+---
+
 ## [3.14.0] - (07-19-2023)
 
 ### Added

@@ -87,7 +87,8 @@ export async function getPassword(device: string): Promise<any> {
 
     // logger.debug(`getPassword Device: ${device}`);
     
-    let password = await ext.keyTar.getPassword('f5Hosts', device).then( passwd => passwd );
+    // let password = await ext.keyTar.getPassword('f5Hosts', device).then( passwd => passwd );
+    let password = await ext.context.secrets.get(device);
     
     // logger.debug(`IS PASSWORD IN KEYTAR?: ${password}`);
     if (!password) {

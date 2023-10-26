@@ -41,7 +41,17 @@ admin@1.1.1.1
 ]
 ```
 
-### json object import structure
+### single json object import structure
+
+```json
+{
+    "device": "dude@2.1.3.4",
+    "password": "coolness",
+    "provider": "tmos"
+}
+```
+
+### json object list import structure
 
 ```json
 [

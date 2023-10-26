@@ -358,12 +358,12 @@ export class TclTreeProvider implements TreeDataProvider<TCLitem> {
 			/**
 			 * Comment out meta-data to allow for re/import
 			 */
-			text = text.replace(/(partition\s.*?\s)/, '#$1');
-			text = text.replace(/(signing-key\s.+?\s)/, '#$1');
-			text = text.replace(/(tmpl-checksum\s.+?\s)/, '#$1');
-			text = text.replace(/(tmpl-signature\s.+?\s)/, '#$1');
-			text = text.replace(/(total-signing-status\s.+?\s)/, '#$1');
-			text = text.replace(/(verification-status\s.+?\s)/, '#$1');
+			text = text.replace(/    (partition .*?)\n/, '');
+			text = text.replace(/    (signing-key\s.+?\s)\n/, '#$1');
+			text = text.replace(/    (tmpl-checksum\s.+?\s)\n/, '#$1');
+			text = text.replace(/    (tmpl-signature\s.+?\s)\n/, '#$1');
+			text = text.replace(/    (total-signing-status\s.+?\s)\n/, '#$1');
+			text = text.replace(/    (verification-status\s.+?\s)\n/, '#$1');
 
 			return text;
 		};

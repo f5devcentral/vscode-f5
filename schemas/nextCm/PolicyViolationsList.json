@@ -1,9 +1,0 @@
-{
-    "properties": {
-        "violations": {
-            "items": null,
-            "type": "array"
-        }
-    },
-    "type": "object"
-}

@@ -318,22 +318,24 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 			// passed in from view click or deviceClient
 			logger.debug('CLEARING KEYTAR PASSWORD CACHE for', device);
-			return await ext.keyTar.deletePassword('f5Hosts', device);
+			// return await ext.keyTar.deletePassword('f5Hosts', device);
+			return await ext.context.secrets.delete(device);
 
 		} else {
 
 			// delete all passwords
 			// get list of items in keytar for the 'f5Hosts' service
-			logger.debug('CLEARING KEYTAR PASSWORD CACHE');
-			await ext.keyTar.findCredentials('f5Hosts').then(list => {
+			logger.debug('CLEARING KEYTAR PASSWORD CACHE - no longer a thing - look into keytar migration issues');
+			// logger.debug('CLEARING KEYTAR PASSWORD CACHE');
+			// await ext.keyTar.findCredentials('f5Hosts').then(list => {
 
-				// map out just the account names
-				const devices = list.map(item => item.account);
-				// log the accounts pending password removal
-				logger.info('removing cached password for following devices;', devices);
-				// map through and delete all
-				devices.map(device => ext.keyTar.deletePassword('f5Hosts', device));
-			});
+			// 	// map out just the account names
+			// 	const devices = list.map(item => item.account);
+			// 	// log the accounts pending password removal
+			// 	logger.info('removing cached password for following devices;', devices);
+			// 	// map through and delete all
+			// 	devices.map(device => ext.keyTar.deletePassword('f5Hosts', device));
+			// });
 			/**
 			 * future: setup clear all to return an array of touples to show which
 			 *  device passwords got cleared

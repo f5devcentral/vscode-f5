@@ -1,9 +1,0 @@
-{
-    "properties": {
-        "http_rfc_violations": {
-            "items": null,
-            "type": "array"
-        }
-    },
-    "type": "object"
-}
