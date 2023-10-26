@@ -118,7 +118,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
                 return { label: item.device, target: item };
             });
 
-            device = await window.showQuickPick(qPickHostList, { placeHolder: 'Select Device' });
+            device = await window.showQuickPick(qPickHostList, { placeHolder: 'Select Device', ignoreFocusOut: true });
             if (!device) {
                 throw new Error('user exited device input');
             } else {
@@ -154,38 +154,45 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
             ext.teemAgent
         );
 
-        await ext.f5Client.connect()
-            .then(connect => {
+        if(device && user && host && password) {
 
-                // cache password in keytar
-                ext.keyTar.setPassword('f5Hosts', device.device, password);
-
-                logger.info('F5 Connect Discovered', connect);
-
-
-                // ts-todo: add details about platformMarketinName/VE/m
-                ext.telemetry.capture({
-                    command: "f5.connectDevice",
-                    connect: {
-                        product: connect.product,
-                        version: connect.version,
-                        atc: connect.atc,
-                        baseRegKey: ext.f5Client?.host?.license?.registrationKey
-                    }
+            await ext.f5Client.connect()
+                .then(connect => {
+    
+                    // cache password in secrete store
+                    // ext.keyTar.setPassword('f5Hosts', device.device, password);
+                    ext.context.secrets.store(device.device, password);
+    
+                    logger.info('F5 Connect Discovered', connect);
+    
+    
+                    // ts-todo: add details about platformMarketinName/VE/m
+                    ext.telemetry.capture({
+                        command: "f5.connectDevice",
+                        connect: {
+                            product: connect.product,
+                            version: connect.version,
+                            atc: connect.atc,
+                            baseRegKey: ext.f5Client?.host?.license?.registrationKey
+                        }
+                    });
+    
+                    ext.hostsTreeProvider.connectedDevice = ext.f5Client;
+                    ext.hostsTreeProvider.refresh();
+    
+                    bigipProvider.connected = ext.f5Client;
+                    bigipProvider.refresh();
+    
+                    ext.as3Tree.refresh();
+    
+                })
+                .catch(err => {
+                    logger.error('Connect/Discover failed', err);
                 });
-
-                ext.hostsTreeProvider.connectedDevice = ext.f5Client;
-                ext.hostsTreeProvider.refresh();
-
-                bigipProvider.connected = ext.f5Client;
-                bigipProvider.refresh();
-
-                ext.as3Tree.refresh();
-
-            })
-            .catch(err => {
-                logger.error('Connect/Discover failed', err);
-            });
+        } else {
+            // log details that are missing
+            logger.error('Missing details for connect/discover', device, user, host, password);
+        }
 
         // finish debounce logic
         wait(1000);

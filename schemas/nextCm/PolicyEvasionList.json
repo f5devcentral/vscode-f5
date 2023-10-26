@@ -1,9 +1,0 @@
-{
-    "properties": {
-        "evasion_violations": {
-            "items": null,
-            "type": "array"
-        }
-    },
-    "type": "object"
-}

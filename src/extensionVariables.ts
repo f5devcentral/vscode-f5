@@ -26,7 +26,6 @@ import {
     commands,
     window
 } from "vscode";
-import * as keyTarType from "keytar";
 import { logger } from "./logger";
 import { TextDocumentView } from './editorViews/editorView';
 import { EventEmitter } from "events";
@@ -39,7 +38,6 @@ import { Telemetry } from './telemetry';
 import { XcDiag } from './tmosXcDiag';
 import { CfgProvider } from './treeViewsProviders/cfgTreeProvider';
 
-type KeyTar = typeof keyTarType;
 
 /**
  * Namespace for common variables used throughout the extension. 
@@ -49,7 +47,6 @@ export namespace ext {
     export let context: ExtensionContext;
     export let f5Client: F5Client | undefined;
     export let extHttp: ExtHttp;
-    export let keyTar: KeyTar;
     export let hostsTreeProvider: F5TreeProvider;
     export let telemetry: Telemetry;
     export let as3Tree: AS3TreeProvider;

@@ -100,9 +100,9 @@
     {
         "code": "d633",
         "severity": "Error",
-        "title": "iRule stream profile detected",
-        "message": "F5 TMOS stream profile functionality not supported",
-        "regex": "stream::"
+        "title": "XC - iRule stream profile detected",
+        "message": "F5 TMOS stream profile functionality not supported  --- https://my.f5.com/manage/s/article/K39394712",
+        "regex": "STREAM::(enable|disable|expression)"
     },
     {
         "code": "05ab",
@@ -134,31 +134,31 @@
     },
     {
         "code": "659b",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "iRule contains subtables",
+        "message": "iRule subtables are not supported in XC",
+        "regex": " -subtable "
     },
     {
         "code": "b432",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Warning",
+        "title": "XC - iRule HTTP response",
+        "message": "custome HTTP response not supported in XC",
+        "regex": "HTTP::respond"
     },
     {
         "code": "c5dc",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "XC - iRule TCP collect/payload/release",
+        "message": "tcp payload manipulation not supported in XC",
+        "regex": "TCP::(collect|payload|release)"
     },
     {
         "code": "86d2",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "XC - iRule binary scan",
+        "message": "binary data scan not supported in XC",
+        "regex": "binary scan "
     },
     {
         "code": "f4a6",

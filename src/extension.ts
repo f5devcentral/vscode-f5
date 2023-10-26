@@ -16,7 +16,6 @@ import {
 import jsYaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as keyTarType from 'keytar';
 import * as os from 'os';
 
 import { ExampleDecsProvider } from './treeViewsProviders/githubDecExamples';
@@ -104,7 +103,7 @@ export async function activate(context: ExtensionContext) {
 	ext.connectBar.show();
 
 	ext.panel = new TextDocumentView();
-	ext.keyTar = keyTarType;
+	// ext.keyTar = keyTarType;
 
 	tokenTimer();
 

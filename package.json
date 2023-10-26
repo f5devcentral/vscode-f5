@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.14.0",
+	"version": "3.15.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -53,9 +53,9 @@
 		"docs": "docsify serve docs"
 	},
 	"devDependencies": {
-		"@types/glob": "^7.1.3",
-		"@types/js-yaml": "^4.0.5",
-		"@types/mocha": "^7.0.1",
+		"@types/glob": "^8.1.0",
+		"@types/js-yaml": "^4.0.8",
+		"@types/mocha": "^10.0.3",
 		"@types/node": "^14.18.1",
 		"@types/vscode": "^1.63.0",
 		"@typescript-eslint/eslint-plugin": "^5.60.0",
@@ -63,20 +63,17 @@
 		"@vscode/test-electron": "^2.2.1",
 		"eslint": "^8.12.0",
 		"glob": "^7.1.6",
-		"mocha": "^9.2.2",
+		"mocha": "^10.2.0",
 		"nock": "^13.2.9",
 		"ts-node": "^10.9.1",
-		"typescript": "^4.8.4"
+		"typescript": "^5.2.2"
 	},
 	"dependencies": {
-		"@apidevtools/json-schema-ref-parser": "^9.1.0",
-		"@f5devcentral/f5-fast-core": "^0.19.1",
+		"@f5devcentral/f5-fast-core": "^0.23.0",
 		"ajv": "^8.11.2",
 		"f5-conx-core": "^0.17.2",
-		"f5-corkscrew": "^1.3.0",
-		"js-yaml": "^4.0.0",
-		"keytar": "^7.9.0",
-		"openapi-data-validator": "^2.0.44"
+		"f5-corkscrew": "^1.4.0",
+		"js-yaml": "^4.0.0"
 	},
 	"release": {
 		"branches": [
@@ -162,10 +159,6 @@
 			{
 				"fileMatch": "*.cf.json",
 				"url": "https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json"
-			},
-			{
-				"fileMatch": "*.nextcm.json",
-				"url": "./openapi_nextCm.json"
 			}
 		],
 		"viewsContainers": {

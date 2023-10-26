@@ -98,6 +98,7 @@ export async function deviceImport(seed: string) {
  *      - 'admin@1.1.1.1'
  *      - ['admin@1.1.1.1', 'usr1@2.2.2.2:8443', ...]
  *      - [{ device: 'admin@4.4.4.4', password: 'pizzaTower', provider: 'tmos' }, ...]
+ *      - { device: 'admin@4.4.4.4', password: 'pizzaTower', provider: 'tmos' }
  * 
  * had to wrap in a function to provde a standard typed output
  * 
@@ -109,6 +110,11 @@ export async function parseDeviceLoad (seed: string) {
     seed = seed.trim();
 
     const seedList = isValidJson(seed);
+
+    // if seedlist is a single object, convert to array
+    if (seedList && typeof seedList === 'object' && !Array.isArray(seedList)) {
+        return [seedList];
+    } else
 
     if (seedList) {
         return seedList.map( (el: string | CfgDevice) => {
@@ -179,22 +185,23 @@ async function addDevice (device: {device: string, provider?: string, password?:
 }
 
 async function importPassword (device: string, password: string) {
-    return await ext.keyTar.setPassword('f5Hosts', device, password);
+    // return await ext.keyTar.setPassword('f5Hosts', device, password);
+    return await ext.context.secrets.store(device, password);
 }
 
 
-/**
- * following is only used for troubleshooting...
- */
-async function outputKeytar () {
-    ext.keyTar.findCredentials('f5Hosts').then( list => {
-        // map through and delete all
-        list.map(item => {
-            const psswd = ext.keyTar.getPassword('f5Hosts', item.account);
-            console.log('***KEYTAR OUTPUT***', JSON.stringify(item));
-        });
-    });
-}
+// /**
+//  * following is only used for troubleshooting...
+//  */
+// async function outputKeytar () {
+//     ext.keyTar.findCredentials('f5Hosts').then( list => {
+//         // map through and delete all
+//         list.map(item => {
+//             const psswd = ext.keyTar.getPassword('f5Hosts', item.account);
+//             // console.log('***KEYTAR OUTPUT***', JSON.stringify(item));
+//         });
+//     });
+// }
 
 const exampleImport = {
     devices: [
