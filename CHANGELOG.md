@@ -24,6 +24,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.15.1] - (11-03-2023)
+
+### Fixed
+
+- fixed f5-corkscrew (v1.4.1) objCounter bug trying to count missing objects
+
 ## [3.15.0] - (08-18-2023)
 
 ### Added
