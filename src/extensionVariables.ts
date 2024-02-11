@@ -137,10 +137,13 @@ export async function initSettings(context: ExtensionContext) {
         logger.debug(`existing cache directory detected: ${ext.cacheDir}`);
     };
 
-    // get atc release information
-    await atcVersionClient.getAtcReleasesInfo()
+    // get atc release information -> this can happen async
+    atcVersionClient.getAtcReleasesInfo()
         .then(versions => {
             ext.atcVersions = versions;
+        })
+        .catch(err => {
+            logger.error('failed to get atc versions (vscode-f5)', err);
         });
 }
 
