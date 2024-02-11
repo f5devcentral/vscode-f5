@@ -143,7 +143,7 @@
         "code": "b432",
         "severity": "Warning",
         "title": "XC - iRule HTTP response",
-        "message": "custome HTTP response not supported in XC",
+        "message": "custom HTTP response not supported in XC",
         "regex": "HTTP::respond"
     },
     {

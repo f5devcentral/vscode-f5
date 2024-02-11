@@ -34,7 +34,7 @@ import { ext } from "./extensionVariables";
 import { BigipHost } from "./models";
 import { F5TreeProvider } from "./treeViewsProviders/hostsTreeProvider";
 import * as utils from './utils/utils';
-import { Asset, HttpResponse, isArray, wait } from 'f5-conx-core';
+import { Asset, AxiosResponseWithTimings, isArray, wait } from 'f5-conx-core';
 import * as rpmMgmt from './utils/rpmMgmt';
 import { BigipTreeProvider } from './treeViewsProviders/bigipTreeProvider';
 import { tokenTimer } from './tokenTimer';
@@ -438,7 +438,7 @@ export default function devicesCore(context: ExtensionContext, f5OutputChannel: 
         const upLoadResponses = [];
         let rpm: Asset;
         let signature;
-        let installed: HttpResponse;
+        let installed: AxiosResponseWithTimings;
 
         let prompt: boolean = true;
 
