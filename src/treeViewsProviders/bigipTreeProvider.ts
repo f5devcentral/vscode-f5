@@ -61,11 +61,11 @@ export class BigipTreeProvider implements TreeDataProvider<IpTreeItem> {
     constructor(context: ExtensionContext) {
         this.context = context;
         // this.connected = f5Client;
-        this.fast = ext.atcVersions.fast;
-        this.as3 = ext.atcVersions.as3;
-        this.do = ext.atcVersions.do;
-        this.ts = ext.atcVersions.ts;
-        this.cf = ext.atcVersions.cf;
+        this.fast = ext.atcVersions?.fast;
+        this.as3 = ext.atcVersions?.as3;
+        this.do = ext.atcVersions?.do;
+        this.ts = ext.atcVersions?.ts;
+        this.cf = ext.atcVersions?.cf;
     }
 
 

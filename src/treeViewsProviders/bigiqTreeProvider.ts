@@ -90,8 +90,8 @@ export class BigiqTreeProvider implements TreeDataProvider<IqTreeItem> {
 
     constructor(context: ExtensionContext) {
         this.context = context;
-        this.as3 = ext.atcVersions.as3;
-        this.do = ext.atcVersions.do;
+        this.as3 = ext.atcVersions?.as3;
+        this.do = ext.atcVersions?.do;
     }
 
 
