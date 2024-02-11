@@ -24,6 +24,28 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.16.0] - (02-11-2024)
+
+### Fixed
+
+- Typo in tmosXcRules.json #242
+- [BUG] Error running command f5.addHost on machine without internet access #239
+  - f5-conx-core v1.0.0 changes to make this happen
+
+### Changed
+
+- f5-conx-core v1.0.0
+  - updated atcVersionsClient to handle errors when internet connectivity is not availible
+    - Cleaned up cache location
+    - added lastUpdatedDate in addition to lastCheckDate
+  - Moved project to full 1.0.0 release.  It's been used as is long enough.  :)
+  - All dependencies fully updated
+  - Removed NYC from tests
+    - it was causing memory overrun errors
+  - Updates to http request/response TS models to accomodate newer versions
+
+---
+
 ## [3.15.1] - (11-03-2023)
 
 ### Added
