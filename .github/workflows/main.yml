@@ -32,7 +32,7 @@ jobs:
     permissions:
       contents: write
     environment: publishing
-    # needs: test
+    needs: test
     name: Package-Release-Publish
     steps:
 
