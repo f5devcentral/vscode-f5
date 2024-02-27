@@ -24,6 +24,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.16.1] - (02-27-2024)
+
+### Fixed
+
+- [BUG] Tenants with . in name do not show #246
+
+---
+
 ## [3.16.0] - (02-11-2024)
 
 ### Fixed
