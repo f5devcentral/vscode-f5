@@ -1,6 +1,6 @@
 # The F5 VSCode Extension
 
-Let the F5 VSCode Extension supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples and declaration schema validation, and also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
+Let the F5 VSCode Extension supercharge your abilities to write (A)utomated (T)ool(C)hain declarations with snippets, examples, and declaration schema validation, and also assist with connecting, deploying, retrieving and updating declarations on F5 devices.
 
 It can also help with iRules/iApps, BIG-IQ, and regular configuration/migration.
 
@@ -11,9 +11,9 @@ It can also help with iRules/iApps, BIG-IQ, and regular configuration/migration.
 - Convert JSON <-> YAML
 - Hovers to view decoded information for (certificates/base64)
 - Extract TMOS applications (per virtual server)
-- Write, deploy and modify iRules/iApps (with vscode-irule extension for language support)
+- Write, deploy, and modify iRules/iApps (with vscode-irule extension for language support)
 
-!> Any comments, questions or feature requests, please open an issue!
+> Any comments, questions, or feature requests, please open an issue!
 
 ## Documentation site
 
@@ -59,15 +59,15 @@ Select `Add Host` in the `F5: Hosts` view.  Then type in device details in the \
 
 Click on the hostname of the connected device at the bottom of the window.
 
-> This is the easiest way to get an editor window for JSON files and it also demontrates how to get device details
+> This is the easiest way to get an editor window for JSON files and it also demonstrates how to get device details
 
-Now that we have a json editor, select all text (`control + a`), then `delete`.
+Now that we have a JSON editor, select all text (`ctrl + a`), then `delete`.
 
-Type `as3` to get the example AS3 snippet, press `Enter`.
+Type `as3` to get the example AS3 snippet, and press `Enter`.
 
 This should insert a sample AS3 declaration into the editor
 
-> Note the declaration schema reference at the top.  This provides instant feedback and validation for any necssary modifications.  Please see [Schema Validation](schema_validation.md) for more details
+> Note the declaration schema reference at the top.  This provides instant feedback and validation for any necessary modifications.  Please see [Schema Validation](schema_validation.md) for more details
 
 Right-click in the editor and select `POST as AS3 Declaration`.  This should post the declaration to the currently connected device
 
@@ -87,7 +87,7 @@ Right-click on the tenant in the AS3 view on the left, then select `Delete Tenan
 
 HTTP/422 responses - Can happen for a handful of reasons:
 
-- Getting DO declaration when device has settings DO can configure but device was not deployed with DO (it can't manage the settings that are already there)
+- Getting DO declaration when the device has settings DO can configure but the device was not deployed with DO (it can't manage the settings that are already there)
 - Improperly formatted/wrong declaration
   - Sometimes this is from the '$schema' reference in the declaration
 - Sometimes you can fix a DO HTTP/400 response by overwriting with a clean/updated declaration
@@ -95,7 +95,7 @@ HTTP/422 responses - Can happen for a handful of reasons:
 
 ### HTTP Auth Failures
 
-When utilizing an external auth provider, occasionally restjavad/restnoded can have some issues, resulting in some occansional HTTP/400 auth errors:
+When utilizing an external auth provider, occasionally restjavad/restnoded can have some issues, resulting in some occasional HTTP/400 auth errors:
 
 The fix is to restart: restjavad and restnoded
 
@@ -125,29 +125,29 @@ Error from restjavad log
 
 ---
 
-## Client side extension debugging
+## Client-side extension debugging
 
 ### Developer Debugger
 
-VScode has a built in debugger very much like Chrome.  This can be used to gain insight to what is happening when things don't respond as expected.
+VScode has a built-in debugger very much like Chrome.  This can be used to gain insight into what is happening when things don't respond as expected.
 
 If you are having issues, it may be best to start here and capture the output as described below:
 
-- In the main VSCode window, along the top, select **Help**, then **Toggle Developer Tools**, select the **Console** tab.
+- In the main VSCode window, along the top, select **Help**, then **Toggle Developer Tools**, and select the **Console** tab.
   - Then, explore the requests and responses to see if there are any areas of concern
-    - Expand some of the objects by clicking the little triangle next to the obejct under a request or response to inspect
+    - Expand some of the objects by clicking the little triangle next to the object under a request or response to inspect
 
 If needed, **right-click** on an entry, then select **save-as** to save the log including expanded objects to a file.  This can be used for troubleshooting
 
 <!-- ![vscode debugging console](./README_docs/images/vscodeDebugConsole_5.20.2020.PNG) -->
 <img src="./README_docs/images/vscodeDebugConsole_5.20.2020.PNG" alt="drawing" width="80%"/>
 
-This mainly catches logs send through the console.log(''), which should typically be for development.
+This mainly catches logs sent through the console.log(''), which should typically be for development.
 
 
 ## installing vsix
 
-The recommended way to get this extension is to install from the Microsoft VScode extension marketplace or from within VSCode directly, under the extensions activity bar view on the left.
+The recommended way to get this extension is to install it from the Microsoft VScode extension marketplace or from within VSCode directly, under the extensions activity bar view on the left.
 
 If you still need to install from vsix, they can be downloaded under the 'release' tab above: <https://github.com/f5devcentral/vscode-f5/releases>
 
@@ -170,8 +170,8 @@ Different ways to install vsix:
 
 - Start Debugging environment: Keystroke `F5`
 - Navigate to view container by clicking on the f5 icon in the Activity bar (typically on the left)
-- Update device list in tree view on the left with a device in your environment
+- Update the device list in tree view on the left with a device in your environment
   - ***ADD*** in the ***F5 Hosts*** view
   - or `click` the pencil icon on an item and modify the item
-- Connect to device
-  - (`click` device in host tree or `Cntrl+shift+P` or `F1`)
+- Connect to the device
+  - (`click` device in host tree or `ctrl + shift + P` or `F1`)
