@@ -162,10 +162,10 @@
     },
     {
         "code": "f4a6",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Information",
+        "title": "XC - ICMP Monitors not supported",
+        "message": "ICMP Monitors not supported. Consider switching to HTTP or TCP monitor.",
+        "regex": "monitor.*icmp"
     },
     {
         "code": "016c",
