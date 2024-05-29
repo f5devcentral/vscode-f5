@@ -176,10 +176,10 @@
     },
     {
         "code": "7efa",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "VDI Profiles are not supported",
+        "message": "VDI Profiles are not supported. Chaining XC to BIG-IP may work for HTML5 based VDI.",
+        "regex": "/Common/vdi"
     },
     {
         "code": "fcd6",
