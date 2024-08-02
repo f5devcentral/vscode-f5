@@ -141,15 +141,15 @@
 		"jsonValidation": [
 			{
 				"fileMatch": "*.as3.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json"
 			},
 			{
 				"fileMatch": "*.device.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/main/src/schema/latest/base.schema.json"
 			},
 			{
 				"fileMatch": "*.do.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/remote.schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/main/src/schema/latest/remote.schema.json"
 			},
 			{
 				"fileMatch": "*.ts.json",
