@@ -89,13 +89,13 @@ https://code.visualstudio.com/docs/editor/userdefinedsnippets
 <p>&nbsp;</p>
 
 ### Latest AS3 Schema
-https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json
+https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json
 
 ### Latest DO Schema
-https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json
+https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/HEAD/src/schema/latest/base.schema.json
 
 ### Latest TS Schema
-https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json
+https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/HEAD/src/schema/latest/base_schema.json
 
 <p>&nbsp;</p>
 
@@ -117,9 +117,9 @@ In the vscode settings for that extension:
 
 ```json
     "yaml.schemas": {
-        "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json": ["*.as3.yml"],
-        "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json": ["*.do.yml"],
-        "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json": ["*.ts.*"],
+        "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json": ["*.as3.yml"],
+        "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/HEAD/src/schema/latest/base.schema.json": ["*.do.yml"],
+        "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/HEAD/src/schema/latest/base_schema.json": ["*.ts.*"],
     }
 ```
 <p>&nbsp;</p>

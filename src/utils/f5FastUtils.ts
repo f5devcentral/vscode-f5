@@ -189,7 +189,7 @@ export async function zipPostTempSet (folder: string) {
     });
 }
 
-// https://github.com/zinkem/fast-docker/blob/master/templates/index.yaml
+// https://github.com/zinkem/fast-docker/blob/HEAD/templates/index.yaml
 
 /**
  * Second try - WORKING!!!!

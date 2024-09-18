@@ -21,6 +21,7 @@ export class FastWebView {
 
     public constructor() {
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
+        // this.fastEngine = new fast.FsTemplateProvider(localPath);
     }
 
     public get onDidCloseAllWebviewPanels(): Event<void> {
@@ -36,7 +37,7 @@ export class FastWebView {
         commands.executeCommand('setContext', this.previewActiveContextKey, value);
     }
 
-    protected displayRenderedTemplate (tempParams: string) {
+    protected displayRenderedTemplate(tempParams: string) {
         /**
          * take params from panel submit button
          * process through fast with template
@@ -50,6 +51,9 @@ export class FastWebView {
 
     protected async renderHTML(fastYml: string) {
 
+        // invalidate the cache to load any template changes
+        // this.fastEngine.invalidateCache();
+
         /**
          * add checking for YAML format since we only want to support yaml
          * 
@@ -60,6 +64,8 @@ export class FastWebView {
             logger.error(e);
             window.showErrorMessage(e.message);
         }
+
+        // this.fastEngine.invalidateCache();
         const schema = this.fastEngine.getParametersSchema();
         const defaultParams = this.fastEngine.getCombinedParameters();
         const htmlData = fast.guiUtils.generateHtmlPreview(schema, defaultParams);
@@ -70,12 +76,16 @@ export class FastWebView {
 
         // put the incoming fast template somewhere
         this.fastTemplateYml = fastYml;
+
+        // // invalidate the cache to load any template changes
+        // this.fastEngine.invalidateCache();
+
         // create 
         let html = await this.renderHTML(fastYml);
 
         let title = 'test-title';
 
-        const newEditorColumn = ext.settings.previewColumn; 
+        const newEditorColumn = ext.settings.previewColumn;
         const preserveEditorFocus = ext.settings.preserveEditorFocus;
         const newEditorTabForAll = ext.settings.newEditorTabForAll;
         let viewColumn: ViewColumn | undefined;
@@ -116,7 +126,7 @@ export class FastWebView {
                 this.activePanel = webviewPanel.active ? webviewPanel : undefined;
             });
 
-            panel.webview.onDidReceiveMessage( async message => {
+            panel.webview.onDidReceiveMessage(async message => {
                 // console.log( message );
 
                 try {
@@ -126,9 +136,9 @@ export class FastWebView {
                     logger.error(e);
                     // window.showErrorMessage(e.message);
                 }
-    
+
             });
-            
+
             this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];

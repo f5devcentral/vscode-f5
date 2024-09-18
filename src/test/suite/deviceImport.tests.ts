@@ -3,7 +3,7 @@ import fs = require('fs');
 import path = require('path');
 
 // import * as vscode from 'vscode';
-import { deviceImport } from '../../deviceImport';
+import { deviceImport, exampleImport } from '../../deviceImport';
 
 
 suite('device import tests', () => {
