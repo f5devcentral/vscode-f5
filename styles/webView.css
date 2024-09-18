@@ -218,7 +218,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Copy from https://github.com/Microsoft/vscode-docs/blob/master/release-notes/css/inproduct_releasenotes.css */
+/* Copy from https://github.com/Microsoft/vscode-docs/blob/HEAD/release-notes/css/inproduct_releasenotes.css */
 #scroll-to-top {
   position: fixed;
   width: 40px;

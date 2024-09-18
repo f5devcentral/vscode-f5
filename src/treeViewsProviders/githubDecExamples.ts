@@ -215,7 +215,7 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 					{
 						command: 'vscode.open',
 						title: '',
-						arguments: [Uri.parse('https://github.com/F5Networks/f5-declarative-onboarding/tree/master/examples')]
+						arguments: [Uri.parse('https://github.com/F5Networks/f5-declarative-onboarding/tree/HEAD/examples')]
 					}
 				)
 			);
@@ -229,7 +229,7 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 					{
 						command: 'vscode.open',
 						title: '',
-						arguments: [Uri.parse('https://github.com/F5Networks/f5-telemetry-streaming/tree/master/examples')]
+						arguments: [Uri.parse('https://github.com/F5Networks/f5-telemetry-streaming/tree/HEAD/examples')]
 					}
 				)
 			);
@@ -243,7 +243,7 @@ export class ExampleDecsProvider implements TreeDataProvider<ExampleDec> {
 					{
 						command: 'vscode.open',
 						title: '',
-						arguments: [Uri.parse('https://github.com/F5Networks/f5-cloud-failover-extension/tree/master/examples')]
+						arguments: [Uri.parse('https://github.com/F5Networks/f5-cloud-failover-extension/tree/HEAD/examples')]
 					}
 				)
 			);

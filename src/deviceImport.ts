@@ -83,8 +83,9 @@ export async function deviceImport(seed: string) {
     // converts the different input structurs to a standard object list
     const seedList2 = await parseDeviceLoad(seed);
 
-    await seedList2.forEach((el: CfgDevice) => {
-         addDevice(el);
+    // todo/bug: Import Devices only takes one device at a time #248
+    await seedList2.forEach(async (el: CfgDevice) => {
+         await addDevice(el);
     });
 
     // outputKeytar();
@@ -203,7 +204,7 @@ async function importPassword (device: string, password: string) {
 //     });
 // }
 
-const exampleImport = {
+export const exampleImport = {
     devices: [
         {
             device: 'admin@192.168.1.1:8443'

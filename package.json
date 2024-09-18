@@ -3,7 +3,7 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.16.1",
+	"version": "3.17.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
@@ -32,7 +32,7 @@
 		"color": "#DCDCDC",
 		"theme": "light"
 	},
-	"homepage": "https://github.com/f5devcentral/vscode-f5/blob/master/README.md",
+	"homepage": "https://github.com/f5devcentral/vscode-f5/blob/HEAD/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/f5devcentral/vscode-f5.git"
@@ -135,29 +135,29 @@
 		"yamlValidation": [
 			{
 				"fileMatch": "*.fast.yml",
-				"url": "https://raw.githubusercontent.com/f5devcentral/f5-fast-core/master/schema/template.json"
+				"url": "https://raw.githubusercontent.com/f5devcentral/f5-fast-core/HEAD/schema/template.json"
 			}
 		],
 		"jsonValidation": [
 			{
 				"fileMatch": "*.as3.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/HEAD/schema/latest/as3-schema.json"
 			},
 			{
 				"fileMatch": "*.device.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/HEAD/src/schema/latest/base.schema.json"
 			},
 			{
 				"fileMatch": "*.do.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/remote.schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/HEAD/src/schema/latest/remote.schema.json"
 			},
 			{
 				"fileMatch": "*.ts.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/HEAD/src/schema/latest/base_schema.json"
 			},
 			{
 				"fileMatch": "*.cf.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/HEAD/src/nodejs/schema/base_schema.json"
 			}
 		],
 		"viewsContainers": {

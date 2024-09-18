@@ -1,0 +1,3497 @@
+{
+    "as3": {
+        "releases": [
+            {
+                "version": "v3.52.0",
+                "id": 166892444,
+                "assets": [
+                    {
+                        "name": "as3-3.52.0-5.examples.collection.json",
+                        "id": 181547408,
+                        "size": 798058,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.52.0/as3-3.52.0-5.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.52.0-5.examples.collection.json.sha256",
+                        "id": 181547410,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.52.0/as3-3.52.0-5.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.52.0-5.noarch.rpm",
+                        "id": 181547411,
+                        "size": 26045535,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.52.0/f5-appsvcs-3.52.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.52.0-5.noarch.rpm.sha256",
+                        "id": 181547409,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.52.0/f5-appsvcs-3.52.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.51.0",
+                "id": 158734525,
+                "assets": [
+                    {
+                        "name": "as3-3.51.0-5.examples.collection.json",
+                        "id": 171785031,
+                        "size": 768207,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.51.0/as3-3.51.0-5.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.51.0-5.examples.collection.json.sha256",
+                        "id": 171785029,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.51.0/as3-3.51.0-5.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.51.0-5.noarch.rpm",
+                        "id": 171785030,
+                        "size": 27938444,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.51.0/f5-appsvcs-3.51.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.51.0-5.noarch.rpm.sha256",
+                        "id": 171785028,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.51.0/f5-appsvcs-3.51.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.50.2",
+                "id": 150255388,
+                "assets": [
+                    {
+                        "name": "as3-3.50.2-3.examples.collection.json",
+                        "id": 160972422,
+                        "size": 766197,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.2/as3-3.50.2-3.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.50.2-3.examples.collection.json.sha256",
+                        "id": 160972424,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.2/as3-3.50.2-3.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.50.2-3.noarch.rpm",
+                        "id": 160972421,
+                        "size": 26635877,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.2/f5-appsvcs-3.50.2-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.50.2-3.noarch.rpm.sha256",
+                        "id": 160972423,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.2/f5-appsvcs-3.50.2-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.50.1",
+                "id": 147602920,
+                "assets": [
+                    {
+                        "name": "as3-3.50.1-2.examples.collection.json",
+                        "id": 157759269,
+                        "size": 766197,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.1/as3-3.50.1-2.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.50.1-2.examples.collection.json.sha256",
+                        "id": 157759270,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.1/as3-3.50.1-2.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.50.1-2.noarch.rpm",
+                        "id": 157759271,
+                        "size": 26635363,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.1/f5-appsvcs-3.50.1-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.50.1-2.noarch.rpm.sha256",
+                        "id": 157759272,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.50.1/f5-appsvcs-3.50.1-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.49.0",
+                "id": 137317500,
+                "assets": [
+                    {
+                        "name": "as3-3.49.0-6.examples.collection.json",
+                        "id": 145986946,
+                        "size": 766197,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.49.0/as3-3.49.0-6.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.49.0-6.examples.collection.json.sha256",
+                        "id": 145986947,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.49.0/as3-3.49.0-6.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.49.0-6.noarch.rpm",
+                        "id": 145986948,
+                        "size": 26033150,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.49.0/f5-appsvcs-3.49.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.49.0-6.noarch.rpm.sha256",
+                        "id": 145986949,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.49.0/f5-appsvcs-3.49.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.48.0",
+                "id": 129253896,
+                "assets": [
+                    {
+                        "name": "as3-3.48.0-10.examples.collection.json",
+                        "id": 135385540,
+                        "size": 751246,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.48.0/as3-3.48.0-10.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.48.0-10.examples.collection.json.sha256",
+                        "id": 135385539,
+                        "size": 105,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.48.0/as3-3.48.0-10.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.48.0-10.noarch.rpm",
+                        "id": 135385542,
+                        "size": 26035242,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.48.0/f5-appsvcs-3.48.0-10.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.48.0-10.noarch.rpm.sha256",
+                        "id": 135385541,
+                        "size": 98,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.48.0/f5-appsvcs-3.48.0-10.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.46.2",
+                "id": 129252897,
+                "assets": [
+                    {
+                        "name": "as3-3.46.2-1.examples.collection.json",
+                        "id": 135383792,
+                        "size": 731773,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.2/as3-3.46.2-1.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.46.2-1.examples.collection.json.sha256",
+                        "id": 135383795,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.2/as3-3.46.2-1.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.46.2-1.noarch.rpm",
+                        "id": 135383794,
+                        "size": 27912591,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.2/f5-appsvcs-3.46.2-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.46.2-1.noarch.rpm.sha256",
+                        "id": 135383793,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.2/f5-appsvcs-3.46.2-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.47.0",
+                "id": 120828094,
+                "assets": [
+                    {
+                        "name": "as3-3.47.0-8.examples.collection.json",
+                        "id": 125717000,
+                        "size": 741693,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.47.0/as3-3.47.0-8.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.47.0-8.examples.collection.json.sha256",
+                        "id": 125716999,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.47.0/as3-3.47.0-8.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.47.0-8.noarch.rpm",
+                        "id": 125716998,
+                        "size": 27914342,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.47.0/f5-appsvcs-3.47.0-8.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.47.0-8.noarch.rpm.sha256",
+                        "id": 125716997,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.47.0/f5-appsvcs-3.47.0-8.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.46.1",
+                "id": 120830671,
+                "assets": [
+                    {
+                        "name": "as3-3.46.1-1.examples.collection.json",
+                        "id": 125719651,
+                        "size": 731773,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.1/as3-3.46.1-1.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.46.1-1.examples.collection.json.sha256",
+                        "id": 125719653,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.1/as3-3.46.1-1.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.46.1-1.noarch.rpm",
+                        "id": 125719652,
+                        "size": 27912513,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.1/f5-appsvcs-3.46.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.46.1-1.noarch.rpm.sha256",
+                        "id": 125719654,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.1/f5-appsvcs-3.46.1-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.46.0",
+                "id": 113383937,
+                "assets": [
+                    {
+                        "name": "as3-3.46.0-5.examples.collection.json",
+                        "id": 118418822,
+                        "size": 731773,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.0/as3-3.46.0-5.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.46.0-5.examples.collection.json.sha256",
+                        "id": 118418819,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.0/as3-3.46.0-5.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.46.0-5.noarch.rpm",
+                        "id": 118418826,
+                        "size": 23591054,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.0/f5-appsvcs-3.46.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.46.0-5.noarch.rpm.sha256",
+                        "id": 118418825,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.46.0/f5-appsvcs-3.46.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.45.0",
+                "id": 103849877,
+                "assets": [
+                    {
+                        "name": "as3-3.45.0-5.examples.collection.json",
+                        "id": 109304681,
+                        "size": 720059,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.45.0/as3-3.45.0-5.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.45.0-5.examples.collection.json.sha256",
+                        "id": 109304680,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.45.0/as3-3.45.0-5.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.45.0-5.noarch.rpm",
+                        "id": 109304685,
+                        "size": 25292782,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.45.0/f5-appsvcs-3.45.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.45.0-5.noarch.rpm.sha256",
+                        "id": 109304725,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.45.0/f5-appsvcs-3.45.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.44.0",
+                "id": 97086476,
+                "assets": [
+                    {
+                        "name": "as3-3.44.0-3.examples.collection.json",
+                        "id": 101203050,
+                        "size": 709898,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.44.0/as3-3.44.0-3.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.44.0-3.examples.collection.json.sha256",
+                        "id": 101203049,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.44.0/as3-3.44.0-3.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.44.0-3.noarch.rpm",
+                        "id": 101203052,
+                        "size": 24645240,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.44.0/f5-appsvcs-3.44.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.44.0-3.noarch.rpm.sha256",
+                        "id": 101203051,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.44.0/f5-appsvcs-3.44.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.43.0",
+                "id": 91972278,
+                "assets": [
+                    {
+                        "name": "as3-3.43.0-2.examples.collection.json",
+                        "id": 95029332,
+                        "size": 707147,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/as3-3.43.0-2.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.43.0-2.examples.collection.json.sha256",
+                        "id": 95029336,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/as3-3.43.0-2.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.43.0-2.noarch.rpm",
+                        "id": 95029299,
+                        "size": 24264211,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/f5-appsvcs-3.43.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.43.0-2.noarch.rpm.sha256",
+                        "id": 95029330,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/f5-appsvcs-3.43.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v.3.42.0",
+                "id": 88789473,
+                "assets": [
+                    {
+                        "name": "as3-3.42.0-5.examples.collection.json",
+                        "id": 91488826,
+                        "size": 696159,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v.3.42.0/as3-3.42.0-5.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.42.0-5.examples.collection.json.sha256",
+                        "id": 91488825,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v.3.42.0/as3-3.42.0-5.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "as3-schema-3.42.0-5.json",
+                        "id": 91488823,
+                        "size": 1039491,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v.3.42.0/as3-schema-3.42.0-5.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.42.0-5.noarch.rpm",
+                        "id": 91488828,
+                        "size": 24248418,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v.3.42.0/f5-appsvcs-3.42.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.42.0-5.noarch.rpm.sha256",
+                        "id": 91488827,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v.3.42.0/f5-appsvcs-3.42.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.41.0",
+                "id": 83054421,
+                "assets": [
+                    {
+                        "name": "as3-3.41.0-1.examples.collection.json",
+                        "id": 84622776,
+                        "size": 690516,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/as3-3.41.0-1.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.41.0-1.examples.collection.json.sha256",
+                        "id": 84622778,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/as3-3.41.0-1.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "as3-schema-3.41.0-1.json",
+                        "id": 84622779,
+                        "size": 1029866,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/as3-schema-3.41.0-1.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.41.0-1.noarch.rpm",
+                        "id": 84622781,
+                        "size": 24213795,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.41.0-1.noarch.rpm.sha256",
+                        "id": 84622791,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.40.0",
+                "id": 78895279,
+                "assets": [
+                    {
+                        "name": "as3-3.40.0-5.examples.collection.json",
+                        "id": 79858653,
+                        "size": 682160,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.40.0/as3-3.40.0-5.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.40.0-5.examples.collection.json.sha256",
+                        "id": 79858652,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.40.0/as3-3.40.0-5.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "as3-schema-3.40.0-5.json",
+                        "id": 79858651,
+                        "size": 1019293,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.40.0/as3-schema-3.40.0-5.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.40.0-5.noarch.rpm",
+                        "id": 79858654,
+                        "size": 22724159,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.40.0/f5-appsvcs-3.40.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.40.0-5.noarch.rpm.sha256",
+                        "id": 79858661,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.40.0/f5-appsvcs-3.40.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.39.0",
+                "id": 75027391,
+                "assets": [
+                    {
+                        "name": "as3-3.39.0-7.examples.collection.json",
+                        "id": 75516146,
+                        "size": 674432,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.39.0/as3-3.39.0-7.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.39.0-7.examples.collection.json.sha256",
+                        "id": 75516145,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.39.0/as3-3.39.0-7.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "as3-schema-3.39.0-7.json",
+                        "id": 75516148,
+                        "size": 986613,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.39.0/as3-schema-3.39.0-7.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.39.0-7.noarch.rpm",
+                        "id": 75516150,
+                        "size": 22720416,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.39.0/f5-appsvcs-3.39.0-7.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.39.0-7.noarch.rpm.sha256",
+                        "id": 75516149,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.39.0/f5-appsvcs-3.39.0-7.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.38.0",
+                "id": 72034564,
+                "assets": [
+                    {
+                        "name": "as3-3.38.0-4.examples.collection.json",
+                        "id": 71602273,
+                        "size": 672868,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/as3-3.38.0-4.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.38.0-4.examples.collection.json.sha256",
+                        "id": 71602272,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/as3-3.38.0-4.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "as3-schema-3.38.0-4.json",
+                        "id": 71602268,
+                        "size": 972088,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/as3-schema-3.38.0-4.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.38.0-4.noarch.rpm",
+                        "id": 71602276,
+                        "size": 22820532,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.38.0-4.noarch.rpm.sha256",
+                        "id": 71602266,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.36.1",
+                "id": 68392017,
+                "assets": [
+                    {
+                        "name": "as3-3.36.1-1.examples.collection.json",
+                        "id": 67283813,
+                        "size": 659450,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.1/as3-3.36.1-1.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.36.1-1.examples.collection.json.sha256.txt",
+                        "id": 67283811,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.1/as3-3.36.1-1.examples.collection.json.sha256.txt"
+                    },
+                    {
+                        "name": "as3-schema-3.36.1-1.json",
+                        "id": 67283827,
+                        "size": 958492,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.1/as3-schema-3.36.1-1.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.36.1-1.noarch.rpm",
+                        "id": 67283815,
+                        "size": 21696069,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.1/f5-appsvcs-3.36.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.36.1-1.noarch.rpm.sha256.txt",
+                        "id": 67283830,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.1/f5-appsvcs-3.36.1-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v3.37.0",
+                "id": 68271825,
+                "assets": [
+                    {
+                        "name": "as3-3.37.0-4.examples.collection.json",
+                        "id": 67157972,
+                        "size": 662413,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.37.0/as3-3.37.0-4.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.37.0-4.examples.collection.json.sha256.txt",
+                        "id": 67157971,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.37.0/as3-3.37.0-4.examples.collection.json.sha256.txt"
+                    },
+                    {
+                        "name": "as3-schema-3.37.0-4.json",
+                        "id": 67157974,
+                        "size": 965754,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.37.0/as3-schema-3.37.0-4.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.37.0-4.noarch.rpm",
+                        "id": 67157977,
+                        "size": 22834088,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.37.0/f5-appsvcs-3.37.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.37.0-4.noarch.rpm.sha256.txt",
+                        "id": 67157976,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.37.0/f5-appsvcs-3.37.0-4.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v3.36.0",
+                "id": 64685305,
+                "assets": [
+                    {
+                        "name": "as3-3.36.0-6.examples.collection.json",
+                        "id": 62944582,
+                        "size": 659450,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.0/as3-3.36.0-6.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.36.0-6.examples.collection.json.sha256",
+                        "id": 62944581,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.0/as3-3.36.0-6.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.36.0-6.noarch.rpm",
+                        "id": 62944567,
+                        "size": 21696029,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.0/f5-appsvcs-3.36.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.36.0-6.noarch.rpm.sha256",
+                        "id": 62944575,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.0/f5-appsvcs-3.36.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.35.0",
+                "id": 61329892,
+                "assets": [
+                    {
+                        "name": "as3-3.35.0-4.examples.collection.json",
+                        "id": 58955014,
+                        "size": 659369,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.35.0/as3-3.35.0-4.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.35.0-4.examples.collection.json.sha256",
+                        "id": 58955013,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.35.0/as3-3.35.0-4.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.35.0-4.noarch.rpm",
+                        "id": 58955008,
+                        "size": 21607661,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.35.0/f5-appsvcs-3.35.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.35.0-4.noarch.rpm.sha256",
+                        "id": 58955012,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.35.0/f5-appsvcs-3.35.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.34.0",
+                "id": 57875902,
+                "assets": [
+                    {
+                        "name": "as3-3.34.0-4.examples.collection.json",
+                        "id": 54854989,
+                        "size": 652156,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.34.0/as3-3.34.0-4.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.34.0-4.examples.collection.json.sha256",
+                        "id": 54854988,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.34.0/as3-3.34.0-4.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.34.0-4.noarch.rpm",
+                        "id": 54854994,
+                        "size": 21719654,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.34.0/f5-appsvcs-3.34.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.34.0-4.noarch.rpm.sha256",
+                        "id": 54854991,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.34.0/f5-appsvcs-3.34.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.33.0",
+                "id": 55231032,
+                "assets": [
+                    {
+                        "name": "as3-3.33.0-4.examples.collection.json",
+                        "id": 51702143,
+                        "size": 646632,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.33.0/as3-3.33.0-4.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.33.0-4.examples.collection.json.sha256",
+                        "id": 51702142,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.33.0/as3-3.33.0-4.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.33.0-4.noarch.rpm",
+                        "id": 51702124,
+                        "size": 21353286,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.33.0/f5-appsvcs-3.33.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.33.0-4.noarch.rpm.sha256",
+                        "id": 51702136,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.33.0/f5-appsvcs-3.33.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.32.1",
+                "id": 55228404,
+                "assets": [
+                    {
+                        "name": "as3-3.32.1-1.examples.collection.json",
+                        "id": 51698919,
+                        "size": 644111,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.1/as3-3.32.1-1.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.32.1-1.examples.collection.json.sha256",
+                        "id": 51698918,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.1/as3-3.32.1-1.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.32.1-1.noarch.rpm",
+                        "id": 51698920,
+                        "size": 20649221,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.1/f5-appsvcs-3.32.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.32.1-1.noarch.rpm.sha256",
+                        "id": 51698926,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.1/f5-appsvcs-3.32.1-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.32.0",
+                "id": 52483117,
+                "assets": [
+                    {
+                        "name": "as3-3.32.0-4.examples.collection.json",
+                        "id": 48390845,
+                        "size": 644111,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.0/as3-3.32.0-4.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.32.0-4.examples.collection.json.sha256",
+                        "id": 48390844,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.0/as3-3.32.0-4.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.32.0-4.noarch.rpm",
+                        "id": 48390859,
+                        "size": 20649241,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.0/f5-appsvcs-3.32.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.32.0-4.noarch.rpm.sha256",
+                        "id": 48390865,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.32.0/f5-appsvcs-3.32.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.31.0",
+                "id": 49942107,
+                "assets": [
+                    {
+                        "name": "as3-3.31.0-6.examples.collection.json",
+                        "id": 45232464,
+                        "size": 637167,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.31.0/as3-3.31.0-6.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.31.0-6.examples.collection.json.sha256",
+                        "id": 45232463,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.31.0/as3-3.31.0-6.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.31.0-6.noarch.rpm",
+                        "id": 45232467,
+                        "size": 21079324,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.31.0/f5-appsvcs-3.31.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.31.0-6.noarch.rpm.sha256",
+                        "id": 45232466,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.31.0/f5-appsvcs-3.31.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.30.0",
+                "id": 47450885,
+                "assets": [
+                    {
+                        "name": "as3-3.30.0-5.examples.collection.json",
+                        "id": 41912213,
+                        "size": 624539,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/as3-3.30.0-5.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.30.0-5.examples.collection.json.sha256",
+                        "id": 41912212,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/as3-3.30.0-5.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.30.0-5.noarch.rpm",
+                        "id": 41912218,
+                        "size": 20629761,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.30.0-5.noarch.rpm.sha256",
+                        "id": 41912219,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.29.0",
+                "id": 45254033,
+                "assets": [
+                    {
+                        "name": "as3-3.29.0-3.examples.collection.json",
+                        "id": 39233272,
+                        "size": 978359,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.29.0/as3-3.29.0-3.examples.collection.json"
+                    },
+                    {
+                        "name": "as3-3.29.0-3.examples.collection.json.sha256",
+                        "id": 39233271,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.29.0/as3-3.29.0-3.examples.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.29.0-3.noarch.rpm",
+                        "id": 39233275,
+                        "size": 20031375,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.29.0/f5-appsvcs-3.29.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.29.0-3.noarch.rpm.sha256",
+                        "id": 39233279,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.29.0/f5-appsvcs-3.29.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v3.28.0",
+                "id": 43180787,
+                "assets": [
+                    {
+                        "name": "as3-3.28.0-3.examples.collection.json",
+                        "id": 37148858,
+                        "size": 962122,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.28.0/as3-3.28.0-3.examples.collection.json"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.28.0-3.noarch.rpm",
+                        "id": 37148862,
+                        "size": 23938752,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.28.0/f5-appsvcs-3.28.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-3.28.0-3.noarch.rpm.sha256",
+                        "id": 37148860,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.28.0/f5-appsvcs-3.28.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            }
+        ],
+        "latest": "v3.52.0"
+    },
+    "fast": {
+        "releases": [
+            {
+                "version": "v1.25.0",
+                "id": 115993135,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.25.0-1.noarch.rpm",
+                        "id": 121000653,
+                        "size": 4759308,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.25.0/f5-appsvcs-templates-1.25.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.25.0-1.noarch.rpm.sha256.txt",
+                        "id": 121000654,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.25.0/f5-appsvcs-templates-1.25.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.24.0",
+                "id": 91957512,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.24.0-1.noarch.rpm",
+                        "id": 95004300,
+                        "size": 4753376,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.24.0/f5-appsvcs-templates-1.24.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.24.0-1.noarch.rpm.sha256.txt",
+                        "id": 95004301,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.24.0/f5-appsvcs-templates-1.24.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.23.0",
+                "id": 88656771,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.23.0-1.noarch.rpm",
+                        "id": 91355445,
+                        "size": 4748444,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.23.0/f5-appsvcs-templates-1.23.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.23.0-1.noarch.rpm.sha256.txt",
+                        "id": 91355444,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.23.0/f5-appsvcs-templates-1.23.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.22.0",
+                "id": 83185146,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.22.0-1.noarch.rpm",
+                        "id": 84762636,
+                        "size": 4686008,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.22.0-1.noarch.rpm.sha256.txt",
+                        "id": 84762635,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.21.0",
+                "id": 78885604,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.21.0-1.noarch.rpm",
+                        "id": 79846501,
+                        "size": 4676102,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.21.0/f5-appsvcs-templates-1.21.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.21.0-1.noarch.rpm.sha256.txt",
+                        "id": 79846500,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.21.0/f5-appsvcs-templates-1.21.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.20.0",
+                "id": 75013693,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.20.0-1.noarch.rpm",
+                        "id": 75501140,
+                        "size": 4674933,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.20.0/f5-appsvcs-templates-1.20.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.20.0-1.noarch.rpm.sha256.txt",
+                        "id": 75501137,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.20.0/f5-appsvcs-templates-1.20.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.19.0",
+                "id": 71411556,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.19.0-1.noarch.rpm",
+                        "id": 70779274,
+                        "size": 4607497,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.19.0-1.noarch.rpm.sha256.txt",
+                        "id": 70779288,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.18.0",
+                "id": 68278808,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.18.0-1.noarch.rpm",
+                        "id": 67162268,
+                        "size": 4575428,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.18.0/f5-appsvcs-templates-1.18.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.18.0-1.noarch.rpm.sha256.txt",
+                        "id": 67162250,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.18.0/f5-appsvcs-templates-1.18.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.17.0",
+                "id": 64664346,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.17.0-1.noarch.rpm",
+                        "id": 62920295,
+                        "size": 3951340,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.17.0/f5-appsvcs-templates-1.17.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.17.0-1.noarch.rpm.sha256.txt",
+                        "id": 62920293,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.17.0/f5-appsvcs-templates-1.17.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.16.0",
+                "id": 61314846,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.16.0-1.noarch.rpm",
+                        "id": 58934386,
+                        "size": 3754328,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.16.0/f5-appsvcs-templates-1.16.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.16.0-1.noarch.rpm.sha256.txt",
+                        "id": 58934385,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.16.0/f5-appsvcs-templates-1.16.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.15.0",
+                "id": 57857332,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.15.0-1.noarch.rpm",
+                        "id": 54838585,
+                        "size": 3767581,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.15.0/f5-appsvcs-templates-1.15.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.15.0-1.noarch.rpm.sha256",
+                        "id": 54838582,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.15.0/f5-appsvcs-templates-1.15.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.14.0",
+                "id": 55225244,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.14.0-1.noarch.rpm",
+                        "id": 51695070,
+                        "size": 3526069,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.14.0/f5-appsvcs-templates-1.14.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.14.0-1.noarch.rpm.sha256.txt",
+                        "id": 51695069,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.14.0/f5-appsvcs-templates-1.14.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.13.0",
+                "id": 52480655,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.13.0-1.noarch.rpm",
+                        "id": 48386933,
+                        "size": 3586684,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.13.0/f5-appsvcs-templates-1.13.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.13.0-1.noarch.rpm.sha256",
+                        "id": 48386958,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.13.0/f5-appsvcs-templates-1.13.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.12.0",
+                "id": 49943907,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.12.0-1.noarch.rpm",
+                        "id": 45234448,
+                        "size": 3450927,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.12.0/f5-appsvcs-templates-1.12.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.12.0-1.noarch.rpm.sha256",
+                        "id": 45234457,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.12.0/f5-appsvcs-templates-1.12.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.11.0",
+                "id": 47447668,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.11.0-1.noarch.rpm",
+                        "id": 41908046,
+                        "size": 3449689,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.11.0-1.noarch.rpm.sha256",
+                        "id": 41908062,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.10.0",
+                "id": 45262206,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.10.0-1.noarch.rpm",
+                        "id": 39242401,
+                        "size": 3434082,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.10.0/f5-appsvcs-templates-1.10.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.10.0-1.noarch.rpm.sha256",
+                        "id": 39242410,
+                        "size": 107,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.10.0/f5-appsvcs-templates-1.10.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.9.0",
+                "id": 43164066,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.9.0-1.noarch.rpm",
+                        "id": 37137115,
+                        "size": 3474734,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.9.0/f5-appsvcs-templates-1.9.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.9.0-1.noarch.rpm.sha256",
+                        "id": 37137113,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.9.0/f5-appsvcs-templates-1.9.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.8.1",
+                "id": 42030314,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.8.1-1.noarch.rpm",
+                        "id": 35863463,
+                        "size": 3741492,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.8.1/f5-appsvcs-templates-1.8.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.8.1-1.noarch.rpm.sha256.txt",
+                        "id": 35863462,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.8.1/f5-appsvcs-templates-1.8.1-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.8.0",
+                "id": 40955224,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.8.0-1.noarch.rpm",
+                        "id": 34481445,
+                        "size": 3746213,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.8.0/f5-appsvcs-templates-1.8.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.8.0-1.noarch.rpm.sha256",
+                        "id": 34481443,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.8.0/f5-appsvcs-templates-1.8.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.7.1",
+                "id": 39906943,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.7.1-1.noarch.rpm",
+                        "id": 33556312,
+                        "size": 5373973,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.7.1/f5-appsvcs-templates-1.7.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.7.1-1.noarch.rpm.sha256.txt",
+                        "id": 33556311,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.7.1/f5-appsvcs-templates-1.7.1-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.7.0",
+                "id": 38450284,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.7.0-1.noarch.rpm",
+                        "id": 32440986,
+                        "size": 5679752,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.7.0/f5-appsvcs-templates-1.7.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.7.0-1.noarch.rpm.sha256",
+                        "id": 32440994,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.7.0/f5-appsvcs-templates-1.7.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.6.1",
+                "id": 37201031,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.6.1-1.noarch.rpm",
+                        "id": 31494642,
+                        "size": 5903721,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.6.1/f5-appsvcs-templates-1.6.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.6.1-1.noarch.rpm.sha256",
+                        "id": 31494665,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.6.1/f5-appsvcs-templates-1.6.1-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.6.0",
+                "id": 36252954,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.6.0-1.noarch.rpm",
+                        "id": 30561534,
+                        "size": 5903654,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.6.0/f5-appsvcs-templates-1.6.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.6.0-1.noarch.rpm.sha256",
+                        "id": 30561550,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.6.0/f5-appsvcs-templates-1.6.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.5.0",
+                "id": 34202653,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.5.0-1.noarch.rpm",
+                        "id": 28530842,
+                        "size": 5312073,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.5.0/f5-appsvcs-templates-1.5.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.5.0-1.noarch.rpm.sha256",
+                        "id": 28530850,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.5.0/f5-appsvcs-templates-1.5.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.4.0",
+                "id": 32463603,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.4.0-1.noarch.rpm",
+                        "id": 26877926,
+                        "size": 5166545,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.4.0/f5-appsvcs-templates-1.4.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.4.0-1.noarch.rpm.sha256",
+                        "id": 26878054,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.4.0/f5-appsvcs-templates-1.4.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.3.0",
+                "id": 30584338,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.3.0-1.noarch.rpm",
+                        "id": 24739561,
+                        "size": 5024075,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.3.0/f5-appsvcs-templates-1.3.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.3.0-1.noarch.rpm.sha256",
+                        "id": 25326095,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.3.0/f5-appsvcs-templates-1.3.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.2.0",
+                "id": 28687407,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.2.0-1.noarch.rpm",
+                        "id": 22990252,
+                        "size": 4422556,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.2.0/f5-appsvcs-templates-1.2.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.2.0-1.noarch.rpm.sha256",
+                        "id": 22990268,
+                        "size": 111,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.2.0/f5-appsvcs-templates-1.2.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.1.0",
+                "id": 27113449,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.1.0-1.noarch.rpm",
+                        "id": 21266454,
+                        "size": 4954266,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.1.0/f5-appsvcs-templates-1.1.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.1.0-1.noarch.rpm.sha256",
+                        "id": 21266465,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.1.0/f5-appsvcs-templates-1.1.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.0.0",
+                "id": 26027292,
+                "assets": [
+                    {
+                        "name": "f5-appsvcs-templates-1.0.0-1.noarch.rpm",
+                        "id": 20281476,
+                        "size": 4858078,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.0.0/f5-appsvcs-templates-1.0.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-appsvcs-templates-1.0.0-1.noarch.rpm.sha256",
+                        "id": 20281519,
+                        "size": 106,
+                        "browser_download_url": "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.0.0/f5-appsvcs-templates-1.0.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            }
+        ],
+        "latest": "v1.25.0"
+    },
+    "cf": {
+        "releases": [
+            {
+                "version": "v2.1.2",
+                "id": 165218176,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-2.1.2-2.noarch.rpm",
+                        "id": 179223771,
+                        "size": 6433722,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.2/f5-cloud-failover-2.1.2-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-2.1.2-2.noarch.rpm.sha256",
+                        "id": 179223782,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.2/f5-cloud-failover-2.1.2-2.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 179223784,
+                        "size": 114470,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.2/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v2.1.1",
+                "id": 158367699,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-2.1.1-1.noarch.rpm",
+                        "id": 171342556,
+                        "size": 6433699,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.1/f5-cloud-failover-2.1.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-2.1.1-1.noarch.rpm.sha256",
+                        "id": 171342558,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.1/f5-cloud-failover-2.1.1-1.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 171342563,
+                        "size": 80582,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.1/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v2.1.0",
+                "id": 149652281,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-2.1.0-0.noarch.rpm",
+                        "id": 160146108,
+                        "size": 6433490,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.0/f5-cloud-failover-2.1.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-2.1.0-0.noarch.rpm.sha256",
+                        "id": 160146129,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.0/f5-cloud-failover-2.1.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postman-collection.zip",
+                        "id": 160148093,
+                        "size": 29593,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.1.0/postman-collection.zip"
+                    }
+                ]
+            },
+            {
+                "version": "v2.0.2",
+                "id": 134845025,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-2.0.2-2.noarch.rpm",
+                        "id": 141889094,
+                        "size": 6433081,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.2/f5-cloud-failover-2.0.2-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-2.0.2-2.noarch.rpm.sha256",
+                        "id": 141889108,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.2/f5-cloud-failover-2.0.2-2.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 141889128,
+                        "size": 80582,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.2/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v2.0.1",
+                "id": 134664853,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-2.0.1-1.noarch.rpm",
+                        "id": 141663663,
+                        "size": 6433041,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.1/f5-cloud-failover-2.0.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-2.0.1-1.noarch.rpm.sha256",
+                        "id": 141663676,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.1/f5-cloud-failover-2.0.1-1.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 141663702,
+                        "size": 80582,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.1/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v2.0.0",
+                "id": 134126307,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-2.0.0-0.noarch.rpm",
+                        "id": 140884557,
+                        "size": 6433077,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.0/f5-cloud-failover-2.0.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-2.0.0-0.noarch.rpm.sha256",
+                        "id": 140884571,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.0/f5-cloud-failover-2.0.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 140884597,
+                        "size": 80582,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v2.0.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.15.0",
+                "id": 117350419,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.15.0-0.noarch.rpm",
+                        "id": 121631478,
+                        "size": 31373742,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.15.0/f5-cloud-failover-1.15.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.15.0-0.noarch.rpm.sha256",
+                        "id": 121631482,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.15.0/f5-cloud-failover-1.15.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postman-collection.zip",
+                        "id": 121631483,
+                        "size": 28919,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.15.0/postman-collection.zip"
+                    }
+                ]
+            },
+            {
+                "version": "v1.14.0",
+                "id": 92879191,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.14.0-0.noarch.rpm",
+                        "id": 96105300,
+                        "size": 38628089,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.14.0/f5-cloud-failover-1.14.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.14.0-0.noarch.rpm.sha256",
+                        "id": 96105355,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.14.0/f5-cloud-failover-1.14.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postman-collection.zip",
+                        "id": 96105367,
+                        "size": 28919,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.14.0/postman-collection.zip"
+                    }
+                ]
+            },
+            {
+                "version": "v1.13.0",
+                "id": 77187444,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.13.0-0.noarch.rpm",
+                        "id": 77886652,
+                        "size": 39389475,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.13.0/f5-cloud-failover-1.13.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.13.0-0.noarch.rpm.sha256",
+                        "id": 77886656,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.13.0/f5-cloud-failover-1.13.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postman-collection.zip",
+                        "id": 77886705,
+                        "size": 28921,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.13.0/postman-collection.zip"
+                    }
+                ]
+            },
+            {
+                "version": "v1.12.0",
+                "id": 74312559,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.12.0-0.noarch.rpm",
+                        "id": 74521338,
+                        "size": 39273513,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.12.0/f5-cloud-failover-1.12.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.12.0-0.noarch.rpm.sha256",
+                        "id": 74521370,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.12.0/f5-cloud-failover-1.12.0-0.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.11.0",
+                "id": 66827968,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.11.0-0.noarch.rpm",
+                        "id": 65438176,
+                        "size": 36616653,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.11.0/f5-cloud-failover-1.11.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.11.0-0.noarch.rpm.sha256",
+                        "id": 65438185,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.11.0/f5-cloud-failover-1.11.0-0.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.10.0",
+                "id": 55706782,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.10.0-0.noarch.rpm",
+                        "id": 52235657,
+                        "size": 32700503,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.10.0/f5-cloud-failover-1.10.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.10.0-0.noarch.rpm.sha256",
+                        "id": 52235706,
+                        "size": 104,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.10.0/f5-cloud-failover-1.10.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postman-collection.zip",
+                        "id": 52235727,
+                        "size": 25843,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.10.0/postman-collection.zip"
+                    }
+                ]
+            },
+            {
+                "version": "v1.9.0",
+                "id": 45577241,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.9.0-0.noarch.rpm",
+                        "id": 39568250,
+                        "size": 30199268,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.9.0-0.noarch.rpm.sha256",
+                        "id": 39568265,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postman-collection.zip",
+                        "id": 39568266,
+                        "size": 23242,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/postman-collection.zip"
+                    }
+                ]
+            },
+            {
+                "version": "v1.8.0",
+                "id": 40016080,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.8.0-0.noarch.rpm",
+                        "id": 33653420,
+                        "size": 29363419,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.8.0/f5-cloud-failover-1.8.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.8.0-0.noarch.rpm.sha256",
+                        "id": 33653466,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.8.0/f5-cloud-failover-1.8.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postman-collection.zip",
+                        "id": 33653412,
+                        "size": 23242,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.8.0/postman-collection.zip"
+                    }
+                ]
+            },
+            {
+                "version": "v1.7.1",
+                "id": 36687050,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.7.1-1.noarch.rpm",
+                        "id": 30972034,
+                        "size": 29203049,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.7.1/f5-cloud-failover-1.7.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.7.1-1.noarch.rpm.sha256",
+                        "id": 30972033,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.7.1/f5-cloud-failover-1.7.1-1.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 30972054,
+                        "size": 61438,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.7.1/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.7.0",
+                "id": 36422861,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.7.0-0.noarch.rpm",
+                        "id": 30715836,
+                        "size": 29202150,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.7.0/f5-cloud-failover-1.7.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.7.0-0.noarch.rpm.sha256",
+                        "id": 30715834,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.7.0/f5-cloud-failover-1.7.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 30715813,
+                        "size": 61438,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.7.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.6.1",
+                "id": 33247878,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.6.1-1.noarch.rpm",
+                        "id": 27713304,
+                        "size": 28652747,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.6.1/f5-cloud-failover-1.6.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.6.1-1.noarch.rpm.sha256",
+                        "id": 27713303,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.6.1/f5-cloud-failover-1.6.1-1.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 27713279,
+                        "size": 61438,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.6.1/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.6.0",
+                "id": 32647510,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.6.0-0.noarch.rpm",
+                        "id": 27051581,
+                        "size": 28608651,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.6.0/f5-cloud-failover-1.6.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.6.0-0.noarch.rpm.sha256",
+                        "id": 27051580,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.6.0/f5-cloud-failover-1.6.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 27051629,
+                        "size": 61438,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.6.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.5.0",
+                "id": 30691247,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.5.0-0.noarch.rpm",
+                        "id": 24858853,
+                        "size": 26663409,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.5.0/f5-cloud-failover-1.5.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.5.0-0.noarch.rpm.sha256",
+                        "id": 24858866,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.5.0/f5-cloud-failover-1.5.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 24858844,
+                        "size": 61134,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.5.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.4.0",
+                "id": 28423355,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.4.0-0.noarch.rpm",
+                        "id": 22738234,
+                        "size": 26446132,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.4.0/f5-cloud-failover-1.4.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.4.0-0.noarch.rpm.sha256",
+                        "id": 22738258,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.4.0/f5-cloud-failover-1.4.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 22738279,
+                        "size": 64494,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.4.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.3.0",
+                "id": 27006868,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.3.0-0.noarch.rpm",
+                        "id": 21156388,
+                        "size": 26234283,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.3.0/f5-cloud-failover-1.3.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.3.0-0.noarch.rpm.sha256",
+                        "id": 21156404,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.3.0/f5-cloud-failover-1.3.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 21156377,
+                        "size": 64494,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.3.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.2.0",
+                "id": 25586086,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.2.0-0.noarch.rpm",
+                        "id": 19891956,
+                        "size": 25238206,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.2.0/f5-cloud-failover-1.2.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.2.0-0.noarch.rpm.sha256",
+                        "id": 19891965,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.2.0/f5-cloud-failover-1.2.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 19891981,
+                        "size": 64494,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.2.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.1.0",
+                "id": 25585935,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.1.0-0.noarch.rpm",
+                        "id": 19891279,
+                        "size": 26355192,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.1.0/f5-cloud-failover-1.1.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.1.0-0.noarch.rpm.sha256",
+                        "id": 19891281,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.1.0/f5-cloud-failover-1.1.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 19892049,
+                        "size": 60438,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.1.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v1.0.0",
+                "id": 25585819,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-1.0.0-0.noarch.rpm",
+                        "id": 19891155,
+                        "size": 26249520,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.0.0/f5-cloud-failover-1.0.0-0.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-1.0.0-0.noarch.rpm.sha256",
+                        "id": 19891153,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.0.0/f5-cloud-failover-1.0.0-0.noarch.rpm.sha256"
+                    },
+                    {
+                        "name": "postmanCollection.json",
+                        "id": 19891149,
+                        "size": 60438,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.0.0/postmanCollection.json"
+                    }
+                ]
+            },
+            {
+                "version": "v0.9.1",
+                "id": 25585734,
+                "assets": [
+                    {
+                        "name": "f5-cloud-failover-0.9.1-1.noarch.rpm",
+                        "id": 19891110,
+                        "size": 26696419,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v0.9.1/f5-cloud-failover-0.9.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-cloud-failover-0.9.1-1.noarch.rpm.sha256",
+                        "id": 19891106,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v0.9.1/f5-cloud-failover-0.9.1-1.noarch.rpm.sha256"
+                    }
+                ]
+            }
+        ],
+        "latest": "v2.1.2"
+    },
+    "ts": {
+        "releases": [
+            {
+                "version": "v1.36.0",
+                "id": 170305428,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.36.0-1.noarch.rpm",
+                        "id": 186093242,
+                        "size": 20603270,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.36.0/f5-telemetry-1.36.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.36.0-1.noarch.rpm.sha256",
+                        "id": 186093241,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.36.0/f5-telemetry-1.36.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.35.0",
+                "id": 143460810,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.35.0-1.noarch.rpm",
+                        "id": 153281776,
+                        "size": 18446286,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.35.0/f5-telemetry-1.35.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.35.0-1.noarch.rpm.sha256",
+                        "id": 153281775,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.35.0/f5-telemetry-1.35.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.34.0",
+                "id": 137335942,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.34.0-1.noarch.rpm",
+                        "id": 146029129,
+                        "size": 18423601,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.34.0/f5-telemetry-1.34.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.34.0-1.noarch.rpm.sha256",
+                        "id": 146029128,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.34.0/f5-telemetry-1.34.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.33.0",
+                "id": 96717005,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.33.0-1.noarch.rpm",
+                        "id": 100669083,
+                        "size": 22562625,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.33.0/f5-telemetry-1.33.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.33.0-1.noarch.rpm.sha256",
+                        "id": 100669075,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.33.0/f5-telemetry-1.33.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.32.0",
+                "id": 78894343,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.32.0-2.noarch.rpm",
+                        "id": 79857538,
+                        "size": 20931399,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.32.0/f5-telemetry-1.32.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.32.0-2.noarch.rpm.sha256",
+                        "id": 79857537,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.32.0/f5-telemetry-1.32.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.31.0",
+                "id": 75025402,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.31.0-2.noarch.rpm",
+                        "id": 75514143,
+                        "size": 20930605,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.31.0/f5-telemetry-1.31.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.31.0-2.noarch.rpm.sha256",
+                        "id": 75514140,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.31.0/f5-telemetry-1.31.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.30.0",
+                "id": 72033180,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.30.0-1.noarch.rpm",
+                        "id": 71600652,
+                        "size": 16251287,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.30.0-1.noarch.rpm.sha256",
+                        "id": 71600648,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.29.0",
+                "id": 68273577,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.29.0-1.noarch.rpm",
+                        "id": 67159504,
+                        "size": 18060231,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.29.0/f5-telemetry-1.29.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.29.0-1.noarch.rpm.sha256.txt",
+                        "id": 67159503,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.29.0/f5-telemetry-1.29.0-1.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.28.0",
+                "id": 64680052,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.28.0-2.noarch.rpm",
+                        "id": 62936242,
+                        "size": 17975275,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.28.0/f5-telemetry-1.28.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.28.0-2.noarch.rpm.sha256",
+                        "id": 62936241,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.28.0/f5-telemetry-1.28.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.27.1",
+                "id": 64679800,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.27.1-1.noarch.rpm",
+                        "id": 62935871,
+                        "size": 17972088,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.1/f5-telemetry-1.27.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.27.1-1.noarch.rpm.sha256",
+                        "id": 62935870,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.1/f5-telemetry-1.27.1-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.27.0",
+                "id": 61326450,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.27.0-3.noarch.rpm",
+                        "id": 58949613,
+                        "size": 17971846,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.0/f5-telemetry-1.27.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.27.0-3.noarch.rpm.sha256",
+                        "id": 58949612,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.0/f5-telemetry-1.27.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.26.0",
+                "id": 57872461,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.26.0-3.noarch.rpm",
+                        "id": 54851742,
+                        "size": 18127875,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.26.0/f5-telemetry-1.26.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.26.0-3.noarch.rpm.sha256",
+                        "id": 54851757,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.26.0/f5-telemetry-1.26.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.25.0",
+                "id": 55226749,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.25.0-2.noarch.rpm",
+                        "id": 51696913,
+                        "size": 17965073,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.25.0/f5-telemetry-1.25.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.25.0-2.noarch.rpm.sha256",
+                        "id": 51696912,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.25.0/f5-telemetry-1.25.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.24.0",
+                "id": 52483639,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.24.0-3.noarch.rpm",
+                        "id": 48391496,
+                        "size": 18265375,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.24.0/f5-telemetry-1.24.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.24.0-3.noarch.rpm.sha256",
+                        "id": 48391501,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.24.0/f5-telemetry-1.24.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.23.0",
+                "id": 49940201,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.23.0-4.noarch.rpm",
+                        "id": 45230580,
+                        "size": 18182301,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.23.0/f5-telemetry-1.23.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.23.0-4.noarch.rpm.sha256",
+                        "id": 45230579,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.23.0/f5-telemetry-1.23.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.22.0",
+                "id": 47448944,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.22.0-1.noarch.rpm",
+                        "id": 41909436,
+                        "size": 15866996,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.22.0-1.noarch.rpm.sha256",
+                        "id": 41909434,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.20.1",
+                "id": 45519318,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.20.1-1.noarch.rpm",
+                        "id": 39509032,
+                        "size": 14592477,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.20.1/f5-telemetry-1.20.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.20.1-1.noarch.rpm.sha256",
+                        "id": 39509031,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.20.1/f5-telemetry-1.20.1-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.21.0",
+                "id": 45253186,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.21.0-1.noarch.rpm",
+                        "id": 39232474,
+                        "size": 15709651,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.21.0/f5-telemetry-1.21.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.21.0-1.noarch.rpm.sha256",
+                        "id": 39232473,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.21.0/f5-telemetry-1.21.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.20.0",
+                "id": 43182257,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.20.0-3.noarch.rpm",
+                        "id": 37150339,
+                        "size": 14592343,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.20.0/f5-telemetry-1.20.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.20.0-3.noarch.rpm.sha256",
+                        "id": 37150338,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.20.0/f5-telemetry-1.20.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.19.0",
+                "id": 40968110,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.19.0-3.noarch.rpm",
+                        "id": 34496019,
+                        "size": 14327065,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.19.0/f5-telemetry-1.19.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.19.0-3.noarch.rpm.sha256",
+                        "id": 34496018,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.19.0/f5-telemetry-1.19.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.18.0",
+                "id": 38448242,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.18.0-2.noarch.rpm",
+                        "id": 32439103,
+                        "size": 14171939,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.18.0/f5-telemetry-1.18.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.18.0-2.noarch.rpm.sha256",
+                        "id": 32439102,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.18.0/f5-telemetry-1.18.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.17.0",
+                "id": 36254475,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.17.0-4.noarch.rpm",
+                        "id": 30563255,
+                        "size": 13727023,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.17.0/f5-telemetry-1.17.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.17.0-4.noarch.rpm.sha256",
+                        "id": 30563254,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.17.0/f5-telemetry-1.17.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.16.0",
+                "id": 34205123,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.16.0-4.noarch.rpm",
+                        "id": 28533540,
+                        "size": 11420905,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.16.0/f5-telemetry-1.16.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.16.0-4.noarch.rpm.sha256",
+                        "id": 28533539,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.16.0/f5-telemetry-1.16.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.15.0",
+                "id": 32474553,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.15.0-4.noarch.rpm",
+                        "id": 26892523,
+                        "size": 11044535,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.15.0/f5-telemetry-1.15.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.15.0-4.noarch.rpm.sha256",
+                        "id": 26892522,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.15.0/f5-telemetry-1.15.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.14.0",
+                "id": 30540277,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.14.0-2.noarch.rpm",
+                        "id": 24688850,
+                        "size": 11193456,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.14.0/f5-telemetry-1.14.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.14.0-2.noarch.rpm.sha256",
+                        "id": 24688846,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.14.0/f5-telemetry-1.14.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.13.0",
+                "id": 28761065,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.13.0-2.noarch.rpm",
+                        "id": 23077525,
+                        "size": 10996015,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.13.0/f5-telemetry-1.13.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.13.0-2.noarch.rpm.sha256",
+                        "id": 23288209,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.13.0/f5-telemetry-1.13.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.12.0",
+                "id": 27117285,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.12.0-3.noarch.rpm",
+                        "id": 21270238,
+                        "size": 10809236,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.12.0/f5-telemetry-1.12.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.12.0-3.noarch.rpm.sha256",
+                        "id": 23371411,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.12.0/f5-telemetry-1.12.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.11.0",
+                "id": 25705723,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.11.0-1.noarch.rpm",
+                        "id": 20011241,
+                        "size": 9625313,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.11.0/f5-telemetry-1.11.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.11.0-1.noarch.rpm.sha256",
+                        "id": 20014373,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.11.0/f5-telemetry-1.11.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.10.0",
+                "id": 24369270,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.10.0-2.noarch.rpm",
+                        "id": 18591767,
+                        "size": 9988331,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.10.0/f5-telemetry-1.10.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.10.0-2.noarch.rpm.sha256",
+                        "id": 18591774,
+                        "size": 99,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.10.0/f5-telemetry-1.10.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.9.0",
+                "id": 23262175,
+                "assets": [
+                    {
+                        "name": "f5-telemetry-1.9.0-1.noarch.rpm",
+                        "id": 17686767,
+                        "size": 9544237,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.9.0/f5-telemetry-1.9.0-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-telemetry-1.9.0-1.noarch.rpm.sha256",
+                        "id": 23371540,
+                        "size": 97,
+                        "browser_download_url": "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.9.0/f5-telemetry-1.9.0-1.noarch.rpm.sha256"
+                    }
+                ]
+            }
+        ],
+        "latest": "v1.36.0"
+    },
+    "do": {
+        "releases": [
+            {
+                "version": "v1.45.0",
+                "id": 166903656,
+                "assets": [
+                    {
+                        "name": "do.examples-1.45.0-6.collection.json",
+                        "id": 181555020,
+                        "size": 200656,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.45.0/do.examples-1.45.0-6.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.45.0-6.collection.json.sha256",
+                        "id": 181555017,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.45.0/do.examples-1.45.0-6.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.45.0-6.noarch.rpm",
+                        "id": 181555018,
+                        "size": 2372153,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.45.0/f5-declarative-onboarding-1.45.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.45.0-6.noarch.rpm.sha256",
+                        "id": 181555019,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.45.0/f5-declarative-onboarding-1.45.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.44.0",
+                "id": 158751795,
+                "assets": [
+                    {
+                        "name": "do.examples-1.44.0-5.collection.json",
+                        "id": 171799951,
+                        "size": 198378,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.44.0/do.examples-1.44.0-5.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.44.0-5.collection.json.sha256",
+                        "id": 171799954,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.44.0/do.examples-1.44.0-5.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.44.0-5.noarch.rpm",
+                        "id": 171799953,
+                        "size": 2370612,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.44.0/f5-declarative-onboarding-1.44.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.44.0-5.noarch.rpm.sha256",
+                        "id": 171799952,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.44.0/f5-declarative-onboarding-1.44.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.43.0",
+                "id": 145873290,
+                "assets": [
+                    {
+                        "name": "do.examples-1.43.0-5.collection.json",
+                        "id": 156107731,
+                        "size": 198378,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.43.0/do.examples-1.43.0-5.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.43.0-5.collection.json.sha256",
+                        "id": 156107729,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.43.0/do.examples-1.43.0-5.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.43.0-5.noarch.rpm",
+                        "id": 156107732,
+                        "size": 2371640,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.43.0/f5-declarative-onboarding-1.43.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.43.0-5.noarch.rpm.sha256",
+                        "id": 156107730,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.43.0/f5-declarative-onboarding-1.43.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.42.0",
+                "id": 137316024,
+                "assets": [
+                    {
+                        "name": "do.examples-1.42.0-9.collection.json",
+                        "id": 145983567,
+                        "size": 198378,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.42.0/do.examples-1.42.0-9.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.42.0-9.collection.json.sha256",
+                        "id": 145983565,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.42.0/do.examples-1.42.0-9.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.42.0-9.noarch.rpm",
+                        "id": 145983566,
+                        "size": 2370233,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.42.0/f5-declarative-onboarding-1.42.0-9.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.42.0-9.noarch.rpm.sha256",
+                        "id": 145983564,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.42.0/f5-declarative-onboarding-1.42.0-9.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.41.0",
+                "id": 129255789,
+                "assets": [
+                    {
+                        "name": "do.examples-1.41.0-8.collection.json",
+                        "id": 135390135,
+                        "size": 198135,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.41.0/do.examples-1.41.0-8.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.41.0-8.collection.json.sha256",
+                        "id": 135390134,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.41.0/do.examples-1.41.0-8.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.41.0-8.noarch.rpm",
+                        "id": 135390132,
+                        "size": 2369720,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.41.0/f5-declarative-onboarding-1.41.0-8.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.41.0-8.noarch.rpm.sha256",
+                        "id": 135390133,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.41.0/f5-declarative-onboarding-1.41.0-8.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.40.0",
+                "id": 120810479,
+                "assets": [
+                    {
+                        "name": "do.examples-1.40.0-8.collection.json",
+                        "id": 125702877,
+                        "size": 196468,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.40.0/do.examples-1.40.0-8.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.40.0-8.collection.json.sha256",
+                        "id": 125702879,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.40.0/do.examples-1.40.0-8.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.40.0-8.noarch.rpm",
+                        "id": 125702880,
+                        "size": 2367755,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.40.0/f5-declarative-onboarding-1.40.0-8.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.40.0-8.noarch.rpm.sha256",
+                        "id": 125702878,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.40.0/f5-declarative-onboarding-1.40.0-8.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.39.1",
+                "id": 120817424,
+                "assets": [
+                    {
+                        "name": "do.examples-1.39.1-2.collection.json",
+                        "id": 125706694,
+                        "size": 193639,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.1/do.examples-1.39.1-2.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.39.1-2.collection.json.sha256",
+                        "id": 125706693,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.1/do.examples-1.39.1-2.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.39.1-2.noarch.rpm",
+                        "id": 125706695,
+                        "size": 2364297,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.1/f5-declarative-onboarding-1.39.1-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.39.1-2.noarch.rpm.sha256",
+                        "id": 125706696,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.1/f5-declarative-onboarding-1.39.1-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.39.0",
+                "id": 113386889,
+                "assets": [
+                    {
+                        "name": "do.examples-1.39.0-4.collection.json",
+                        "id": 118421695,
+                        "size": 193639,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.0/do.examples-1.39.0-4.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.39.0-4.collection.json.sha256",
+                        "id": 118421733,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.0/do.examples-1.39.0-4.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.39.0-4.noarch.rpm",
+                        "id": 118421734,
+                        "size": 2363407,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.0/f5-declarative-onboarding-1.39.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.39.0-4.noarch.rpm.sha256",
+                        "id": 118421694,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.39.0/f5-declarative-onboarding-1.39.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.38.0",
+                "id": 103850640,
+                "assets": [
+                    {
+                        "name": "do.examples-1.38.0-7.collection.json",
+                        "id": 109305320,
+                        "size": 193639,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.38.0/do.examples-1.38.0-7.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.38.0-7.collection.json.sha256",
+                        "id": 109305321,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.38.0/do.examples-1.38.0-7.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.38.0-7.noarch.rpm",
+                        "id": 109305324,
+                        "size": 2321617,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.38.0/f5-declarative-onboarding-1.38.0-7.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.38.0-7.noarch.rpm.sha256",
+                        "id": 109305322,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.38.0/f5-declarative-onboarding-1.38.0-7.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.37.0",
+                "id": 97085745,
+                "assets": [
+                    {
+                        "name": "do.examples-1.37.0-3.collection.json",
+                        "id": 101202300,
+                        "size": 189673,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.37.0/do.examples-1.37.0-3.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.37.0-3.collection.json.sha256",
+                        "id": 101202296,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.37.0/do.examples-1.37.0-3.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.37.0-3.noarch.rpm",
+                        "id": 101202303,
+                        "size": 1778636,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.37.0/f5-declarative-onboarding-1.37.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.37.0-3.noarch.rpm.sha256",
+                        "id": 101202301,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.37.0/f5-declarative-onboarding-1.37.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.36.1",
+                "id": 95460543,
+                "assets": [
+                    {
+                        "name": "do.examples-1.36.1-1.collection.json",
+                        "id": 99246589,
+                        "size": 187043,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/do.examples-1.36.1-1.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.36.1-1.collection.json.sha256",
+                        "id": 99246590,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/do.examples-1.36.1-1.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.36.1-1.noarch.rpm",
+                        "id": 99246594,
+                        "size": 1774723,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/f5-declarative-onboarding-1.36.1-1.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.36.1-1.noarch.rpm.sha256",
+                        "id": 99246593,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/f5-declarative-onboarding-1.36.1-1.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.36.0",
+                "id": 91970438,
+                "assets": [
+                    {
+                        "name": "do.examples-1.36.0-4.collection.json",
+                        "id": 95025178,
+                        "size": 187043,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.0/do.examples-1.36.0-4.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.36.0-4.collection.json.sha256",
+                        "id": 95025176,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.0/do.examples-1.36.0-4.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.36.0-4.noarch.rpm",
+                        "id": 95025175,
+                        "size": 1774707,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.0/f5-declarative-onboarding-1.36.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.36.0-4.noarch.rpm.sha256",
+                        "id": 95025173,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.0/f5-declarative-onboarding-1.36.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.35.0",
+                "id": 88784476,
+                "assets": [
+                    {
+                        "name": "do.examples-1.35.0-6.collection.json",
+                        "id": 91482566,
+                        "size": 187043,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.35.0/do.examples-1.35.0-6.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.35.0-6.collection.json.sha256",
+                        "id": 91482570,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.35.0/do.examples-1.35.0-6.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.35.0-6.noarch.rpm",
+                        "id": 91482573,
+                        "size": 1770532,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.35.0/f5-declarative-onboarding-1.35.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.35.0-6.noarch.rpm.sha256",
+                        "id": 91482571,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.35.0/f5-declarative-onboarding-1.35.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.34.0",
+                "id": 83066681,
+                "assets": [
+                    {
+                        "name": "do.examples-1.34.0-5.collection.json",
+                        "id": 84626023,
+                        "size": 186991,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/do.examples-1.34.0-5.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.34.0-5.collection.json.sha256",
+                        "id": 84626027,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/do.examples-1.34.0-5.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.34.0-5.noarch.rpm",
+                        "id": 84626030,
+                        "size": 1769457,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.34.0-5.noarch.rpm.sha256",
+                        "id": 84626036,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.33.0",
+                "id": 78890546,
+                "assets": [
+                    {
+                        "name": "do.examples-1.33.0-7.collection.json",
+                        "id": 79851324,
+                        "size": 186819,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.33.0/do.examples-1.33.0-7.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.33.0-7.collection.json.sha256",
+                        "id": 79851323,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.33.0/do.examples-1.33.0-7.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.33.0-7.noarch.rpm",
+                        "id": 79851326,
+                        "size": 1768329,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.33.0/f5-declarative-onboarding-1.33.0-7.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.33.0-7.noarch.rpm.sha256",
+                        "id": 79851325,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.33.0/f5-declarative-onboarding-1.33.0-7.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.32.0",
+                "id": 75027990,
+                "assets": [
+                    {
+                        "name": "do.examples-1.32.0-3.collection.json",
+                        "id": 75516830,
+                        "size": 185142,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.32.0/do.examples-1.32.0-3.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.32.0-3.collection.json.sha256",
+                        "id": 75516829,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.32.0/do.examples-1.32.0-3.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.32.0-3.noarch.rpm",
+                        "id": 75516832,
+                        "size": 1766742,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.32.0/f5-declarative-onboarding-1.32.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.32.0-3.noarch.rpm.sha256",
+                        "id": 75516831,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.32.0/f5-declarative-onboarding-1.32.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.31.0",
+                "id": 72042390,
+                "assets": [
+                    {
+                        "name": "do.examples-1.31.0-6.collection.json",
+                        "id": 71613147,
+                        "size": 184945,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/do.examples-1.31.0-6.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.31.0-6.collection.json.sha256",
+                        "id": 71613145,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/do.examples-1.31.0-6.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.31.0-6.noarch.rpm",
+                        "id": 71613150,
+                        "size": 1763021,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.31.0-6.noarch.rpm.sha256",
+                        "id": 71613144,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.30.0",
+                "id": 68289694,
+                "assets": [
+                    {
+                        "name": "do.examples-1.30.0-3.collection.json",
+                        "id": 67175377,
+                        "size": 184945,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.30.0/do.examples-1.30.0-3.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.30.0-3.collection.json.sha256.txt",
+                        "id": 67175376,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.30.0/do.examples-1.30.0-3.collection.json.sha256.txt"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.30.0-3.noarch.rpm",
+                        "id": 67175381,
+                        "size": 1763141,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.30.0/f5-declarative-onboarding-1.30.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.30.0-3.noarch.rpm.sha256.txt",
+                        "id": 67175378,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.30.0/f5-declarative-onboarding-1.30.0-3.noarch.rpm.sha256.txt"
+                    }
+                ]
+            },
+            {
+                "version": "v1.29.0",
+                "id": 64681484,
+                "assets": [
+                    {
+                        "name": "do.examples-1.29.0-8.collection.json",
+                        "id": 62938448,
+                        "size": 181694,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.29.0/do.examples-1.29.0-8.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.29.0-8.collection.json.sha256",
+                        "id": 62938447,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.29.0/do.examples-1.29.0-8.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.29.0-8.noarch.rpm",
+                        "id": 62938445,
+                        "size": 1764988,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.29.0/f5-declarative-onboarding-1.29.0-8.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.29.0-8.noarch.rpm.sha256",
+                        "id": 62938444,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.29.0/f5-declarative-onboarding-1.29.0-8.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.28.0",
+                "id": 61327327,
+                "assets": [
+                    {
+                        "name": "do.examples-1.28.0-4.collection.json",
+                        "id": 58951029,
+                        "size": 181693,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.28.0/do.examples-1.28.0-4.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.28.0-4.collection.json.sha256",
+                        "id": 58951028,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.28.0/do.examples-1.28.0-4.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.28.0-4.noarch.rpm",
+                        "id": 58951027,
+                        "size": 1764786,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.28.0/f5-declarative-onboarding-1.28.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.28.0-4.noarch.rpm.sha256",
+                        "id": 58951026,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.28.0/f5-declarative-onboarding-1.28.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.27.1",
+                "id": 61327773,
+                "assets": [
+                    {
+                        "name": "do.examples-1.27.1-2.collection.json",
+                        "id": 58951602,
+                        "size": 178878,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.1/do.examples-1.27.1-2.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.27.1-2.collection.json.sha256",
+                        "id": 58951601,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.1/do.examples-1.27.1-2.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.27.1-2.noarch.rpm",
+                        "id": 58951596,
+                        "size": 1764021,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.1/f5-declarative-onboarding-1.27.1-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.27.1-2.noarch.rpm.sha256",
+                        "id": 58951594,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.1/f5-declarative-onboarding-1.27.1-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.27.0",
+                "id": 57874554,
+                "assets": [
+                    {
+                        "name": "do.examples-1.27.0-6.collection.json",
+                        "id": 54853632,
+                        "size": 178878,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.0/do.examples-1.27.0-6.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.27.0-6.collection.json.sha256",
+                        "id": 54853635,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.0/do.examples-1.27.0-6.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.27.0-6.noarch.rpm",
+                        "id": 54853637,
+                        "size": 1764004,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.0/f5-declarative-onboarding-1.27.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.27.0-6.noarch.rpm.sha256",
+                        "id": 54853636,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.27.0/f5-declarative-onboarding-1.27.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.26.0",
+                "id": 55231765,
+                "assets": [
+                    {
+                        "name": "do.examples-1.26.0-5.collection.json",
+                        "id": 51702831,
+                        "size": 178878,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.26.0/do.examples-1.26.0-5.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.26.0-5.collection.json.sha256",
+                        "id": 51702833,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.26.0/do.examples-1.26.0-5.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.26.0-5.noarch.rpm",
+                        "id": 51702835,
+                        "size": 1762301,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.26.0/f5-declarative-onboarding-1.26.0-5.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.26.0-5.noarch.rpm.sha256",
+                        "id": 51702834,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.26.0/f5-declarative-onboarding-1.26.0-5.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.25.0",
+                "id": 52483487,
+                "assets": [
+                    {
+                        "name": "do.examples-1.25.0-7.collection.json",
+                        "id": 48391288,
+                        "size": 179069,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.25.0/do.examples-1.25.0-7.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.25.0-7.collection.json.sha256",
+                        "id": 48391287,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.25.0/do.examples-1.25.0-7.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.25.0-7.noarch.rpm",
+                        "id": 48391290,
+                        "size": 1746019,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.25.0/f5-declarative-onboarding-1.25.0-7.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.25.0-7.noarch.rpm.sha256",
+                        "id": 48391289,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.25.0/f5-declarative-onboarding-1.25.0-7.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.24.0",
+                "id": 49940899,
+                "assets": [
+                    {
+                        "name": "do.examples-1.24.0-6.collection.json",
+                        "id": 45231209,
+                        "size": 177061,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.24.0/do.examples-1.24.0-6.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.24.0-6.collection.json.sha256",
+                        "id": 45231207,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.24.0/do.examples-1.24.0-6.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.24.0-6.noarch.rpm",
+                        "id": 45231211,
+                        "size": 1744102,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.24.0/f5-declarative-onboarding-1.24.0-6.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.24.0-6.noarch.rpm.sha256",
+                        "id": 45231210,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.24.0/f5-declarative-onboarding-1.24.0-6.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.23.0",
+                "id": 47449409,
+                "assets": [
+                    {
+                        "name": "do.examples-1.23.0-4.collection.json",
+                        "id": 41909968,
+                        "size": 171404,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/do.examples-1.23.0-4.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.23.0-4.collection.json.sha256",
+                        "id": 41909970,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/do.examples-1.23.0-4.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.23.0-4.noarch.rpm",
+                        "id": 41909973,
+                        "size": 1737555,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.23.0-4.noarch.rpm.sha256",
+                        "id": 41909972,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.22.0",
+                "id": 45252728,
+                "assets": [
+                    {
+                        "name": "do.examples-1.22.0-3.collection.json",
+                        "id": 39232079,
+                        "size": 164348,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.22.0/do.examples-1.22.0-3.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.22.0-3.collection.json.sha256",
+                        "id": 39232077,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.22.0/do.examples-1.22.0-3.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.22.0-3.noarch.rpm",
+                        "id": 39232081,
+                        "size": 1721565,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.22.0/f5-declarative-onboarding-1.22.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.22.0-3.noarch.rpm.sha256",
+                        "id": 39232080,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.22.0/f5-declarative-onboarding-1.22.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.21.1",
+                "id": 45174999,
+                "assets": [
+                    {
+                        "name": "do.examples-1.21.1-2.collection.json",
+                        "id": 39162095,
+                        "size": 160633,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.1/do.examples-1.21.1-2.collection.json"
+                    },
+                    {
+                        "name": "do.examples-1.21.1-2.collection.json.sha256",
+                        "id": 39162094,
+                        "size": 103,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.1/do.examples-1.21.1-2.collection.json.sha256"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.21.1-2.noarch.rpm",
+                        "id": 39162060,
+                        "size": 1708981,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.1/f5-declarative-onboarding-1.21.1-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.21.1-2.noarch.rpm.sha256",
+                        "id": 39162057,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.1/f5-declarative-onboarding-1.21.1-2.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.21.0",
+                "id": 43181911,
+                "assets": [
+                    {
+                        "name": "do.examples-1.21.0-3.collection.json",
+                        "id": 37149876,
+                        "size": 160633,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.0/do.examples-1.21.0-3.collection.json"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.21.0-3.noarch.rpm",
+                        "id": 37149879,
+                        "size": 1708962,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.0/f5-declarative-onboarding-1.21.0-3.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.21.0-3.noarch.rpm.sha256",
+                        "id": 37149878,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.0/f5-declarative-onboarding-1.21.0-3.noarch.rpm.sha256"
+                    }
+                ]
+            },
+            {
+                "version": "v1.20.0",
+                "id": 40967956,
+                "assets": [
+                    {
+                        "name": "do.examples-1.20.0-2.collection.json",
+                        "id": 34495923,
+                        "size": 158650,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.20.0/do.examples-1.20.0-2.collection.json"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.20.0-2.noarch.rpm",
+                        "id": 34495925,
+                        "size": 1707051,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.20.0/f5-declarative-onboarding-1.20.0-2.noarch.rpm"
+                    },
+                    {
+                        "name": "f5-declarative-onboarding-1.20.0-2.noarch.rpm.sha256",
+                        "id": 34495924,
+                        "size": 112,
+                        "browser_download_url": "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.20.0/f5-declarative-onboarding-1.20.0-2.noarch.rpm.sha256"
+                    }
+                ]
+            }
+        ],
+        "latest": "v1.45.0"
+    },
+    "lastCheckDate": "2024-09-18T19:13:15.400Z",
+    "lastUpdatedDate": "2024-09-18T19:13:15.400Z"
+}

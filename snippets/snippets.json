@@ -6,7 +6,7 @@
         ],
         "body": [
             "{",
-            "  \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",",
+            "  \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/HEAD/schema/latest/as3-schema.json\",",
             "  \"class\": \"AS3\",",
             "  \"action\": \"deploy\",",
             "  \"persist\": true,",
@@ -56,7 +56,7 @@
         ],
         "body": [
             "{",
-            "  \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json\",",
+            "  \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/HEAD/src/schema/latest/base.schema.json\",",
             "  \"schemaVersion\": \"1.0.0\",",
             "  \"class\": \"Device\",",
             "  \"async\": true,",
@@ -219,7 +219,7 @@
         ],
         "body": [
             "{",
-            "    \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json\",",
+            "    \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/HEAD/src/schema/latest/base_schema.json\",",
             "    \"class\": \"Telemetry\",",
             "    \"My_System\": {",
             "        \"class\": \"Telemetry_System\",",
@@ -259,7 +259,7 @@
         "prefix": "cf-example",
         "body": [
             "{",
-            "    \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json\",",
+            "    \"\\$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/HEAD/src/nodejs/schema/base_schema.json\",",
             "    \"class\": \"Cloud_Failover\",",
             "    \"environment\": \"azure\",",
             "    \"schemaVersion\": \"0.9.1\",",

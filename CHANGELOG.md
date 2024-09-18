@@ -24,6 +24,20 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.17.0] - (09-20-2024)
+
+### Fixed
+
+- [BUG] Schema validation is using the wrong path #255
+- [BUG] V3.16.x ATC Package management broken #249
+- [PR] Update package.json #256
+- [PR] Update tmosXcRules.json #252
+- [PR] Update tmosXcRules.json - VDI support #251
+- [PR] Update tmosXcRules.json #250
+- [PR] Update README.md #227
+
+---
+
 ## [3.16.1] - (02-27-2024)
 
 ### Fixed
@@ -800,7 +814,7 @@ The main purpose behind this major release is a complete overhaul of the underly
       - included options for redeploying iApp-App with current paramters and deleting an iApp-App
   - `Merge TCL/TMOS` can be used to merge ANY TMOS config item
 
-Documentation: <https://github.com/f5devcentral/vscode-f5/blob/master/README_docs/tcl.md>
+Documentation: <https://github.com/f5devcentral/vscode-f5/blob/HEAD/README_docs/tcl.md>
 
 ### Modified
 

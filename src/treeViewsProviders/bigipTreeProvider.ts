@@ -406,7 +406,7 @@ export function sortTreeItems(treeItems: IpTreeItem[]) {
 }
 
 /**
- * bigiq class tree item
+ * bigip/iq class tree item
  */
 class IpTreeItem extends TreeItem {
     constructor(

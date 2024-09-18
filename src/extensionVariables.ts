@@ -232,8 +232,8 @@ type ProxyCfg = {
 
 /*
 // external links - for testing and future use
-https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json
-https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/src/schema/latest/base.schema.json
-https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/master/src/schema/latest/base_schema.json
-https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/master/src/nodejs/schema/base_schema.json
+https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json
+https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/HEAD/src/schema/latest/base.schema.json
+https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/HEAD/src/schema/latest/base_schema.json
+https://raw.githubusercontent.com/F5Networks/f5-cloud-failover-extension/HEAD/src/nodejs/schema/base_schema.json
 */
