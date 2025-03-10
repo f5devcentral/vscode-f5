@@ -24,6 +24,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.18.0] - (03-10-2025)
+
+### Fixed
+
+- f5-conx-core:
+  - updated atc versions
+  - fixed circular json log bug
+- [bug] atc versions not displaying in big-ip view #259
+
+---
+
 ## [3.17.0] - (09-20-2024)
 
 ### Fixed
