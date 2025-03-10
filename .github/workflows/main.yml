@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: 20
+  NODE_VERSION: 22
 
 jobs:
 
@@ -16,8 +16,8 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
     name: Test on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
