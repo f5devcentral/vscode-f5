@@ -24,7 +24,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
-## [3.18.0] - (03-10-2025)
+## [3.18.1] - (03-10-2025)
 
 ### Fixed
 
