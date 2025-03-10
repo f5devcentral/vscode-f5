@@ -183,17 +183,17 @@
     },
     {
         "code": "fcd6",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Error",
+        "title": "HTTP Monitor with Username detected",
+        "message": "Authentication is not supported for HTTP monitors",
+        "regex": "username"
     },
     {
         "code": "6944",
-        "severity": "Hint",
-        "title": "",
-        "message": "",
-        "regex": ""
+        "severity": "Warning",
+        "title": "Persistence in XC is limit to a single site RE or CE",
+        "message": "Cookie or Source IP persistence is limited to a single site RE or CE and will be re-evaluated per site.",
+        "regex": "persistence"
     },
     {
         "code": "78e9",

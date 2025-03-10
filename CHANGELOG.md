@@ -32,6 +32,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - updated atc versions
   - fixed circular json log bug
 - [bug] atc versions not displaying in big-ip view #259
+- updated test to run node 22.14 (lts)
+- updated github actions to run latest v4 (v3 depricated)
+- updated diagnostics from GlenWillms, pull #258
 
 ---
 
