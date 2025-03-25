@@ -138,7 +138,7 @@ export async function initSettings(context: ExtensionContext) {
     };
 
     // get atc release information -> this can happen async
-    atcVersionClient.getAtcReleasesInfo()
+    await atcVersionClient.getAtcReleasesInfo()
         .then(versions => {
             ext.atcVersions = versions;
         })
