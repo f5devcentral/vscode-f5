@@ -24,6 +24,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ---
 
+## [3.18.2] - (03-25-2025)
+
+### Fixed
+
+- [bug] another tweak to get atcVersion info to display again
+
 ## [3.18.1] - (03-10-2025)
 
 ### Fixed
