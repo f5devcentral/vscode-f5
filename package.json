@@ -3,13 +3,12 @@
 	"displayName": "The F5 Extension",
 	"description": "Supercharge your F5 automation development",
 	"publisher": "F5DevCentral",
-	"version": "3.18.2",
+	"version": "3.19.0",
 	"keywords": [
 		"F5",
 		"F5Networks",
 		"AS3",
 		"FAST",
-		"NEXT",
 		"DO",
 		"TS",
 		"TCL",
@@ -70,7 +69,7 @@
 	},
 	"dependencies": {
 		"@f5devcentral/f5-fast-core": "^0.23.0",
-		"f5-conx-core": "^1.1.0",
+		"f5-conx-core": "^1.2.1",
 		"f5-corkscrew": "^1.4.1",
 		"js-yaml": "^4.0.0"
 	},
@@ -153,7 +152,7 @@
 			},
 			{
 				"fileMatch": "*.ts.json",
-				"url": "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/HEAD/src/schema/latest/base_schema.json"
+				"url": "https://raw.githubusercontent.com/F5Networks/f5-telemetry-streaming/HEAD/application/schema/latest/base_schema.json"
 			},
 			{
 				"fileMatch": "*.cf.json",

@@ -11,16 +11,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-### Added
+---
 
-- [RFE] Can't delete tmsh scripts #214
+## [3.19.0] - (02-27-2026)
 
 ### Changed
 
-
-### Fixed
-
-- [RFE] Config Explorer doesn't include cipher groups with the applications #213
+- Updated f5-conx-core to v1.2.1
+  - Fixed ATC schema URLs to use correct default branch per repo
+  - Fixed Telemetry Streaming schema path from `src/schema/` to `application/schema/`
+- Fixed TS JSON validation schema URL (`*.ts.json`) to use correct `application/schema/` path
+- Removed F5 NEXT/NEXT-CM references (product discontinued)
 
 ---
 

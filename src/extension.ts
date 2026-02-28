@@ -799,11 +799,6 @@ export async function activate(context: ExtensionContext) {
 
 		if (req?.url) {
 
-			if (ext.f5Client!.mgmtClient!.hostInfo!.product === 'NEXT') {
-				// if next instance (not CM) append base api path to openapi path
-				req.url = `/api/v1${req.url}`;
-				logger.warn('next instance detected -> appending /api/v1 to url - NOT SUPPORTED AT THIS TIME!!!');
-			}
 			text = req;
 
 		} else if (editor) {

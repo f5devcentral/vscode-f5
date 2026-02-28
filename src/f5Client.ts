@@ -121,16 +121,6 @@ export class F5Client extends _F5Client {
                     commands.executeCommand('setContext', 'f5.device', true);
                     commands.executeCommand('setContext', 'f5.isBigiq', true);
 
-                } else if (this.host.product === 'NEXT') {
-
-                    commands.executeCommand('setContext', 'f5.device', true);
-                    commands.executeCommand('setContext', 'f5.isNext', true);
-
-                } else if (this.host.product === 'NEXT-CM') {
-
-                    commands.executeCommand('setContext', 'f5.device', true);
-                    commands.executeCommand('setContext', 'f5.isNextCM', true);
-
                 } else {
 
                     commands.executeCommand('setContext', 'f5.device', false);

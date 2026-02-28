@@ -47,10 +47,6 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 	private f5Hex = ext.context.asAbsolutePath(path.join("images", "f5_open_dark.svg"));
 	private f524 = ext.context.asAbsolutePath(path.join("images", "f5_white_24x24.svg"));
 	private bigiqSvg = ext.context.asAbsolutePath(path.join("images", "BIG-IQ-sticker_transparent.png"));
-	// other svg recolored to match the mustard yellow of the png
-	private nextSvg = ext.context.asAbsolutePath(path.join("images", "next12.svg"));
-	private nextCmSvg = ext.context.asAbsolutePath(path.join("images", "next12-cm.svg"));
-
 	/**
 	 * regex for confirming host entry <user>@<host/ip>:<port>
 	 */
@@ -117,8 +113,6 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 					const icon =
 						(item.product === 'BIG-IQ') ? this.bigiqSvg :
-						(item.product === 'NEXT') ? this.nextSvg :
-						(item.product === 'NEXT-CM') ? this.nextCmSvg :
 							(item.product === 'BIG-IP') ? this.f5Hex : 'file';
 					const tooltip
 						= item.details
@@ -185,8 +179,6 @@ export class F5TreeProvider implements TreeDataProvider<F5Host> {
 
 					const icon =
 						(item.product === 'BIG-IQ') ? this.bigiqSvg :
-						(item.product === 'NEXT') ? this.nextSvg :
-						(item.product === 'NEXT-CM') ? this.nextCmSvg :
 							(item.product === 'BIG-IP') ? this.f5Hex : '$(file)';
 					const tooltip
 						= item.details
